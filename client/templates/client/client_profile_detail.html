@@ -1,0 +1,210 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+                                <div class="wt-title"><h2>Company Detail</h2></div>
+                                    <ol class="wt-breadcrumb">
+                                        <li><a href="index-2.html">Home</a></li>
+                                        <li><a href="companygrid.html">Company Grid</a></li>
+                                        <li class="wt-active">Comapny Detail</li>
+                                    </ol>
+                                </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Inner Home End-->
+			<!--Main Start-->
+			{% comment %} <main class="wt-haslayout" style="background:white;"> {% endcomment %}
+			<main class="wt-haslayout wt-innerbgcolor">
+				<div class="wt-haslayout wt-main-section">
+					<!-- User Listing Start-->
+					<div class="wt-haslayout">
+						<div class="container">
+							<div class="row">
+								<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
+										<div class="wt-comsingleimg">
+											{% if client.banner_photo %}
+											<figure><img src="{{client.banner_photo.url}}" alt="img description"></figure>
+											{% endif %}
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+										<aside id="wt-sidebar" class="wt-sidebar">
+											<div class="wt-proposalsr wt-proposalsrvtwo">
+												<div class="wt-widgetcontent wt-companysinfo">
+													{% if client.company_logo %}
+													<figure><img src="{{client.company_logo.url}}" alt="img description"></figure>
+													{% endif %}
+													<div class="wt-title">
+														<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> Verified Company</a>
+														<h2>{% if client.brand_name %}{{client.brand_name}} {% else %} {{client.user.get_full_name}}{% endif %}</h2>
+													</div>													
+												</div>		
+											</div>
+											<div class="wt-widget">
+												<div class="wt-widgettitle">
+													<h2>Company Latest Staff</h2>
+												</div>
+												<div class="wt-widgetcontent wt-comfollowers wt-verticalscrollbar">
+													<ul>
+														{% for staff in client_staffs %}
+														<li>
+															<a href= "{% url 'freelancer:freelancer_profile' staff.short_name %}">
+																<span><img src="{{staff.freelancer.profile_photo.url}}" alt="img description"></span>
+																<span>{{staff}}</span>
+															</a>
+														</li>
+														{% endfor %}
+													</ul>
+												</div>
+											</div>
+											
+											<div class="wt-widget wt-sharejob">
+												<div class="wt-widgettitle">
+													<h2>Notice Board</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													{{client.announcement|linebreaksbr}}
+												</div>
+											</div>
+											
+											<div class="wt-widget wt-sharejob">
+												<div class="wt-widgettitle">
+													<h2>Share This Company</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<ul class="wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fab fa-facebook-f"></i>Share on Facebook</a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i>Share on Twitter</a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i>Share on Linkedin</a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google-plus-g"></i>Share on Google Plus</a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-widget wt-reportjob">
+												<div class="wt-widgettitle">
+													<h2>Report This Company</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formreport">
+														<fieldset>
+															<div class="form-group">
+																<span class="wt-select">
+																	<select>
+																		<option>Select Reason</option>
+																	</select>
+																</span>
+															</div>
+															<div class="form-group">
+																<textarea class="form-control" placeholder="Description"></textarea>
+															</div>
+															<div class="form-group wt-btnarea">
+																<a href="javascrip:void(0);" class="wt-btn">Submit</a>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+										</aside>
+									</div>											
+									<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+										<div class="wt-userlistingholder wt-haslayout">
+											<div class="wt-comcontent">
+												<div class="wt-title">
+													<h4>About “{% if client.brand_name %}{{client.brand_name}} {% else %} {{client.user.get_full_name}}{% endif %}”</h4>
+												</div>
+												<div class="wt-description">
+													<p>{{client.description|linebreaksbr}}.</p>
+												</div>
+											</div>
+											{% if client.user == request.user %}
+											<div class="wt-comcontent">
+												<div class="wt-title">
+													<h4>{{announcementform.announcement.label}}</h4>
+												</div>
+												<div class="wt-description">
+													
+													<form method="POST">{% csrf_token %}
+													{{announcementform.announcement}}
+													<span style="color:blue;" role="alert">Remember: Your new announcement will always replace the previous one</span>
+													<span style="color:red;" role="alert">{{ announcementform.announcement.errors}}</span>
+													<div class="form-group wt-btnarea"><br>
+														<button type="submit" class="wt-btn"> Publish </button>
+													</div>
+												</form>	
+												</div>
+											</div>
+											{% endif %}
+											<div class="wt-proposalholder">
+												<div class="wt-proposalhead">
+													<h4>Projects posted by “{% if client.brand_name %}{{client.brand_name}} {% else %} {{client.user.get_full_name}}{% endif %}”</h4>
+												</div>
+											</div>										
+											{% if projects.exists %}
+											{% for project in projects %}
+											<div class="wt-userlistinghold wt-featured wt-userlistingholdvtwo">
+												<div class="wt-userlistingcontent">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="usersingle.html"><i class="fa fa-check-circle"></i> {{project.created_by.get_full_name}}</a>
+															<h2>{{project.title}}</h2>
+														</div>
+														<div class="wt-description">
+															<p>{{project.preview}}...</p>
+														</div>
+														<div class="wt-tag wt-widgettag">
+														{% for skill in project.project_skill.all %}
+															<a href="javascript:void(0);">{{skill}}</a>
+														{% endfor %}
+														</div>
+													</div>
+													<div class="wt-viewjobholder">
+														<ul>
+															<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>Rank: {{project.get_service_level_display}}</span></li>
+															<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description">{% else %}{{project.created_by.country.country_code}} - {% endif %} &nbsp; &nbsp; {{project.created_by.country.name}}</span></li>
+															<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{project.get_project_type_display}}</span></li>
+															<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>
+															<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i> Job ID: {{project.reference}}</span></li>
+															<li class="wt-btnarea"><a href="{{project.get_project_absolute_url}}" class="wt-btn">View Job</a></li>
+														</ul>
+													</div>
+												</div>
+											</div>										
+											{% endfor %}
+											{% endif %}
+											{% if not projects %}
+												<p>There are no active projects by projects to show yet...</p>
+											{% endif %}
+											<nav class="wt-pagination">
+												<ul>
+													<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+													<li><a href="javascrip:void(0);">1</a></li>
+													<li><a href="javascrip:void(0);">2</a></li>
+													<li><a href="javascrip:void(0);">3</a></li>
+													<li><a href="javascrip:void(0);">4</a></li>
+													<li><a href="javascrip:void(0);">...</a></li>
+													<li><a href="javascrip:void(0);">50</a></li>
+													<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+												</ul>
+											</nav>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- User Listing End-->
+				</div>
+			</main>
+
+{% endblock %}
+

@@ -1,0 +1,79 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+        <!--Inner Home Banner Start-->
+        <div class="wt-haslayout wt-innerbannerholder">
+          <div class="container">
+            <div class="row justify-content-md-center">
+              <div class="col-xs-12 col-sm-12 col-md-12 push-md-2 col-lg-12 push-lg-3">
+                <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>Take a Quiz</h2></div>
+                </div>					
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Inner Home End-->
+        <section class="wt-haslayout">
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="wt-greeting-holder">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="wt-greetingcontent">
+                        <div class="wt-sectionhead">
+                          <div id="duration-timer" style="color: green; font-weight: bold; display: none;">{{ time_remaining|date:"M d, Y H:m:s" }} </div>
+                          <div class="row justify-content-md-center">
+                            <h2>{{quiz.title}} (<span id="duration-countdown-timer" style="color: green; font-weight: bold;"></span>)</h2>
+                          </div>
+                          
+                        <div class="wt-description"><br><br>
+                            <h4>Quiz Instruction</h4>
+                            <div class="wt-sectiontitle">
+                                <p>{{quiz.instruction|linebreaksbr}}.</p>
+                            </div>											
+                          </div> 
+                        </div>
+                        
+                        <div class="col s12">
+                          <form method="post" action="{{quiz.get_quiz_result_absolute_url}}" role="form" class="col s12">
+                            {% csrf_token %}
+                            {% for question in quiz.questions.all %}
+                              <div class="col s12">
+                                <br>
+                                <p>{{forloop.counter}}. {{ question.question }}?</p>
+                                <input type="hidden" name="question" value="{{ question.id }}" required></input>
+                              </div>
+                              {% for answer in question.answers.all %}
+                                <div class="input col s12">
+                                  <label>
+                                    <input name="answer" type="checkbox" value="{{ answer.id }}"></input>
+                                    <span>{{ answer.answer }}</span>
+                                  </label>          
+                                </div>
+                              {% endfor %}
+                            {% endfor %}
+                            <a href="{% url 'quiz:list_quiz' %}" class="text-danger" >Take me Back</a> 
+                            <div class="row justify-content-md-center">
+                              <button type="submit" class="btn btn-success" disabled=True> Submit Answers</button><br>
+                          </div>  
+                        </form>
+                      </div>                    
+                  </div>
+                </div>
+              </div>						
+            </div>
+          </section>
+          <div class="wt-proposalholder">
+            <div class="row justify-content-md-center">
+              <div class="wt-sectionhead wt-textcenter">
+               
+              </div>
+            </div>
+          </div>
+      
+    <script src={% static 'js/countdowntimer.js' %}></script>	
+{% endblock %}
+

@@ -1,0 +1,269 @@
+{% load static %}
+
+		{% if request.user.is_authenticated %}
+		<div id="wt-sidebarwrapper" class="wt-sidebarwrapper">
+			<div id="wt-btnmenutoggle" class="wt-btnmenutoggle">
+				<span class="menu-icon">
+					<em></em>
+					<em></em>
+					<em></em>
+				</span>
+			</div>
+			<div id="wt-verticalscrollbar" class="wt-verticalscrollbar">
+				<div class="wt-companysdetails wt-usersidebar">
+					<figure class="wt-companysimg">
+						<img src="{% static 'images/company/img-01.jpg'%}" alt="img description">
+					</figure>
+					<div class="wt-companysinfo">
+						<figure>
+							<img src="{% if request.user.freelancer %}{{request.user.freelancer.profile_photo.url}}{% elif request.user.clients %}{{request.user.clients.profile_photo.url}} {% else %} {% static 'images/user-login.png' %}{% endif %}" alt="img description">
+						</figure>
+						<div class="wt-title">
+							<h2><a href="{{freelancer_profile.freelancer_profile_absolute_url}}"> {{request.user.short_name}}</a></h2>
+						</div>
+						<div class="wt-btnarea">
+							{% if request.user.freelancer %}
+							<a href="{% url 'proposals:create_proposal' %}" class="wt-btn">Proposal</a>
+							{% elif request.user.clients %}
+							<a href="{% url 'projects:create_project' %}" class="wt-btn">New Job</a>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<nav id="wt-navdashboard" class="wt-navdashboard">
+					<ul>
+						{% if request.user.clients %}
+						<li>
+							<a href="{% url 'client:update_client_profile' user_id=user.id %}">
+								<i class="ti-briefcase"></i>
+								<span>My Profile</span>
+							</a>
+						</li>						
+						<li class="menu-item-has-children wt-active">
+							<a href="javascript:void(0);">
+								<i class="ti-dashboard"></i>
+								<span>Deposits</span>
+							</a>
+							<ul class="sub-menu">
+								<li class="wt-active"><hr><a href="{% url 'client:deposit_fee_structure' %}">Fund Deposit</a></li>
+								<li><hr><a href="dashboard-insightsuser.html">Insights User</a></li>
+							</ul>
+						</li>
+						
+						<li>
+							<a href="{% url 'transactions:hiring_box_summary' %}">
+								<i class="ti-heart"></i>
+								<span>My Saved Items</span>
+							</a>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="{% url 'quiz:list_quiz' %}">
+								<i class="ti-package"></i>
+								<span>Quizes</span>
+							</a>
+						</li>																							
+						<li>
+							<a href="{% url 'projects:create_project' %}">
+								<i class="ti-announcement"></i>
+								<span>Create Project</span>
+							</a>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="{% url 'applications:client_application' %}">
+								<i class="ti-bookmark-alt"></i>
+								<span>Applications</span>
+							</a>
+						</li>												
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-package"></i>
+								<span>My Jobs</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'projects:active_project' %}">Active Jobs</a></li>
+								<li><hr><a href="{% url 'projects:review_project' %}">Review Jobs</a></li>
+								<li><hr><a href="{% url 'projects:archived_project_view' %}">Archived Jobs</a></li>
+							</ul>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="{% url 'contract:external_contract_list' %}">
+								<i class="ti-package"></i>
+								<span>My Contracts</span>
+							</a>
+						</li>						
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-package"></i>
+								<span>Project Types</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'projects:active_project' %}">Fixed Jobs</a></li>
+								<li><hr><a href="{% url 'projects:active_project' %}">Hourly Jobs</a></li>
+							</ul>
+						</li>						
+						
+						{% elif request.user.freelancer %}						
+						<li>
+							<a href="{% url 'freelancer:update_freelancer_profile' user_id=user.id %}">
+								<i class="ti-briefcase"></i>
+								<span>My Profile</span>
+							</a>
+						</li>
+						<li class="menu-item-has-children wt-active">
+							<a href="javascript:void(0);">
+								<i class="ti-dashboard"></i>
+								<span>Account Insights</span>
+							</a>
+							<ul class="sub-menu">
+								<li class="wt-active"><hr><a href="dashboard-insights.html">Insights</a></li>
+								<li><hr><a href="{% url 'freelancer:transfer_or_withdraw' %}">Salary Insight</a></li>
+								<li><hr><a href="{% url 'analytics:time_tracker' %}">Time Tracker</a></li>
+							</ul>
+						</li>																		
+						<li class="menu-item-has-children wt-active">
+							<a href="javascript:void(0);">
+								<i class="ti-dashboard"></i>
+								<span>Transactions</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'transactions:purchase_history' %}">Purchases</a></li>
+								{% comment %} <li><hr><a href="{% url 'analytics:time_tracker' %}">Time Tracker</a></li> {% endcomment %}
+							</ul>
+						</li>																		
+						<li>
+							<a href="{% url 'teams:accept_invite' %}">
+								<i class="ti-announcement"></i>
+								<span>My Invites</span>
+							</a>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="{% url 'quiz:list_quiz' %}">
+								<i class="ti-package"></i>
+								<span>Aptitude Test</span>
+							</a>
+						</li>
+						{% if max_proposals_per_team %}																																 
+						<li class="menu-item-has-children">
+							<a href="{% url 'proposals:create_proposal' %}">
+								<i class="ti-bookmark-alt"></i>
+								<span>Create Proposal</span>
+							</a>
+						</li>
+						{% endif %}
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-bookmark-alt"></i>
+								<span>Assigned Tasks</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'teams:assign_to_me' %}">To Me</a></li>
+								<li><hr><a href="{% url 'teams:assign_to_members' %}">To Members</a></li>
+							</ul>
+						</li>												
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-bookmark-alt"></i>
+								<span>My Proposals</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'proposals:active_proposal' %}">Active</a></li>
+								<li><hr><a href="{% url 'proposals:review_proposal' %}">Review</a></li>
+								<li><hr><a href="{% url 'proposals:archive_proposal_page' %}">Archived</a></li>
+							</ul>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="{% url 'applications:freelancer_application' %}">
+								<i class="ti-bookmark-alt"></i>
+								<span>Applications</span>
+							</a>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-package"></i>
+								<span>My Contracts</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'contract:contract_client' %}">External Contractors</a></li>
+								<li><hr><a href="{% url 'contract:internal_contract_list' %}">Internal Contracts</a></li>
+								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
+							</ul>
+						</li>							
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-package"></i>
+								<span>My Invoices</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'proposals:create_invoice' %}">Create Invoice</a></li>
+								<li><hr><a href="javascript:void(0);">View Invoice</a></li>
+							</ul>
+						</li>												
+						{% endif %}	
+												
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-package"></i>
+								<span>Application By Status</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="dashboard-completejobs.html">Completed Jobs</a></li>
+								<li><hr><a href="dashboard-canceljobs.html">Cancelled Jobs</a></li>
+								<li><hr><a href="dashboard-ongoingjob.html">Ongoing Jobs</a></li>
+								<li><hr><a href="dashboard-ongoingsingle.html">Ongoing Single</a></li>
+							</ul>
+						</li>
+						<li class="wt-notificationicon menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-pencil-alt"></i>
+								<span>Messages</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="dashboard-messages.html">Messages</a></li>
+								<li><hr><a href="dashboard-messages2.html">Messages V 2</a></li>
+							</ul>
+						</li>
+						<li>
+							<a href="dashboard-invocies.html">
+								<i class="ti-file"></i>
+								<span>Invoices</span>
+							</a>
+						</li>
+						<li>
+							<a href="">
+								<i class="ti-layers"></i>
+								<span>Category</span>
+							</a>
+						</li>
+						<li>
+							<a href="dashboard-packages.html">
+								<i class="ti-money"></i>
+								<span>Packages</span>
+							</a>
+						</li>
+					
+						<li>
+							<a href="dashboard-accountsettings.html">
+								<i class="ti-anchor"></i>
+								<span>Account Settings</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'marketing:support' %}">
+								<i class="ti-tag"></i>
+								<span>Help and Support</span>
+							</a>
+						</li>
+						<li>
+							<a href="{% url 'account:logout' %}" data-bs-toggle="modal" data-bs-target="#genericlogoutModal">
+								<i class="ti-shift-right"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+				<div class="wt-navdashboard-footer">
+					<span>{{website.site_name}} © 2022 All Rights Reserved.</span>
+				</div>
+			</div>
+		</div>
+		{% endif %}

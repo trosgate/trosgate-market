@@ -1,0 +1,223 @@
+/* your styles go here */
+.wt-breadcrumb li.wt-active { color:#999;}
+/* Theme Styling */
+.wt-main {padding: 20px 0;}
+.wt-footer {background:#323232;}
+.wt-sectionhead,
+.wt-sectiontitle{
+	width:100%;
+	float:left;
+}
+.wt-sectionhead{position: relative;margin: 0;}
+.wt-textcenter{text-align: center;}
+.wt-sectionhead.wt-textcenter{text-align: center;}
+.wt-textcenter .wt-sectiontitle:after{left: 50%;margin: 0 0 0 -80px;}
+.wt-sectiontitle:after{
+	left: 0;
+	bottom: 0;
+	height: 4px;
+	content: '';
+	width: 160px;
+	border-radius: 2px;
+	position: absolute;
+}
+.wt-sectiontitle{padding-bottom:30px; position: relative;margin: 0 0 50px;}
+.wt-sectiontitle h2{
+	margin: 0 0 13px;
+	display: block;
+	color: #323232;
+	font-size: 36px;
+	line-height: 36px;
+}
+/* .wt-sectiontitle span{ */
+	/* display: block; */
+	/* color: #767676; */
+	/* font-size: 18px; */
+	/* line-height: 18px; */
+/* } */
+/* Category Style */
+.wt-categoryexpl{
+	float: left;
+	width: 100%;
+}
+.wt-categorycontent{
+	float: left;
+	width: 100%;
+	min-height: 255px;
+	padding: 20px;
+	border-radius: 4px;
+	overflow: hidden;
+	position: relative;
+	text-align: center;
+	border:1px solid #eff2f5;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	align-content: center;
+	-ms-flex-line-pack: center;
+}
+.wt-categorycontent:hover{
+	box-shadow: 5px 10px 20px 0 rgba(0,0,0,0.25
+	box-shadow: 5px 10px 20px 0 rgba(0,0,0,0.25);
+}
+.wt-categorycontent figure{
+	left: 50%;
+	margin: 0;
+	top: 75px;
+	left: 50%;
+	width: 65px;
+	margin: 0 auto;
+	margin-left:-32px;
+	position: absolute;
+}
+.wt-categorycontent:hover figure{top: -50px;}
+.wt-cattitle{
+	left: 0;
+	top: 160px;
+	float: left;
+	width: 100%;
+	padding: 0 20px;
+	position: absolute;
+}
+.wt-categorycontent:hover .wt-cattitle{top:21%;}
+.wt-cattitle h3{
+	margin: 0;
+	font-size: 18px;
+	font-weight: 400;
+	line-height: 20px;
+}
+.wt-categoryexpl > .float-left:nth-child(n+5){margin-top:30px; }
+.wt-categoryexpl .wt-btnarea{text-align: center;}
+.wt-categoryslidup{
+
+	left:0;
+	opacity: 0;
+	width: 100%;
+	bottom: -100px;
+	display: block;
+	font-size: 16px;
+	padding: 0 20px;
+	font-weight: 400;
+	line-height: 16px;
+	visibility: hidden;
+	border-radius: 50%;
+	position: absolute;
+	text-align: center;
+}
+.wt-categorycontent:hover .wt-categoryslidup{
+	opacity: 1;
+	bottom: 0;
+	bottom: 22%;
+	visibility: visible;
+}
+.wt-categoryslidup p{
+	font-size: 14px;
+	margin: 0 0 28px;
+	line-height: 24px;
+}
+.wt-categoryslidup a{
+	color: #55acee;
+	font-size: 14px;
+	line-height: 16px;
+}
+.wt-categoryslidup a i{font-size: 12px;}
+
+.wt-categoriescontent{
+	float: left;
+	width: 100%;
+	list-style:none;
+	line-height: 14px;
+}
+.wt-categoriescontent li{
+	float: left;
+	width: 100%;
+	line-height: inherit;
+	list-style-type: none;
+}
+.wt-categoriescontent li + li{margin-top: 20px;}
+.wt-categoriescontent li a{
+	color:#767676;
+	display: block;
+	font-size: 14px;
+	line-height: inherit;
+}
+.wt-categoriescontent li a em{
+	float: right;
+	font-style: normal;
+}
+/*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+
+.border-md {
+    border-width: 2px;
+}
+
+.btn-facebook {
+    background: #405D9D;
+    border: none;
+}
+
+.btn-facebook:hover, .btn-facebook:focus {
+    background: #314879;
+}
+
+.btn-twitter {
+    background: #42AEEC;
+    border: none;
+}
+
+.btn-twitter:hover, .btn-twitter:focus {
+    background: #1799e4;
+}
+
+
+
+/*
+*
+* ==========================================
+* REGISTRATION
+* ==========================================
+*
+*/
+
+body {
+    min-height: 100vh;
+}
+
+.form-control:not(select) {
+    padding: 1.5rem 0.5rem;
+}
+
+select.form-control {
+    height: 52px;
+    padding-left: 0.5rem;
+}
+
+.form-control::placeholder {
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+.form-control:focus {
+    box-shadow: none;
+}
+

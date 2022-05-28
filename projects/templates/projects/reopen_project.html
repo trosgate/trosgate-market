@@ -1,0 +1,70 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-12 push-md-2 col-lg-12 push-lg-3">
+					<div class="wt-innerbannercontent">
+					    <div class="wt-title"><h2>Reopen Project</h2></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--Inner Home End-->
+	<section class="wt-haslayout">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="wt-greeting-holder">
+						<div class="row">
+							<div class="col-12">
+								<div class="wt-greetingcontent">
+									<div class="wt-sectionhead">
+										<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+                                            <div class="alert alert-info" role="alert">
+                                                <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> Notice: We selected your initial deadline by default but you can change it though</span>
+                                            </div>
+                                            <div class="form-group">
+                                                <h5><label>Project:</label></h5>
+                                            <h6>{{project.title}}</h6>
+                                            </div>
+											<div class="form-group">																																		
+												{{projectform.dura_converter.label}}
+												{{projectform.dura_converter}}
+											</div>	
+
+											<div class="form-group">
+												{{projectform.rating.label}}
+												{{projectform.rating}}
+											</div>				
+                                            <div class="form-group wt-btnarea mt-5">
+                                                <button type="submit" class="btn btn-success"> Reopen </button>
+                                                <a class="btn btn-danger" href="{% url 'account:dashboard' %}"> Cancel </a>
+                                            </div>											
+                                        </form>
+									</div>
+								</div>
+							</div>
+                        </div>									
+					</div>
+				</div>
+			</div>						
+		</div>
+    </section>
+
+    <div class="wt-proposalholder">
+        <div class="row justify-content-md-center">
+            <div class="wt-sectionhead wt-textcenter">
+                <span>I am Freelancer</span>
+            </div>
+        </div>
+    </div>
+    </main>        
+	
+{% endblock %}
+

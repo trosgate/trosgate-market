@@ -1,0 +1,181 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load trackertag %}
+{% block content%}
+<link rel="stylesheet" href="{% static 'css/bulma-style.css'%}">
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+
+            {% if request.user.freelancer %}
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="alert alert-info" role="alert">
+                                <span style="color: green; font-weight: bold;">!Alert: Ensure to track your daily activities on each proposal for the team founder to assess your performance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>										
+            </section>
+
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            Trosgate Contract Generator
+                        </div>
+
+                        <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+
+                                
+                                <div class="columns">
+                                    <div class="column">
+                                        <h1 class="title">{{ proposal.title }}</h1>
+                                        {% comment %} ({{ proposal.get_status_display }}) {% endcomment %}
+                                        <h2 class="subtitle mt-6">Register time</h2>
+
+                                        <form method="post" action=".">
+                                            {% csrf_token %}
+
+                                            <div class="field is-grouped">
+                                                <div class="control">
+                                                    <div class="select">
+                                                        <select name="hours">
+                                                            <option value="0">0h</option>
+                                                            {% for i in "x"|rjust:"10" %}
+                                                                <option value="{{ forloop.counter }}">{{ forloop.counter }}h</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="control">
+                                                    <div class="select">
+                                                        <select name="minutes">
+                                                            <option value="0">0m</option>
+                                                            {% for i in "x"|rjust:"59" %}
+                                                                <option value="{{ forloop.counter }}">{{ forloop.counter }}m</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="field">
+                                                <label>Date</label>
+
+                                                <div class="control">
+                                                    <input type="date" id="id_date" name="date" class="input" value="{{ today|date:'Y-m-d' }}" placeholder="yyyy-mm-dd">
+                                                </div>
+                                            </div>
+
+                                            <div class="field">
+                                                <label>Tasks for the day</label>
+
+                                                <div class="control">
+                                                    <textarea type="text" id="id_tasks" name="tasks" class="input" placeholder="Your todo tasks for the day"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="field">
+                                                <div class="control">
+                                                    <button class="button is-success">Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>										
+            </section>
+
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            Trosgate Contract Generator
+                        </div>
+
+                        <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                
+                                <div class="columns">
+                                    <div class="column">
+                                        <h2 class="subtitle mt-6">Activity Log</h2>
+
+                                            {% if assigned.trackings.all %}
+                                            <table class="table is-fullwidth" style="text-align: left;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Number</th>
+                                                        <th>Date</th>
+                                                        <th>User</th>
+                                                        <th>Activity</th>
+                                                        <th>Time</th>
+                                                        <th>Action</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                        
+                                                <tbody>
+                                                    {% for track in assigned.trackings.all %}
+                                                        <tr>
+                                                            <td>{{ forloop.counter }}</td>
+                                                            <td>{{ track.created_at }}</td>
+                                                            <td>{% firstof track.created_by.get_full_name track.created_by.short_name %}</td>
+                                                            <td>{{ track.tasks }}</td>
+                                                            <td>{{ track.minutes|time_converter }}</td>
+                                                            <td>
+                                                                <a href="{% url 'teams:modify_proposal_tracking' track.proposal.slug assigned.id track.id %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i></a>
+                                                                <a href="{% url 'teams:delete_proposal_tracking' track.proposal.slug assigned.id track.id %}" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                        
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="4">Total</th>
+                                                        <th colspan="4">{{ proposal.tracking_time|time_converter }}</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        {% else %}
+                                            <p>No entries yet...</p>
+                                        {% endif %}
+                                    </div>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>										
+            </section>
+            {% endif %}
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>I am ...........</span>
+					</div>
+				</div>
+			</div>
+			</main>
+
+{% endblock %}
+

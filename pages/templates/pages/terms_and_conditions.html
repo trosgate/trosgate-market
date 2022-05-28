@@ -1,0 +1,73 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Terms and Conditions</h2></div>
+							{% if user.is_authenticated %}
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Home</a></li>
+								<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
+								<li class="wt-active">T & C</li>
+							</ol>
+							{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Inner Home End-->
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+				<!--Two Columns Start-->
+				<div class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row">
+							<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+									<aside id="wt-sidebar" class="wt-sidebar">
+										<div class="wt-widget wt-effectiveholder">
+											<div class="wt-widgettitle">
+												<h2>{{website.site_name}}'s T & C</h2>
+											</div>
+											<div class="wt-widgetcontent">
+												<ul class="wt-effectivecontent">
+                                                    {% for terms in termsandcond %}
+													<li><a href="{% url 'pages:terms_and_conditions' %}#{{terms.slug}}">{{terms.title}}</a></li>
+                                                    {% endfor %}
+												</ul>
+											</div>
+										</div>
+									</aside>
+								</div>
+								<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+									<div class="wt-submitreportholder wt-bgwhite">
+                                        {% for terms in termsandcond %}
+										<div class="wt-titlebar">
+											<a name="{{terms.slug}}"></a><h2>{{terms.title}}</h2>
+                                            
+										</div>
+										<div class="wt-reportdescription">
+											<div class="wt-description">
+                                            {{terms.description|safe|linebreaksbr}}
+                                            </div>
+										</div>
+                                        {% empty %}
+                                        <div class="wt-description">
+                                            <p> Our Terms and Conditions are still in the draft. Please Check back later </p>
+									    </div>
+                                        {% endfor %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Two Columns End-->
+			</main>
+			{% include 'dashboard/main_footer.html' %}
+{% endblock %}

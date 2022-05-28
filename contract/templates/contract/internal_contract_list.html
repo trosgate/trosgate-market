@@ -1,0 +1,86 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+			{% if request.user.freelancer %}
+
+			{% endif %}
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            All your Internal Contracts
+                        </div>								
+						<div class="wt-insightsitem wt-dashboardbox">
+                        	<div class="card-body">
+
+                            {% comment %} <div class="row"> {% endcomment %}
+                            <div class="col-lg-12">
+
+                            {% if intcontracts|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                    <tr>
+
+                                        <th>#</th>
+                                        <th>Contract #</th>
+                                        <th>Created By</th>
+                                        <th>Proposal Associated</th>
+                                        <th>Created On</th>
+                                        <th>Completion In </th>
+                                        <th>Reaction</th>
+                                        <th>Total Budget($)</th>
+                                        <th>Actions</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for contract in intcontracts %}
+                                    <tr>
+                                    <td>{{forloop.counter}} </td>
+                                    <td>{{contract.reference}}</td>
+                                    <td>{{contract.created_by.get_short_name}}</td>
+                                    <td>{{contract.proposal.title}}</td>
+                                    <td>{{contract.date_created|date:"M-d-Y"}}</td>
+                                    <td>{{contract.get_contract_duration_display}}</td>
+                                    <td>{{contract.get_team_reaction_display}}</td>
+                                    <td>{{contract.grand_total}}</td>
+                                    <td>
+										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success"><i class="fa fa-info"> Preview</i></a>
+										{% if request.user.freelancer %}
+										<a href="javascript:void(0);" class="btn btn-info"><i class="fa fa-folder-open"> Send Client Email</i></a>
+										{% endif %}
+									</td> 
+                                    </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+							{% if not intcontracts %}
+							<p> Ooops! No contract has been connected to you Yet<p>
+							{% endif %}
+				        </div>				
+                    </div>
+                </div>										
+            </section>
+
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>I am Client</span>
+					</div>
+				</div>
+			</div>
+    			{% comment %} {% include 'dashboard/main_footer.html' %} {% endcomment %}
+			</main>
+
+{% endblock %}
+

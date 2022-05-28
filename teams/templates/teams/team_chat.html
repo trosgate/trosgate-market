@@ -1,0 +1,184 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+            <!--Inner Home Banner Start-->
+            <div class="wt-haslayout wt-innerbannerholder">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                            <div class="wt-innerbannercontent">
+                            <div class="wt-title"><h2>Info Desk</h2></div>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									{% comment %} <li><a href="{% url 'teams:team_single' team.id %}">Team</a></li> {% endcomment %}
+									<li class="wt-active">Group Chat</li>
+								</ol>
+							</div>					
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Categories Start-->
+            <div class="wt-haslayout wt-main-section">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <div class="wt-articlesingle-holder wt-bgwhite">
+                                <div class="wt-articlesingle-content">
+                                <!--form Start-->
+                                    <div class="wt-author">
+                                        <div class="wt-authordetails">
+                                            <figure>
+                                                <a href="javascript:void(0);"><img src="{% static 'images/messages/img-12.jpg' %}" alt="image description"></a>
+                                            </figure>
+                                            <div class="wt-authorcontent">
+                                                <div class="wt-authorhead">
+                                                    <div class="wt-boxleft">
+                                                        <h3><a href="javascript:void(0);">Antwan Bosserman</a></h3>
+                                                        <span><i class="lnr lnr-clock"></i> Author Since: Jun 27, 2016</span>
+                                                    </div>
+                                                    <div class="wt-boxright">
+                                                        <ul class="wt-socialiconssimple">
+                                                            <li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook-f"></i></a></li>
+                                                            <li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i></a></li>
+                                                            <li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i></a></li>
+                                                            <li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google"></i></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <div class="alert alert-info" role="alert">
+                                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> This is the Information desk for the Team where members can pass information to the team<a href="javascript:void(0);"> Read the guide</a></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wt-comments">
+                                        {% with chats.count as total_messages %}
+                                        <h2>{{total_messages}} message{{total_messages|pluralize}}</h2>
+                                        {% endwith %}
+                                        {{avatar}}
+                                        <div>
+                                <form id="chatform" method="post">
+                                    {% csrf_token %}
+                                    {% for chat in chats %}
+                                    <div id="display-messages" class="wt-offerermessage">
+                                            <figure><img src="{{ chat.sender.freelancer.profile_photo.url }}" alt="image description"></figure>
+                                            <div class="wt-description">
+                                                <h4>{{chat.sender.short_name}}</h4>
+                                                <p>{{chat.content}}</p>
+                                                <div class="clearfix"></div>
+                                                <time datetime="2017-08-08">{{chat.sent_on}}</time>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>   
+                                    
+                                    </div>
+                                    <div>
+                                        <div class="wt-replaybox">
+                                            <div class="form-group">
+                                                <input type="text" class="d-none" name="{{active_team.title}}" value="{{active_team.id}}" placeholder="Type message here"></input>
+                                                {{chat_form.content}}
+                                            </div>
+                                            <div class="wt-iconbox">
+                                                {% comment %} <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> This is the Information desk for the Team where members can pass information to the team</span> {% endcomment %}
+                                                <i class="lnr lnr-thumbs-up"></i>
+                                                <i class="lnr lnr-thumbs-down"></i>
+                                                <i class="lnr lnr-smile"></i>
+                                                <button type="submit" value="chatform" id='send-btn' class="wt-btnsendmsg">Send</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    $(document).on('click', '#send-btn', function (e){
+                        e.preventDefault();
+            
+                        var button = $(this).attr("value");
+                        var placement = "chatform";
+            
+                        $.ajax({
+                            type:'POST',
+                            url: '{% url "teams:teamchat" %}',
+                            data: $("#" + button).serialize(),
+                            cache:false,
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            success: function(json){
+                                console.log(json)
+                                $(`<div class="wt-offerermessage">
+                                    <figure><img src="` + json['avatar'] +`" alt="image description"></figure>
+                                    <div class="wt-description">
+                                        <h4>` + json['user'] +`</h4>
+                                        <p>` + json['result'] +`.</p>
+                                        <div class="clearfix"></div>
+                                        <time datetime="2017-08-08">` + json['timestamp'] +`</time>
+                                    </div>
+                                </div>`).insertAfter('#' + placement); 
+                            },
+                        });
+                    document.getElementById('id_content').value = ''
+                    });
+                    
+                </script>         
+                {% comment %} <script>
+                    setTimeout('location.reload()', 6000)
+                </script> {% endcomment %}
+                {% comment %} <script>
+                    $(document).on('click', '#send-btn', function (e){
+                        e.preventDefault();
+            
+                        var button = $(this).attr("value");
+                        var placement = "chatform";
+            
+                        $.ajax({
+                            type:'POST',
+                            url: '{% url "teams:teamchat" %}',
+                            data: $("#" + button).serialize(),
+                            cache:false,
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            success: function(json){
+                                console.log(json) 
+                            },
+                        });
+                    document.getElementById('id_content').value = ''
+                    });
+            
+                </script>            {% endcomment %}
+                {% comment %} <script>
+                    $(document).ready(function(){
+                        setInterval(function(){
+                            $.ajax({
+                                type:'GET',
+                                url: '{% url "teams:teamchat" %}',
+                                
+                                cache:false,
+                                success: function(json){
+                                    $("#display-messages").empty();
+                                    for (var chat in json.chats)
+                                    {
+                                        var temp = '<div class="wt-description"><h4>' + json.chats[chat].sender + '</h4><p>' + json.chats[chat].content + '</p> <div class="clearfix"></div>'+ json.chats[chat].sent_on + '</div>'
+                                        $("#display-messages").append(temp);
+                                        //var temp = '<div class="wt-offerermessage"><figure><img src="' + json.chats[chat].sender +'" alt="image description"></figure><div class="wt-description"><h4>' + json.chats[chat].sender + '</h4><p>' + json.chats[chat].content + '</p> <div class="clearfix"></div>'+ json.chats[chat].sent_on + '</div>'
+                                        //$("#display-messages").append(temp);
+                                    }
+                                },
+                                error: function(response){
+                                    alert('An error occured')
+                                }
+
+                            });  
+                        }, 1000);
+                    })
+                </script> {% endcomment %}
+
+{% endblock content %}
+

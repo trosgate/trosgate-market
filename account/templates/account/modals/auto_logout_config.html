@@ -1,0 +1,27 @@
+
+
+	<!--Warning button for auto Logout-->
+	<button id="warningLogout" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#warningLogoutModal" style="display: none;">Warning</button> 
+	{% comment %} style="display: none;" {% endcomment %}
+
+	<!--Warning button for auto Logout-->
+	<a id="autoLogoutNow" href="/autologout" class="btn btn-warning" style="display: none;">Logout auto</a>
+
+	<script>
+		//create warning
+		setTimeout(function() {
+			var warn = document.querySelector("#warningLogout");
+			if (warn) {
+				warn.click();
+			}
+		}, {{autoLogoutSystem.warning_time_schedule}} * 3600000); // 60000--means 1min
+
+		//auto logout
+		setTimeout(function() {
+			var action = document.querySelector("#autoLogoutNow");
+			if (action) {
+				action.click();
+			}
+		}, {{autoLogoutSystem.warning_time_schedule}} * 3900000); //90000 --means 1min + 5 Sec
+
+	</script>	

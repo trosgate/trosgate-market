@@ -1,0 +1,20 @@
+{% extends "account/modals/base_auto_logout_popup.html" %}
+
+{% block modal-id %} id="genericlogoutModal" {% endblock modal-id %}
+
+{% block modal-title %} <i class="fas fa-sign-out-alt mt-4"></i> &nbsp;&nbsp; Logout {% endblock modal-title %}
+
+{% block modal-color %} text-danger {% endblock modal-color %}
+
+{% block modal-icon %} fas fa-sign-out-alt fa-5x {% endblock modal-icon %}
+
+{% block modal-content %} 
+Are you sure you want to exit the system?
+{% endblock modal-content %}
+
+{% block modal-action %}
+<a href="{% url 'account:logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+{% endblock modal-action %}
+{% block modal-name-button %} Cancel {% endblock modal-name-button %}
+
+

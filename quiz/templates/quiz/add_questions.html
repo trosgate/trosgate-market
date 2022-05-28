@@ -1,0 +1,117 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+{% include 'dashboard/main_sidebar.html' %}
+
+
+<main id="wt-main" class="wt-main wt-haslayout">
+
+        <div class="wt-haslayout wt-main-section">
+            <div class="container">
+                <div class="row justify-content-md-center">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                        <div class="wt-dashboardbox">
+                            <div class="wt-dashboardboxtitle">
+                                <h2>Create an Aptitude Test</h2>
+                            </div>
+                            <div class="wt-dashboardboxcontent">
+                                                                                            
+                            <form method='POST' action=''>{% csrf_token %}
+                                {% if question_form.errors %}
+                                <p>{{ question_form.non_field_errors }}</p>
+                                    {% for field in question_form %}
+                                    {% if field.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        <span style="color: red; font-weight: bold;">{{ field.label}}:  {{ field.errors|striptags }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="row">
+                                    <div class="col s12">
+                                    </div>
+                                    </div>
+                                    <div class="wt-jobdescription wt-tabsinfo">
+                                        <div class="wt-tabscontenttitle">
+                                            <h2>Quiz Question and Marks</h2>
+                                        </div>	
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="question">Question</label>
+                                                <input type="text" name="question" id="id_question" class="form-group col-md-12" placeholder="put the question here" required>                                
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label for="marks">Marks</label>
+                                                <input type="number" name="marks" id="id_marks" class="form-group col-md-12" placeholder="eg. 3" required>                                
+                                            </div>
+                                        </div>  
+                                    <div class="wt-jobdetails wt-tabsinfo">
+                                        <div class="wt-tabscontenttitle">
+                                            <h2>Quiz Answer and Status</h2>
+                                        </div>                                          
+                                        <div class="form-row">
+                                            <div class="form-group col-md-9">
+                                                <label for="answer">Answer Option 1</label>
+                                                <input type="text" name="answer" id="id_answer" class="form-group col-md-9" required>
+                                                <div class="form-group col-md-3">
+                                                    <select id="id_is_correct" name="is_correct">
+                                                        <option value="" disabled selected>Is this correct?</option>
+                                                        <option value="True">Yes</option>
+                                                        <option value="False">No</option>
+                                                    </select>
+                                                </div>                                                                
+                                            </div>
+                                        </div>                     
+                                        <div class="form-row">
+                                            <div class="form-group col-md-9">
+                                                <label for="answer">Answer Option 2</label>
+                                                <input type="text" name="answer" id="id_answer" class="form-group col-md-9" required>
+                                                <div class="form-group col-md-3">
+                                                    <select id="id_is_correct" name="is_correct">
+                                                        <option value="" disabled selected>Is this correct?</option>
+                                                        <option value="True">Yes</option>
+                                                        <option value="False">No</option>
+                                                    </select>
+                                                </div>                                                                
+                                            </div>
+                                        </div>  
+                                        <div class="form-row">
+                                            <div class="form-group col-md-9">
+                                                <label for="answers">Answer Option 3</label>
+                                                <input type="text" name="answer" id="id_answer" class="form-group col-md-9" required>
+                                                <div class="form-group col-md-3">
+                                                    <select id="id_is_correct" name="is_correct">
+                                                        <option value="" disabled selected>Is this correct?</option>
+                                                        <option value="True">Yes</option>
+                                                        <option value="False">No</option>
+                                                    </select>
+                                                </div>                                                                
+                                            </div>
+                                        </div> 
+                                        <div class="row justify-content-md-center">
+                                            <button type="submit" class="wt-btn"> Add Next Question </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                    </div>
+                                        </div>
+                                            <div class="wt-updatall">
+                                                <span>Complete the question by clicking “Finish" button.</span>
+                                                <a href="{% url 'quiz:list_quiz' %}" class="wt-btn" >Finish</a> 
+                                            </div>
+                                        </div>
+                                    <div>
+                                <div> 
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+                            
+{% endblock %}
+
+
+
+

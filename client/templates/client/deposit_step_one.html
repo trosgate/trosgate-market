@@ -1,0 +1,153 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<main id="wt-main" class="wt-main wt-haslayout">
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                    <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>Deposit Hub</h2></div>
+                    <ol class="wt-breadcrumb">
+                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                        <li class="wt-active">Deposit </li>
+                    </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wt-proposalholder">
+        <div class="row justify-content-md-center">
+            <div class="wt-hireduserstatus">
+                <h4>Step 1 of 2: Deposit Type </h4>
+            </div>											
+        </div>
+    </div>
+    {% if client %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Fee</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody data-index="{{gateway.id}}">
+                                    {% for gateway in gateways %}
+                                    <tr>
+                                        <tr> 
+                                        <td>{{gateway.name}}</td>
+                                        <td> ${{gateway.processing_fee}}</td>
+                                        <td><input type="radio" name="depositGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
+                                        </tr>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>								
+                </section>
+                    <div class="wt-updatall">
+                        <span>Step 1 of 2 completed</span>
+                        <a href="{% url "client:final_deposit" %}" class="wt-btn">Next Step</a>
+                    </div>
+            
+
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row justify-content-md-center">				
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                        <div class="wt-dashboardbox">
+                            <div class="wt-dashboardboxcontent wt-rcvproposala">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                                    <h3>Deposit History</h3>
+                                    <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                        <div class="wt-tabscontenttitle">
+                                            <div class="alert alert-warning" role="alert">
+                                                <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                                    Info: Only successful debit will impact a credit to your account. 
+                                                </span>
+                                            </div>
+                                        </div>									 
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Sender/Receiver</th>
+                                                        <th>Action Type</th>
+                                                        <th>Position/Narration</th>
+                                                        <th>Transfered On</th>
+                                                        <th>Debited Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for manager_transfer in manager_transfers %}
+                                                    <tr>
+                                                        <td>{{forloop.counter}} </td>
+                                                        <td>{% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.manager.get_full_name}} {% else %} {{manager_transfer.team_staff.get_full_name}}{% endif %}</td>
+                                                        <td>{{manager_transfer.get_action_choice_display}}</td>
+                                                        <td>{% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.narration|truncatechars:60}} {% else %} {{manager_transfer.get_position_display}}{% endif %}</td>
+                                                        <td>{{manager_transfer.created_at}}</td>
+                                                        <td>$ {% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.withdraw_amount}} {% else %} {{manager_transfer.debit_amount}}{% endif %}</td>
+                                                    </tr> 
+                                                {% endfor %}					
+                                                    </tbody>
+                                                </table>
+                                                {% if not manager_transfers %}
+                                                <p><strong>{% if request.user == active_team.created_by %} You have not created profit rights to your members.{% else %}You have not been alloted right to share in profit. Please contact your Team Manager.{% endif %}</strong></p>
+                                                {% endif %}											
+                                            </div> 
+                                        </div>
+                                    </div>								
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
+
+            <div class="wt-proposalholder">
+                <div class="row justify-content-md-center">
+                    <div class="wt-sectionhead wt-textcenter">
+                        <span>Copyright @ {{website.site_name}}</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    {% endblock content %}
+    {% block scripts %}
+    
+    <script>
+        $('input[type=radio][name=depositGateway]').on('change', function(e) {
+            e.preventDefault();
+            $.ajax({
+            type: "POST",
+            url: '{% url "client:deposit_fee_session" %}',
+            data: {
+                depogateway: $(this).val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: "deposit-gateway",
+            },
+            success: function (json) {
+                console.log(json)
+                //document.getElementById("totalDiscount").innerHTML = json.discount;
+                //document.getElementById("totalFees").innerHTML = json.contract_fee;
+            },
+            error: function (xhr, errmsg, err) {},
+            });
+            
+        });
+        </script>
+
+    {% endblock scripts %}

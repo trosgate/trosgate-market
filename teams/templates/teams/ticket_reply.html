@@ -1,0 +1,133 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+            <!--Inner Home Banner Start-->
+            <div class="wt-haslayout wt-innerbannerholder">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                            <div class="wt-innerbannercontent">
+                            <div class="wt-title"><h2>Team Chat</h2></div>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									{% comment %} <li><a href="{% url 'teams:team_single' team.id %}">Team</a></li> {% endcomment %}
+									<li class="wt-active">Group Chat</li>
+								</ol>
+							</div>					
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Categories Start-->
+            <div class="wt-haslayout wt-main-section">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <div class="wt-articlesingle-holder wt-bgwhite">
+                                <div class="wt-articlesingle-content">
+                                <!--form Start-->
+                                    <div class="wt-author">
+                                        <div class="wt-authordetails">
+                                            <figure>
+                                                <a href="javascript:void(0);"><img src="{% static 'images/messages/img-12.jpg' %}" alt="image description"></a>
+                                            </figure>
+                                            <div class="wt-authorcontent">
+                                                <div class="wt-authorhead">
+                                                    <div class="wt-boxleft">
+                                                        <h3><a href="javascript:void(0);">Antwan Bosserman</a></h3>
+                                                        <span><i class="lnr lnr-clock"></i> Author Since: Jun 27, 2016</span>
+                                                    </div>
+                                                    <div class="wt-boxright">
+                                                        <ul class="wt-socialiconssimple">
+                                                            <li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook-f"></i></a></li>
+                                                            <li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i></a></li>
+                                                            <li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i></a></li>
+                                                            <li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google"></i></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>Excepteur sint occaecat cupidatat non proident, sunt inlpa officia deserunt molliteu anim idestrume Sed utaiciatis unde omnis iste natus error sitame voluptatem accusntium dolorem aque laudaiumin totam rem aiam eaque ipsa quae abillointore veritatis et quasi architecto eibeatae vitae dicta suntise explicabo nemo enim ipsam voluptatem quia voluptas.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <div class="wt-comments">
+                                    {% with contents.count as total_messages %}
+                                    <h2>{{total_messages}} message{{total_messages|pluralize}}</h2>
+                                    {% endwith %}
+
+                                <form id="chatform" method="post">
+                                    {% csrf_token %}
+                                    {% comment %} <div class="wt-comments">
+                                        {% with contents.count as total_messages %}
+                                        <h2>{{total_messages}} message{{total_messages|pluralize}}</h2>
+                                        {% endwith %} {% endcomment %}
+
+                                        <div>
+                                            <div id="display-messages" class="wt-offerermessage">
+                                                {% comment %} {% for chat in all_chats %} {% endcomment %}
+                                                {% comment %} <figure><img src="{% for data in profile_image %}{{ data.profile_photo.url }}{% endfor %}" alt="image description"></figure>  {% endcomment %}
+                                                {% comment %} {% endfor %} {% endcomment %}
+
+                                            </div>
+                                        </div>   
+                                        
+                                    </div>
+                                    <div>
+                                        <div class="wt-replaybox">
+                                            <div class="form-group">
+                                                <input type="text" class="d-none" name="{{active_team.title}}" value="{{active_team.id}}" placeholder="Type message here"></input>
+                                                {{chat_form.content}}
+                                            </div>
+                                            <div class="wt-iconbox">
+                                                <i class="lnr lnr-thumbs-up"></i>
+                                                <i class="lnr lnr-thumbs-down"></i>
+                                                <i class="lnr lnr-smile"></i>
+                                                <button type="submit" value="chatform" id='send-btn' class="wt-btnsendmsg">Send</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    $(document).on('click', '#send-btn', function (e){
+                        e.preventDefault();
+            
+                        var button = $(this).attr("value");
+                        var placement = "chatform";
+            
+                        $.ajax({
+                            type:'POST',
+                            url: '{% url "teams:teamchat" %}',
+                            data: $("#" + button).serialize(),
+                            cache:false,
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            success: function(json){
+                                console.log(json)
+                                $(`<div class="wt-offerermessage">
+                                    <figure><img src="` + json['avatar'] +`" alt="image description"></figure>
+                                    <div class="wt-description">
+                                        <h4>` + json['user'] +`</h4>
+                                        <p>` + json['result'] +`.</p>
+                                        <div class="clearfix"></div>
+                                        <time datetime="2017-08-08">` + json['timestamp'] +`</time>
+                                    </div>
+                                </div>`).insertBefore('#' + placement); 
+                            },
+                        });
+                    document.getElementById('id_content').value = ''
+                    });
+            
+                </script>
+                    
+                
+{% endblock content %}

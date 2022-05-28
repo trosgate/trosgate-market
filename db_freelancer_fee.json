@@ -1,0 +1,18 @@
+[
+    {
+        "model": "general_settings.hiringfee",
+        "pk": 1,
+        "fields": {
+            "preview": "Freelancer fees and charges",
+            "contract_fee_percentage": 20,
+            "contract_fee_fixed": 10,
+            "contract_delta_amount": 400,
+            "proposal_fee_percentage": 20,
+            "proposal_fee_fixed": 10,
+            "proposal_delta_amount": 400,
+            "application_fee_percentage": 20,
+            "application_fee_fixed": 10,
+            "application_delta_amount": 400
+        }
+    }
+]

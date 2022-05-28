@@ -1,0 +1,167 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Blog and Articles</h2></div>
+							{% if request.user.is_authenticated %}
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Articles Detail</li>
+							</ol>
+							{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+
+            <div class="wt-haslayout wt-main-section">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <div class="wt-articlesingle-holder wt-bgwhite">
+                                <div class="wt-articlesingle-content">
+                                    <figure class="wt-singleimg-one">
+                                        <img src="{{blog.thumbnail.url}}" alt="img description">
+                                    </figure>
+                                    <div class="wt-title">
+                                        <h2>{{blog.title}}</h2>
+                                    </div>
+                                    <ul class="wt-postarticlemeta">
+                                        <li>
+                                            <a href="javascript:void(0);">
+                                                <i class="lnr lnr-calendar-full"></i>
+                                                <span>{{blog.created_at|timesince}} ago</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);">
+                                                <i class="lnr lnr-user"></i>
+                                                <span>{{blog.created_by}}</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);">
+                                                <i class="lnr lnr-tag"></i>
+                                                <span>{{blog.category}}</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);">
+                                                <i class="ti-heart"> 0</i>
+                                                <span>Likes</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="wt-description">
+                                        {{blog.description|safe|linebreaks}}
+                                    </div>
+                                    
+                                    <div class="wt-tagsshare">
+                                        <div class="wt-tag wt-widgettag">
+                                            <span>Tags:</span>
+                                            {% for tag in blog.tags.all %}
+                                            <a href="javascript:void(0);">{{tag}}</a>
+                                            {% endfor %}
+                                        </div>
+                                        <ul class="wt-socialiconssimple wt-blogsocialicons">
+                                            <!-- sharethis button begins-->	
+                                            <div class="sharethis-inline-share-buttons">Share this blog</div>
+                                            <!-- sharethis button ends-->
+                                        </ul>
+                                    </div>
+                                    <div class="wt-description justify-content-md-center">
+                                        <blockquote class="wt-blockquotevone">
+                                            <span><i class="ti-heart"></i></span>
+                                            <q>0 Likes</q>
+                                        </blockquote>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'dashboard/main_footer.html' %}
+        </main>
+			<!--Main End-->
+    <script>
+        $(document).on('click', '#add-box', function (e) {
+            e.preventDefault();
+            $.ajax({
+            type: 'POST',
+            url: '{% url "payment:add_to_hiring_box" %}',
+            data: {
+                proposalid: $('#add-box').val(),
+                memberqty: $('#select option:selected').text(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post'
+            },
+            success: function (json) {
+                console.log(json)
+                document.getElementById("members-qty").innerHTML = json.member_qty
+            },
+            error: function (xhr, errmsg, err) {}
+            });
+        })
+    </script>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,101 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-12 push-md-2 col-lg-12 push-lg-3">
+					<div class="wt-innerbannercontent">
+					    <div class="wt-title"><h2>Start Quiz</h2></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Inner Home End-->
+	<section class="wt-haslayout">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="wt-greeting-holder">
+						<div class="row">
+							<div class="col-12">
+								<div class="wt-greetingcontent">
+									<div class="wt-sectionhead">
+										<div class="wt-sectiontitle">
+											<h4>Quiz Name: {{quiz.title|capfirst}}</h4>
+										</div>
+										
+									</div>
+									<div id="wt-statistics" class="wt-statistics">
+
+                                        <div class="wt-statisticcontent wt-countercolor1">
+											<em>{{quiz.created_by.short_name|capfirst}} </em><br><br>
+											<h4>Client @Copyright</h4>
+										</div>
+
+										<div class="wt-statisticcontent wt-countercolor2">
+											<em>{{quiz.attempts}}</em><br><br>
+											<h4># of Attempts</h4>
+										</div>
+
+										<div class="wt-statisticcontent wt-countercolor3">
+											<em>{{quiz.duration}}</em><br><br>
+											<h4>Quiz Time(Min)</h4>
+										</div>                                        
+									</div>
+								</div>
+							</div>
+                            <div class="wt-description"><br><br>
+                                <h4>Quiz Instruction</h4>
+                                <div class="wt-sectiontitle">
+                                    <p>{{quiz.instruction|linebreaksbr}}.</p>
+                                    <h5><p>Total Qestions: {{quiz.questions.count}}</p></h5>
+                                    {% if request.user.freelancer %}
+									<h5><p><span style="color: green; font-weight: bold;">Attempts: You have taken {{participant_attempts }} out of {{ quiz.attempts}} quiz attempts</span> </p></h5>
+									{% endif %}
+								</div>											
+						    </div>
+                        </div>										
+                        <div class="wt-btnarea">
+							<div class="row justify-content-md-center">
+								{% if request.user.freelancer %}
+									{% if participant_attempts < max_quiz_attempts %}										
+										<a href="{{quiz.get_take_test_absolute_url}}" class="btn btn-success"><i class="fa fa-info"></i> Start Quiz</a><br>
+									{% else %}
+										<div class="alert alert-danger" role="alert">
+											<span style="color: red; font-weight: bold;">!Alert: Hello {{ request.user.short_name }}! You have exceeded the Maximum attempts for this Quiz </span>
+										</div>
+									{% endif %}
+								{% endif %}
+
+								{% if request.user.clients %}
+								{% if quiz.created_by == request.user %}
+								<div class="container">
+									<div class="text-center">
+										<a href="{{quiz.get_question_detail_absolute_url}}" class="btn btn-success"><i class="fa fa-success"></i> Preview Question</a>
+										<a href="{{quiz.get_question_absolute_url}}" target="_blank" class="btn btn-danger"><i class="fa fa-info"></i> Add Question</a>
+									</div>
+                                </div>
+								{% endif %}
+								{% endif %}
+							</div>
+                        </div>  
+					</div>
+				</div>
+			</div>						
+		</div>
+    </section>
+
+	<div class="wt-proposalholder mt-6">
+		<div class="row justify-content-md-center">
+			<div class="wt-sectionhead wt-textcenter">
+				<span>Copyright @ {{website.site_name}}</span>
+			</div>
+		</div>
+	</div>
+	
+{% endblock %}
+

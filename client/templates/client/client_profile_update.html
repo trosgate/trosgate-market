@@ -1,0 +1,265 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include "dashboard/main_sidebar.html" %}
+
+	<!--Register Form Start--> 
+	<section class="wt-haslayout wt-dbsectionspace">
+		<div class="row justify-content-md-center">				
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+				<div class="wt-haslayout wt-dbsectionspace">
+					<div class="wt-dashboardbox wt-dashboardtabsholder">
+						<div class="wt-dashboardboxtitle">
+							<h2>My Profile</h2>
+						</div>
+						<div class="wt-dashboardtabs">
+							<ul class="wt-tabstitle nav navbar-nav">
+								<li class="nav-item">
+									<a class="active" data-toggle="tab" href="#wt-skills">Resume and Specialty</a>
+								</li>
+							</ul>
+						</div>
+						<div class="wt-tabscontent tab-content">
+							<div class="wt-personalskillshold tab-pane active fade show" id="wt-skills">
+								<div class="wt-yourdetails wt-tabsinfo">
+									{% if profileform %}
+									<p>Please correct the following errors:</p>
+									{% for field in profileform %}
+										{% if field.errors %}
+										<div class="alert alert-danger" role="alert">
+											{{ field.label_tag }}:{{ field.errors|striptags }}
+											 {% comment %} #{{ field.label_tag }}   {% endcomment %}
+										</div>
+										{% endif %}
+									{% endfor %}
+									{% endif %}											
+									<div class="wt-tabscontenttitle">
+										<h2>Your Details</h2>
+									</div>
+										<div>
+											Full Name: {{request.user.get_full_name}}
+										</div>	
+										<div>
+											Email: {{request.user.email}}
+										</div>
+									<hr>	
+									<form method="POST" enctype="multipart/form-data" class="wt-formtheme wt-userform">{% csrf_token %}	
+											<div class="form-group">
+												{{profileform.gender.label}}
+												{{profileform.gender}}
+											</div>
+
+											<div class="form-group">
+												{{profileform.budget_per_hourly_rate.label}}
+												{{profileform.budget_per_hourly_rate}}
+											</div>
+											<div class="form-group">
+												{{profileform.address.label}}
+												{{profileform.address}}
+											</div>										
+											<div class="form-group">
+												{{profileform.tagline.label}}
+												{{profileform.tagline}}
+											</div>
+											<div class="form-group">
+												{{profileform.description.label}}
+												{{profileform.description}}
+											</div>
+									</div> 
+									<div class="wt-profilephoto wt-tabsinfo">
+										<div class="wt-tabscontenttitle">
+											<h2>Profile Photo</h2>
+										</div>
+									<div class="wt-profilephotocontent">
+										<div class="wt-description">
+											<p>Anytime you upload new image it will replace current one.</p>
+										</div>
+												<div class="form-group form-group-label">
+													<div class="wt-labelgroup">
+															{{profileform.profile_photo}}
+														<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
+													</div>
+												</div>
+												<div class="form-group">
+													<ul class="wt-attachfile wt-attachfilevtwo">
+														<li class="wt-uploadingholder wt-companyimg-uploading">
+															<div class="wt-uploadingbox">
+																<div class="wt-designimg">
+																	<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
+																	{% if request.user.clients.profile_photo.url %}
+																	<label for="demoz"><img src="{{request.user.clients.profile_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
+																	{% else %}
+																	<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
+																	{% endif %}
+																</div>
+																<div class="wt-uploadingbar wt-uploading">
+																	<span class="uploadprogressbar"></span>
+																	<span>Profile Photo.jpg</span>
+																	<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
+																</div>
+															</div>
+														</li>
+													</ul>
+												</div>
+										</div> 
+									<div class="wt-bannerphoto wt-tabsinfo">
+										<div class="wt-tabscontenttitle">
+											<h2>Banner Photo</h2>
+										</div>
+										<div class="wt-profilephotocontent">
+											<div class="wt-description">
+												<p>Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua aut enim ad minim veniamac quis nostrud exercitation ullamco laboris.</p>
+											</div>
+												<div class="form-group form-group-label">
+													<div class="wt-labelgroup">
+														{{profileform.banner_photo}}
+														<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
+													</div>
+												</div>														
+												<div class="form-group">
+													<ul class="wt-attachfile wt-attachfilevtwo">
+														<li class="wt-uploadingholder">
+															<div class="wt-uploadingbox">
+																<div class="wt-designimg">
+																	<input id="id_banner_photo" type="radio" name="banner_photo" value="banner_photo" checked="">
+																	
+																	{% if request.user.clients.banner_photo.url %}
+																	<label for="demoz"><img src="{{request.user.clients.banner_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
+																	{% else %}
+																	<label for="demoq"><img src="{% static 'images/banner.jpg' %}" alt="img description"><i class="fa fa-check"></i></label>
+																	{% endif %}																				
+																</div>
+																<div class="wt-uploadingbar">
+																	<span class="uploadprogressbar"></span>
+																	<span>Banner Photo.jpg</span>
+																	<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
+																</div>
+															</div>
+														</li>
+													</ul>
+												</div>
+											</div> 
+										</div> 
+										<div class="wt-skills">
+											<div class="wt-tabscontenttitle">
+												<h2>Skill Specialty</h2>
+											</div>
+											<div class="form-group">
+												<select class="chosen-select Skills" {{profileform.skill}}></select>
+											</div>										
+										</div>	
+									<div class="wt-profilephoto wt-tabsinfo">
+									{% if request.user.user_type == 'client' %}
+										<div class="wt-tabscontenttitle">
+											<h2>Branding</h2>
+										</div>
+										<div class="wt-profilephotocontent">											
+											<div class="wt-description">
+												<p>Consectetur adipisicing elit, sed doxercitation ullamco laboris.</p>
+											</div>	
+												<div class="form-group form-group-label">
+													{{profileform.brand_name.label}}
+													{{profileform.brand_name}}
+												</div>																										
+												<div class="form-group form-group-label">
+													{{ profileform.company_logo.label }}
+													<div class="wt-labelgroup">
+														{{profileform.company_logo}}
+														<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
+													</div>
+												</div>
+												<div class="form-group">
+													<ul class="wt-attachfile wt-attachfilevtwo">
+														<li class="wt-uploadingholder wt-companyimg-uploading">
+															<div class="wt-uploadingbox">
+																<div class="wt-designimg">
+																	<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
+																	{% if request.user.clients.company_logo.url %}
+																	<label for="demoz"><img src="{{request.user.clients.company_logo.url}}" alt="img description"><i class="fa fa-check"></i></label>
+																	{% else %}
+																	<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
+																	{% endif %}
+																</div>
+																<div class="wt-uploadingbar wt-uploading">
+																	<span class="uploadprogressbar"></span>
+																	<span>Brand Logo.jpg</span>
+																	<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
+																</div>
+															</div>
+														</li>
+													</ul>
+												</div>
+										</div> 
+									{% endif %}	 					
+									</div> 	
+									<div class="wt-tabcompanyinfo wt-tabsinfo">
+										<div class="wt-tabscontenttitle">
+											<h2>Brand Size</h2>
+										</div>
+										<div class="wt-accordiondetails">
+											<div class="wt-radioboxholder">
+												<div class="wt-title">
+													<h4>No. of employees you have</h4>
+												</div>
+												<span class="form-group">
+													{% for size in profileform.business_size %}
+														{{size}}
+													{% endfor %}
+												</span>														
+											</div>
+											<div class="wt-radioboxholder">
+												<div class="wt-title">
+													<h4>Your Department?</h4>
+												</div>
+												<span class="form-group">
+													{% for dept in profileform.department %}
+														{{dept}}
+													{% endfor %}
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+					<div class="wt-updatall">
+						<i class="ti-announcement"></i>
+						<span>Update all your latest changes by just clicking on “Save &amp; Continue” button.</span>
+						<button type="submit" class="wt-btn"> Save &amp; Update</button>
+					</div>
+					</form>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+					<div class="wt-haslayout wt-dbsectionspace wt-codescansidebar">
+						<div class="tg-authorcodescan wt-codescanholder">
+							<figure class="tg-qrcodeimg">
+								<img src="{% static 'images/qrcode.png' %}" alt="img description">
+							</figure>
+							<div class="tg-qrcodedetail">
+								<span class="lnr lnr-laptop-phone"></span>
+								<div class="tg-qrcodefeat">
+									<h3>Scan with your <span>Smart Phone </span> To Get It Handy.</h3>
+								</div>
+							</div>
+							<div class="wt-codescanicons">
+								<span>Share Your Profile</span>
+								<ul class="wt-socialiconssimple">
+									<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook-f"></i></a></li>
+									<li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i></a></li>
+									<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i></a></li>
+									<li class="wt-clone"><a href="javascript:void(0);"><i class="far fa-clone"></i></a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="wt-companyad">
+							<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+							<span>Advertisement  255px X 255px</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--Register Form End--> 
+{% endblock content %}

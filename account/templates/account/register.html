@@ -1,0 +1,185 @@
+{% extends 'dashboard/main_base.html' %}
+{% load static %} 
+{% load widget_tweaks %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/register.css'%}">
+
+<main class="wt-haslayout" style="background:white;">
+    <div class="container bg-white">
+        <div class="row py-5 mt-4 align-items-center">
+            <!-- For Demo Purpose -->
+            <div class="col-md-5 pr-lg-5 mb-5 mb-md-0">
+                <img src="{% static 'images/signupimage.svg' %}" alt="" class="img-fluid mb-3 d-none d-md-block">
+                <h1>Create Account</h1>
+                <p class="font-italic text-muted mb-0">It's free to get started.</p>
+                <p class="font-italic text-muted">We are an Online Marketplace for freelance and Ecommerce Services <class="text-muted">
+            </div>
+
+            <!-- Registeration Form -->
+            <div class="col-md-7 col-lg-6 ml-auto">
+
+                <form method="POST" autocomplete="off">
+                    {% csrf_token %}
+                    {% if regform.errors %}
+                    <p>Please correct the following errors:</p>
+                    {% for field in regform %}
+                    {% if field.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ field.errors|striptags }}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    <div class="row">
+                        <!-- First Name -->
+                        <div class="input-group col-lg-6 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-user text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.first_name.errors }}
+                            {% render_field regform.first_name class+="form-control" placeholder="First Name"%}
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="input-group col-lg-6 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-user text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.last_name.errors }}
+                            {% render_field regform.last_name class+="form-control" placeholder="Last Name" %}
+                        </div>
+                        <!-- Username -->
+                        <div class="input-group col-lg-12 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-user text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.short_name.errors }}
+                            {% render_field regform.short_name class+='form-control' placeholder='Username' hx-post='/verify_username/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#short_name-status' %} 
+                            <div id="short_name-status" class="input-group col-lg-12"></div>    
+                        </div>  
+                        <!-- Email Address -->
+                        <div class="input-group col-lg-12 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-envelope text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.email.errors }}
+                            {% render_field regform.email class+="form-control" placeholder="Email" %}
+                        </div>
+                        {{ regform.email.errors }}
+                        <div id="email-error"></div>
+                        <!-- UserType -->
+                        <div class="input-group col-lg-12 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-check-circle text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.user_type.errors }} 
+                            {% render_field regform.user_type class+="form-control" placeholder="Select UserType" hx-get="/user_types/" hx-target="#user_type" %}
+                            <div id="user_type" class="input-group col-lg-12"></div>
+                            </div>
+                        <!-- Phone -->
+                        <div class="input-group col-lg-12 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-check-circle text-muted"></i>
+                                </span>
+                            </div>
+                            {% render_field regform.phone class+="form-control" placeholder="Enter Phone" %}
+                            {{ regform.phone.errors }} 
+                            <div id="user_type" class="input-group col-lg-12"></div>
+                        </div>                            
+                        <!-- Country -->
+                        <div class="input-group col-lg-12 mb-4">
+                            
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-check-circle text-muted"></i>
+                                </span>
+                            </div>
+                            {% render_field regform.country class+="form-control" placeholder="Select Country" %}
+                            </div>
+                
+                        <!-- Password -->                    
+                        <div class="input-group col-lg-6 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-lock text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.password1.errors }}
+                            {% render_field regform.password1 class+="form-control" placeholder="Password One" %}
+                        </div>
+
+                        <!-- Password Confirmation -->
+                        <div class="input-group col-lg-6 mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white px-3 border-md border-right-0">
+                                    <i class="fa fa-lock text-muted"></i>
+                                </span>
+                            </div>
+                            {{ regform.password2.errors }}
+                            {% render_field regform.password2 class+="form-control" placeholder="Confirm Password" %}
+                        </div>
+                        <!-- T&C CheckBox -->
+                        <div class="col-12">
+                            <div class="form-check">
+                            <input
+                                class="form-check-input" type="checkbox" value=""id="invalidCheck" required=True/>
+                            <label class="form-check-label" for="invalidCheck">
+                                        Agree to terms and conditions
+                            </label>
+                            <div class="invalid-feedback">You must agree before submitting.</div>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <!-- google recaptcha Button -->
+                        <div class="form-group g-recaptcha" data-sitekey="{{googleRecaptcha.site_key}}"></div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group col-lg-12 mx-auto mb-0">
+                            <button type="submit" class="btn btn-primary btn-block"> Signup  </button>
+                        </div>
+
+                        <!-- Divider Text -->
+                        <div class="form-group col-lg-12 mx-auto d-flex align-items-center my-4">
+                            <div class="border-bottom w-100 ml-5"></div>
+                            <span class="px-2 small text-muted font-weight-bold text-muted">OR</span>
+                            <div class="border-bottom w-100 mr-5"></div>
+                        </div>
+
+                        <!-- Social Login -->
+                        <div class="form-group col-lg-12 mx-auto">
+                            <a href="#" class="btn btn-primary btn-block py-2 btn-facebook">
+                                <i class="fa fa-facebook-f mr-2"></i>
+                                <span class="font-weight-bold">Continue with Facebook</span>
+                            </a>
+                            <a href="#" class="btn btn-primary btn-block py-2 btn-twitter">
+                                <i class="fa fa-twitter mr-2"></i>
+                                <span class="font-weight-bold">Continue with Twitter</span>
+                            </a>
+                        </div>
+                        <!-- Already Registered -->
+                        <div class="text-center w-100">
+                            <p class="text-muted font-weight-bold">Already Registered? <a href="{% url 'account:login' %}" class="text-primary ml-2">Login</a></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock content %}
+
+
+        

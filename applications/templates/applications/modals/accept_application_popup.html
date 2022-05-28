@@ -1,0 +1,19 @@
+{% extends "account/modals/base_auto_logout_popup.html" %}
+
+{% block modal-id %} id="projectAccept" {% endblock modal-id %}
+
+{% block modal-title %} <i class="lnr lnr-thumbs-up mt-4"></i> &nbsp;&nbsp; Accept Application {% endblock modal-title %}
+
+{% block modal-color %} text-danger {% endblock modal-color %}
+
+{% block modal-icon %} lnr lnr-thumbs-up fa-5x {% endblock modal-icon %}
+
+{% block modal-content %} 
+Are you sure you want to accept this applicant?
+{% endblock modal-content %}
+
+{% block modal-action %}
+<button class="btn btn-outline-danger btn-sm" type="button" id="accept-project-applicant" data-index="{{application.id}}">Accept</button>
+{% comment %} <button class="btn btn-outline-danger btn-sm" type="button" id="accept-project-applicant" data-index="{{application.id}}"><i class="fa fa-check"> Accept</i></button> {% endcomment %}
+{% endblock modal-action %}
+{% block modal-name-button %} Cancel {% endblock modal-name-button %}

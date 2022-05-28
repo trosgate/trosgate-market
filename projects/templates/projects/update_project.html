@@ -1,0 +1,127 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+		<div class="wt-haslayout wt-innerbannerholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+						<div class="wt-innerbannercontent">
+						<div class="wt-title"><h2>Update Project</h2></div>
+						<ol class="wt-breadcrumb">
+							<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+							<li class="wt-active">Update Project</li>
+						</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="wt-haslayout wt-main-section">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+							<div class="wt-dashboardbox">
+								<div class="wt-dashboardboxtitle">
+								<div class="wt-dashboardboxtitle">
+									<h2>Post a Project</h2>
+								</div>
+								<div class="wt-dashboardboxcontent">
+									{% if projectform.errors %}
+									
+									<div class="alert alert-danger" role="alert">
+										Ooop! form error occured. Please check below and correct
+									</div>
+									
+									{% endif %}
+																								
+									<div class="wt-jobdescription wt-tabsinfo">
+										<div class="wt-tabscontenttitle">
+											<h2>Project Description</h2>
+										</div>
+										<form method="POST" enctype="multipart/form-data">
+											{% csrf_token %}
+											<div class="form-group">
+												{{projectform.title.label}}
+												{{projectform.title}}
+												<span style="color:red;" role="alert">{{ projectform.title.errors}}</span>
+												
+											</div>	
+
+											<div class="form-group">																																		
+												{{projectform.category.label}}
+												{{projectform.category}}
+												<span style="color:red;" role="alert">{{ projectform.category.errors}}</span>
+											</div>	
+
+											<div class="form-group">
+												{{projectform.preview.label}}
+												{{projectform.preview}}
+												<span style="color:red;" role="alert">{{ projectform.preview.errors}}</span>
+											</div>
+											
+											<div class="form-group form-group-half">
+												{{projectform.completion_time.label}}
+												{{projectform.completion_time}}
+												<span style="color:red;" role="alert">{{ projectform.completion_time.errors}}</span>
+											</div>
+											<div class="form-group form-group-half">																																														
+												{{projectform.service_level.label}}
+												{{projectform.service_level}}
+												<span style="color:red;" role="alert">{{ projectform.service_level.errors}}</span>
+											</div>		
+											<div class="form-group form-group-half">
+												{{projectform.rating.label}}
+												{{projectform.rating}}
+												<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>
+											</div>									
+											<div class="form-group form-group-half">
+												{{projectform.feature.label}}
+												{{projectform.feature}}
+												<span style="color:red;" role="alert">{{ projectform.feature.errors}}</span>
+											</div>										
+										</div>
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Project Details</h2>
+											</div>
+											<div class="form-group">
+												{{projectform.media|safe}}
+												{{projectform.description}}
+												<span style="color:red;" role="alert">{{ projectform.description.errors}}</span>
+											</div>																	
+											<div class="form-group">
+												<italics> {{projectform.sample_link.label}}</italics>
+												{{projectform.sample_link}}	
+												<span style="color:red;" role="alert">{{ projectform.sample_link.errors}}</span>														
+											</div>																						
+
+										<div class="wt-jobskills wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Specialties Required</h2>
+											</div>
+											<div class="form-group">
+												{{projectform.project_skill.label}}
+												<select class="chosen-select Skills"{{ projectform.project_skill}}></select>
+												<span style="color:red;" role="alert">{{ projectform.project_skill.errors}}</span>														
+											</div>
+											<div class="form-group wt-formwithlabel">
+												{{projectform.amount.label}}
+												{{projectform.amount}}
+												<span style="color:red;" role="alert">{{ projectform.amount.errors}}</span>
+											</div>																																									
+										</div>
+									</div>
+								</div>
+									</div>
+										</div>
+											<div class="wt-updatall">
+												<i class="ti-announcement"></i>
+												<span>Post job by just clicking on “Post Job Now” button.</span>
+												<button type="submit" class="wt-btn"> Post Job Now </button>
+											</div>
+											</form>
+									</div>
+								</div>
+								<!--Register Form End-->
+{% endblock %}

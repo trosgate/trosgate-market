@@ -1,0 +1,194 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+		<!--Inner Home Banner Start-->
+		<div class="wt-haslayout wt-innerbannerholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+						<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Project Detail</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}" class="btn btn-info" >Dashboard</a></li>
+								{% if request.user == project.created_by and project.status == 'active' %}
+								<li class="wt-btnarea">
+									<a href="{{project.get_project_archive_absolute_url}}" class="btn btn-danger"><i class="fa fa-window-restore"></i> Archive</a>
+								</li>
+								<li class="wt-active">
+									<a href="{{project.get_project_update_absolute_url}}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a>
+								</li>
+								{% elif request.user == project.created_by and project.status == 'review' %}
+								<li class="wt-active">
+									<a href="javascript:void(0);" class="btn btn-success"><i class="fas fa-spinner fa-spin"></i> Under Review</a>
+								</li>
+								{% elif request.user == project.created_by and project.status == 'archived' %}									
+								<li class="wt-active">
+									<a href="{{project.get_project_archive_restored_absolute_url}}" class="btn btn-danger"><i class="fa fa-window-restore"></i> Restore</a>
+								</li>
+								{% elif request.user == project.created_by and project.status == 'ongoing' %}	
+								<li class="wt-active">
+									<a href="{{project.get_project_absolute_url}}" class="btn btn-success"><i class="fa fa-info"></i> Details</a>
+								</li>	
+								<li class="wt-active">
+									<a href="{{project.get_project_update_absolute_url}}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a>
+								</li>	
+								{% endif %}
+							</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% if request.user.is_authenticated %}
+			{% if project.status == 'active' %}
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<div id="duration-timer" style="color: green; font-weight: bold; display: none;">{{ project.duration|date:"M d, Y H:m:s"}} </div>
+						<div class="alert alert-info" role="alert">
+							<strong>Expires In: </strong><span id="duration-countdown-timer" style="color: green; font-weight: bold;"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			{% endif %}
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+				<div class="wt-haslayout wt-main-section">
+					<!-- User Listing Start-->
+				<div class="container">
+					<div class="row">
+						<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+							<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
+								<div class="wt-proposalholder">
+									{% if monthly_project_application == true %}
+										{% if active_team.created_by == request.user %}
+										<div class="alert alert-danger" role="alert">
+											<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+												Alert: You have reached the application limit for this month 
+												{% if active_team.package.type == "Basic" %}
+												<a href="{% url 'teams:packages' %}"> Upgrade Package</a>
+												{% endif %}
+											</span>
+										</div>										
+										{% endif %}
+									{% endif %}
+									<div class="wt-proposalhead">
+										<h2>{{projectdetail.title}}</h2>
+										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{projectdetail.get_service_level_display}}</span></li>
+											<li><span>{% if not projectdetail.created_by.country.flag %}{{projectdetail.created_by.country.country_code}} - {% endif %}{% if projectdetail.created_by.country.flag %}<img src="{{projectdetail.created_by.country.flag.url}}" alt="img description">{% endif %} {{projectdetail.created_by.country.name}}</span></li>
+											{% if project.status == 'active' %}
+											<li><span><i class="far fa-clock"></i> Deadline In: {{project.duration|date:"M-d-Y"}}</span></li>
+											{% endif %}
+											<li><span><i class="far fa-clock"></i> Completion In: {{project.get_completion_time_display}}</span></li>
+										</ul>
+									</div>
+									{% if request.user.freelancer %}									  
+										{% if not monthly_project_application %}
+										<div class="wt-btnarea"><a href="{% url 'applications:apply_for_project' project.slug %}" class="wt-btn">Apply</a></div>
+										{% endif %}
+									{% endif %}
+								</div>
+								</div>
+								
+								<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+									<div class="wt-projectdetail-holder">
+										<div class="wt-projectdetail">
+											<div class="wt-title">
+												<h3>Project Detail</h3>
+											</div>
+											<div class="wt-description">
+												<p> {{projectdetail.description|safe}}</p>
+												<ul class="wt-projectliststyle">
+													<li><span><i class="fa fa-check"></i>Nemo enim ipsam voluptatem quia</span></li>
+													<li><span><i class="fa fa-check"></i>Adipisci velit, sed quia non numquam eius modi tempora</span></li>
+													<li><span><i class="fa fa-check"></i>Eaque ipsa quae ab illo inve et quasi architecto</span></li>
+													<li><span><i class="fa fa-check"></i>qui dolorem ipsum quia dolor sit amet</span></li>
+												</ul>
+											</div>
+										</div>
+										<div class="wt-skillsrequired">
+											<div class="wt-title">
+												<h3>Skills Required</h3>
+											</div>
+											<div class="wt-tag wt-widgettag">
+											{% for skill in projectdetail.project_skill.all %}
+												<a href="javascript:void(0);">{{skill}}</a>
+											{% endfor %}
+											</div>
+										</div>
+										<div class="wt-attachments">
+											<div class="wt-title">
+												<h3>Attachments</h3>
+											</div>
+											<ul class="wt-attachfile">
+												<li>
+													<span>Documents Attached</span>
+													{% if projectdetail.attachment and request.user.is_authenticated %}
+													<em>File size: 512 kb<a href=" {{projectdetail.attachment.url}}"><i class="lnr lnr-download"></i></a></em>
+													{% endif %}
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>								
+
+								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+									<aside id="wt-sidebar" class="wt-sidebar">
+										<div class="wt-proposalsr">
+											<div class="wt-clicksavearea">
+												<span>Job ID: {{projectdetail.reference}}</span>
+											</div>
+										</div>
+										<div class="wt-widget wt-companysinfo-jobsingle">
+											<div class="wt-companysdetails">
+												<figure class="wt-companysimg">
+													{% if projectdetail.created_by.clients.banner_photo %}
+													<img src="{{projectdetail.created_by.clients.banner_photo.url}}" alt="img description">
+													{% endif %}
+												</figure>
+												<div class="wt-companysinfo">
+													<figure><img src="{{projectdetail.created_by.clients.profile_photo.url}}" alt="img description"></figure>
+													<div class="wt-title">
+														<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> Verified Company</a>
+														<h2>{% if profile_view.brand_name %}{{profile_view.brand_name}} {% else %} {{profile_view.user.get_full_name}}{% endif %}</h2>
+													</div>
+													<ul class="wt-postarticlemeta">
+														<li>
+															<a href="javascript:void(0);">
+																<span>Open Jobs</span>
+															</a>
+														</li>
+														<li>
+															<a href="{{profile_view.client_profile_get_absolute_url}}">
+																<span>Full Profile</span>
+															</a>
+														</li>
+														<li class="wt-following">
+															<a href="javascript:void(0);">
+																<span>Following</span>
+															</a>
+														</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+									</aside>
+								</div>
+							</div>
+						</div>					
+					</div>
+				</div>
+			</main>
+		</div>
+		<!--Content Wrapper End-->
+	</div>
+	<script src={% static 'js/countdowntimer.js' %} ></script>
+
+{% endblock content %}

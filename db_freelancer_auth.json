@@ -1,0 +1,90 @@
+[
+    {
+        "model": "account.customer",
+        "pk": 5,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$QwgIogA6HJ9nrDOZLEDc7K$jLijidSAN7HuWE8thtY6gKkTxgGBwddHZf+LKz/H6+A=",
+            "is_superuser": false,
+            "email": "sirkatey@gmail.com",
+            "short_name": "sirkatey",
+            "first_name": "isaac",
+            "last_name": "agbedam",
+            "date_joined": "2022-02-02T21:08:36.149Z",
+            "last_login": "2022-02-04T23:36:11.603Z",
+            "phone": null,
+            "country": 74,
+            "is_active": true,
+            "is_staff": false,
+            "is_admin": false,
+            "user_type": "freelancer",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "account.customer",
+        "pk": 6,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$QwgIogA6HJ9nrDOZLEDc7K$jLijidSAN7HuWE8thtY6gKkTxgGBwddHZf+LKz/H6+A=",
+            "is_superuser": false,
+            "email": "david@gmail.com",
+            "short_name": "David",
+            "first_name": "Dave",
+            "last_name": "Tetteh",
+            "date_joined": "2022-02-02T21:08:36.149Z",
+            "last_login": "2022-02-04T23:36:11.603Z",
+            "phone": null,
+            "country": 74,
+            "is_active": true,
+            "is_staff": false,
+            "is_admin": false,
+            "user_type": "freelancer",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "account.customer",
+        "pk": 7,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$QwgIogA6HJ9nrDOZLEDc7K$jLijidSAN7HuWE8thtY6gKkTxgGBwddHZf+LKz/H6+A=",
+            "is_superuser": false,
+            "email": "dakeh@@gmail.com",
+            "short_name": "James",
+            "first_name": "Dakeh",
+            "last_name": "Rough",
+            "date_joined": "2022-02-02T21:08:36.149Z",
+            "last_login": "2022-02-04T23:36:11.603Z",
+            "phone": null,
+            "country": 74,
+            "is_active": true,
+            "is_staff": false,
+            "is_admin": false,
+            "user_type": "freelancer",
+            "groups": [],
+            "user_permissions": []
+        }
+    },            
+    {
+        "model": "account.customer",
+        "pk": 8,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$JloXg0H03b6KfzLrqxXXKx$Xtio3TKTv5gJ9K9/9hJ7YjvkKU80d2iAUeQrsnfppCs=",
+            "is_superuser": false,
+            "email": "isaacagbedam@gmail.com",
+            "short_name": "cindy",
+            "first_name": "Cynthia",
+            "last_name": "Dede",
+            "date_joined": "2022-02-05T00:23:18.241Z",
+            "last_login": "2022-02-05T00:29:44.427Z",
+            "phone": null,
+            "country": 231,
+            "is_active": true,
+            "is_staff": false,
+            "is_admin": false,
+            "user_type": "freelancer",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

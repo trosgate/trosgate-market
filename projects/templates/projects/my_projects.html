@@ -1,0 +1,134 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+	<!--Register Form Start-->
+	<section class="wt-haslayout wt-dbsectionspace">
+		<div class="row justify-content-md-center">				
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+				<div class="wt-dashboardbox">
+					<div class="wt-dashboardboxtitle">
+						<h2>Manage Projects</h2>
+					</div>
+					<div class="wt-dashboardboxcontent wt-jobdetailsholder">
+					<li<em><a href="{% url 'projects:create_project' %}" class="btn btn-Dark float-right">Create New Projects</a></li>
+						<div class="wt-freelancerholder">
+							<div class="wt-tabscontenttitle">
+								<h2>Your Posted Jobs</h2>
+							</div>
+							<div class="wt-managejobcontent wt-verticalscrollbar">
+									{% for projects in projects %}
+								<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
+									<span class="wt-featuredtag"><img src="{% static 'images/featured.png' %}" alt="img description" data-tipso="Plus Member" class="template-content tipso_style"></span>
+									<div class="wt-userlistingcontent">
+										<div class="wt-contenthead">
+											<div class="wt-title">
+												<a href="usersingle.html"><i class="fa fa-check-circle"></i> {{ projects.created_by.get_full_name}}</a>
+												<h3>{{ projects.title }} - ({{projects.get_status_display}})</h3>
+											</div>
+												<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
+													<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>Rank: {{projects.service_level}}</span></li>
+													<li><span><img src="{{projects.created_by.profile.country.flag}}" alt="img description"> {{projects.created_by.profile.country.name}}</span></li>
+													<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{projects.project_type}}</span></li>
+													<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{projects.project_duration}}</span></li>															
+													{% comment %} <li><span class="wt-dashboradclock"><i class="fa fa-arrow-up"></i> Posted: {{projects.created_at|timesince}} Ago </span></li>															 {% endcomment %}
+												</ul>
+										</div>
+										<div class="wt-description">
+											<p>{{ projects.preview}} </p>
+										</div>	
+										<div class="wt-tag wt-widgettag">
+											{% for skill in projects.project_skill.all %}
+												<a href="javascript:void(0);">{{skill}}</a>
+											{% endfor %}	
+										</div> 
+										<div class="wt-rightarea">
+											<div class="wt-btnarea">
+												<a href="{{projects.get_project_absolute_url}}" class="btn btn-info">Preview</a>  
+												<a href="{{projects.get_project_absolute_url_update}}" class="wt-btn">Update</a>
+											</div>
+											<div class="wt-hireduserstatus">
+												<h4>01</h4><span>Proposals</span>
+												<ul class="wt-hireduserimgs">
+													<li><figure><img src="{% static 'images/user/userlisting/img-05.jpg' %}" alt="img description"></figure></li>
+													<li><figure><img src="{% static 'images/user/userlisting/img-01.jpg' %}" alt="img description"></figure></li>
+													<li><figure><img src="{% static 'images/user/userlisting/img-02.jpg' %}" alt="img description"></figure></li>
+													<li><figure><img src="{% static 'images/user/userlisting/img-03.jpg' %}" alt="img description"></figure></li>
+												</ul>
+											</div>
+										</div>
+									</div>	
+								</div>
+								{% endfor %}
+							{% if not projects %}
+							<div class="wt-description">
+								<span class="wt-clicksavefolder"><i class="wt-btn"></i>Hello Howdy! You don't have any project yet...</span>
+								<figure class="wt-userlistingimg">
+									<img src="{% static 'images/security.jpg'%}" alt="image description" class="mCS_img_loaded">
+								</figure>
+							</div>												
+							{% endif %}	
+						</div>												
+					</div>
+				</div>
+					<nav class="wt-pagination wt-savepagination">
+						<ul>
+							<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+							<li><a href="javascrip:void(0);">1</a></li>
+							<li><a href="javascrip:void(0);">2</a></li>
+							<li><a href="javascrip:void(0);">3</a></li>
+							<li><a href="javascrip:void(0);">4</a></li>
+							<li><a href="javascrip:void(0);">...</a></li>
+							<li><a href="javascrip:void(0);">50</a></li>
+							<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+						</ul>
+					</nav>								
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
+				<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>150</h3>
+								<span>Total Ongoing Jobs</span>
+							</div>
+						</div> 
+					</div>
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent wt-componyfolow">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>1406</h3>
+								<span>Total Completed Jobs</span>
+							</div>
+						</div> 
+					</div>								
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent  wt-freelancelike">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>2075</h3>
+								<span>Total Cancelled Jobs</span>
+							</div>
+						</div> 
+					</div>								
+				</aside>
+				<div class="wt-companyad">
+					<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+					<span>Advertisement  255px X 255px</span>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Register Form End-->
+
+{% endblock %}
+

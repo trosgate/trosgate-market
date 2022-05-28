@@ -1,0 +1,51 @@
+[
+{
+    "model": "general_settings.department",
+    "pk": 1,
+    "fields": {
+        "name": "Sales and Marketing"
+    }
+},
+{
+    "model": "general_settings.department",
+    "pk": 2,
+    "fields": {
+        "name": "Ecommerce"
+    }
+},
+{
+    "model": "general_settings.department",
+    "pk": 3,
+    "fields": {
+        "name": "Social Media"
+    }
+},
+{
+    "model": "general_settings.department",
+    "pk": 4,
+    "fields": {
+        "name": "Graphic and Design"
+    }
+},
+{
+    "model": "general_settings.department",
+    "pk": 5,
+    "fields": {
+        "name": "Web and Tech"
+    }
+},
+{
+    "model": "general_settings.department",
+    "pk": 6,
+    "fields": {
+        "name": "Human Relations"
+    }
+},
+{
+    "model": "general_settings.department",
+    "pk": 7,
+    "fields": {
+        "name": "Public Relations"
+    }
+}
+]

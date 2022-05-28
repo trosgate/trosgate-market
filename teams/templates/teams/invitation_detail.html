@@ -1,0 +1,224 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+				<div class="wt-haslayout wt-innerbannerholder">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-innerbannercontent">
+								<div class="wt-title"><h2>Invitation to {{ teams.title }} </h2></div>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									<li class="wt-active">Invites </li>
+								</ol>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="wt-proposalholder">
+					<div class="row justify-content-md-center">
+						<div class="wt-hireduserstatus">
+							<h4>Invitation to "{{ teams.title }}"</h4>
+							<em>There are two options available to invite users. (1) Internal Users & (2) External Freelancers</em>
+							{% if not max_team_members %}
+							<div class="alert alert-warning" role="alert">
+								<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+									Alert: You have reached the application limit for this month 
+									{% if teams.created_by == request.user %}
+									<a href="{% url 'teams:packages' %}"> Upgrade Package</a>
+									{% endif %}
+								</span>
+							</div>
+							{% endif %}
+						</div>											
+					</div>
+				</div>
+
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+							<div class="wt-dashboardbox">
+								<div class="wt-dashboardboxcontent wt-rcvproposala">
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+
+									<div class="wt-freelancerholder wt-rcvproposalholder">
+										<div class="wt-sectiontitle">
+											<span>Option #1: Internal Invitation(via Profile)</span>
+										</div>
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Instructions</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: Click on <em>'Invite Freelancer'</em> button below</span></li>
+											<li><span><i class="fa fa-check"></i>#2: You will be taken to the list of freelancers page</span></li>
+											<li><span><i class="fa fa-check"></i>#3: Click on <em>'user Avatar', or 'User fullname' or tagline</em> to open details</span></li>
+											<li><span><i class="fa fa-check"></i>#4: locate the button 'invite Freelancer' and Click to invite</span></li>
+										</ul>
+										{% if max_team_members %}											
+											<div class="form-group wt-btnarea">
+												<a href="{% url 'freelancer:freelancer_listing' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite Freelancer</button></a>
+											</div>
+										{% else %}
+											<div class="form-group wt-btnarea">
+												<a href="{% url 'teams:packages' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Upgrade Plan</button></a>
+											</div>
+										{% endif %}											
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>	
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+									<div class="wt-freelancerholder wt-rcvproposalholder">												
+										<div class="wt-sectiontitle">
+											<span>Option #2: External Invitation</span>
+										</div>
+
+
+										<form method="POST", action='.'> {% csrf_token %}
+											{% if inviteform.errors %}
+												{% for field in inviteform %}
+													{% for error in field.errors %} 
+													<div class="wt-jobalerts col-lg-6 float-center">
+														<div class="alert alert-danger alert-dismissible fade show">
+															<span> {{ error|escape }}</span>
+															<a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+														</div> 
+													</div>
+													{% endfor %}
+												{% endfor %}
+											{% endif %}
+											{% if max_team_members %}
+											<div class="form-group ">
+												{{inviteform.label}}
+												{{inviteform}}
+											</div> 
+											<div class="form-group wt-btnarea">
+												<button type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite member </button>
+											</div>											
+											{% else %}
+											<div class="form-group wt-btnarea">
+												<a href="{% url 'teams:packages' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Upgrade Plan</button></a>
+											</div>
+											{% endif %}
+										</form> 
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Remember!</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: Beware of scam emails. Only invite external users with trusted emails</span></li>
+											<li><span><i class="fa fa-check"></i>#2: Provide a valid and active email that invitee can monitor</span></li>
+											<li><span><i class="fa fa-check"></i>#3: The provided email owner shouldn't be an existing team member</span></li>
+											<li><span><i class="fa fa-check"></i>#4: There is possibility to invite existing user to your team if you  have their emails</span></li>
+										</ul>											                  														
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+		</section>
+		<section class="wt-haslayout wt-dbsectionspace">
+			<div class="row justify-content-md-center">				
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+				<div class="wt-dashboardbox">
+					<div class="wt-dashboardboxcontent wt-rcvproposala">
+						<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+							<div class="wt-freelancerholder wt-rcvproposalholder">												
+								<div class="wt-sectiontitle">
+									<span>Team Members</span>
+								</div>
+									<div class="wt-tabscontenttitle">
+										<h2>Invited Members</h2>
+									</div>									 
+										<div class="table-responsive">
+										<table class="table">
+										<thead>
+										<tr>
+											<th>#</th>
+											<th>Email</th>
+											<th>Sent on </th>
+											<th>Code Sent</th>
+											<th>Status</th>
+										</tr>
+										</thead>
+										<tbody>
+										{% for invite in invited %}
+											<tr>
+											<td>{{forloop.counter}} </td>
+											<td>{{invite.email}}</td>
+											<td>{{invite.sent_on}}</td>
+											<td>{{invite.code}}</td>
+											{% if invite %}
+											<td><button class="btn btn-outline-info btn-sm mt-2" disabled>{{invite.get_status_display}}</button></td>
+											{% endif %}
+											</tr> 
+										{% endfor %}					
+											</tbody>
+										</table>
+										{% if not invited %}
+										<p><strong>No Invited Member to show yet.</strong></p>
+										{% endif %}											
+										</div> 
+									</div>
+										<div class="wt-freelancerholder wt-rcvproposalholder">
+										<div class="wt-tabscontenttitle">
+											<h2>Accepted Members</h2>
+										</div>									 
+										<div class="table-responsive">
+										<table class="table">
+										<thead>
+										<tr>
+											<th>#</th>
+											<th>Email</th>
+											<th>Sent on </th>
+											<th>Code Sent</th>
+											<th>Status</th>
+										</tr>
+										</thead>
+										<tbody>
+										{% for accept in accepted %}
+											<tr>
+											<td>{{forloop.counter}} </td>
+											<td>{{accept.email}}</td>
+											<td>{{accept.sent_on}}</td>
+											<td>{{accept.code}}</td>
+											{% if accept %}
+											<td><button class="btn btn-outline-success btn-sm mt-2" disabled>{{accept.get_status_display}}</button></td>
+											{% endif %}
+											</tr> 
+										{% endfor %}					
+											</tbody>
+										</table>
+										{% if not accepted %}
+										<p><strong>No Accepted Member to show yet.</strong></p>
+										{% endif %}											
+									</div> 
+								</div>								
+							</div>
+						</div>
+					</section>
+    			    <div class="wt-proposalholder">
+						<div class="row justify-content-md-center">
+							<div class="wt-sectionhead wt-textcenter">
+								<span>Copyright @ {{website.site_name}}</span>
+							</div>
+						</div>
+					</div>
+
+			</main>
+			<!--Main End-->	
+
+				
+{% endblock %}

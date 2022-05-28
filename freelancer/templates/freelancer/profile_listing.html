@@ -1,0 +1,395 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Search Result</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="index-2.html">Home</a></li>
+								<li class="wt-active">Freelancers</li>
+							</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wt-categoriesslider-holder wt-haslayout">
+				<div class="wt-title">
+					<h2>Browse Top Job Categories:</h2>
+				</div>
+				<div id="wt-categoriesslider" class="wt-categoriesslider owl-carousel">
+                    {% for cat in categories %}
+					<div class="wt-categoryslidercontent item">
+						<figure><img src="{{cat.icon.url}}" alt="image description"></figure>
+						<div class="wt-cattitle">
+							<h3><a href="javascrip:void(0);">{{cat.name}}</a></h3>
+							<span>Items: 523,112</span>
+						</div>
+					</div>
+                        {% endfor %}
+				</div>
+			</div>
+			<!--Inner Home End-->
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+				<div class="wt-main-section wt-haslayout">
+					<!-- User Listing Start-->
+					<div class="wt-haslayout">
+						<div class="container">
+							<div class="row">
+								<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+									<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+										<div class="wt-usersidebaricon">
+											<span class="fa fa-cog wt-usersidebardown">
+												<i></i>
+											</span>
+										</div>
+										<aside id="wt-sidebar" class="wt-sidebar wt-usersidebar">
+											<div class="wt-widget wt-effectiveholder">
+												<div class="wt-widgettitle">
+													<h2>Categories</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formsearch">
+														<fieldset>
+															<div class="form-group">
+																<input type="text" name="Search" class="form-control" placeholder="Search Category">
+																<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
+															</div>
+														</fieldset>
+														<fieldset>
+															<div class="wt-checkboxholder wt-verticalscrollbar">
+																<span class="wt-checkbox">
+																	<input id="wordpress" type="checkbox" name="description" value="company" checked>
+																	<label for="wordpress"> WordPress</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="graphic" type="checkbox" name="description" value="company">
+																	<label for="graphic"> Graphic Design</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="website" type="checkbox" name="description" value="company">
+																	<label for="website"> Website Design</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="article" type="checkbox" name="description" value="company">
+																	<label for="article"> Article Writing</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="software" type="checkbox" name="description" value="company">
+																	<label for="software"> Software Architecture</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="wordpress1" type="checkbox" name="description" value="company">
+																	<label for="wordpress1"> WordPress</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="graphic1" type="checkbox" name="description" value="company">
+																	<label for="graphic1"> Graphic Design</label>
+																</span>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+											<div class="wt-widget wt-effectiveholder">
+												<div class="wt-widgettitle">
+													<h2>Location</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formsearch">
+														<fieldset>
+															<div class="form-group">
+																<input type="text" name="fullname" class="form-control" placeholder="Search Location">
+																<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
+															</div>
+														</fieldset>
+														<fieldset>
+															<div class="wt-checkboxholder wt-verticalscrollbar">
+																<span class="wt-checkbox">
+																	<input id="wt-description" type="checkbox" name="description" value="company" checked>
+																	<label for="wt-description"> <img src="images/flag/img-01.png" alt="img description"> Australia</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="us" type="checkbox" name="description" value="company">
+																	<label for="us"> <img src="images/flag/img-02.png" alt="img description"> United States</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="canada" type="checkbox" name="description" value="company">
+																	<label for="canada"> <img src="images/flag/img-03.png" alt="img description"> Canada</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="england" type="checkbox" name="description" value="company">
+																	<label for="england"> <img src="images/flag/img-04.png" alt="img description"> England</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="emirates" type="checkbox" name="description" value="company">
+																	<label for="emirates"> <img src="images/flag/img-05.png" alt="img description"> United Emirates</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="wt-description1" type="checkbox" name="description" value="company">
+																	<label for="wt-description1"> <img src="images/flag/img-01.png" alt="img description"> Australia</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="us1" type="checkbox" name="description" value="company">
+																	<label for="us1"> <img src="images/flag/img-02.png" alt="img description"> United States</label>
+																</span>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+											<div class="wt-widget wt-effectiveholder">
+												<div class="wt-widgettitle">
+													<h2>Hourly Rate</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formsearch">
+														<fieldset>
+															<div class="wt-checkboxholder wt-verticalscrollbar">
+																<span class="wt-checkbox">
+																	<input id="rate1" type="checkbox" name="description" value="company" checked>
+																	<label for="rate1">$10 and below</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rate2" type="checkbox" name="description" value="company">
+																	<label for="rate2"> $10 - $30</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rate3" type="checkbox" name="description" value="company">
+																	<label for="rate3"> $30 - $60</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rate4" type="checkbox" name="description" value="company">
+																	<label for="rate4"> $60 - $90</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rate5" type="checkbox" name="description" value="company">
+																	<label for="rate5"> $90 &amp;above</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rate2v" type="checkbox" name="description" value="company">
+																	<label for="rate2v">$10 and below</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rate3v" type="checkbox" name="description" value="company">
+																	<label for="rate3v"> $10 - $30</label>
+																</span>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+											<div class="wt-widget wt-effectiveholder">
+												<div class="wt-widgettitle">
+													<h2>Freelancer Type</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formsearch">
+														<fieldset>
+															<div class="wt-checkboxholder">
+																<span class="wt-checkbox">
+																	<input id="proindependent" type="checkbox" name="description" value="company" checked>
+																	<label for="proindependent">Pro Independent Freelancers</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="proagency" type="checkbox" name="description" value="company">
+																	<label for="proagency"> Pro Agency Freelancers</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="independent" type="checkbox" name="description" value="company">
+																	<label for="independent"> Independent Freelancers</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="agency" type="checkbox" name="description" value="company">
+																	<label for="agency">Agency Freelancers</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="rising" type="checkbox" name="description" value="company">
+																	<label for="rising"> New Rising Talent</label>
+																</span>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+											<div class="wt-widget wt-effectiveholder">
+												<div class="wt-widgettitle">
+													<h2>English level</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formsearch">
+														<fieldset>
+															<div class="wt-checkboxholder">
+																<span class="wt-checkbox">
+																	<input id="basic" type="checkbox" name="description" value="company" checked>
+																	<label for="basic">Basic</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="conversational" type="checkbox" name="description" value="company">
+																	<label for="conversational"> Conversational</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="fluent" type="checkbox" name="description" value="company">
+																	<label for="fluent"> Fluent</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="native" type="checkbox" name="description" value="company">
+																	<label for="native"> Native or bilingual</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="professional" type="checkbox" name="description" value="company">
+																	<label for="professional"> Professional</label>
+																</span>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+											<div class="wt-widget wt-effectiveholder">
+												<div class="wt-widgettitle">
+													<h2>Languages</h2>
+												</div>
+												<div class="wt-widgetcontent">
+													<form class="wt-formtheme wt-formsearch">
+														<fieldset>
+															<div class="form-group">
+																<input type="text" name="fullname" class="form-control" placeholder="Search Language">
+																<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
+															</div>
+														</fieldset>
+														<fieldset>
+															<div class="wt-checkboxholder wt-verticalscrollbar">
+																<span class="wt-checkbox">
+																	<input id="chinese" type="checkbox" name="description" value="company" checked>
+																	<label for="chinese">Chinese</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="spanish" type="checkbox" name="description" value="company">
+																	<label for="spanish">Spanish</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="english" type="checkbox" name="description" value="company">
+																	<label for="english">English</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="arabic" type="checkbox" name="description" value="company">
+																	<label for="arabic">Arabic</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="russian" type="checkbox" name="description" value="company">
+																	<label for="russian">Russian</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="chinese1" type="checkbox" name="description" value="company">
+																	<label for="chinese1">Chinese</label>
+																</span>
+																<span class="wt-checkbox">
+																	<input id="spanish1" type="checkbox" name="description" value="company">
+																	<label for="spanish1">Spanish</label>
+																</span>
+															</div>
+														</fieldset>
+													</form>
+												</div>
+											</div>
+											<div class="wt-widget wt-applyfilters-holder">
+												<div class="wt-widgetcontent">
+													<div class="wt-applyfilters">
+														<span>Click “Apply Filter” to apply latest<br> changes made by you.</span>
+														<a href="javascript:void(0);" class="wt-btn">Apply Filters</a>
+													</div>
+												</div>
+											</div>
+										</aside>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+										<div class="wt-userlistingholder wt-userlisting wt-haslayout">
+											<div class="wt-userlistingtitle">
+												<span>01 - 48 of 57143 results for <em>"Logo Design"</em></span>
+											</div>
+											<div class="wt-filterholder">
+												<ul class="wt-filtertag">
+													<li class="wt-filtertagclear">
+														<a href="javascrip:void(0)"><i class="fa fa-times"></i> <span>Clear All Filter</span></a>
+													</li>
+												 	<li class="alert alert-dismissable fade in">
+														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Graphic Design</span></a>
+													</li>
+													<li class="alert alert-dismissable fade in">
+														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Any Hourly Rate</span></a>
+													</li>
+													<li class="alert alert-dismissable fade in">
+														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Any Freelancer Type</span></a>
+													</li>
+													<li class="alert alert-dismissable fade in">
+														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Chinese</span></a>
+													</li>
+													<li class="alert alert-dismissable fade in">
+														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>English</span></a>
+													</li>
+												</ul>
+											</div>
+                                            {% for profile in profile_list %}
+											<div class="wt-userlistinghold wt-featured">
+												<span class="wt-featuredtag"><img src="{% static 'images/featured.png' %}" alt="img description" data-tipso="Plus Member" class="template-content tipso_style"></span>
+												<figure class="wt-userlistingimg">
+													<img src="{{freelancer.profile_photo.url}}" alt="image description">
+												</figure>
+												<div class="wt-userlistingcontent">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="javascrip:void(0)"><i class="fa fa-check-circle"></i> {{freelancer.user.get_full_name}}</a>
+															<h2>{{freelancer.tagline}}</h2>
+														</div>
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="far fa-money-bill-alt"></i> ${{profile.hourly_rate}}/ hr</span></li>
+															<li><span><img src="{{freelancer.country.flag}}" alt="img description"> {{freelancer.user.country.name}}</span></li>
+															<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+														</ul>
+													</div>
+													<div class="wt-rightarea">
+														<span class="wt-starsvtwo">
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+														</span>
+														<span class="wt-starcontent">4.5/<sub>5</sub> <em>(860 Feedback)</em></span>
+													</div>
+												</div>
+												<div class="wt-description">
+													<p>{{profile.description|truncatechars:290}}...</p>
+												</div>
+												<div class="wt-tag wt-widgettag">
+                                                {% for skill in freelancer.skill.all %}
+													<a href="javascript:void(0);">{{skill}}</a>
+                                                {% endfor %}
+												</div>
+											</div>
+                                            {% endfor %}
+									    </div>
+									</div>
+                                        <nav class="wt-pagination">
+                                            <ul>
+                                                <li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+                                                <li><a href="javascrip:void(0);">1</a></li>
+                                                <li><a href="javascrip:void(0);">2</a></li>
+                                                <li><a href="javascrip:void(0);">3</a></li>
+                                                <li><a href="javascrip:void(0);">4</a></li>
+                                                <li><a href="javascrip:void(0);">...</a></li>
+                                                <li><a href="javascrip:void(0);">50</a></li>
+                                                <li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+                                            </ul>
+                                        </nav>                                    
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- User Listing End-->
+     {% endblock content %}

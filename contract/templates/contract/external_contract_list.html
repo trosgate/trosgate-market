@@ -1,0 +1,152 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+			{% if request.user.freelancer %}
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            List of Contracts
+                        </div>
+
+                        <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h5 class="card-title">Create Contract
+									<div class="wt-btnarea">
+										<a href="{% url 'contract:create_external_contract' %}" class="btn btn-success">Add Contract</a>
+									</div>	
+                            </div>
+                        </div>
+                    </div>
+                </div>										
+            </section>
+			{% endif %}
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            All your External Contracts
+                        </div>								
+
+                            {% if contracts|length > 0 %}
+							<table class="table table-striped table-sm">
+								<thead>
+								<tr>
+
+									<th>Number</th>
+									<th>Invoice #</th>
+									<th>{% if request.user.freelancer %}Client {% elif request.user.clients %}Freelancer{% endif%}</th>
+									<th>Core Service</th>
+									<th>Created On</th>
+									<th>Completion In </th>
+									<th>Total Budget($)</th>
+									<th>Actions</th>
+
+								</tr>
+								</thead>
+								<tbody>
+
+								{% for contract in contracts %}
+								<tr>
+								<td>{{forloop.counter}} </td>
+								<td>{{contract.reference}}</td>
+								<td>{{contract.client.name}}</td>
+								<td>{{contract.line_one}}</td>
+								<td>{{contract.date_created}}</td>
+								<td>{{contract.get_contract_duration_display}}</td>
+								<td>{{contract.grand_total}}</td>
+								<td>
+									<a href="{% url 'contract:external_contract_detail' contract.id contract.urlcode %}" class="btn btn-success"><i class="fa fa-info"> Preview</i></a>
+									{% if request.user.freelancer %}
+									<a href="javascript:void(0);" class="btn btn-info"><i class="fa fa-folder-open"> Send Client Email</i></a>
+									{% endif %}
+								</td> 
+								</tr>
+								{% endfor %}
+
+								</tbody>
+							</table>
+						</div>
+						{% endif %}
+						{% if not contracts %}
+						<p> Ooops! No contract has been connected to you Yet<p>
+						{% endif %}										
+					</section>
+
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{website.site_name}}</span>
+					</div>
+				</div>
+			</div>
+    			{% comment %} {% include 'dashboard/main_footer.html' %} {% endcomment %}
+			</main>
+
+			<!-- Add Invoice Client Popup Start-->
+			<!-- Popup Start-->
+			<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="invoiceclientmodal">
+				<div class="modal-dialog" role="document">
+					<div class="wt-modalcontent modal-content">
+						<div class="wt-popuptitle">
+							<h2>Add A Client</h2>
+							<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
+						</div>
+						<div class="modal-body">
+							<div class="wt-projectdropdown-hold">
+								<div class="wt-projectdropdown-option">
+									<div class="wt-projectselect">
+										<figure><img src="images/thumbnail/img-07.jpg" alt="img description"></figure>
+										<div class="wt-projectselect-content">
+											<h3>Project Title Here</h3>
+											<span><i class="lnr lnr-calendar-full"></i> Project Deadline: May 27, 2019</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+								<div class="form-group">
+									{{contractorform.name.label}}
+									{{contractorform.name}}
+								</div>
+								<div class="form-group">
+									{{contractorform.email.label}}
+									{{contractorform.email}}
+								</div>
+								<div class="form-group">
+									{{contractorform.address.label}}
+									{{contractorform.address}}
+								</div>
+								<div class="form-group">
+									{{contractorform.postal_code.label}}
+									{{contractorform.postal_code}}
+								</div>  
+								<div class="form-group">
+									{{contractorform.phone_Number.label}}
+									{{contractorform.phone_Number}}
+								</div>
+								<div class="form-group">
+									{{contractorform.tax_Number.label}}
+									{{contractorform.tax_Number}}
+								</div>                                                                
+								<div class="form-group wt-btnarea">
+									<button type="submit" class="wt-btn"> Add Contractor </button>
+								</div>											
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Popup End-->
+
+
+{% endblock %}
+

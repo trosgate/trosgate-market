@@ -1,0 +1,3 @@
+
+class FundException(Exception):
+    pass

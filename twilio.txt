@@ -1,0 +1,14 @@
+Account_SID: AC70fb8218590a0dd00ed73988e04faed7
+Auth-Token: 38f735993c1afe7db44128d1a99bfff5
+
+from twilio.rest import Client 
+ 
+account_sid = 'AC70fb8218590a0dd00ed73988e04faed7' 
+auth_token = '[AuthToken]' 
+client = Client(account_sid, auth_token) 
+ 
+message = client.messages.create(         
+                              to='+233557541875' 
+                          ) 
+ 
+print(message.sid)

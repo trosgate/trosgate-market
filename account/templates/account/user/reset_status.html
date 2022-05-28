@@ -1,0 +1,37 @@
+{% extends 'dashboard/main_base.html' %}
+{% load i18n static %}
+
+{% block content%}
+<br>
+<br>
+<br>
+{% if request.user.is_authenticated %}
+<script>
+    window.location.href = '{% url "account:dashboard" %}';
+</script>
+{% endif %}
+
+<br>
+<br>
+<br>
+<div class="card bg-light">
+<article class="card-body mx-auto" style="max-width: 600px;">
+
+<div class="container">
+    <div>
+        {% if 'email' in request.get_full_path %}
+        <h3 class="mb-4">Password Reset Started</h3>
+        <p>Check your email for instructions</p>
+        {% endif%}
+        {% if 'complete' in request.get_full_path %}
+        <h3 class="mb-4">Password Reset Success</h3>
+        <p class="text-center">Time to login <a href="{% url 'account:login'%}">Go to login</a> </p>
+        {% endif%}
+    </div>
+       
+</article>
+
+</div> 
+
+
+{% endblock%}

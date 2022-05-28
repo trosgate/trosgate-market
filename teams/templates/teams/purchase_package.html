@@ -1,0 +1,144 @@
+        {% extends "dashboard/main_base.html" %}
+        {% load static %}
+        {% block content%}
+        <link rel="stylesheet" href="{% static 'css/bootstrap-5.min.css'%}">
+        
+        
+    <div class="wt-dashboardbox">
+        <div class="wt-proposalsr">
+            <div class="container"><br><br><br>
+                <div class="wt-managejobcontent">
+                    <div class="col-12">
+                        <h3>Subscription Checkout</h3>
+                    </div>
+                    <div class="wt-updatall">
+                        <span>These are multiple options available for subscription</span>
+                    </div>	
+                    
+                </div>
+                
+                <div class="container">
+                    <div class="row g-3">
+
+                        <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
+                            <div class="d-flex bd-highlight ms-0">
+                                <div class="p-2 flex-grow-1 bd-highlight">Package Type:</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5"></span><span
+                                class="fw-bold h5">{% firstof package.verbose_type package.type %}</span></div>
+                            </div>
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">Package Price:</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5">$</span><span
+                                class="fw-bold h5">{{package.price}}</span></div>
+                            </div>
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">Current Team:</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5"></span><span 
+                                    class="fw-bold h5">{{active_team.title}}</span></div>
+                                </div>
+                            </div> 
+                        <div class="col-md-7 col-lg-8">
+                        
+                            <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
+                            <div class="row g-0">
+                                <div class="col-md-2 ps-3 ps-md-4">
+                                </div>
+                                <div class="col-md-9 ps-md-1">
+                                <div class="card-body p-1">
+                                <h3 class="card-text ps-2 pb-3">Option #1: Stripe Checkout</h3>
+                                </div>
+                                </div>
+                                <button type="submit" id="submitBtn" class="wt-btn">Stripe</button>
+                            </div>
+                            </div>
+                            <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
+                            <div class="row g-0">
+                                <div class="col-md-2 ps-3 ps-md-4">
+                                </div>
+                                <div class="col-md-9 ps-md-1">
+                                <div class="card-body p-1">
+                                    <h3 class="card-text ps-2 pb-3">Option #1: PayPal Checkout</h3>
+                                </div>
+                                </div>
+                                <div id="paypal-button-container"></div>
+                                {% comment %} <div id="paypal-button-container-P-2U544007T7929025VMIR5YJI"></div> {% endcomment %}
+                            </div>
+                            </div>
+
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="wt-proposalholder mt-6">
+            <div class="row justify-content-md-center">
+                <div class="wt-sectionhead wt-textcenter">
+                    <span>Copyright @ {{website.site_name}}</span>
+                </div>
+            </div>
+        </div> 
+     
+        {% comment %} <script src="https://www.paypal.com/sdk/js?client-id={{publishable_key}}" data-sdk-integration-source="button-factory"></script>       
+
+        <script>
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken');
+
+            function packagePayPalButton(){
+                paypal.Buttons({
+                    style: {
+                        shape: 'rect',
+                        color: 'gold',
+                        layout: 'vertical',
+                        label: 'subscribe'
+                    },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        /* Creates the subscription */
+                        plan_id: 'P-2U544007T7929025VMIR5YJI'
+                      });
+                    },
+                onApprove: function (data) {
+                    var url = "{% url 'teams:paypal_package_order' %}"
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: {
+                        'content-type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                        },
+                        body: JSON.stringify({
+                        orderID: data.orderID
+                        })
+                    }).then(function () {
+                        location.href = "{% url 'teams:package_success' %}" 
+                    })
+                    },
+                }).render('#paypal-button-container');
+            }
+            packagePayPalButton();  
+               
+        </script> {% endcomment %}
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="{% static 'js/payments/stripe-subscription.js' %}"></script>
+
+{% endblock %}
+        
+        
+        
+        

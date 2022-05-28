@@ -1,0 +1,24 @@
+[
+    {
+        "model": "account.customer",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$So10snAigEADr6KHj7XVcF$VkQSJmaVYMueg8hiki2pLlWq7DpQDQx2menI12yD2aI=",
+            "is_superuser": true,
+            "email": "katey@gmail.com",
+            "short_name": "admin1",
+            "first_name": "Katey",
+            "last_name": "Isaac",
+            "date_joined": "2022-01-10T14:18:00Z",
+            "last_login": "2022-02-01T20:36:20.829Z",
+            "phone": null,
+            "country": 4,
+            "is_active": true,
+            "is_staff": true,
+            "is_admin": true,
+            "user_type": "admin",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

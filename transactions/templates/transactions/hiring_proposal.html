@@ -1,0 +1,159 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+	<!--Register Form Start-->
+	<section class="wt-haslayout wt-dbsectionspace">
+		<div class="row justify-content-md-center">				
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+				<div class="wt-dashboardbox">
+					<div class="wt-dashboardboxtitle">
+						<h2>Checkout Process</h2>
+					</div>
+					<div class="wt-dashboardboxcontent wt-jobdetailsholder">
+						<div class="wt-freelancerholder">
+							<div class="wt-tabscontenttitle">
+								<h2>Hiring More Staff</h2>
+							</div>
+							<div class="wt-managejobcontent">
+                            
+                            <div class="container mt-5 mb-5">
+                                <div class="d-flex justify-content-center row">
+                                    <div class="col-md-12">
+                                        <div class="row p-2 bg-white border rounded">
+                                            <div class="col-md-3 mt-1"><img class="img-fluid img-responsive rounded product-image" src="{{proposal.thumbnail.url}}"></div>
+                                            <div class="col-md-6 mt-1">
+                                            <h5>{{proposal.title}}</h5>
+                                            <p class="text-justify text-truncate para mb-0" >{{proposal.preview}}<br><br></p>
+                                                <div class="form-group">
+													<a href="javascript:void(0);" class="btn btn-outline-primary btn-sm mt-2"><i class="fas fa-spinner fa-spin"></i> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} Available:</a>
+
+													<select class="form-control" style="width:auto;" id="select {{proposal.id}}">
+                                                            {% comment %} <option value=1 selected> 1 </option> {% endcomment %}
+                                                            {% if proposal.team.members.count >= 1 %}<option value=1 selected> 1 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 2 %}<option value=2> 2 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 3 %}<option value=3> 3 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 4 %}<option value=4> 4 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 5 %}<option value=5> 5</option> {% endif %}
+                                                            {% if proposal.team.members.count >= 6 %}<option value=6> 6 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 7 %}<option value=7> 7 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 8 %}<option value=8> 8 </option>{% endif %}
+                                                                                                                                                                                                                     rs.count >= 9 %}<option value=9> 9 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 10 %}<option value=10> 10 </option> {% endif %}
+                                                            {% if proposal.team.members.count >= 11 %}<option value=11> 11 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 12 %}<option value=12> 12 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 13 %}<option value=13> 13 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 14 %}<option value=14> 14 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 15 %}<option value=15> 15 </option> {% endif %}
+                                                            {% if proposal.team.members.count >= 16 %}<option value=16> 16 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 17 %}<option value=17> 17 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 18 %}<option value=18> 18 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 19 %}<option value=19> 19 </option>{% endif %}
+                                                            {% if proposal.team.members.count >= 20 %}<option value=20> 20</option> {% endif %}																														
+                                                        </select>                                                                                                                    
+													<button type="button" id="update-button" data-index="{{proposal.id}}" class="btn btn-outline-success btn-sm mt-2">Modify & Save </button>
+                                                </div>
+                                                </div>
+                                                <div class="align-items-center align-content-center col-md-3 border-left mt-1">
+                                                    <div class="d-flex flex-row align-items-center">
+														{% comment %} <h6 class="text-danger" id="budget-amount" value="{{proposal.budget}}">Budget: ${{proposal.budget}}</h6> {% endcomment %}
+														<button class="btn btn-outline-primary btn-sm mt-2" type="button">Total Salary: ${{proposal.salary}}</a></button><br><br>
+                                                    </div>
+													<h6 class="text-info">Service Duration: {{proposal.duration}}</h6>
+													<h6 class="text-info">Service Level: {{proposal.service_level}}</h6>
+													<h6 class="text-info">Revision: {{proposal.get_revision_display}}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+							<h3>Payment Options</h3>
+							<div class="wt-managejobcontent">
+								{% for payment in payments %}
+								<div class="wt-userlistinghold wt-featured wt-proposalitem">
+									<figure class="wt-userlistingimg">
+									{% if proposal.created_by.freelancer.profile_photo %}
+										{{payment.gateway_logo_tag}}
+									{% endif %}
+									</figure>
+
+									<div class="wt-proposaldetails">
+										<div class="wt-contenthead">
+											<div class="wt-title">
+												<a href="{{proposal.created_by.freelancer.profile_get_absolute_url}}"></a>
+											</div>
+										</div>
+									</div> 
+									<div class="wt-rightarea">
+										<div class="wt-hireduserstatus">
+											<h6>{{payment.name}} Checkout</h6>
+										</div>										
+										<div class="wt-hireduserstatus">
+											<button class="btn btn-outline-success btn-sm mt-2" id="total-salary" type="button">Total Salary: ${{proposal.salary}}</a></button>
+										</div>										
+										<div class="wt-hireduserstatus">
+											<a href="" class="btn btn-success">Pay Now </a>
+										</div>
+
+									</div>
+								</div>
+								{% endfor %}
+							</div>							
+                        </div>
+                    </div>						
+				</div>					
+			</div>
+
+			
+			<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
+				<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>150</h3>
+								<span>Total Ongoing Jobs</span>
+							</div>
+						</div> 
+					</div>
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent wt-componyfolow">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>1406</h3>
+								<span>Total Completed Jobs</span>
+							</div>
+						</div> 
+					</div>								
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent  wt-freelancelike">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>2075</h3>
+								<span>Total Cancelled Jobs</span>
+							</div>
+						</div> 
+					</div>								
+				</aside>
+				<div class="wt-companyad">
+					<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+					<span>Advertisement  255px X 255px</span>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Register Form End-->
+
+</section>
+  
+
+{% endblock content %}

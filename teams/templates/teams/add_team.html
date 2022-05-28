@@ -1,0 +1,240 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+					
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+					<div class="wt-title"><h2>Welcome to Team</h2></div>
+						<a href="javascript:void(0);" class="wt-btn" data-toggle="modal" data-target="#teammodal">Create A Team</a>
+					</div>					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Inner Home End-->
+	<section class="wt-haslayout">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="wt-greeting-holder">
+						<div class="row">
+							<div class="col-12 col-sm-12 col-md-12 col-lg-7 float-left">
+								<div class="wt-greetingcontent">
+									<div class="wt-sectionhead">
+										<div class="wt-sectiontitle">
+											<h2>Greetings &amp; Welcome</h2>
+											<span>Start Today For a Great Future</span>
+										</div>
+										{% if messages %}
+											<ul class="messages">
+												{% for message in messages %}
+												<li class="{{ message.tags }}"> {{ message }} </li>
+												{% endfor %}
+											</ul>
+											{% endif %}
+										<div class="wt-description">
+											{% for team in teams %}
+											<p>{{team.notice|linebreaksbr}}.</p>
+											{% endfor %}
+										</div>
+									</div>
+									<div id="wt-statistics" class="wt-statistics">
+										<div class="wt-statisticcontent wt-countercolor1">
+											<h3 data-from="0" data-to="1500" data-speed="8000" data-refresh-interval="50">1500</h3>
+											<em>k</em>
+											<h4>Active Projects</h4>
+										</div>
+										<div class="wt-statisticcontent wt-countercolor2">
+											<h3 data-from="0" data-to="99" data-speed="8000" data-refresh-interval="5.9">99%</h3>
+											<em>%</em>
+											<h4>Great Feedback</h4>
+										</div>
+										<div class="wt-statisticcontent wt-countercolor3">
+											<h3 data-from="0" data-to="5000" data-speed="8000" data-refresh-interval="100">5000</h3>
+											<em>k</em>
+											<h4>Active Freelancers</h4>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-sm-12 col-md-12 col-lg-5 float-left">
+								<div class="wt-greetingvideo">
+									<figure>
+										<a data-rel="prettyPhoto[video]" href="https://www.youtube.com/watch?v=J37W6DjqT3Q"><img src="{% static 'images/video-img.png' %}" alt="video">
+										</a>
+									</figure>
+								</div>
+							</div>
+								<div class="wt-title"><br>
+									<a href="javascript:void(0);" class="wt-btn" data-toggle="modal" data-target="#teammodal">Add Team</a>
+								</div>											
+						</div> <br>
+							<div class="wt-sectiontitle">
+								<h3>Listed Teams</h3>
+								<span>Teams you belong to</span>
+							</div>										
+					</div>
+				</div>
+			</div>						
+		</div>
+	</section>
+	
+	<!--More Details Start-->
+	<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+		<div class="container">
+			<div class="row">
+				{% for team in teams %}
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<figure class="wt-userlistingimg">
+							<img src="{% static 'images/thumbnail/group-02.jpg' %}" alt="image description" class="mCS_img_loaded">
+						</figure>
+						<h4>{{team.title}}</h4>
+						<h6>{% if team.created_by == request.user %}(Owner){% else %}(Member){% endif %}</h6>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<a class="btn btn-warning" href="{{team.get_team_detail_absolute_url}}"><h3>Go to team</h3></a>
+								{% if team.created_by == request.user %}
+								<a class="btn btn-success" href="javascript:void(0)"><h3>Activate</h3></a>
+								{% endif %}
+							</div>													
+						</div>
+					</div>
+				</div>
+				{% endfor %} 
+			</div>
+		</div>
+	</section>					
+
+	<!--Signup Start-->
+	<section class="wt-haslayout" role="dialog" id="profileexperiencemodal">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="wt-signupholder">
+						<div class="col-12 col-sm-12 col-md-12 col-lg-6 pull-right">
+							<div class="wt-signupcontent">
+								<div class="wt-title">
+									<h2><span> The designers</span>Katrr Team</h2>
+								</div>
+								<div class="wt-description">
+									<p>Consectetur adipisicing elit amissed dotem eiusmod tempor incuntes utneai labore etdolore.</p>
+								</div>
+								<div class="wt-btnarea">
+									<a href="javascript:void(0);" class="wt-btn wt-btnvtwo">Your Plan</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Signup End-->
+
+	<!--Our Team Start-->
+	<section class="wt-haslayout">
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="wt-ourteamhold wt-haslayout wt-bgwhite">
+						<div id="filter-masonry" class="wt-teamfilter wt-haslayout">
+							<div class="wt-sectionhead">
+								<div class="wt-sectiontitle">
+									<h2>Our Professionals</h2>
+									<span>Team Members Behind The Curtain</span>
+								</div>
+							</div>
+							{% for member in teams %}
+							<div class="wt-teamholder">
+								<figure class="wt-speakerimg">
+									<img src="{% static 'images/team/img-01.jpg' %}" alt="image description">
+								</figure>
+								<div class="wt-teamcontent">
+									<div class="wt-title">
+										<h2><a href="javascript:void(0);">{{member.title}}</a></h2>
+										<h2><a href="javascript:void(0);">{{member.members.profile.user.username}}</a></h2>
+										<span>Marketing Manager</span>
+									</div>
+									<ul class="wt-socialicons wt-socialiconssimple">
+										<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+										<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+										<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+										<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+									</ul>
+								</div>
+							</div>
+							{% endfor %}
+							<div class="wt-teamholder">
+								<figure class="wt-speakerimg">
+									<img src="{% static 'images/team/img-02.jpg' %}" alt="image description">
+								</figure>
+								<div class="wt-teamcontent">
+									<div class="wt-title">
+										<h2><a href="javascript:void(0);">Guadalupe</a></h2>
+										<span>Marketing Administrator</span>
+									</div>
+									<ul class="wt-socialicons wt-socialiconssimple">
+										<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+										<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+										<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+										<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Our Team End-->
+
+	<!-- Add team Popup Start-->
+	<!-- Popup Start-->
+	<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="teammodal">
+		<div class="modal-dialog" role="document">
+			<div class="wt-modalcontent modal-content">
+				<div class="wt-popuptitle">
+					<h2>About to Create Team</h2>
+					<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
+				</div>
+				<div class="modal-body">
+					<div class="wt-projectdropdown-hold">
+						<div class="wt-projectdropdown-option">
+							<div class="wt-projectselect">
+								<figure><img src="images/thumbnail/img-07.jpg" alt="img description"></figure>
+								<div class="wt-projectselect-content">
+									<h3>Project Title Here</h3>
+									<span><i class="lnr lnr-calendar-full"></i> Project Deadline: May 27, 2019</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+						<div class="form-group">
+							{{teamform.title.label}}
+							{{teamform.title}}
+						</div>
+						<div class="form-group">
+							{{teamform.notice.label}}
+							{{teamform.notice}}
+						</div>
+						<div class="form-group wt-btnarea">
+							<button type="submit" class="wt-btn"> Add Team </button>
+						</div>											
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Popup End-->
+				
+{% endblock %}

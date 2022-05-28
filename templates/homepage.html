@@ -1,0 +1,429 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+			<div class="wt-haslayout wt-bannerholder">
+				<div class="container">
+					<div class="row">
+						<div class="col-12 col-sm-12 col-md-12 col-lg-5">
+							<div class="wt-bannerimages">
+								<figure class="wt-bannermanimg" data-tilt>
+									<img src="{% static 'images/bannerimg/img-01.png' %}" alt="img description">
+									<img src="{% static 'images/bannerimg/img-02.png' %}" class="wt-bannermanimgone" alt="img description">
+									<img src="{% static 'images/bannerimg/img-03.png' %}" class="wt-bannermanimgtwo" alt="img description"> 
+								</figure>
+							</div>
+						</div>
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-7">
+							<div class="wt-bannercontent">
+								<div class="wt-bannerhead">
+									<div class="wt-title">
+										<h2 style="color:white">Hire expert for {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
+									</div>
+									<div class="wt-description">
+										<p>Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.</p>
+									</div>
+								</div>
+								<form class="wt-formtheme wt-formbanner">
+									<fieldset>
+										<div class="form-group">
+											<input type="text" name="fullname" class="form-control" placeholder="I’m looking for">
+											<div class="wt-formoptions">
+												<div class="wt-dropdown">
+													<span>In: <em class="selected-search-type">Freelancers </em><i class="lnr lnr-chevron-down"></i></span>
+												</div>
+												<div class="wt-radioholder">
+													<span class="wt-radio">
+														<input id="wt-freelancers" data-title="Freelancers" type="radio" name="searchtype" value="freelancer" checked>
+														<label for="wt-freelancers">Freelancers</label>
+													</span>
+													<span class="wt-radio">
+														<input id="wt-jobs"  data-title="Jobs" type="radio" name="searchtype" value="job">
+														<label for="wt-jobs">Jobs</label>
+													</span>
+													<span class="wt-radio">
+														<input id="wt-company"  data-title="Companies" type="radio" name="searchtype" value="job">
+														<label for="wt-company">Companies</label>
+													</span>
+												</div>
+												<a type="button" href="userlisting.html" class="wt-searchbtn"><i class="lnr lnr-magnifier"></i></a>
+											</div>
+										</div>
+									<fieldset>
+								</form>
+								<div class="wt-videoholder">
+									<div class="wt-videoshow">
+										<a data-rel="prettyPhoto[video]" href="https://www.youtube.com/watch?v=J37W6DjqT3Q"><i class="fa fa-play"></i></a>
+									</div>
+									<div class="wt-videocontent">
+										<span>See For Yourself!<em>How it works &amp; experience the ultimate joy.</em></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!--Home Banner End-->
+			<div class="wt-categoriesslider-holder wt-haslayout">
+				<div class="wt-title">
+					<h2>All Categories:</h2>
+				</div>
+				<div id="wt-categoriesslider" class="wt-categoriesslider owl-carousel">
+                    {% for category in categories %}
+					<div class="wt-categoryslidercontent item">
+						<figure><img src="{{category.icon.url}}" alt="image description"></figure>
+						<div class="wt-cattitle">
+							<h3><a href="{{category.category_absolute_url}}">{{category.name}}</a></h3>
+							<span>Items: {{category.proposal.count}}</span>
+						</div>
+					</div>
+                    {% endfor %}
+				</div>
+			</div>			
+			<!--Main Start-->
+			<main class="wt-haslayout" style="background:white;">
+				<!--Categories Start-->
+				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>Explore Categories</h2>
+										<span>Professional by categories</span>
+									</div>
+								</div>
+							</div>
+							<div class="wt-categoryexpl">
+                			{% for category in categories %}
+								<div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 float-left">
+									<div class="wt-categorycontent">
+										<figure><img src="{{category.icon.url}}" alt="image description"></figure>
+										<div class="wt-cattitle">
+											<h3><a href="javascrip:void(0);">{{category.name}}</a></h3>
+											<span>Items: ({{category.proposal.count}})</span>
+										</div>
+										<div class="wt-categoryslidup">
+											<p>{{category.preview}}.</p>
+											<a href="{{category.category_absolute_url}}">Explore <i class="fa fa-arrow-right"></i></a>
+										</div>
+									</div>
+								</div>
+                			{% endfor %}
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+									<div class="wt-btnarea">
+										<a href="javascript:void(0)" class="wt-btn">View All</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!--Categories End-->
+
+				<!--Company listing starts-->
+				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>Explore Proposals</h2>
+										<span>Verified Proposals</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>				
+					<div class="wt-companysinfoholder">	
+						<div class="container">
+							<div class="row justify-content-md-center">
+							{% for proposal in proposal_list %}
+								<div class="col-12 col-sm-12 col-md-12 col-lg-3">
+									<div class="wt-companysdetails">
+										<figure class="wt-companysimg">
+										{% if proposal.thumbnail %}
+											<img src="{{proposal.thumbnail.url}}" alt="img description">
+										{% else %}
+											<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" alt="img description">
+										{% endif %}
+										</figure>
+										<div class="wt-companysinfo">
+											<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description"></figure>
+											<div class="wt-title">
+												<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_short_name}}{% endif %}</a>
+												<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title}}</p></a> 
+												<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
+											<hr>
+											<ul class="wt-postarticlemeta">
+												<li>
+													<a href="javascript:void(0);">
+														<span>Views()</span>
+													</a>
+												</li>
+												<li class="wt-following">
+													<a href="javascript:void(0);">
+														<span>Bookmark</span>
+													</a>
+												</li>
+											</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+								{% endfor %}
+								{% if not proposal_list %}
+									<p> No featured proposals to show yet </p>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+								<figure class="wt-mobileimg">
+									<img src="{% static 'images/work/img-03.jpg' %}" alt="img description">
+								</figure>
+							</div>
+							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+								<div class="wt-experienceholder">
+									<div class="wt-sectionhead">
+										<div class="wt-sectiontitle">
+											<h2>#1 Choice for Businesses</h2>
+											<span>Business on the Go</span>
+										</div>
+										<div class="wt-description">
+											<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce.</p>
+											<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumed perspiciatis.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+								<figure class="wt-mobileimg">
+									<a data-rel="prettyPhoto[video]" href="https://www.youtube.com/watch?v=J37W6DjqT3Q"><img src="{% static 'images/video-img.png' %}" alt="video"></a>
+								</figure>
+							</div>
+							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-right">
+								<div class="wt-experienceholder">
+									<div class="wt-sectionhead">
+										<div class="wt-sectiontitle">
+											<h2>What others Say?</h2>
+											<span>Business on the Go</span>
+										</div>
+										<div class="wt-description">
+											<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce.</p>
+											<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumed perspiciatis.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>	
+
+				<section class="wt-haslayout wt-main-section"> 
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>Explore Projects</h2>
+										<span>Verified Projects</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>								
+					{% for project in projects %}
+					<div class="container mt-5 mb-5">
+						<div class="d-flex justify-content-center row">
+							<div class="col-md-12">
+								<div class="row p-2 bg-white border rounded">
+									<div class="col-md-3 mt-1">
+										<img class="img-fluid img-responsive rounded project-image" src="https://i.imgur.com/QpjAiHq.jpg">
+									</div>
+									<div class="col-md-6 mt-1">
+										<h5> {{project.title}}</h5>
+										<p class="text-justify para mb-0" >{{project.preview}}<br><br></p>
+										<div class="wt-tag wt-widgettag">
+										<h5>Skills Required:</h5>
+											{% for skill in project.project_skill.all %}
+												<a href="javascript:void(0);">{{skill}}</a>
+											{% endfor %}
+										</div>
+									</div>
+									<div class="align-items-center align-content-center col-md-3 border-left mt-1">
+										<div class="d-flex flex-row align-items-center">
+											<h4 class="text-success mr-1">Budget: ${{project.amount}}</h4>
+										</div>
+										<h6 class="text-danger">Type: {{project.specification}}</h6>
+										<h6 class="text-info">Spec: {{project.project_type}}</h6>
+										<h6 class="badge bg-success bg-gradient rounded-pill mb-2 text-white">New Jobs</h6>
+										<div class="d-flex flex-column mt-4"><button class="btn btn-primary btn-sm" type="button"><a href="{{project.get_project_absolute_url}}">Details</a></button>
+										<button class="btn btn-outline-primary btn-sm mt-2" type="button"><a href="{{project.get_project_absolute_url}}">Add to wishlist</a></button></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				</section>
+				<section class="wt-haslayout wt-main-section"> 
+				<div class="demo10">
+					<div class="container">
+						<h2 class="py-4 text-center">Pricing Plan</h2>
+						<div class="row">
+							{% for package in packages %}
+							<div class="col-md-3 col-sm-6">
+								<div class="pricingTable10">
+									<div class="pricingTable-header">
+										<h3 class="heading">{% firstof package.verbose_type package.type %}</h3>
+										<div class="wt-tag wt-widgettag">
+											<a href="javascript:void(0);">{{package.get_status_display}}</a>
+										</div><br><br>
+										<span class="price-value">
+											<span class="currency">Package Price: ${{package.price}}</span> <br><br>
+										</span>
+									</div>
+									<div class="pricing-content">
+										<ul>
+											{% if package.max_member_per_team > 1 %} <i class="ti-check">   Goup Chat Available</i><br><br> {% else %} <i class="ti-na">  No Group Chat </i><br><br>{% endif %}
+											{% if package.max_member_per_team > 0 %} <i class="ti-check">  {{package.max_member_per_team}} Member{{package.max_member_per_team|pluralize}} Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.max_member_per_team}} Max member Per Team </i><br><br>{% endif %}
+											{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">  {{package.monthly_offer_contracts_per_team}} Monthly Offer Contracts Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.monthly_offer_contracts_per_team}} Monthly Offer Contracts Per Team </i><br><br>{% endif %}
+											{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">  {{package.max_proposals_allowable_per_team}} Max Proposals Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}} Max Proposals Per Team </i><br><br>{% endif %}
+											{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check">  {{package.monthly_projects_applicable_per_team}} Monthly Job/Project Applicable Per Team </i><br><br> {% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}} Monthly Job/Project Applicable Per Team </i><br><br>{% endif %}
+											{% if package.daily_Handshake_mails_to_clients > 0 %} <i class="ti-check">  {{package.daily_Handshake_mails_to_clients}} Daily Handshake Mails Per Invoice to client </i><br><br> {% else %} <i class="ti-na">  {{package.daily_Handshake_mails_to_clients}} Daily Handshake Mails Per Invoice to client </i><br><br>{% endif %}
+											{% if package.max_member_per_team > 0 %} <i class="ti-check">  {{package.max_member_per_team}} Max member Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.max_member_per_team}} Max member Per Team </i><br><br>{% endif %}
+										</ul>
+										<a href="#" class="read">sign up</a>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+							<div class="col-md-3 col-sm-6">
+								<div class="pricingTable10">
+									<div class="pricingTable-header">
+										<h3 class="heading">Extra</h3>
+										<span class="price-value">
+											<span class="currency"></span> Want More?
+										</span>
+									</div>
+									<div class="pricing-content">
+										<ul>
+											<li>needs more members team? </li>
+											<li>needs more projects to Apply?</li>
+											<li>needs more proposals to create?</li>
+											<li>needs online and offline chat alert?</li>
+											<li>needs more team members Invite?</li>
+											<li>and more?</li>
+										</ul>
+										<a href="#" class="read">Contact Us</a>
+									</div>
+								</div>
+							</div> 
+						</div>
+					</div>
+				</div>				 
+				</section>	
+
+				<section class="wt-haslayaout wt-main-section wt-footeraboutus">
+					<div class="container">
+						<div class="row">
+							<div class="col-12 col-sm-6 col-md-3 col-lg-3">
+								<div class="wt-widgetskills">
+									<div class="wt-fwidgettitle">
+										<h3>By Skills</h3>
+									</div>
+									<ul class="wt-fwidgetcontent">
+										<li><a href="javascript:void(0);">Software Engineer</a></li>
+										<li><a href="javascript:void(0);">Technical Writer</a></li>
+										<li><a href="javascript:void(0);">UI Designer</a></li>
+										<li><a href="javascript:void(0);">UX Designer</a></li>
+										<li><a href="javascript:void(0);">Virtual Assistant</a></li>
+										<li><a href="javascript:void(0);">Web Designer</a></li>
+										<li><a href="javascript:void(0);">Wordpress Developer</a></li>
+										<li><a href="javascript:void(0);">Content Writer</a></li>
+										<li class="wt-viewmore"><a href="javascript:void(0);">+ View All</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="col-12 col-sm-6 col-md-3 col-lg-3">
+								<div class="wt-widgetskill">
+									<div class="wt-fwidgettitle">
+										<h3>Skills In US</h3>
+									</div>
+									<ul class="wt-fwidgetcontent">
+										<li><a href="javascript:void(0);">HTML Developers in US</a></li>
+										<li><a href="javascript:void(0);">HTML5 Developers in US</a></li>
+										<li><a href="javascript:void(0);">JavaScript Developers in US</a></li>
+										<li><a href="javascript:void(0);">Microsoft Word Experts in US</a></li>
+										<li><a href="javascript:void(0);">PowerPoint Experts in US</a></li>
+										<li><a href="javascript:void(0);">Social Media Marketers in US</a></li>
+										<li><a href="javascript:void(0);">WordPress Developers in US</a></li>
+										<li><a href="javascript:void(0);">Writers in US</a></li>
+										<li class="wt-viewmore"><a href="javascript:void(0);">+ View All</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="col-12 col-sm-6 col-md-3 col-lg-3">
+								<div class="wt-footercol wt-widgetcategories">
+									<div class="wt-fwidgettitle">
+										<h3>By Categories</h3>
+									</div>
+									<ul class="wt-fwidgetcontent">
+										{% for category in categories %}
+										<li><a href="{{category.category_absolute_url}}">{{category.name}}</a></li>
+										{% endfor %}
+										<li class="wt-viewmore"><a href="javascript:void(0);">+ View All</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="col-12 col-sm-6 col-md-3 col-lg-3">
+								<div class="wt-widgetbylocation">
+									<div class="wt-fwidgettitle">
+										<h3>By Location</h3>
+									</div>
+									<ul class="wt-fwidgetcontent">
+										<li><a href="javascript:void(0);">Switzerland</a></li>
+										<li><a href="javascript:void(0);">Canada</a></li>
+										<li><a href="javascript:void(0);">Germany</a></li>
+										<li><a href="javascript:void(0);">United Kingdom</a></li>
+										<li><a href="javascript:void(0);">Japan</a></li>
+										<li><a href="javascript:void(0);">Sweden</a></li>
+										<li><a href="javascript:void(0);">Australia</a></li>
+										<li><a href="javascript:void(0);">United States</a></li>
+										<li class="wt-viewmore"><a href="javascript:void(0);">+ View All</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</main>	
+
+			{% include 'dashboard/main_footer.html' %}
+			<script src="{% static 'js/typed-2.0.js' %}"></script>
+			<script>
+				let typed = new Typed(".autoTyper", {
+					strings: [{% for typer in pypist %}"{{typer}}",{% endfor %}],
+					typeSpeed: 100,
+					backSpeed: 100,
+					loop: true
+				})
+				
+			</script>
+			
+{% endblock %}

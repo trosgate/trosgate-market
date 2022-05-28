@@ -1,0 +1,80 @@
+{% extends 'dashboard/main_base.html' %}
+
+{% load static %} 
+
+{% block content %}
+<main class="wt-haslayout" style="background:white;">
+	<article class="card-body mx-auto" style="max-width: 450px;">
+		<h1 class="card-title mt-4 text-center">Login</h1>
+		<p class="text-center">Let us Log you In</p>
+		
+	<div class="container">
+
+		<form method="post" autocomplete="off">
+			{% csrf_token %}
+			{% if loginform.errors %}
+			{% for field in loginform %}
+			{% if field.errors %}
+			<div class="alert alert-primary" role="alert">
+				{{ field.errors|striptags }}
+			</div>
+			{% endif %}
+			{% endfor %}
+			{% endif %}
+
+			<div class="input-group col-lg-12 mb-4">
+				<div class="input-group-prepend">
+					<span class="input-group-text bg-white px-3 border-md border-right-0">
+						<i class="fa fa-envelope text-muted"></i>
+					</span>
+				</div>
+				{{ loginform.email }}
+			</div>
+			<div class="input-group col-lg-12 mb-4">
+				<div class="input-group-prepend">
+					<span class="input-group-text bg-white px-3 border-md border-right-0">
+						<i class="fa fa-lock text-muted"></i>
+					</span>
+				</div>
+				{{ loginform.password }}
+			</div>
+				<!-- google recaptcha Button -->
+			<div class="input-group col-lg-12 mb-4">
+				<div class="form-group g-recaptcha" data-sitekey="{{googleRecaptcha.site_key}}"></div>	
+			</div>
+			<div class="input-group col-lg-12 mb-4">
+				<button type="submit" class="btn btn-primary btn-block"> Login </button>
+			</div>
+			<p class="text-center">Forgot? <a href="{% url 'account:passwordreset'%}">Reset Password</a> </p>
+			<p class="text-center">Don't have an account? <a href="{% url 'account:register' %}">Register</a> </p>
+		</form>
+	</div>       
+	</article>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<div class="wt-proposalholder mt-6">
+		<div class="row justify-content-md-center">
+			<div class="wt-sectionhead wt-textcenter">
+				<span>Copyright @ {{website.site_name}}</span>
+			</div>
+		</div>
+	</div>
+</main>
+
+{% endblock%}
+
+
+
+
+        

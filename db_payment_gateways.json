@@ -1,0 +1,35 @@
+[
+    {
+        "model": "general_settings.paymentgateway",
+        "pk": 1,
+        "fields": {
+            "name": "PayPal",
+            "status": true,
+            "default": true,
+            "processing_fee": 7,
+            "ordering": 1
+        }
+    },
+    {
+        "model": "general_settings.paymentgateway",
+        "pk": 2,
+        "fields": {
+            "name": "Stripe",
+            "status": true,
+            "default": false,
+            "processing_fee": 10,
+            "ordering": 2
+        }
+    },
+    {
+        "model": "general_settings.paymentgateway",
+        "pk": 3,
+        "fields": {
+            "name": "Flutterwave",
+            "status": true,
+            "default": false,
+            "processing_fee": 3,
+            "ordering": 3
+        }
+    }
+]

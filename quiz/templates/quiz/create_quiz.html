@@ -1,0 +1,88 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+{% include 'dashboard/main_sidebar.html' %}
+
+
+                    <main id="wt-main" class="wt-main wt-haslayout">
+                            
+                        <div class="container">
+                            <div class="row justify-content-md-center">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                                        <div class="wt-dashboardbox">
+                                            <div class="wt-dashboardboxtitle">
+                                                <h2>Create Quiz</h2>
+                                            </div>
+                                            <div class="wt-dashboardboxcontent">
+                                                {% if quiz_form.errors %}
+                                                <p>{{ quiz_form.non_field_errors }}</p>
+                                                {% for field in quiz_form %}
+                                                {% if field.errors %}
+                                                <div class="alert alert-danger" role="alert">
+                                                    {{ field.label }}{{ field.errors|striptags }}
+                                                </div>
+                                                {% endif %}
+                                                {% endfor %}
+                                                {% endif %}
+                                                <div class="wt-jobdescription wt-tabsinfo">
+                                                    <div class="wt-tabscontenttitle">
+                                                        <h2>Quiz Overview</h2>
+                                                    </div>									
+                                                    <form method="POST" enctype="multipart/form-data">
+                                                        {% csrf_token %}										
+                                                        <div class="form-group">
+                                                            {{quiz_form.title.label}}
+                                                            {{quiz_form.title}}
+                                                        </div>
+            
+                                                        <div class="form-group">
+                                                            {{quiz_form.instruction.label}}											
+                                                            {{quiz_form.instruction}}											
+                                                        </div>
+
+                                                 
+                                                <div class="wt-jobdetails wt-tabsinfo">
+                                                    <div class="wt-tabscontenttitle">
+                                                        <h2>Controls</h2>
+                                                    </div>
+                                                                                                            
+                                                        <div class="form-group">
+                                                            {{quiz_form.skills.label}}
+                                                            {{ quiz_form.skills}}	
+                                                        </div>
+
+                                                        <div class="form-group form-group-half wt-formwithlabel">
+                                                            {{quiz_form.attempts.label}}
+                                                            {{quiz_form.attempts}}	
+                                                        </div>
+            
+                                                        <div class="form-group form-group-half wt-formwithlabel">
+                                                            {{quiz_form.duration.label}}
+                                                            {{quiz_form.duration}}	
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            {{quiz_form.is_published.label}}
+                                                            {{quiz_form.is_published}}	
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                </div>
+                                                    <div class="wt-updatall">
+                                                        <i class="ti-announcement"></i>
+                                                        <span>Create Quiz by just clicking on “Add a Quiz” button.</span>
+                                                        <button type="submit" class="wt-btn"><i class="fa fa-folder-open" aria-hidden="true"></i> Add a Quiz </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </main>
+                            {% endblock %}
+                            
+
+
+

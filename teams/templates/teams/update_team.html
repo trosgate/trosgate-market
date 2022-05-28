@@ -1,0 +1,291 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+					
+					<!--Inner Home Banner Start-->
+					<div class="wt-haslayout wt-innerbannerholder">
+						<div class="container">
+							<div class="row justify-content-md-center">
+								<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+									<div class="wt-innerbannercontent">
+									<div class="wt-title"><h2>Update Team</h2></div>
+									</div>					
+								</div>
+							</div>
+						</div>
+					</div>
+			
+					<!--Inner Home End-->
+					<section class="wt-haslayout">
+						<div class="container">
+							<div class="row">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="wt-greeting-holder">
+										<div class="row">                         												
+											<div class="col-12 col-sm-12 col-md-12 col-lg-7 float-left">
+												<div class="wt-greetingcontent">
+													<div class="wt-sectionhead">
+														<div class="wt-sectiontitle">
+															<h2>Welcome to Team</h2>
+															<span>About to make changes</span>
+														</div>
+														<form method="POST", action='.', id="updateteammodal"> {% csrf_token %}
+															<div class="form-group">
+																{{update_teamform.title.label}}
+																{{update_teamform.title}}
+															</div>
+															<div class="form-group">
+																{{update_teamform.notice.label}}
+																{{update_teamform.notice}}
+															</div>
+															<div class="form-group wt-btnarea">
+																<button type="submit" class="wt-btn"> Update Team </button>
+															</div>											
+														</form>                   														
+													</div>
+												</div>
+											</div>
+											<div class="col-12 col-sm-12 col-md-12 col-lg-5 float-left">
+												<div class="wt-greetingvideo">
+													<figure>
+														<a data-rel="prettyPhoto[video]" href="https://www.youtube.com/watch?v=J37W6DjqT3Q"><img src="{% static 'images/video-img.png' %}" alt="video">
+														</a>
+													</figure>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!--Greetings & Welcome End-->
+
+					<!--Signup Start-->
+					<section class="wt-haslayout" role="dialog" id="profileexperiencemodal">
+						<div class="container">
+							<div class="row">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="wt-signupholder">
+										<div class="col-12 col-sm-12 col-md-12 col-lg-6 pull-right">
+											<div class="wt-signupcontent">
+												<div class="wt-title">
+													<h2><span> The designers</span>Katrr Team</h2>
+												</div>
+												<div class="wt-description">
+													<p>Consectetur adipisicing elit amissed dotem eiusmod tempor incuntes utneai labore etdolore.</p>
+												</div>
+												<div class="wt-btnarea">
+													<a href="javascript:void(0);" class="wt-btn wt-btnvtwo">New Team</a>
+													<a href="javascript:void(0);" class="wt-btn">Edit Team</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!--Signup End-->
+					<!--Our Team Start-->
+					<section class="wt-haslayout">
+						<div class="container">
+							<div class="row">
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="wt-ourteamhold wt-haslayout wt-bgwhite">
+										<div id="filter-masonry" class="wt-teamfilter wt-haslayout">
+											<div class="wt-sectionhead">
+												<div class="wt-sectiontitle">
+													<h2>Our Professionals</h2>
+													<span>Team Behind The Curtain</span>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-01.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Luisa Moxley</a></h2>
+														<span>Marketing Manager</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-02.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Guadalupe</a></h2>
+														<span>Marketing Administrator</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-03.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Brande Feeley</a></h2>
+														<span>Marketing Director</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-04.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Joseph Farner</a></h2>
+														<span>VP Marketing</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-05.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Rozella Hott</a></h2>
+														<span>Marketing Director</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-06.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Duane Villalta</a></h2>
+														<span>Marketing Administrator</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-07.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Johanne Deyoung</a></h2>
+														<span>VP Marketing</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="wt-teamholder">
+												<figure class="wt-speakerimg">
+													<img src="{% static 'images/team/img-08.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-teamcontent">
+													<div class="wt-title">
+														<h2><a href="javascript:void(0);">Joseph Farner</a></h2>
+														<span>Marketing Manager</span>
+													</div>
+													<ul class="wt-socialicons wt-socialiconssimple">
+														<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook"></i></a></li>
+														<li class="wt-twitter"><a href="javascript:void(0);"><i class="fa fa-twitter"></i></a></li>
+														<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fa fa-linkedin"></i></a></li>
+														<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fa fa-google-plus"></i></a></li>
+													</ul>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!--Our Team End-->
+
+
+					<!-- Update team Popup Start-->
+					<!-- Popup Start-->
+					<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="updateteammodal">
+						<div class="modal-dialog" role="document">
+							<div class="wt-modalcontent modal-content">
+								<div class="wt-popuptitle">
+									<h2>About to Create Team</h2>
+									<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
+								</div>
+								<div class="modal-body">
+									<div class="wt-projectdropdown-hold">
+										<div class="wt-projectdropdown-option">
+											<div class="wt-projectselect">
+												<figure><img src="images/thumbnail/img-07.jpg" alt="img description"></figure>
+												<div class="wt-projectselect-content">
+													<h3>Project Title Here</h3>
+													<span><i class="lnr lnr-calendar-full"></i> Project Deadline: May 27, 2019</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+										<div class="form-group">
+											{{update_teamform.title.label}}
+											{{update_teamform.title}}
+										</div>
+										<div class="form-group">
+											{{update_teamform.notice.label}}
+											{{update_teamform.notice}}
+										</div>
+										<div class="form-group wt-btnarea">
+											<button type="submit" class="wt-btn"> Update Team </button>
+										</div>											
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Popup End-->						
+{% endblock %}

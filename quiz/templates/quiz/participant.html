@@ -1,0 +1,119 @@
+
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Your Quiz Takers</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="index-2.html">Potential Participants for your Long-Term projects</a></li>
+							</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wt-categoriesslider-holder wt-haslayout">
+				<div class="wt-title">
+					<h2>Job Categories:</h2>
+				</div>
+				<div id="wt-categoriesslider" class="wt-categoriesslider owl-carousel">
+          {% for category in categories %}
+					<div class="wt-categoryslidercontent item">
+						<figure><img src="{{category.icon.url}}" alt="image description"></figure>
+						<div class="wt-cattitle">
+							<h3><a href="{{category.category_absolute_url}}">{{category.name}}</a></h3>
+							<span>Items: {{category.project.count}}</span>
+						</div>
+					</div>
+          {% endfor %}
+				</div>
+			</div>
+			<!--Inner Home End-->
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+				<div class="wt-main-section wt-haslayout">
+					<!-- User Listing Start-->
+					<div class="wt-haslayout">
+						<div class="container">
+							<div class="row">
+								<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
+										<div class="wt-usersidebaricon">
+											<span class="fa fa-cog wt-usersidebardown">
+												<i></i>
+											</span>
+										</div>
+                      					{% for part in participants %}
+											<div class="wt-userlistinghold wt-featured">
+												<figure class="wt-userlistingimg">
+													<a href="{{part.participant.freelancer.freelancer_profile_absolute_url}}"><img src="{{part.participant.freelancer.profile_photo.url}}" alt="image description"></a>
+												</figure>
+												<div class="wt-userlistingcontent">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="{{part.participant.freelancer.freelancer_profile_absolute_url}}"><i class="fa fa-check-circle"></i> {{part.participant.freelancer.user.get_full_name}}</a>
+															<a href="{{part.participant.freelancer.freelancer_profile_absolute_url}}">{{part.participant.freelancer.tagline}} </a>
+														</div>
+														<ul class="wt-userlisting-breadcrumb">
+                              								<li><span><i class="far fa-money-bill-alt"></i> ${{part.participant.freelancer.hourly_rate}}/ hr</span></li>
+															<li><span>{% if part.participant.freelancer.user.country.flag %}<img src="{{part.participant.freelancer.user.country.flag.url}}" alt="img description"> {% else %}{{part.participant.freelancer.user.country.country_code}} - {% endif %} {{part.participant.freelancer.user.country.name}}</span></li>
+															<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+														</ul>
+													</div>
+													<div class="wt-rightarea">
+														<span class="wt-starcontent">4.5/<sub>5</sub> <em>(860 Feedback)</em></span>
+														<span class="wt-starsvtwo">
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+														</span>
+													</div>
+												</div>
+												<div class="wt-description">
+                          						<p>{{part.participant.freelancer.description|truncatechars:290}}...</p>
+												</div>
+												<div class="wt-tag wt-widgettag">
+                          						{% for skill in part.participant.freelancer.skill.all %}
+													<a href="javascript:void(0);">{{skill}}</a>
+                          						{% endfor %}
+												</div> 
+												<span style="color: blue; font-weight: bold;">Stats: -{{quiz.attempts}}- attempts with Quiz Score of {{part.score}}</span>
+											</div>                      
+												{% endfor %}
+																</div>
+											{% if not participants %}
+											<div class="alert alert-info" role="alert">
+												<span style="color: green; font-weight: bold;"><p> Ooops! No participant Available for your Quiz Yet<p></span>
+											</div>
+											{% endif %}                        
+										</div>
+									</div>
+				
+								<div>
+								{% comment %} <nav class="wt-pagination">
+									<ul>
+										<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+										<li><a href="javascrip:void(0);">1</a></li>
+										<li><a href="javascrip:void(0);">2</a></li>
+										<li><a href="javascrip:void(0);">3</a></li>
+										<li><a href="javascrip:void(0);">4</a></li>
+										<li><a href="javascrip:void(0);">...</a></li>
+										<li><a href="javascrip:void(0);">50</a></li>
+										<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+									</ul>
+								</nav>                                     {% endcomment %}
+							</div>
+						</div>
+					</div>
+				</main>
+     {% endblock content %}
+
+

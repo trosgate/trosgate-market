@@ -1,0 +1,80 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+
+            {% if request.user.freelancer %}
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="alert alert-info" role="alert">
+                                <span style="color: green; font-weight: bold;">!Alert: Ensure to track your daily activities on each proposal for the team founder to assess your performance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>										
+            </section>
+          
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="wt-insightsitem wt-dashboardbox">
+                    <div class="card">
+                        <div class="card-header">
+                            Proposals Assigned to You
+                        </div>
+
+                            {% if assigned|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                    <tr>
+
+                                        <th>Number</th>
+                                        <th>Assigned By</th>
+                                        <th>Proposal</th>
+                                        <th>Assigned On</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for assignee in assigned %}
+                                    <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{assignee.assignor.get_full_name}}</td>
+                                    <td>{{assignee.proposal|truncatechars:100}}</td>
+                                    <td>{{assignee.created_at|date:"M d, y" }}</td>
+                                    <td>
+										<a href="{% url 'teams:proposal_tracking' assignee.proposal.slug assignee.id %}" class="btn btn-success"><i class="fas fa-spinner fa-spin"></i> Start Tracking</a>
+									</td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+							{% if not assigned %}
+							<p> Ooops! no proposal assigned to you Yet<p>
+							{% endif %}
+				        </div>				
+                    </div>
+                </div>										
+            </section>
+            {% endif %}
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>I am Freelancer</span>
+					</div>
+				</div>
+			</div>
+			</main>
+
+{% endblock %}
+

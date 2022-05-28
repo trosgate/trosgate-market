@@ -1,0 +1,349 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxtitle">
+								<h2>Manage {{ teams.title }}</h2>
+							</div>
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
+									<div class="wt-userlistingcontent">
+										<div class="wt-contenthead">
+											<div class="wt-title">
+												<h3>{{ teams.title }}</h3>
+											</div>
+											<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
+												<li><span class="wt-dashboradclock"><i class="fa fa-arrow-up"></i>You Are: {% if teams.created_by == request.user %}Owner{% else %}Member{% endif %}</span></li>															
+												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Created: {{teams.created_at|timesince}} ago</span></li>															
+												<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>Status: {{teams.get_status_display}}</span></li>
+												<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i> Plan:...</span></li>
+											</ul>
+										</div>
+									<div class="wt-description">
+										<h5>About "{{ teams.title }}" </h5>
+											<span>{{teams.notice|slice:200}} ...</span>
+									</div>	
+									<div class="wt-rightarea">
+										<div class="wt-btnarea">										
+										<a class="wt-btnarea"><a href="{% url 'teams:teamchatroom' %}" class="btn btn-danger">Group Chat</a>
+										<a class="wt-btnarea"><a href="/" class="btn btn-success">Go Back</a>
+										</div>
+										<div class="wt-hireduserstatus">
+											<h4>{{teams.members.count}}</h4><span>Team Members</span>
+											<ul class="wt-hireduserimgs">
+												{% for member in teams.members.all %}
+												<li><figure><img src="{{member.freelancer.profile_photo.url}}" alt="img description"></figure></li>
+												{% endfor %}
+											</ul>									
+										</div>
+										<div class="wt-hireduserstatus">
+											<h4>{{teams.created_by.get_full_name}}</h4><span>Founder from {{teams.created_by.country.name}}</span>
+											<ul class="wt-hireduserimgs">
+												<li><figure><img src="{{teams.created_by.freelancer.profile_photo.url}}" alt="img description"></figure></li>
+											</ul>									
+										</div>																				
+									</div>			
+								</div>								
+							</div>
+							{% if teams.created_by == request.user %}
+
+							<section class="wt-haslayout wt-dbsectionspace">
+								<div class="row">
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="card">
+										<div class="card-header">
+											<h5>Team Owner Actions</h5>
+										</div>
+				
+										<div class="table-responsive">
+											<table class="table table-striped table-sm">
+												<thead>
+												<tr>
+			
+													<th>Make Changes</th>
+													<th>Close Team</th>
+			
+												</tr>
+												</thead>
+												<tbody>
+			
+												<tr>
+													<td><a href="{{teams.get_team_update_absolute_url}}" class="btn btn-warning">Modify</a></td>
+													<td><a href="{{teams.get_team_delete_absolute_url}}" class="btn btn-danger" data-toggle="modal" data-target="#assignteammodal">Close Team</a></td>
+												</tr>
+			
+												</tbody>
+											</table>
+										</div>										
+									</div>										
+								</div>										
+							</section>							
+							{% endif %} 
+
+
+							<section class="wt-haslayout wt-dbsectionspace">
+							<div class="wt-freelancerholder wt-rcvproposalholder">
+								<div class="wt-tabscontenttitle">
+									<h2>{{teams.title}} has {{applications.count}} Application{{applications.count|pluralize}}</h2>
+								</div>									 
+				
+									<div class="row">
+										<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+											<div class="card">
+												<div class="card-header">
+													<h5>Team Owner Actions</h5>
+												</div>
+					
+												<div class="table-responsive">
+													<table class="table table-striped table-sm">
+													<thead>
+													<tr>
+														<th>#</th>
+														<th>Project(s) Applied</th>
+														<th>Date Awarded</th>
+														{% comment %} <th>Assign</th> {% endcomment %}
+														<th>Status</th>
+				
+													</tr>
+													</thead>
+													<tbody>
+				
+														{% for application in applications %}
+														<tr>
+														<td>{{forloop.counter}}</td> 
+														<td><a href="">{{application.project.title}}</a></td>
+														<td>{{application.created_at|date:"d-m-Y"}}</td>
+														{% comment %} <td><a href="{% url 'teams:assign_project' application.id application.project.slug %}" class="btn btn-success">Assign Me</a></td> {% endcomment %}
+														<td><a href="#" class="btn btn-xs btn-warning">Tracker</a></td>
+														</tr>
+														{% endfor %}
+				
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>										
+								</div>
+								</section>
+
+								<section class="wt-haslayout wt-dbsectionspace">
+									<div class="wt-freelancerholder wt-rcvproposalholder">
+										<div class="wt-tabscontenttitle">
+											<h2>{{teams.title}} has {{teams.proposals.count}} proposal{{teams.proposals.count|pluralize}}</h2>
+										</div>									 
+						
+										<div class="row">
+											<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+												<div class="card">
+													<div class="card-header">
+														<h5>Team Owner Actions</h5>
+													</div>
+						
+													<div class="table-responsive">
+														<table class="table table-striped table-sm">
+														<thead>
+														<tr>
+					
+															<th>#</th>
+															<th>Title</th>
+															<th>Preview</th>
+															<th>Assign</th>
+					
+														</tr>
+														</thead>
+														<tbody>
+					
+															{% for proposal in proposals %}
+															<tr>
+															<td>{{forloop.counter}}</td> 
+															<td><a href="">{{proposal.title}}</a></td>
+															<td>
+																<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}" class="btn btn-info">View</a>
+															</td>
+															<td>
+																<a href="{% url 'teams:assign_proposal' proposal.team.slug proposal.slug %}" class="btn btn-success">Assign</a>
+															</td>
+															</tr>
+															{% endfor %}
+					
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>										
+									</div>
+							</section>
+		
+							<section class="wt-haslayout wt-dbsectionspace">
+								<div class="wt-freelancerholder wt-rcvproposalholder">
+									<div class="wt-tabscontenttitle">
+										<h2>{{teams.title}} has {{teams.members.count}} active team Member{{teams.members.count|pluralize}}</h2>
+									</div>									 
+					
+									<div class="row">
+										<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+											<div class="card">
+												<div class="card-header">
+													<h5>Members Profile</h5>
+												</div>
+					
+												<div class="table-responsive">
+													<table class="table table-striped table-sm">
+													<thead>
+														<tr>
+					
+															<th>#</th>
+															<th>Image</th>
+															<th>Country</th>
+															<th>Username</th>
+															{% if active_team.created_by == request.user %}<th>Email</th>{% endif %}
+															<th>Profile</th>
+					
+														</tr>
+														</thead>
+														<tbody>
+					
+															{% for member in teams.members.all %}
+															<tr>
+															<td>{{forloop.counter}}</td> 
+															<td>
+																<div class="wt-teamholder">
+																	<figure class="wt-speakerimg">
+																		
+																		<img src="{% if member.freelancer.profile_photo.url %}{{member.freelancer.profile_photo.url}}{% endif %}" alt="image description">
+																		
+																	</figure>
+																</div>														
+															</td>
+															<td>{{member.country.name}}</td> 
+															<td>{{member.short_name}}</td>
+															{% if active_team.created_by == request.user %}<td>{{member.email}}</td>{% endif %}
+															<td>
+																<a href="{{member.freelancer.freelancer_profile_absolute_url}}" class="btn btn-info">Preview</a>
+															</td>
+															</tr>
+															{% endfor %}
+					
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>										
+									</div>
+							</section>
+
+						</div>
+							<nav class="wt-pagination wt-savepagination">
+								<ul>
+									<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+									<li><a href="javascrip:void(0);">1</a></li>
+									<li><a href="javascrip:void(0);">2</a></li>
+									<li><a href="javascrip:void(0);">3</a></li>
+									<li><a href="javascrip:void(0);">4</a></li>
+									<li><a href="javascrip:void(0);">...</a></li>
+									<li><a href="javascrip:void(0);">50</a></li>
+									<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+								</ul>
+							</nav>								
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-12 col-md-8 col-lg-5 col-xl-3">
+						<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
+							<div class="wt-proposalsr">
+								<div class="wt-proposalsrcontent">
+									<figure>
+										<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
+									</figure>
+									<div class="wt-title">
+										<h3>150</h3>
+										<span>Total Ongoing Jobs</span>
+									</div>
+								</div> 
+							</div>
+							<div class="wt-proposalsr">
+								<div class="wt-proposalsrcontent wt-componyfolow">
+									<figure>
+										<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
+									</figure>
+									<div class="wt-title">
+										<h3>1406</h3>
+										<span>Total Completed Jobs</span>
+									</div>
+								</div> 
+							</div>								
+							<div class="wt-proposalsr">
+								<div class="wt-proposalsrcontent  wt-freelancelike">
+									<figure>
+										<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
+									</figure>
+									<div class="wt-title">
+										<h3>2075</h3>
+										<span>Total Cancelled Jobs</span>
+									</div>
+								</div> 
+							</div>								
+						</aside>
+						<div class="wt-companyad">
+							<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+							<span>Advertisement  255px X 255px</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!--Register Form End-->
+
+
+			<!-- Add team Popup Start-->
+			<!-- Popup Start-->
+			<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="assignteammodal">
+				<div class="modal-dialog" role="document">
+					<div class="wt-modalcontent modal-content">
+						<div class="wt-popuptitle">
+							<h2>About to Create Team</h2>
+							<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
+						</div>
+						<div class="modal-body">
+							<div class="wt-projectdropdown-hold">
+								<div class="wt-projectdropdown-option">
+									<div class="wt-projectselect">
+										<figure><img src="images/thumbnail/img-07.jpg" alt="img description"></figure>
+										<div class="wt-projectselect-content">
+											<h3>Project Title Here</h3>
+											<span><i class="lnr lnr-calendar-full"></i> Project Deadline: May 27, 2019</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+								<div class="form-group">
+									{{assignform.project.label}}
+									{{assignform.project}}
+								</div>
+								<div class="form-group">
+									{{assignform.assignee.label}}
+									{{assignform.assignee}}
+								</div>								
+								{% comment %} {% for member in teams.members.all %}
+								<div class="form-group">
+									<a href="#"><i class="fa fa-check-circle"></i> Member: {{member.short_name}}</a>
+								</div>
+								{% endfor %} {% endcomment %}
+								<div class="form-group wt-btnarea">
+									<button type="submit" class="btn btn-success"> Asign Member </button>
+									<button type="submit" class="btn btn-danger"> Cancel </button>
+									{% comment %} <a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a> {% endcomment %}
+								</div>											
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Popup End-->			
+
+{% endblock %}

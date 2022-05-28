@@ -1,0 +1,16 @@
+[
+    {
+        "pk": 1,
+        "model": "general_settings.websitesetting",
+        "fields": {
+            "site_name": "Trosgate",
+            "tagline": "Trosgate Marketplace",
+            "site_description": "This is the Trosgate Marketplace",
+            "site_Logo": "site/logo.png",
+            "protocol": true,
+            "www": true,
+            "site_domain": "http://127.0.0.1"
+            
+        }
+    }
+]

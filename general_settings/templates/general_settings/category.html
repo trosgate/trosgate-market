@@ -1,0 +1,97 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Category</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="index-2.html">Home</a></li>
+								<li><a href="javascript:void(0);">Jobs</a></li>
+								<li class="wt-active">Job Detail</li>
+							</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Inner Home End-->
+			<div class="wt-categoriesslider-holder wt-haslayout">
+				<div class="wt-title">
+					<h2>All Categories:</h2>
+				</div>
+				<div id="wt-categoriesslider" class="wt-categoriesslider owl-carousel">
+                    {% for category in categories %}
+					<div class="wt-categoryslidercontent item">
+						<figure><img src="{{category.icon.url}}" alt="image description"></figure>
+						<div class="wt-cattitle">
+							<h3><a href="{{category.category_absolute_url}}">{{category.name}}</a></h3>
+							<span>Items: {{category.proposal.count}}</span>
+						</div>
+					</div>
+                    {% endfor %}
+				</div>
+			</div>
+			<section class="wt-haslayout wt-main-section">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
+							<div class="wt-sectionhead wt-textcenter">
+								<div class="wt-sectiontitle"> <br>
+									<span>Proposals By Categories</span>
+								</div>
+							</div>	
+						</div>
+					</div>
+				</div>								
+				<div class="wt-companysinfoholder">	
+					<div class="container">
+						<div class="row justify-content-md-center">
+						
+						{% for proposal in proposals %}																		
+							<div class="col-12 col-sm-12 col-md-12 col-lg-3">
+								<div class="wt-companysdetails">
+									<figure class="wt-companysimg">
+									{% if proposal.thumbnail %}
+										<img src="{{proposal.thumbnail.url}}" alt="img description">
+									{% else %}
+										<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" alt="img description">
+									{% endif %}
+									</figure>
+									<div class="wt-companysinfo">
+										<figure><img src="{{proposal.thumbnail.url}}" alt="img description"></figure>
+										<div class="wt-title">
+											<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_full_name}}{% endif %}</a>
+											<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><h2>{{proposal.title}}</h2></a> 
+											<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
+										<hr>
+										<ul class="wt-postarticlemeta">
+											<li>
+												<a href="javascript:void(0);">
+													<span>Views</span>
+												</a>
+											</li>
+											<li class="wt-following">
+												<a href="javascript:void(0);">
+													<span>Follow</span>
+												</a>
+											</li>
+										</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+							{% if not proposals %}
+								<p> No proposals to show in this category yet </p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</section>
+
+{% endblock %}

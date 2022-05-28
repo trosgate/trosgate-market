@@ -1,0 +1,202 @@
+{% load static %}
+
+  <!-- Preloader Start -->
+  <div class="preloader-outer">
+    <div class="loader"></div>
+  </div>
+  <!-- Preloader End -->
+  <!-- Wrapper Start -->
+  <div id="wt-wrapper" class="wt-wrapper wt-haslayout">
+    <!-- Content Wrapper Start -->
+    <div class="wt-contentwrapper">
+      <!-- Header Start -->
+      <header id="wt-header" class="wt-header wt-headervtwo wt-haslayout">
+        <div class="wt-navigationarea">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <strong class="wt-logo"><a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a></strong>
+
+                <div class="wt-rightarea">
+                  <nav id="wt-nav" class="wt-nav navbar-expand-lg">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                      <i class="lnr lnr-menu"></i>
+                    </button>
+                    
+                    <div class="collapse navbar-collapse wt-navigation" id="navbarNav">
+                      <ul class="navbar-nav">
+                        <li class="nav-item">
+                          <a href="{% url 'freelancer:freelancer_listing' %}"
+                            >Freelancers</a>
+                        </li>
+
+                        <li class="nav-item">
+                          <a href="{% url 'pages:how_it_works' %}">WorkFlow</a>
+                        </li>
+
+                        <li
+                          class="menu-item-has-children page_item_has_children">
+                          <a href="{% url 'marketing:blog_list' %}">Articles</a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                        <li
+                          class="menu-item-has-children page_item_has_children">
+                          <a href="{% url 'notification:notifications' %}">Notifications ({{ notifications.count }})</a>
+                        </li>
+                        {% endif %}
+                        {% if request.user.clients %}
+                        <li
+                          class="menu-item-has-children page_item_has_children">
+                          <a href="{% url 'proposals:proposal_list' %}">Proposals</a>
+                        </li>
+                        <li
+                          class="menu-item-has-children page_item_has_children">
+                          <a type="button" href="{% url 'transactions:hiring_box_summary' %}" class="btn btn-outline-secondary btn-sm">
+                            {% with total_staff=hiring_box|length %}
+                            <div id="members-qty" class="d-inline-flex">
+                              {% if total_staff > 0 %}{{total_staff}} {%else%}0{% endif %}
+                            </div>
+                            <i class="fa fa-archive" aria-hidden="true">
+                              Staff</i>
+                            {% endwith %}
+                          </a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </nav>
+                  {% if not request.user.is_authenticated %}
+										<div class="wt-loginoption">
+											<a class="nav-link" href="{% url 'account:login' %}"><img src="{% static 'images/user-login.png'%}" alt="img description"></a>
+										</div>
+										<div class="wt-loginoption">
+											<a class="nav-link btn btn-danger" type="button" href="{% url 'account:register' %}">Join</a>
+										</div>
+									{% endif  %}			
+									{% if request.user.is_authenticated %}
+									<div class="wt-userlogedin">
+                    <figure class="wt-userimg">
+                      <img src="{% if request.user.freelancer %}{{request.user.freelancer.profile_photo.url}}{% elif request.user.clients %}{{request.user.clients.profile_photo.url}} {% else %} {% static 'images/user-login.png' %}{% endif %}"
+                        alt="image description"/>
+                    </figure>
+                    <div class="wt-username">
+                      <h3>{{request.user.short_name|capfirst}}</h3>
+                      <span>
+                        {% if active_team %} {{active_team.title|capfirst}}
+                        {% else %}
+                        {{request.user.get_user_type_display}}
+                        {% endif %}
+                      </span>
+                    </div>
+                    <nav class="wt-usernav">
+                      <ul>
+                        <li
+                          class="menu-item-has-children page_item_has_children">
+                          <a href="javascript:void(0);">
+                            <span>Insights</span>
+                          </a>
+                          <ul class="sub-menu children">
+                            <li>
+                              <a href="dashboard-insights.html">Insights</a>
+                            </li>
+                            <li>
+                              <a href="dashboard-insightsuser.html">Insights User</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="{% url 'freelancer:update_freelancer_profile' user.id %}">
+                            <span>My Profile</span>
+                          </a>
+                        </li>
+                        <li class="menu-item-has-children">
+                          <a href="javascript:void(0);">
+                            <span>All Jobs</span>
+                          </a>
+                          <ul class="sub-menu">
+                            <li>
+                              <a href="dashboard-completejobs.html">Completed Jobs</a>
+                            </li>
+                            <li>
+                              <a href="dashboard-canceljobs.html">Cancelled Jobs</a>
+                            </li>
+                            <li>
+                              <a href="dashboard-ongoingjob.html">Ongoing Jobs</a>
+                            </li>
+                            <li>
+                              <a href="dashboard-ongoingsingle.html">Ongoing Single</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="{% url 'applications:freelancer_application' %}">
+                            <span>Manage Applications</span>
+                          </a>
+                        </li>
+                        <li class="wt-notificationicon menu-item-has-children">
+                          <a href="javascript:void(0);">
+                            <span>Messages</span>
+                          </a>
+                          <ul class="sub-menu">
+                            <li>
+                              <a href="dashboard-messages.html">Messages</a>
+                            </li>
+                            <li>
+                              <a href="dashboard-messages2.html">Messages V 2</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="dashboard-saveitems.html">
+                            <span>My Saved Items</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="dashboard-invocies.html">
+                            <span>Invoices</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="">
+                            <span>Category</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="dashboard-packages.html">
+                            <span>Packages</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="dashboard-proposals.html">
+                            <span>Proposals</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="dashboard-accountsettings.html">
+                            <span>Account Settings</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="dashboard-helpsupport.html">
+                            <span>Help &amp; Support</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="{% url 'account:logout' %}" data-bs-toggle="modal" data-bs-target="#genericlogoutModal">
+                            <span>Logout</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </nav>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <!--Header End-->
+    </div>
+

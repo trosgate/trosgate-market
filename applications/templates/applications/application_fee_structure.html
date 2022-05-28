@@ -1,0 +1,119 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+<link rel="stylesheet" href="{% static 'css/bootstrap-5.min.css'%}">
+
+
+        <div class="wt-dashboardbox">
+            <div class="wt-proposalsr">
+                <div class="container"><br><br><br>
+                    <div class="wt-managejobcontent">
+                        <div class="col-12">
+                            <h3>Fee Structure</h3>
+                        </div>
+                        <div class="wt-updatall">
+                          <span>
+                            {% if application_addon.get_discount_value > 0 %}
+                             You just won yourself a ({{application_addon.get_discount_multiplier}}%) discount on your total amount 
+                            {% else %}
+                            Get a huge discount for every hire above {{base_currency}}{{application_addon.get_start_discount_value}} 
+                            {% endif %}. 
+                            The total includes previously saved Applications
+                          </span>
+                        </div>	
+                      
+                    </div>
+                    
+                    <div class="container">
+                        <div class="row g-3">
+
+                            <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
+                              <div class="d-flex bd-highlight ms-0">
+                                <div class="p-2 flex-grow-1 bd-highlight">Total Amount:</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5">{{base_currency}}</span><span id="subtotal"
+                                    class="fw-bold h5">{{application_addon.get_total_price_before_fee_and_discount}}</span></div>
+                              </div>
+                              <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">Applicant{{application_addon.get_total_applicants|pluralize}}:</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5"></span><span 
+                                    class="fw-bold h5">{{application_addon.get_total_applicants}}</span></div>
+                              </div>
+                              <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">Processing Fees (F):</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5"> + {{base_currency}}</span><span id="totalFees"
+                                    class="fw-bold h5">{{application_addon.get_fee_payable}}</span></div>
+                              </div>
+                              <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">Discount (D) - ({{application_addon.get_discount_multiplier}}%):</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5">- {{base_currency}}</span><span id="totalDiscount"
+                                    class="fw-bold h5">{{application_addon.get_discount_value}}</span></div>
+                              </div>
+                              <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">Total Payable:</div>
+                                <div class="p-2 bd-highlight"><span class="fw-bold h5">{{base_currency}}</span><span 
+                                    class="fw-bold h5">({{application_addon.get_total_price_before_fee_and_discount}} - D) + {{base_currency}}F </span></div>
+                              </div>
+                              <a role="button" href="{% url 'applications:final_application_checkout' %}" class="btn btn-primary fw-bold w-100"
+                                type="button"><i class="fa fa-lock" aria-hidden="true"></i> Pay Securely</a>
+                            </div>  
+                            <div class="col-md-7 col-lg-8">
+                            {% for gateway in payment_gateways %}
+                              <div class="card mb-3 border-1 rounded-0 product-item me-md-4" data-index="{{gateway.id}}">
+                                <div class="row g-0">
+                                  <div class="col-md-2 ps-3 ps-md-4">
+                                        {{gateway.gateway_logo_tag}}
+                                  </div>
+                                  <div class="col-md-9 ps-md-1">
+                                    <div class="card-body p-1">
+                                      <p class="card-text ps-2 mb-1 pt-1 fw-bold">{{gateway.name}}</p>
+                                      <p class="card-text ps-2 pb-3">Our Fee on {{gateway.name}}: ${{gateway.processing_fee}}</p>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-1 ps-md-1">
+                                    <input class="align-middle h-100" type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}" required>
+                                  </div>
+                                </div>
+                              </div>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+            <div class="wt-proposalholder mt-6">
+                <div class="row justify-content-md-center">
+                    <div class="wt-sectionhead wt-textcenter">
+                        <a href="{% url 'applications:application_multiple_summary' %}" class="text-info" target="_blank">Let me review this amount ${{application_addon.get_total_price_before_fee_and_discount}}</a><br><br>
+                        <span>Copyright @ {{website.site_name}}</span>
+                    </div>
+                </div>
+            </div> 
+    <script>
+        $('input[type=radio][name=paymentGateway]').on('change', function(e) {
+            e.preventDefault();
+            $.ajax({
+            type: "POST",
+            url: '{% url "applications:application_fee" %}',
+            data: {
+                gatewaytype: $(this).val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: "gateway",
+            },
+            success: function (json) {
+                console.log(json)
+                document.getElementById("subtotal").innerHTML = json.subtotal;
+                document.getElementById("totalFees").innerHTML = json.selected_fee;
+                document.getElementById("totalDiscount").innerHTML = json.discount;
+            },
+            error: function (xhr, errmsg, err) {},
+            });
+            
+        });
+        </script>
+
+{% endblock %}
+
+
+

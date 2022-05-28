@@ -1,0 +1,24 @@
+{% if chats %}
+{% for chat in chats %}
+<div class="wt-offerermessage">
+    <figure><img
+            src="{% if chat.sender.user_type == 'freelancer' %}{{ chat.sender.freelancer.profile_photo.url }}{% elif chat.sender.user_type == 'client' %}{{ chat.sender.clients.profile_photo.url }}{% endif %}"
+            alt="image description"></figure>
+    <div class="wt-authorcontent">
+        <h5>{{chat.sender.short_name}}
+            {% if chat.sender.user_type == 'freelancer' %} 
+            <span class="notification" style="background-color:green; font-size:10px; color:white; border-radius: 75px;padding:2px;">Member</span>
+            {% elif chat.sender.user_type == 'client'%}
+            <span class="notification" style="background-color:blue; color:white; font-size:10px; border-radius: 75px; padding: 2px;">Client</span>
+            {% endif %}
+        </h5>
+        <p>{{chat.content}} </p>
+        <div class="clearfix"></div>
+        <time datetime="2017-08-08">{{chat.sent_on}}</time>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> No messages at the moment
+</span>
+{% endif %}

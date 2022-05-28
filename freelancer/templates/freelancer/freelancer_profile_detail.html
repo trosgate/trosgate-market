@@ -1,0 +1,368 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+{% if request.user.is_authenticated %}
+			<!--Inner Home Start--> 
+			<div class="wt-haslayout wt-innerbannerholder wt-innerbannerholdervtwo">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3"></div>
+					</div>
+				</div>
+			</div> 
+			<!--Inner Home End--> 
+			
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+				<!-- User Profile Start-->
+				<div class="wt-main-section wt-paddingtopnull wt-haslayout">
+					<div class="container">
+						<div class="row">	
+							<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+								
+								<div class="wt-userprofileholder">
+									<div class="col-12 col-sm-12 col-md-12 col-lg-3 float-left">
+										<div class="row">
+											
+											<div class="wt-userprofile">
+												{% comment %} {% if not max_member_per_team %}
+												{%if team %}
+												<div class="alert alert-danger" role="alert">
+													<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+														Alert: You have reached the application limit for this month 
+														<a href=""> Upgrade Package</a>
+													</span>
+												</div>
+												{% endif %}
+												{% endif %} {% endcomment %}
+												<figure>
+													<img src="{{freelancer.profile_photo.url}}" alt="img description">
+													<div class="wt-userdropdown wt-online"></div>
+												</figure>
+												<div class="wt-title">
+													<h3><i class="fa fa-check-circle"></i> {{freelancer.user.get_full_name}}</h3>
+													<span>5.0/5 <a class="javascript:void(0);">(860 Feedback)</a> <br>Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
+
+													{% if request.user.freelancer %}
+													<div class="form-group wt-btnarea">
+														<a href="{% url 'teams:internal_invitation' freelancer.user.short_name %}"><button type="submit" class="btn btn-outline-danger-light"><i class="fa fa-handshake-o"></i> Invite to Team</a>
+													</div>
+													{% endif %}
+												</div>
+												
+											</div>
+										</div>
+									</div>
+									<div class="col-12 col-sm-12 col-md-12 col-lg-9 float-left">
+										<div class="row">
+											<div class="wt-proposalhead wt-userdetails">
+												<h2>{{freelancer.tagline}}</h2>
+												<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+													<li><span><i class="far fa-money-bill-alt"></i> ${{freelancer.hourly_rate}} / hr</span></li>
+													<li><span> {% if freelancer.user.country.flag %}<img src="{{freelancer.user.country.flag.url}}" alt="img description"> {% else %}{{freelancer.user.country.country_code}} - {% endif %} {{freelancer.user.country.name}}</span><li>
+													<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+												</ul>
+												<div class="wt-description">
+													{{freelancer.description|linebreaksbr}}
+												</div>
+											</div>
+											<div id="wt-statistics" class="wt-statistics wt-profilecounter">
+												<div class="wt-statisticcontent wt-countercolor1">
+													<h3 data-from="0" data-to="03" data-speed="800" data-refresh-interval="03">03</h3>
+													<h4>Ongoing <br>Projects</h4>
+												</div>
+												<div class="wt-statisticcontent wt-countercolor2">
+													<h3 data-from="0" data-to="1503" data-speed="8000" data-refresh-interval="100">1503</h3>
+													<h4>Completed <br>Projects</h4>
+												</div>
+												<div class="wt-statisticcontent wt-countercolor4">
+													<h3 data-from="0" data-to="02" data-speed="800" data-refresh-interval="02">02</h3>
+													<h4>Cancelled <br>Projects</h4>
+												</div>
+												<div class="wt-statisticcontent wt-countercolor3">
+													<h3 data-from="0" data-to="25" data-speed="8000" data-refresh-interval="100">25</h3>
+													<em>k</em>
+													<h4>Served <br>Hours</h4>
+												</div>
+												<div class="wt-description">
+													<p>* Adpsicing elit sed do eiusmod tempor incididunt ut labore et dolore.</p>
+													{% if request.user.clients %}
+													{% if monthly_contracts_limiter %}
+													<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
+													{% endif %}
+													{% endif %}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- User Profile End-->
+					<!-- User Listing Start-->
+					<div class="container">
+						<div class="row">
+							<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+								<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+									<div class="wt-usersingle">
+										<div class="wt-clientfeedback">
+											<div class="wt-usertitle wt-titlewithselect">
+												<h2>Client Feedback</h2>
+												<div class="form-group">
+													<span class="wt-select">
+														<select>
+															<option value="Show All">Show All</option>
+															<option value="One Page">One Page </option>
+															<option value="Two Page">Two Page</option>
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+												<figure class="wt-userlistingimg">
+													<img src="{% static 'images/client/img-01.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-userlistingcontent">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> Themeforest Company</a>
+															<h3>Translation and Proof Reading (Multi Language)</h3>
+														</div>
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="fa fa-dollar-sign"></i> Beginner</span></li>
+															<li><span><img src="{% static 'images/flag/img-04.png' %}" alt="img description"> England</span></li>
+															<li><span><i class="fas fa-spinner fa-spin"></i> In Progress</span></li>
+														</ul>
+													</div>
+												</div>
+											</div>
+											<div class="wt-userlistinghold wt-userlistingsingle">	
+												<figure class="wt-userlistingimg">
+													<img src="{% static 'images/client/img-02.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-userlistingcontent">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> Videohive Studio</a>
+															<h3>Need help translating app stringlist from English to Arabic</h3>
+														</div>
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Intermediate</span></li>
+															<li><span><img src="{% static 'images/flag/img-03.png' %}" alt="img description">  Canada</span></li>
+															<li><span><i class="far fa-calendar"></i> Jun 2017 - Jul 2017</span></li>
+															<li><span class="wt-stars"><span></span></span></li>
+														</ul>
+													</div>
+												</div>
+												<div class="wt-description">
+													<p>“ Eiusmod tempor incididunt ut labore et dolore magna quis nostrud exercitation ullamco laboris. ”</p>
+												</div>
+											</div>
+											<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+												<figure class="wt-userlistingimg">
+													<img src="{% static 'images/client/img-03.jpg' %}" alt="image description">
+												</figure>
+												<div class="wt-userlistingcontent">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> Photodune Professionals</a>
+															<h3>Blog Post Writing in English Language</h3>
+														</div>
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Professional</span></li>
+															<li><span><img src="{% static 'images/flag/img-02.png' %}" alt="img description"> United States</span></li>
+															<li><span><i class="far fa-calendar"></i>  Jun 2017</span></li>
+															<li><span class="wt-stars"><span></span></span></li>
+														</ul>
+													</div>
+												</div>
+												<div class="wt-description">
+													<p>“ Consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliquaenim ad minim veniamac quis nostrud exercitation ullamco laboris. ”</p>
+												</div>
+											</div>
+											<div class="wt-btnarea">
+												<a href="javascript:void(0);" class="wt-btn">Load More</a>
+											</div>
+										</div>
+										<div class="wt-craftedprojects">
+											<div class="wt-usertitle">
+												<h2>Projects And Awards</h2>
+											</div>
+											<div class="wt-projects">
+												<div class="wt-project">
+													{% if freelancer.image_one %}
+													<figure>
+														<img src="{{freelancer.image_one.url}}" alt="img description">
+													</figure>
+													{% endif %}
+													<div class="wt-projectcontent">
+													{% if freelancer.project_title %}
+														<h3>{{freelancer.project_title}}</h3>
+													{% endif %}
+													{% if freelancer.project_url %}
+														<a href="{{freelancer.project_url}}">{{freelancer.project_url}}</a>
+													{% endif %}
+													</div>
+												</div>
+												<div class="wt-project">
+													{% if freelancer.image_two.url %}
+													<figure>
+														<img src="{{freelancer.image_two.url}}"alt="img description">
+													</figure>
+													{% endif %}
+													<div class="wt-projectcontent">
+													{% if freelancer.project_title_two %}
+														<h3>{{freelancer.project_title_two}}</h3>
+													{% endif %}
+													{% if freelancer.project_url_two %}
+														<a href="{{freelancer.project_url_two}}">{{freelancer.project_url_two}}</a>
+													{% endif %}
+													</div>
+												</div>
+												<div class="wt-project">
+													{% if freelancer.image_three %}
+													<figure>
+														<img src="{{freelancer.image_three.url}}" alt="img description">
+													</figure>
+													{% endif %}
+													<div class="wt-projectcontent">
+													{% if freelancer.project_title_three %}
+														<h3>{{freelancer.project_title_three}}</h3>
+													{% endif %}
+													{% if freelancer.project_url_three %}
+														<a href="{{freelancer.project_url_three}}">{{freelancer.project_url_three}}</a>
+													{% endif %}
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="wt-experience">
+											<div class="wt-usertitle">
+												<h2>Education And Experience</h2>
+											</div>
+											<div class="wt-experiencelisting-hold">
+												<div class="wt-experiencelisting wt-bgcolor">
+													<div class="wt-title">
+														<h3>{{freelancer.job_position}}</h3>
+													</div>
+													<div class="wt-experiencecontent">
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="far fa-building"></i>{{freelancer.user.get_full_name}}</span></li>
+															<li><span><i class="far fa-calendar"></i> {{freelancer.start_date}} - {{freelancer.end_date}}</span></li>
+														</ul>
+														<div class="wt-description">
+															<p>“ {{freelancer.job_description}}. ”</p>
+														</div>
+													</div>
+												</div>
+												<div class="wt-experiencelisting">
+													<div class="wt-title">
+														<h3>{{freelancer.job_position_two}}</h3>
+													</div>
+													<div class="wt-experiencecontent">
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="far fa-building"></i> {{freelancer.user.get_full_name}}</span></li>
+															<li><span><i class="far fa-calendar"></i> {{freelancer.start_date_two}}- {{freelancer.end_date_two}}</span></li>
+														</ul>
+														<div class="wt-description">
+															<p>“ {{freelancer.job_description_two}}. ”</p>
+														</div>
+													</div>
+												</div>
+												<div class="divheight"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+									<aside id="wt-sidebar" class="wt-sidebar">
+										<div class="wt-widget wt-widgetarticlesholder wt-articlesuser">
+											<div class="wt-widgettitle">
+												<h2>Advertisement</h2>
+											</div>										
+											<div class="wt-companyad">
+												<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+												<span>Image Size  255px X 255px</span>
+											</div>										
+										</div>
+										<div class="wt-proposalsr">
+											<div class="tg-authorcodescan tg-authorcodescanvtwo">
+												<figure class="tg-qrcodeimg">
+													<img src="{% static 'images/qrcode.png' %}" alt="img description">
+												</figure>
+												<div class="tg-qrcodedetail">
+													<span class="lnr lnr-laptop-phone"></span>
+													<div class="tg-qrcodefeat">
+														<h3>Scan with your <span>Smart Phone </span> To Get It Handy.</h3>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="wt-widget">
+											<div class="wt-widgettitle">
+												<h2>My Skills</h2>
+											</div>
+											<div class="wt-widgetcontent">
+												<div class="wt-widgettag wt-widgettagvtwo">
+												{% for skill in freelancer.my_skill.all %}
+													<a href="javascript:void(0);">{{skill}}</a>
+												{% endfor %}
+												</div>
+											</div>
+										</div>
+										<div class="wt-widget wt-sharejob">
+											<div class="wt-widgettitle">
+												<h2>Share This User</h2>
+											</div>
+											<div class="wt-widgetcontent">
+												<ul class="wt-socialiconssimple">
+													<li class="wt-facebook"><a href="javascript:void(0);"><i class="fab fa-facebook-f"></i>Share on Facebook</a></li>
+													<li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i>Share on Twitter</a></li>
+													<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i>Share on Linkedin</a></li>
+													<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google-plus-g"></i>Share on Google Plus</a></li>
+												</ul>
+											</div>
+										</div>
+										<div class="wt-widget wt-reportjob">
+											<div class="wt-widgettitle">
+												<h2>Report This User</h2>
+											</div>
+											<div class="wt-widgetcontent">
+												<form class="wt-formtheme wt-formreport">
+													<fieldset>
+														<div class="form-group">
+															<span class="wt-select">
+																<select>
+																	<option value="reason">Select Reason</option>
+																	<option value="reason1">Reason1</option>
+																	<option value="reason2">Reason2</option>
+																	<option value="reason3">Reason3</option>
+																	<option value="reason4">Reason4</option>
+																</select>
+															</span>
+														</div>
+														<div class="form-group">
+															<textarea class="form-control" placeholder="Description"></textarea>
+														</div>
+														<div class="form-group wt-btnarea">
+															<a href="javascrip:void(0);" class="wt-btn">Submit</a>
+														</div>
+													</fieldset>
+												</form>
+											</div>
+										</div>
+									</aside>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- User Listing End-->
+				</div>
+			</main>
+			<!--Main End-->
+	{% endif %}
+
+{% endblock %}
+

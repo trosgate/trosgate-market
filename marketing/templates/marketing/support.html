@@ -1,0 +1,236 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Help Desk</h2></div>
+							{% if request.user.is_authenticated %}
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Support</li>
+							</ol>
+							{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+            <main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-6 float-left">
+                        <div class="wt-dashboardbox">
+                            <div class="wt-dashboardboxtitle wt-titlewithsearch">
+                                <h2>Help &amp; Support</h2>
+                                <form class="wt-formtheme wt-formsearch">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <input type="text" name="Search" class="form-control" placeholder="Search Query">
+                                            <a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                            <div class="wt-dashboardboxcontent wt-helpsupporthead">
+                                <div class="wt-tabscontenttitle">
+                                    <h2>{{support.title}}</h2>
+                                </div>
+                                <div class="wt-helpsupportcontent">
+                                    <div class="wt-description">
+                                        <p>{{support.preview|linebreaks}}</p>
+                                    </div>
+                                    <ul class="wt-accordionhold accordion">
+                                        {% if support.option_one %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingtwo4" data-toggle="collapse" data-target="#collapsetwo4">
+                                                <span>{{support.option_one}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse show" id="collapsetwo4" aria-labelledby="headingtwo4">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_one}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_one_description|linebreaks}} {% if support.option_one_backlink %}<a href="{{support.option_one_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>                                        
+                                        {% endif %}
+                                        {% if support.option_two %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingtwo2" data-toggle="collapse" data-target="#collapsetwo2">
+                                                <span>{{support.option_two}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsetwo2" aria-labelledby="headingtwo2">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_two}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_two_description|linebreaks}} {% if support.option_two_backlink %}<a href="{{support.option_two_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_three %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingthree2" data-toggle="collapse" data-target="#collapsethree2">
+                                                <span>{{support.option_three}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsethree2" aria-labelledby="headingthree2">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_three}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_three_description|linebreaks}} {% if support.option_three_backlink %}<a href="{{support.option_three_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_four %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingtwo3" data-toggle="collapse" data-target="#collapsetwo3">
+                                                <span>{{support.option_four}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsetwo3" aria-labelledby="headingtwo3">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_four}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_four_description|linebreaks}} {% if support.option_four_backlink %}<a href="{{support.option_four_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_five %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingtwo6" data-toggle="collapse" data-target="#collapsetwo6">
+                                                <span>{{support.option_five}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsetwo6" aria-labelledby="headingtwo6">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_five}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_five_description|linebreaks}} {% if support.option_five_backlink %}<a href="{{support.option_five_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_six %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingthree6" data-toggle="collapse" data-target="#collapsethree6">
+                                                <span>{{support.option_six}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsethree6" aria-labelledby="headingthree6">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_six}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_six_description|linebreaks}} {% if support.option_six_backlink %}<a href="{{support.option_six_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_seven %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingtwo7" data-toggle="collapse" data-target="#collapsetwo7">
+                                                <span>{{support.option_seven}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsetwo7" aria-labelledby="headingtwo7">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_seven}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_seven_description|linebreaks}} {% if support.option_seven_backlink %}<a href="{{support.option_seven_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_eight %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingtwo8" data-toggle="collapse" data-target="#collapsetwo8">
+                                                <span>{{support.option_eight}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsetwo8" aria-labelledby="headingtwo8">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_eight}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_eight_description|linebreaks}} {% if support.option_eight_backlink %}<a href="{{support.option_eight_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% if support.option_nine %}
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="headingthree8" data-toggle="collapse" data-target="#collapsethree8">
+                                                <span>{{support.option_nine}}</span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="collapsethree8" aria-labelledby="headingthree8">
+                                                <div class="wt-title">
+                                                    <h3>{{support.option_nine}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{support.option_nine_description|linebreaks}} {% if support.option_nine_backlink %}<a href="{{support.option_nine_backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-6 float-left">
+                        <div class="wt-dashboardbox wt-holdersolution">
+                            <div class="wt-dashboardboxtitle">
+                                <h2>Didn't Find Your Solution?</h2>
+                            </div>
+                            <div class="wt-dashboardboxcontent wt-querycontent">
+                                <div class="wt-tabscontenttitle">
+                                    <h2>Ask Your Query</h2>
+                                </div>
+                                <form class="wt-formtheme wt-userform">
+                                    <div class="form-group">
+                                        <input name="title" class="form-control" placeholder="Query Description"></input>
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="wt-select">
+                                            <select>
+                                                <option value="" disabled="">Select Query Type</option>
+                                                <option value="">Query</option>
+                                                <option value="">Query Type</option>
+                                            </select>
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <textarea name="message" class="form-control" placeholder="Query Description"></textarea>
+                                    </div>
+                                    <div class="form-group form-group-half wt-btnarea">
+                                        <a href="javascript:void(0);" class="wt-btn">Submit</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="wt-proposalholder">
+                <div class="row justify-content-md-center">
+                    <div class="wt-sectionhead wt-textcenter">
+                        <span>Copyright @ {{website.site_name}}</span>
+                    </div>
+                </div>
+            </div>
+            </main>
+            <!--Main End-->	
+     
+{% endblock content %}

@@ -1,0 +1,28 @@
+    <!-- Modal -->
+    
+    <div class="modal fade" {% block modal-id %} {% endblock modal-id %} tabindex="-1" aria-labelledby="baseLogoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="baseLogoutModalLabel">
+                    {% block modal-title %} {% endblock modal-title %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-center mt-1 {% block modal-color %} {% endblock modal-color %}">
+
+                    <span class="{% block modal-icon %} {% endblock modal-icon %}">
+                        <i class="{% block modal-icon1 %} {% endblock modal-icon1 %}"></i>
+                        <i class="{% block modal-icon2 %} {% endblock modal-icon2 %} {% block modal-icon2a %} {% endblock modal-icon2a %}"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="text-center mb-2 mt-2">{% block modal-content %} {% endblock modal-content %}</div>
+            <div class="modal-footer">
+                {% block modal-action %} {% endblock modal-action %}
+                <button class="btn btn-outline-success btn-sm" data-bs-dismiss="modal" style="width: 80px;">{% block modal-name-button %} {% endblock modal-name-button %}</button>
+            </div>
+            </div>
+        </div>
+        </div>

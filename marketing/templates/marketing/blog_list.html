@@ -1,0 +1,200 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Blog and Articles</h2></div>
+							{% if request.user.is_authenticated %}
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Articles Detail</li>
+							</ol>
+							{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+				<!--Categories Start-->
+				<div class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+								<div class="wt-articletabshold wt-articlelist">
+									<ul class="wt-navarticletab nav navbar-nav">
+										<li class="nav-item">
+											<a class="active" id="all-tab" data-toggle="tab" href="#alltab">General</a>
+										</li>
+										<li class="nav-item">
+											<a id="business-tab" data-toggle="tab" href="#business">Freelancer</a>
+										</li>
+										<li class="nav-item">
+											<a id="trading-tab" data-toggle="tab" href="#trading">Client</a>
+										</li>
+									</ul>
+									<div class="tab-content wt-haslayout">
+										<div class="wt-contentarticle tab-pane active fade show" id="alltab">
+											<div class="row">
+                                                {% for blog in all_blogs %}
+												<div class="col-12 col-sm-12 col-md-6 col-lg-6">
+													<div class="wt-article">
+														<figure>
+															<img src="{{blog.thumbnail.url}}" alt="img description">
+														</figure>
+														<div class="wt-articlecontent">
+															<div class="wt-title">
+																<h2><a href="{% url 'marketing:blog_detail' blog.slug %}">{{blog.title}}</a></h2>
+															</div>
+															<ul class="wt-postarticlemeta">
+																<li>
+																	<a href="javascript:void(0);">
+																		<i class="lnr lnr-clock"></i>
+																		<span>{{blog.created_at|timesince}} ago</span>
+																	</a>
+																</li>
+																<li>
+																	<a href="javascript:void(0);">
+																		<i class="lnr lnr-user"></i>
+																		<span>{{blog.created_by}}</span>
+																	</a>
+																</li>
+															</ul>
+														</div>
+													</div>
+												</div>
+                                                {% endfor %}
+                                                {% if not all_blogs %}
+                                                <div class="alert alert-info justify-content-md-center" role="alert">
+                                                    <span style="color: blue; font-weight: bold;"> Articles are still in-progress. Please check back later.</span>
+                                                </div>
+                                                {% endif %}
+											</div>
+										</div>
+										<div class="wt-contentarticle tab-pane fade" id="business">
+											<div class="row">
+												{% for blog in freelancer_blogs %}
+												<div class="col-12 col-sm-12 col-md-6 col-lg-6">
+													<div class="wt-article">
+														<figure>
+															<img src="{{blog.thumbnail.url}}" alt="img description">
+														</figure>
+														<div class="wt-articlecontent">
+															<div class="wt-title">
+																<h2><a href="{% url 'marketing:blog_detail' blog.slug %}">{{blog.title}}</a></h2>
+															</div>
+															<ul class="wt-postarticlemeta">
+																<li>
+																	<a href="javascript:void(0);">
+																		<i class="lnr lnr-clock"></i>
+																		<span>{{blog.created_at|timesince}} ago</span>
+																	</a>
+																</li>
+																<li>
+																	<a href="javascript:void(0);">
+																		<i class="lnr lnr-user"></i>
+																		<span>{{blog.created_by}}</span>
+																	</a>
+																</li>
+															</ul>
+														</div>
+													</div>
+												</div>
+                                                {% endfor %}
+                                                {% if not freelancer_blogs %}
+                                                <div class="alert alert-info justify-content-md-center" role="alert">
+                                                    <span style="color: blue; font-weight: bold;"> Articles in this criteria are in-progress. Check back later.</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+										</div>
+										<div class="wt-contentarticle tab-pane fade" id="trading">
+											<div class="row">
+												{% for blog in client_blogs %}
+												<div class="col-12 col-sm-12 col-md-6 col-lg-6">
+													<div class="wt-article">
+														<figure>
+															<img src="{{blog.thumbnail.url}}" alt="img description">
+														</figure>
+														<div class="wt-articlecontent">
+															<div class="wt-title">
+																<h2><a href="{% url 'marketing:blog_detail' blog.slug %}">{{blog.title}}</a></h2>
+															</div>
+															<ul class="wt-postarticlemeta">
+																<li>
+																	<a href="javascript:void(0);">
+																		<i class="lnr lnr-clock"></i>
+																		<span>{{blog.created_at|timesince}} ago</span>
+																	</a>
+																</li>
+																<li>
+																	<a href="javascript:void(0);">
+																		<i class="lnr lnr-user"></i>
+																		<span>{{blog.created_by}}</span>
+																	</a>
+																</li>
+															</ul>
+														</div>
+													</div>
+												</div>
+                                                {% endfor %}
+                                                {% if not client_blogs %}
+                                                <div class="alert alert-info justify-content-md-center" role="alert">
+                                                    <span style="color: blue; font-weight: bold;"> Articles in this criteria are in-progress. Check back later.</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+									</div>
+										<nav class="wt-pagination">
+											<ul>
+												<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+												<li><a href="javascrip:void(0);"><i class="fa fa-th"></i></a></li>
+												<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+											</ul>
+										</nav>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Limitless Experience End-->
+			</main>
+			<!--Main End-->
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

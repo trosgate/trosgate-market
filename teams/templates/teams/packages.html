@@ -1,0 +1,123 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% comment %} {% load trackertag %} {% endcomment %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+
+<main id="wt-main" class="wt-main wt-haslayout">
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxtitle">
+                        <h2>Packages</h2>
+                    </div>
+                    <div id="packaging" class="wt-dashboardboxcontent wt-packages">
+                        <div class="wt-package wt-packagedetails">
+                            <div class="wt-packagehead">
+                            </div>
+                            <div class="wt-packagecontent">
+                                <ul class="wt-packageinfo">
+                                    <li class="wt-packageprices"><span>Price</span></li>
+                                    <li><span>Group Chat</span></li>
+                                    <li><span>Member Per Team</span></li>
+                                    <li><span>Monthly Offer Contracts Per Team</span></li>
+                                    <li><span>Max Proposals Per Team</span></li>
+                                    <li><span>Monthly Job/Project Applicable Per Team</span></li>
+                                    <li><span>Daily Handshake Mails Per Invoice to client</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        {% for package in packages %}
+                        <div class="wt-package wt-baiscpackage">
+                            <div class="wt-packagehead">
+                                <h3>{% firstof package.verbose_type package.type %}</h3>
+                                <span>{{package.get_status_display}}</span>
+                            </div>
+                            <div class="wt-packagecontent">
+                                <ul class="wt-packageinfo">
+                                    <li class="wt-packageprice"><span><sup>$</sup>{{package.price}}<sub>\ Month</sub></span></li>
+                                    <li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+                                    <li><span>{% if package.max_member_per_team > 0 %} <i class="ti-check"> {{package.max_member_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_member_per_team}} </i>{% endif %}</span></li>
+                                    <li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">  {{package.monthly_offer_contracts_per_team}}</i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+                                    <li><span>{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">  {{package.max_proposals_allowable_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
+                                    <li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check"> {{package.monthly_projects_applicable_per_team}}</i>{% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
+                                    <li><span>{% if package.daily_Handshake_mails_to_clients > 0 %} <i class="ti-check">  {{package.daily_Handshake_mails_to_clients}}</i> {% else %} <i class="ti-na">  {{package.daily_Handshake_mails_to_clients}}</i>{% endif %}</span></li>
+                                </ul>
+                                {% if package.type == 'Basic' %}
+                                {% if team.package.type == 'Basic' %}
+                                <button type="button" class="wt-btn" disabled=true> Active </button>
+                                {% endif %}
+                                {% elif package.type == 'Team' %}
+                                {% if team.package.type == 'Team' %}
+                                <a class="wt-btn" href="?cancel_package=true"><span>Cancel</span></a>
+                                {% else %}
+                                <a class="wt-btn" href="{% url 'teams:purchase_package' package.type %}"><span>Subscribe</span></a>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-3 float-left">
+							<div class="wt-dashboardboxcontent wt-offersidebar wt-dashboardbox-margin">
+								<figure><img src="{% static 'images/save-img-01.jpg'%}" alt="img description"></figure>
+								<div class="wt-offercontent">
+									<h2>Save Big, Do Big</h2>
+									<p>Consectetur adipisicing elitems sed dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim incune utnaem labore etdolore maigna aliqua.</p>
+									{% comment %} <a href="{% url 'teams:purchase_package' team.package.type %}" class="wt-btn">Give it a try</a> {% endcomment %}
+								</div>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="wt-proposalholder">
+        <div class="row justify-content-md-center">
+            <div class="wt-sectionhead wt-textcenter">
+                <span>Copyright @ {{website.site_name}}</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

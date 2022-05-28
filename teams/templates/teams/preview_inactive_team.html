@@ -1,0 +1,61 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+
+			<section class="wt-haslayout wt-dbsectionspace">
+				<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxtitle">
+								<h2>Preview of "{{ teams.title }}"</h2>
+							</div>
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
+									<span class="wt-featuredtag wt-featuredtagcolor3"><img src="{% static 'images/featured.png' %}" alt="img description" data-tipso="Plus Member" class="template-content tipso_style mCS_img_loaded"></span>
+									<div class="wt-userlistingcontent">
+										<div class="wt-contenthead">
+											<div class="wt-title">
+												<h3>{{ teams.title }}</h3>
+											</div>
+											<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
+												<li><span class="wt-dashboradclock"><i class="fa fa-arrow-up"></i>You Are: {% if teams.created_by == request.user %}Owner{% else %}Member{% endif %}</span></li>															
+												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Created: {{teams.created_at|timesince}} ago</span></li>															
+												<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>Status: {{teams.get_status_display}}</span></li>
+												<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i> Plan: {{teams.package.type}}</span></li>
+											</ul>
+										</div>
+									<div class="wt-description">
+										<h5>About "{{ teams.title }}" </h5>
+											<span>{{teams.notice|slice:200}} ...</span>
+									</div>											
+									<div class="wt-rightarea">
+										<div class="wt-btnarea">
+										{% if teams.status == "active" %} 
+										<a href="{{teams.get_team_activated_url}}" class="btn btn-success">Activate</a> 
+										{% endif %}										
+										<a href="/" class="btn btn-danger">Go Back</a>
+										</div>
+										<div class="wt-hireduserstatus">
+											<h4>{{teams.members.count}}</h4><span>Team Members</span>
+											<ul class="wt-hireduserimgs">
+												{% for member in teams.members.all %}
+												<li><figure><img src="{{member.freelancer.profile_photo.url}}" alt="img description"></figure></li>
+												{% endfor %}
+											</ul>									
+										</div>
+										<div class="wt-hireduserstatus">
+											<h4>{{teams.created_by.get_full_name}}</h4><span>Founder from {{teams.created_by.country.name}}</span>
+											<ul class="wt-hireduserimgs">
+												<li><figure><img src="{{teams.created_by.freelancer.profile_photo.url}}" alt="img description"></figure></li>
+											</ul>									
+										</div>																				
+									</div>			
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+							
+
+{% endblock %}

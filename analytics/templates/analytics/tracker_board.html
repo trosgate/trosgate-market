@@ -1,0 +1,224 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load trackertag %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+                <div class="wt-haslayout wt-innerbannerholder">
+                    <div class="container">
+                        <div class="row justify-content-md-center">
+                            <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                                <div class="wt-innerbannercontent">
+                                <div class="wt-title"><h2>Time Tracker</h2></div>
+                                <ol class="wt-breadcrumb">
+                                    <li><a href="index-2.html">Home</a></li>
+                                    <li class="wt-active">Assigned Proposal</li>
+                                </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+					<div class="row">
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6">
+							<div class="wt-insightsitem wt-dashboardbox">
+								<div class="card">
+                                    <div class="card-header">
+                                        <h3 class="is-size-3 mb-4 float-left"> Activity log for {% if num_of_days is 0 %} Today {% else %} {{ date_of_user|date:"M-d-Y" }} {% endif %}</h3><br><br>
+                                        <h5 class="is-size-3 float-left" span style="color: blue; font-weight: bold;"> {% if date_tracking|length == 0 %}<p>No tracking time for today...</p>{% endif %}</h5>
+                                        
+                                        {% if date_tracking|length > 0 %}
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-sm">
+                                                <thead>
+                                                <tr>
+            
+                                                    <th>#</th>
+                                                    <th>Tasks</th>
+                                                    <th>Proposal</th>
+                                                    <th>Time</th>
+            
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for tracking in date_tracking %}
+                                                <tr>
+                                                <td>{{forloop.counter}} </td>
+                                                <td>{% if tracking.tasks %} {{tracking.tasks|truncatechars:100 }}{% else %} - {%endif%}</td>
+                                                <td>{{tracking.proposal.title|truncatechars:100 }}</td>
+                                                <td>{{tracking.minutes|time_converter}}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2">Total</th>
+                                                        <th colspan="2">{{ user_team_and_date_tracking|time_converter }}</th>
+                                                    </tr>
+                                                </tfoot>                                                
+                                            </table>
+                                        </div>  
+                                            {% endif %}
+                                            
+                                        </div>
+                                        <nav class="wt-pagination wt-savepagination">
+                                            <ul>
+                                                <li class="wt-prevpage"><a href="?num_of_days={{num_of_days|add:1}}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                                {% if num_of_days > 0 %}<li class="wt-nextpage"><a href="?num_of_days={{num_of_days|add:-1}}"><i class="lnr lnr-chevron-right"></i></a></li>{% endif %}
+                                            </ul>
+                                        </nav>	
+                                            
+                                </div>  
+                            </div>						
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+							<div class="wt-insightsitem wt-dashboardbox">
+								<div class="card">
+                                    <div class="card-header">
+                                        <h3 class="is-size-3 mb-4 float-left"> Activity log for {% if num_of_month is 0 %} this Month {% else %} {{ month_of_user|date:"M-Y" }} {% endif %}</h3><br><br>
+                                        <h5 class="is-size-3 mb-4 float-left" span style="color: blue; font-weight: bold;"> {% if not user_team_and_month_tracking %}<p>No tracking activity for this month...</p>{% endif %}</h5>
+                                        
+                                        {% if user_team_and_month_tracking %}
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-sm">
+                                                <thead>
+                                                <tr>
+            
+                                                    <th>#</th>
+                                                    <th>Proposal</th>
+                                                    <th>Time</th>
+            
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for proposal in proposals %}
+                                                {% if proposal.user_team_and_proposal_and_month_tracking %}
+                                                <tr>
+                                                <td>{{forloop.counter}} </td>
+                                                <td>{{proposal.title|truncatechars:100 }}</td>
+                                                <td>{{proposal.user_team_and_proposal_and_month_tracking|time_converter}}</td>
+                                                </tr>
+                                                {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2">Total</th>
+                                                        <th colspan="2">{{ user_team_and_month_tracking|time_converter}}</th>
+                                                    </tr>
+                                                </tfoot>                                                
+                                            </table>
+                                        </div>  
+                                        {% endif %}
+                                    </div>
+                                        <nav class="wt-pagination wt-savepagination">
+                                            <ul>
+                                                <li class="wt-prevpage"><a href="?num_of_month={{num_of_month|add:1}}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                                {% if num_of_month > 0 %}<li class="wt-nextpage"><a href="?num_of_month={{num_of_month|add:-1}}"><i class="lnr lnr-chevron-right"></i></a></li>{% endif %}
+                                            </ul>
+                                        </nav>			
+                                </div>  
+                            </div>						
+                        </div>
+                        
+                    </div>		
+				</section>
+
+                <section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+					<div class="row">
+                        {% if request.user == team.created_by %}
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="wt-insightsitem wt-dashboardbox">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="is-size-3 mb-4 float-left"> Member Activity log for {% if team_month is 0 %} this Month {% else %} {{ month_of_team_members|date:"M-Y" }} {% endif %}</h3><br><br>
+                                        <h5 class="is-size-3 mb-4 float-left" span style="color: blue; font-weight: bold;"> {% if not team_and_month_tracking %}<p>No tracking time for members for this period...</p>{% endif %}</h5>
+
+                                        {% if team_and_month_tracking > 0 %}
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-sm">
+                                                <thead>
+                                                <tr>
+            
+                                                    <th>#</th>
+                                                    <th>Team Member</th>
+                                                    <th>Time</th>
+            
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for member in members %}
+                                                <tr>
+                                                <td>{{forloop.counter}} </td>
+                                                <td>{% firstof member.get_full_name member.short_name %}</td>
+                                                <td>{{member.time_for_user_team_and_month_tracking|time_converter}}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2">Total</th>
+                                                        <th colspan="2">{{ team_and_month_tracking|time_converter }}</th>
+                                                    </tr>
+                                                </tfoot>                                                
+                                            </table>
+                                        </div>  
+                                        {% endif %}
+                                            
+                                    </div>
+                                    <nav class="wt-pagination wt-savepagination">
+                                    <ul>
+                                        <li class="wt-prevpage"><a href="?team_month={{team_month|add:1}}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                        {% if team_month > 0 %}<li class="wt-nextpage"><a href="?team_month={{team_month|add:-1}}"><i class="lnr lnr-chevron-right"></i></a></li>{% endif %}
+                                    </ul>
+                                </nav>	
+                            </div>  
+                        </div>
+                        {% endif %}						
+                    </div>
+                </section>   		
+				
+                    {% comment %} <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                        <div class="wt-haslayout wt-dbsectionspace">
+                            <div class="wt-dashboardbox">
+                                <div class="wt-dashboardboxtitle wt-yeartag">
+                                    <h2>Job Posted</h2>
+                                    <div class="wt-tag wt-widgettag">
+                                        <a href="javascript:void(0);">2019</a>
+                                        <a href="javascript:void(0);">2018</a>
+                                        <a href="javascript:void(0);">2017</a>
+                                    </div>
+                                </div>
+                                <div class="wt-dashboardboxcontent">
+                                    <div id="wt-postedsilder" class="wt-postedsilder owl-carousel">
+                                        <div class="item">
+                                            <div class="wt-posteditem">
+                                                <span><i class="fa fa-check-circle"></i><a href="javascript:void(0);"> Louanne Mattioli</a></span>
+                                                <h3>I want some customization</h3>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="wt-posteditem">
+                                                <span><i class="fa fa-check-circle"></i><a href="javascript:void(0);"> Louanne Mattioli</a></span>
+                                                <h3>I want some customization</h3>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="wt-posteditem">
+                                                <span><i class="fa fa-check-circle"></i> Louanne Mattioli</span>
+                                                <h3>Website changes in HTML</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wt-jobchartholder">
+                                        <canvas id="wt-jobchart" class="wt-jobchart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				</section>                 {% endcomment %}
+ 
+                {% endblock %}

@@ -1,0 +1,7 @@
+
+<select id="select" class="form-control">
+    <option selected> Select State </option>
+    {% for state in states %}	
+        <option value="{{state.pk}}">{{state.name}}</option>
+    {% endfor %}
+</select> 

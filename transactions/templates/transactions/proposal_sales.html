@@ -1,0 +1,98 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<!--Main Start-->
+	<main id="wt-main" class="wt-main wt-haslayout">
+
+		<div class="wt-proposalholder">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<div class="alert alert-info" role="alert">
+						<span style="color: blue; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Notice: At any given time where you belong to more than 1 Team, we will show proposals from your currently active team (whether you are online or offline) to clients that will offer contract to you.</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Company listing starts-->
+		<div class="wt-proposalholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-12">
+						<div class="wt-sectionhead wt-textcenter">
+							<div class="wt-sectiontitle">
+								<h2>Transactions</h2>
+								<div class="alert alert-info" role="alert">
+									<span style="color: green; font-weight: bold;"> All Your Transactions history</span>
+								</div>
+								<form action="" method="post">
+									<div class="input-group">
+										<input type="text" class="form-control" name="" id="">
+										<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>				
+
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Buyer</th>
+							<th>Purchase Date</th>
+							<th>Proposal Sold</th>
+							<th>Payment Type</th>
+							<th>Staff Hired</th>
+							<th>Price </th>
+							<th>Offer Discount </th>
+							<th>Earning Fees </th>
+							{% comment %} <th>Total Salary </th> {% endcomment %}
+							<th>Status</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for proposal_sale in proposal_sales %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{proposal_sale.purchase.client.short_name|capfirst}}</td>
+							<td>{{proposal_sale.created_at}}</td>
+							<td>{{proposal_sale.proposal.title|truncatechars:100}}</td>
+							<td>{{proposal_sale.purchase.payment_method}}</td>
+							<td>{{proposal_sale.staff_hired}}</td>
+							<td>{{proposal_sale.proposal.salary}}</td>
+							<td>{{proposal_sale.discount_offered}}</td>
+							<td>{{proposal_sale.earning_fee_charged}}</td>
+							<td>{{proposal_sale.get_status_display}}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not purchases %}
+					<div class="alert alert-info justify-content-md-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Ooops! No transactions to show Yet.</span>
+					</div>
+					{% endif %}
+			</div>
+			{% if purchases.count == 10 %}
+			<div class="wt-commentsbtn">
+				<button class="wt-btn" type="button">Load More</button>
+			</div>
+			{% endif %}
+		</div>
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	{% endblock %}

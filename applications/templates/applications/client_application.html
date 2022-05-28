@@ -1,0 +1,127 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+	<!--Register Form Start-->
+	<section class="wt-haslayout wt-dbsectionspace">
+		<div class="row justify-content-md-center">				
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+				<div class="wt-dashboardbox">
+					<div class="wt-dashboardboxtitle">
+						<h2>Manage My Projects</h2>
+					</div>
+					<div class="wt-dashboardboxcontent wt-jobdetailsholder">
+						<div class="wt-freelancerholder">
+							<a href="{% url 'projects:create_project' %}"><button type="button" class="btn btn-outline-danger float-right"><i class="fa fa-folder-open" aria-hidden="true"></i> Create Project</button></a>
+							<div class="wt-tabscontenttitle">
+								<h2>Active Projects</h2>
+							</div>
+							<div class="wt-managejobcontent">
+								{% for project in active_projects %}
+								<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
+									<div class="wt-userlistingcontent">
+												<h3>{{ project.title }}</h3>
+										<div class="wt-contenthead">
+											<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
+												<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>{{project.get_service_level_display}}</span></li>
+												<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:30}}</span></li>
+												<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{project.get_specification_display}}</span></li>
+												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>															
+											</ul>
+										</div>
+										<div class="wt-description">
+											<p>{{ project.preview}} </p>
+										</div>	
+										<div class="wt-tag wt-widgettag">
+											{% for skill in project.project_skill.all %}
+												<a href="javascript:void(0);">{{skill}}</a>
+											{% endfor %}	
+										</div> 
+										<div class="wt-rightarea">
+											{% if request.user == project.created_by and project.status == 'active' %}
+											<div class="wt-btnarea"><a href="{{project.get_project_absolute_url}}" class="btn btn-success"><i class="fa fa-info"></i> Details</a>
+											<a href="{% url 'applications:application_detail' project.slug %}" class="btn btn-danger"><i class="fa fa-arrow-up"></i>Applications</a></div>
+											{% endif %}
+											<div class="wt-hireduserstatus">
+												<h4>{{ project.applications.count }}</h4><span>Applicants</span>
+												<ul class="wt-hireduserimgs">
+													{% for application in project.applications.all %}
+													<li><figure><img src="{{application.applied_by.freelancer.profile_photo.url}}" alt="img description"></figure></li>
+													{% endfor %}
+												</ul>
+											</div>											
+										</div>
+									</div>	
+								</div>
+								{% endfor %}
+								{% if not active_projects %}
+								<div class="wt-description">
+									<span><i class="wt-btn float-center"></i>Hello Howdy! You don't have any project yet...</span>
+								</div>												
+							{% endif %}	
+						</div>												
+					</div>
+				</div>
+					<nav class="wt-pagination wt-savepagination">
+						<ul>
+							<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+							<li><a href="javascrip:void(0);">1</a></li>
+							<li><a href="javascrip:void(0);">2</a></li>
+							<li><a href="javascrip:void(0);">3</a></li>
+							<li><a href="javascrip:void(0);">4</a></li>
+							<li><a href="javascrip:void(0);">...</a></li>
+							<li><a href="javascrip:void(0);">50</a></li>
+							<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+						</ul>
+					</nav>								
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
+				<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>150</h3>
+								<span>Total Ongoing Jobs</span>
+							</div>
+						</div> 
+					</div>
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent wt-componyfolow">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>1406</h3>
+								<span>Total Completed Jobs</span>
+							</div>
+						</div> 
+					</div>								
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent  wt-freelancelike">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>2075</h3>
+								<span>Total Cancelled Jobs</span>
+							</div>
+						</div> 
+					</div>								
+				</aside>
+				<div class="wt-companyad">
+					<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+					<span>Advertisement  255px X 255px</span>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Register Form End-->
+
+
+{% endblock %}
+

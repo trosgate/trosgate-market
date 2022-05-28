@@ -1,0 +1,60 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <title>Trosgate</title>
+
+        <style type="text/css">
+            html {
+                width: 100%;
+            }
+
+            body {
+                width: 100%;
+                font-family: Arial;
+                font-size: 14px;
+                background-color: #fff;
+                color: #333;
+            }
+
+            a {
+                color: #111;
+            }
+        </style>
+    </head>
+
+    <body>
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+                <td><h1>Welcome to Trosgate</h1></td>
+            </tr>
+            <tr>
+                <td><h1>Hello {{username}},</h1></td>
+            </tr>            
+
+            <tr>
+                <td>
+                    <p>Congratulations on joining Trosgate</p>
+                    <p>Please follow the link below to explore how to get started and benefit from our service.</p>
+                </td>
+            </tr>
+                <td>
+                    <p> Your registered email is: <strong>{{ email }}</strong></p>
+                </td>
+            <tr>
+                <td>
+                    <p>Please contact us here if you have any challenges: isaacagbedam@gmail.com</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="{{ acceptation_url }}" class="btn btn-success">Accept invitation</a>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
+
+{% endautoescape %}

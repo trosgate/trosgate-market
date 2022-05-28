@@ -1,0 +1,412 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<div class="alert alert-info" role="alert">
+							<span style="color: green; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Alert: Are you a big company? You can now create aptitude tests/quizes to shortlist freelancers for your big projects.<a href="{% url 'quiz:create_quiz' %}"> Create a Quiz</a></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--More Details Start-->
+			<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+				<div class="row">
+					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+						<div class="wt-insightsitem wt-dashboardbox">
+							<figure class="wt-userlistingimg">
+								<img src="{% static 'images/security.jpg'%}" alt="image description" class="mCS_img_loaded">
+							</figure>
+							<div class="wt-insightdetails">
+								<div class="wt-title">
+									<h3>Settings</h3>
+									{% comment %} <a href="/account/two_factor/setup/">Add Extra Security</a> | {% endcomment %}
+									<a href="javascript:void(0)">Account Settings</a>
+								</div>													
+							</div>	
+						</div>
+					</div>
+					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+						<div class="wt-insightsitem wt-dashboardbox">
+							<figure class="wt-userlistingimg">
+								<img src="{% static 'images/thumbnail/img-20.png'%}" alt="image description" class="mCS_img_loaded">
+							</figure>
+							<div class="wt-insightdetails">
+								<div class="wt-title">
+									<h3>Profile</h3>
+									<a href="{% url 'client:update_client_profile' user_id=user.id %}">Click To Update</a> |
+									<a href="{{client_profile.client_profile_get_absolute_url}}"target='_blank'>Click To Preview</a>
+								</div>													
+							</div>	
+						</div>
+					</div>												
+					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+						<div class="wt-insightsitem wt-dashboardbox">
+							<figure class="wt-userlistingimg">
+								<img src="{% static 'images/thumbnail/img-19.png'%}" alt="image description" class="mCS_img_loaded">
+							</figure>
+							<div class="wt-insightdetails">
+								<div class="wt-title">
+									<h3>New Messages</h3>
+									<a href="{% url 'teams:team' %}"target='_new'>Click To Preview</a>
+								</div>													
+							</div>	
+						</div>
+					</div>	
+					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+						<div class="wt-insightsitem wt-dashboardbox">
+							<figure class="wt-userlistingimg">
+								<img src="{% static 'images/thumbnail/img-21.png'%}" alt="image description" class="mCS_img_loaded">
+							</figure>
+							<div class="wt-insightdetails">
+								<div class="wt-title">
+									<h3>Applicants</h3>
+									<a href="{% url 'applications:application_multiple_summary' %}">Click To View</a> 
+									{% comment %} <a href="{{client_profile.client_profile_get_absolute_url}}"target='_blank'>Click To Preview</a> {% endcomment %}
+								</div>													
+							</div>	
+						</div>
+					</div>																	
+				</div>
+			</section>
+			<div class="wt-haslayout wt-innerbannerholder">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                            <div class="wt-innerbannercontent">
+                            <div class="wt-title"><h2>Hiring Made Easy</h2></div>
+                                <ol class="wt-breadcrumb">
+                                    <li class="wt-active">Soo many ways to Hire. Click on each Icon below to navigate </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+						<div class="wt-proposalsr wt-box-shadow">
+							<div class="wt-proposalsrcontent">
+							<a href="{% url 'proposals:proposal_list' %}"> 
+								<figure><img src="{% static 'images/thumbnail/img-17.png'%}" alt="image"></figure>
+							</a>
+							<div class="wt-title">
+									<h3>Direct Hire</h3>
+									<span>Hire directly from proposals</span>
+								</div>
+							</div> 
+						</div>
+					</aside>
+				</div> 
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+						<div class="wt-proposalsr wt-box-shadow">
+							<div class="wt-proposalsrcontent wt-freelancelike">
+								<a href="{% url 'freelancer:freelancer_listing' %}">
+									<figure><img src="{% static 'images/thumbnail/img-15.png'%}" alt="image"></figure>
+								</a>
+								<div class="wt-title">
+									<h3>Contracts</h3>
+									<span>Offer Contracts from profiles</span>
+								</div>
+							</div> 
+						</div>
+					</aside>
+				</div>
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+						<div class="wt-proposalsr wt-box-shadow">
+							<div class="wt-proposalsrcontent wt-repostjob">
+								<a href="{% url 'projects:create_project' %}"> 
+									<figure><img src="{% static 'images/thumbnail/img-18.png'%}" alt="image"></figure>
+								</a>
+								<div class="wt-title">
+									<h3>Projects</h3>
+									<span>Post job and Hire applicants</span>
+								</div>
+							</div> 
+						</div>
+					</aside>
+				</div>
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">	
+						<div class="wt-proposalsr wt-box-shadow">
+							<div class="wt-proposalsrcontent wt-componyfolow">
+								<a href="{% url 'quiz:list_quiz' %}">
+									<figure><img src="{% static 'images/thumbnail/img-16.png'%}" alt="image"></figure>
+								</a>
+								<div class="wt-title">
+									<h3>Quizes</h3>
+									<span>Shortlist high value projects</span>
+								</div>
+							</div> 
+						</div>
+					</aside>
+				</div>
+			</div>
+	
+			<div class="wt-proposalholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-12">
+							<div class="wt-sectionhead wt-textcenter">
+								<div class="wt-sectiontitle">
+									<h2>Open Projects</h2>
+									<div class="alert alert-info" role="alert">
+										<span style="color: green; font-weight: bold;"> These projects are open for applications</span>
+									</div>
+									<form action="" method="post">
+										<div class="input-group">
+											<input type="text" class="form-control" name="" id="">
+											<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>				
+
+				<div class="table-responsive">
+					<table class="table table-striped table-sm">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Your Posted Jobs</th>
+								<th>Open Until</th>
+								<th>Applicants</th>
+								<th>Project</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							{% for project in open_projects %}
+							<tr>
+								<tr>
+								<td>{{forloop.counter}}</td> 
+								<td>{{project.title|truncatechars:200}}</a></td>
+								<td><class="wt-hireduserstatus">{{project.duration}}</td>
+								<td><class="wt-hireduserstatus"> {{ project.applications.count }} </td>
+								<td><a class="btn btn-outline-info btn-sm mt-2" href="{{project.get_project_absolute_url}}">Preview</a></td>
+								<td><a class="btn btn-outline-success btn-sm mt-2" href="{% url 'applications:application_detail' project.slug %}"> Messages </a></td>
+								</tr>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					{% if not open_projects %}
+						<div class="alert alert-info justify-content-md-center" role="alert">
+							<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
+						</div>
+						{% endif %}
+				</div>
+			</div>
+
+			<div class="wt-proposalholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-12">
+							<div class="wt-sectionhead wt-textcenter">
+								<div class="wt-sectiontitle">
+									<h2>Closed Projects</h2>
+									<div class="alert alert-info" role="alert">
+										<span style="color: green; font-weight: bold;"> You can re-open these projects when you preview to modify the deadlines</span>
+									</div>
+									<form action="" method="post">
+										<div class="input-group">
+											<input type="text" class="form-control" name="" id="">
+											<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>				
+
+				<div class="table-responsive">
+					<table class="table table-striped table-sm">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Your Posted Jobs</th>
+								<th>Applicants</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							{% for project in closed_projects %}
+							<tr>
+								<tr>
+								<td>{{forloop.counter}}</td> 
+								<td>{{project.title|truncatechars:200}}</a></td>
+								<td><a class="btn btn-outline-success btn-sm mt-2" href="{% url 'applications:application_detail' project.slug %}"><i class="fa fa-arrow-up"></i> {{ project.applications.count }} applied </a></td>
+								<td><a class="btn btn-outline-info btn-sm mt-2" href="{{project.get_reopen_project_absolute_url}}"><i class="fa fa-window-restore"></i> Re-Open</a></td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					{% if not closed_projects %}
+						<div class="alert alert-info justify-content-md-center" role="alert">
+							<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<!--Company listing starts-->
+				<div class="wt-proposalholder">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-12">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>Contracts</h2>
+										<div class="alert alert-info" role="alert">
+											<span style="color: green; font-weight: bold;"> All Your Internal contracts Created</span>
+										</div>
+										<form action="" method="post">
+											<div class="input-group">
+												<input type="text" class="form-control" name="" id="">
+												<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>				
+
+					<div class="table-responsive">
+						<table class="table table-striped table-sm">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Contract #</th>
+									<th>Awarded Team</th>
+									<th>Proposal Associated</th>
+									<th>Created On</th>
+									<th>Reaction</th>
+									<th>Total Budget($)</th>
+									<th>Message</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								{% for contract in contracts %}
+								<tr>
+									<td>{{forloop.counter}} </td>
+									<td>{{contract.reference}}</td>
+									<td>{{contract.team.title}}</td>
+									<td>{{contract.proposal.title}}</td>
+									<td>{{contract.date_created|date:"M-d-Y"}}</td>
+									<td>{{contract.get_team_reaction_display}}</td>
+									<td>{{contract.grand_total}}</td>
+									<td>
+										<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-info btn-sm"><i class="fa fa-folder-open"> Chat Team</i></a>
+									</td>
+									<td> 
+										<a href="{% url 'contract:internal_contract_detail' contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+									</td> 
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+							{% if not contracts %}
+							<div class="alert alert-info justify-content-md-center" role="alert">
+								<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
+							</div>
+							{% endif %}
+					</div>
+					{% if contracts|length > 5 %}
+					<div class="wt-commentsbtn">
+						<a href="{% url 'contract:internal_contract_list' %}" class="wt-btn"> View More</a>
+						{% comment %} <button class="wt-btn" type="button">Load More</button> {% endcomment %}
+					</div>
+					{% endif %}
+				</div>
+				<div class="wt-proposalholder">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-12">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>Proposals</h2>
+										<div class="alert alert-info" role="alert">
+											<span style="color: green; font-weight: bold;"> Latest Proposals for Hire</span>
+										</div>
+										<form action="" method="post">
+											<div class="input-group">
+												<input type="text" class="form-control" name="" id="">
+												<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>			
+				</div>				
+				<section class="wt-haslayout wt-dbsectionspace">	
+					<div class="container">
+						<div class="row justify-content-md-center">
+						{% for proposal in proposals %}
+							<div class="col-12 col-sm-12 col-md-12 col-lg-3">
+								<div class="wt-companysdetails">
+									<figure class="wt-companysimg">
+									{% if proposal.thumbnail %}
+										<img src="{{proposal.thumbnail.url}}" alt="img description">
+									{% endif %}
+									</figure>
+									<div class="wt-companysinfo">
+										<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description"></figure>
+										<div class="wt-title">
+											<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_full_name}}{% endif %}</a>
+											<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><h2>{{proposal.title}}</h2></a> 
+											<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
+										<hr>
+										<ul class="wt-postarticlemeta">
+											<li>
+												<a href="javascript:void(0);">
+													<span>Views()</span>
+												</a>
+											</li>
+											<li class="wt-following">
+												<a href="javascript:void(0);">
+													<span>Bookmark</span>
+												</a>
+											</li>
+										</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+							{% if not proposals %}
+								<p> No featured proposals to show yet </p>
+							{% endif %}
+						</div>
+					</div>
+				</section>
+				<div class="wt-proposalholder">
+					<div class="row justify-content-md-center">
+						<div class="wt-sectionhead wt-textcenter">
+							<span>Copyright @ {{website.site_name}}</span>
+						</div>
+					</div>
+				</div>
+    			{% comment %} {% include 'dashboard/main_footer.html' %} {% endcomment %}
+			</main>
+
+{% endblock %}

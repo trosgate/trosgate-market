@@ -1,0 +1,69 @@
+{% extends 'dashboard/main_base.html' %}
+
+{% load static %} 
+
+{% block content %}
+<main class="wt-haslayout" style="background:white;">
+	<article class="card-body mx-auto" style="max-width: 450px;">
+		<h3 class="card-title mt-4 text-center">Verification</h3>
+		<p class="text-center">Let us verify you now</p>
+		
+	<div class="container">
+
+		<form method="post" autocomplete="off">
+			{% csrf_token %}
+			{% if twofactorform.errors %}
+									
+			<div class="alert alert-danger" role="alert">
+				Ooop! form error occured. Please check below and correct
+			</div>
+			
+			{% endif %}
+
+			<div class="form-group">
+			{{twofactorform.pass_code.label}}
+			{{twofactorform.pass_code}}
+			{{twofactorform.pass_code.help_text}}
+			<span style="color:red;" role="alert">{{ twofactorform.passcode.errors}}</span>
+			
+		</div>	
+			
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-block"> Verify and Login </button>
+			</div>
+
+		</form>
+	</div>       
+	</article>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<div class="wt-proposalholder mt-6">
+		<div class="row justify-content-md-center">
+			<div class="wt-sectionhead wt-textcenter">
+				<span>Copyright @ {{website.site_name}}</span>
+			</div>
+		</div>
+	</div>
+</main>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+{% endblock%}
+
+
+
+
+        

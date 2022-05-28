@@ -1,0 +1,20 @@
+
+    {% if chats %}
+        {% for chat in chats %}
+        <div class="wt-offerermessage">   
+            <figure><img src="{{ chat.sender.freelancer.profile_photo.url }}" alt="image description"></figure>
+            <div class="wt-description">
+                <h4>{{chat.sender.short_name}}</h4>
+                <p>{{chat.content}} </p>
+                <div class="clearfix"></div>
+                <time datetime="2017-08-08">{{chat.sent_on}}</time>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <span 
+        style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> No messages at the moment
+    </span>
+    {% endif %}
+ 
+

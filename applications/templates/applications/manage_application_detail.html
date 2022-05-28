@@ -1,0 +1,208 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+<style>
+	.thumb-up-or-down{
+		background-color: blue
+	}
+</style>
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+							<div class="wt-dashboardbox">
+								<div class="wt-dashboardboxtitle">
+									<h2>Manage Applicants</h2>
+								</div>
+								<div class="wt-dashboardboxcontent wt-rcvproposala">
+									<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
+										<div class="wt-userlistingcontent">
+													<h3>{{ project.title }}</h3>
+											<div class="wt-contenthead">
+												<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
+													<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>{{project.get_service_level_display}}</span></li>
+													<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:30}}</span></li>
+													<li><span class="wt-dashboraddoller">Salary: <i class="fa fa-dollar-sign"></i>{{project.amount}}</span></li>
+													<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{project.get_specification_display}}</span></li>
+													<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>															
+												</ul>
+											</div>
+											<div class="wt-description">
+												<p>{{ project.preview}} </p>
+											</div>	
+										<div class="wt-rightarea">
+											{% if request.user == project.created_by %}
+											<div class="wt-btnarea"><a href="{% url 'applications:client_application' %}" class="btn btn-danger"><i class="fa fa-arrow-up"></i> Go Back</a></div>
+											{% else %}
+											<div class="wt-btnarea"><a href="{% url 'applications:freelancer_application' %}" class="btn btn-danger"><i class="fa fa-arrow-up"></i> Go Back</a></div>
+											{% endif %}															
+												<div class="wt-hireduserstatus">
+													<h4>{{ project.applications.count }}</h4><span>Applicants</span>
+													<ul class="wt-hireduserimgs">
+														{% for application in project.applications.all %}
+														<li><figure><img src="{{application.applied_by.freelancer.profile_photo.url}}" alt="img description"></figure></li>
+														{% endfor %}
+													</ul>
+												</div>
+												<div class="wt-hireduserstatus">
+													<h4>{{project.created_by.get_full_name}}</h4><span>Project Creator</span>
+													<ul class="wt-hireduserimgs">
+														<li><figure><img src="{{project.created_by.clients.profile_photo.url}}" alt="img description"></figure></li>
+													</ul>
+												</div>												
+											</div>
+										</div>	
+									</div>
+									<span id="feedback-message" style="color:green; text-align:right;">.</span>
+									<div class="wt-freelancerholder wt-rcvproposalholder">
+										<div id="project" data-value = "{{project.id}}" class="wt-tabscontenttitle">
+											<h2>{% if request.user.freelancer %} Your Application {% elif request.user.clients %} Received Application{{ applications|pluralize }} {% endif %}</h2>
+										</div>
+
+										{% for application in applications %}										
+										<div class="wt-managejobcontent">
+											<div class="wt-userlistinghold wt-featured wt-proposalitem">
+												<figure class="wt-userlistingimg">
+												{% if application.applied_by.freelancer.profile_photo %}
+													<img src="{{application.applied_by.freelancer.profile_photo.url}}" alt="image description" class="mCS_img_loaded">
+												{% endif %}
+												</figure>
+
+												<div class="wt-proposaldetails">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<a href="{{application.applied_by.freelancer.profile_get_absolute_url}}"> {{ application.applied_by.get_full_name }}</a>
+														</div>
+													</div>
+													<div class="wt-proposalfeedback">
+														<span class="wt-starsvtwo">
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+															<i class="fa fa-star fill"></i>
+														</span>
+														<span class="wt-starcontent"> 4.5/<i>5</i> <em>(860)</em></span>
+													</div>													
+												</div>
+												<div class="wt-rightarea">
+													{% if request.user == application.project.created_by %}
+													<div class="wt-hireduserstatus">
+														<button type="button" id="accept-project-applicant" data-index="{{application.id}}" class="btn btn-danger btn-sm accept-project-applicant">Click to Hire</button>
+													</div>
+													<div class="wt-hireduserstatus">
+														<a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm">View</a> 
+													</div>
+													{% endif %}
+													<div class="wt-hireduserstatus">
+														<h5>{{application.team.members.count}}</h5>
+														<span>Member{{application.team.members.count|pluralize}}</span>
+													</div>										
+													<div class="wt-hireduserstatus">
+														<h5>${{application.budget}}</h5>
+														<span>In {{application.get_estimated_duration_display}}</span>
+													</div>
+													<div class="wt-hireduserstatus">
+														<h5 id="application" class="application" value="{{application.id}}">{{application.get_status_display}}</h5>
+														<span>Status</span>
+													</div>
+														
+												</div>
+												<div class="wt-description">
+													<h4>Message :) </h4>
+													{{application.message|linebreaksbr}}
+												</div>												
+											</div>
+										</div>
+										{% endfor %}
+										{% if not applications %}
+											<div class="wt-description">
+												<span><i class="wt-btn float-center"></i>Hello Howdy! You don't have any application yet...</span>
+											</div>												
+										{% endif %}	
+									</div>
+								</div>
+								<nav class="wt-pagination wt-savepagination">
+									<ul>
+										<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+										<li><a href="javascrip:void(0);">1</a></li>
+										<li><a href="javascrip:void(0);">2</a></li>
+										<li><a href="javascrip:void(0);">3</a></li>
+										<li><a href="javascrip:void(0);">4</a></li>
+										<li><a href="javascrip:void(0);">...</a></li>
+										<li><a href="javascrip:void(0);">50</a></li>
+										<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+									</ul>
+								</nav>								
+							</div>
+						</div>
+						<div class="col-xs-12 col-sm-12 col-md-8 col-lg-5 col-xl-3">
+							<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
+								<div class="wt-proposalsr">
+									<div class="wt-proposalsrcontent">
+										<figure>
+											<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
+										</figure>
+										<div class="wt-title">
+											<h3>150</h3>
+											<span>Total Ongoing Jobs</span>
+										</div>
+									</div> 
+								</div>
+								<div class="wt-proposalsr">
+									<div class="wt-proposalsrcontent wt-componyfolow">
+										<figure>
+											<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
+										</figure>
+										<div class="wt-title">
+											<h3>1406</h3>
+											<span>Total Completed Jobs</span>
+										</div>
+									</div> 
+								</div>								
+								<div class="wt-proposalsr">
+									<div class="wt-proposalsrcontent  wt-freelancelike">
+										<figure>
+											<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
+										</figure>
+										<div class="wt-title">
+											<h3>2075</h3>
+											<span>Total Cancelled Jobs</span>
+										</div>
+									</div> 
+								</div>								
+							</aside>
+							<div class="wt-companyad">
+								<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+								<span>Advertisement  255px X 255px</span>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!--Register Form End-->						
+				<script>
+					$(document).on('click', '.accept-project-applicant', function (e) {
+						e.preventDefault();
+
+						let projectid = document.getElementById('project').getAttribute('data-value');
+						
+						$.ajax({
+						type: 'POST',
+						url: '{% url "applications:add_application" %}',
+						data: {
+							projectid:projectid,
+							applicationid: $(this).data('index'),
+							csrfmiddlewaretoken: "{{csrf_token}}",
+							action: 'accept-applicant'
+						},
+						success: function (json) {
+							console.log(json)
+							document.getElementById('feedback-message').innerHTML = json['message']
+							document.getElementById('application').innerHTML= json['status']							
+
+						},
+						error: function (xhr, errmsg, err) {}
+						});
+					})
+				</script>
+
+{% endblock %}

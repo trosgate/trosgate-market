@@ -1,0 +1,90 @@
+[
+    {
+      "pk": 1, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Graphic and Design", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "graphic-and-design"
+      }
+    }, 
+    {
+      "pk": 2, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Social Media Marketing", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "social-media-marketing"
+      }
+    }, 
+    {
+      "pk": 3, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Academics and Research", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "academics-and-research"
+      }
+    },
+    {
+      "pk": 4, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Network and IT", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "network-and-it"
+      }
+    }, 
+    {
+      "pk": 5, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Engineering", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "engineering"
+      }
+    }, 
+    {
+      "pk": 6, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Web Development", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "web-development"
+      }
+    },
+    {
+      "pk": 7, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Mobile App Development", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "mobile-app-development"
+      }
+    }, 
+    {
+      "pk": 8, 
+      "model": "general_settings.Category", 
+      "fields": {
+        "name": "Audio and Video", 
+        "icon": "categories/category.png", 
+        "preview": "This is the preview of the category", 
+        "visible": true,
+        "slug": "audio-and-videos"
+      }
+    }
+] 

@@ -1,0 +1,327 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<main id="wt-main" class="wt-main wt-haslayout">
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                    <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>Deposit Now</h2></div>
+                    <ol class="wt-breadcrumb">
+                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                        <li class="wt-active">Salaries </li>
+                    </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if client %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent">
+                        <section id="tabs" class="project-tab">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="alert alert-info text-center" role="alert">
+                                            <span style="color: green; font-weight: bold;"><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> 
+                                                Account Balance: {{base_currency}}&nbsp;{{request.user.clientfunduser.available_balance}}
+                                            </span>
+                                        </div>
+                                        <nav>
+                                            <div class="nav nav-pills nav-justified">
+                                                <a class="nav-item nav-link text-white btn btn-info mt-2" href="{% url "client:deposit_fee_structure" %}"><i class="fa fa-arrow-left"> &nbsp; &nbsp; Previous Step</i></a>
+                                                <a class="nav-item nav-link text-white btn btn-success mt-2"><i class="fa fa-arrow-down">&nbsp; &nbsp; Time to Deposit</i></a>
+                                            </div>
+                                        </nav>
+                                        {% if selected_gateway.name == "PayPal" %}
+                                        <br>
+                                            <div id="paypal-error-message" class="a" role="alert">.</div>
+                                            <div id="paypal-success-message" class="a" role="alert">.</div>
+                                            
+                                            <div class="row">
+                                                <h3> Deposit Method - {{selected_gateway}} </h3>
+                                                    
+                                                <div class="form-group">
+                                                    <label for="depositAmount" class="form-label">Deposit Amount </label>
+                                                    <input name="depositAmount" type="number" value="" class="form-control" id="depositAmount">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
+                                                    <input name="depositNarration" type="text" class="form-control" id="depositNarration" value="">
+                                                </div>
+                                                <div id = 'paypal-deposit-confirm' class="wt-updatall">
+                                                    <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
+                                                    <a href="javascript:void(0);" class="wt-btn">
+                                                        <div id="deposit-confirmation" class="btn btn-inline-danger text-white">I Confirm</div>
+                                                    </a>
+                                                </div>
+                                                <div id = 'paypal-deposit-nextstep' class="wt-updatall">
+                                                    <span>Step 2: I understand that after successful deposit, its Irreversible</span>
+                                                    <button id='paypal-deposit-button' type="submit" class="wt-btn"> Yes, Make Deposit </button>
+                                                </div>											
+                                                <ul class="wt-projectliststyle">
+                                                    <div class="wt-title">
+                                                        <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
+                                                    </div>	
+                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                </ul>
+                                            </div>
+                                            {% elif selected_gateway.name == "Flutterwave" %}  
+                                            <br> 
+                                            <div id="flutterwave-error-message" class="a" role="alert">.</div>
+                                            <div id="flutterwave-success-message" class="a" role="alert">.</div>
+                                            
+                                            <div class="row">
+                                                <h3> Deposit Method - {{selected_gateway}} </h3>
+                                                    
+                                                <div class="form-group">
+                                                    <label for="depositAmount" class="form-label">Deposit Amount </label>
+                                                    <input name="depositAmount" type="number" value="" class="form-control" id="depositAmount">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
+                                                    <input name="depositNarration" type="text" class="form-control" id="depositNarration" value="">
+                                                </div>
+                                                <div id = 'flutterwave-deposit-confirm' class="wt-updatall">
+                                                    <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
+                                                    <a href="javascript:void(0);" class="wt-btn">
+                                                        <div id="flutterwave-deposit-confirmation" class="btn btn-inline-danger text-white">I Confirm</div>
+                                                    </a>
+                                                </div>
+                                                <div id = 'flutterwave-deposit-nextstep' class="wt-updatall">
+                                                    <span>Step 2: I understand that after successful deposit, its Irreversible</span>
+                                                    <button id='flutterwave-deposit-button' type="submit" class="wt-btn"> Yes, Make Deposit </button>
+                                                </div>											
+                                                <ul class="wt-projectliststyle">
+                                                    <div class="wt-title">
+                                                        <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
+                                                    </div>	
+                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                </ul>
+                                            </div>
+                                            {% elif selected_gateway.name == "Stripe" %}
+                                            <br>  
+                                            <div id="stripe-error-message" class="text-center" role="alert">.</div>
+                                            <div id="stripe-success-message" class="a" role="alert">.</div>
+                                            <div class="row">
+                                                
+                                                <h3> Deposit Method - {{selected_gateway}} </h3>
+                                                
+                                                <div class="form-group">
+                                                    <label for="stripeAmount" class="form-label">Deposit Amount </label>
+                                                    <input name="stripeAmount" type="number" value="" class="form-control" id="stripeAmount">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="stripeNarration" class="form-label">Narration <span class="text-muted"></span></label>
+                                                    <input name="stripeNarration" type="text" class="form-control" id="stripeNarration" value="">
+                                                </div>
+                                                <div id = 'stripe-deposit-confirm' class="wt-updatall">
+                                                    <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
+                                                    <a href="javascript:void(0);" class="wt-btn">
+                                                        <div class="btn btn-inline-danger text-white">I Confirm</div>
+                                                    </a>
+                                                </div>
+                                                
+                                                <div id = 'stripe-deposit-nextstep' class="wt-updatall">
+                                                    <span>Step 2: I understand that after successful deposit, its Irreversible</span>
+                                                    <button onclick='stripeDepoPay(event)' class="wt-btn"> Yes, Make Deposit </button>
+                                                </div>											
+                                                <ul class="wt-projectliststyle">
+                                                    <div class="wt-title">
+                                                        <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
+                                                    </div>	
+                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                </ul>
+                                            </div> 
+                                            {% elif selected_gateway.name == "Razorpay" %} 
+                                            <br> 
+                                            <div id="razorpay-error-message" class="a" role="alert">.</div>
+                                            <div id="razorpay-success-message" class="a" role="alert">.</div>
+                                            
+                                            <div class="row">
+                                                <h3> Deposit Method - {{selected_gateway}} </h3>
+                                                <div class="form-group">
+                                                    <label for="depositAmount" class="form-label">Deposit Amount </label>
+                                                    <input name="depositAmount" type="number" value="" class="form-control" id="depositAmount">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
+                                                    <input name="depositNarration" type="text" class="form-control" id="depositNarration" value="">
+                                                </div>
+                                                <div id = 'razorpay-deposit-confirm' class="wt-updatall">
+                                                    <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
+                                                    <a href="javascript:void(0);" class="wt-btn">
+                                                        <div id="razorpay-deposit-confirmation" class="btn btn-inline-danger text-white">I Confirm</div>
+                                                    </a>
+                                                </div>
+                                                <div id = 'razorpay-deposit-nextstep' class="wt-updatall">
+                                                    <span>Step 2: I understand that after successful deposit, its Irreversible</span>
+                                                    <button id='razorpay-deposit-button' type="submit" class="wt-btn"> Yes, Make Deposit </button>
+                                                </div>											
+                                                <ul class="wt-projectliststyle">
+                                                    <div class="wt-title">
+                                                        <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
+                                                    </div>	
+                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                </ul>
+                                            </div> 
+                                            {% endif %} 
+                                        </div>                                            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>								
+            </section>
+            {% endif %}
+            <div class="wt-proposalholder">
+                <div class="row justify-content-md-center">
+                    <div class="wt-sectionhead wt-textcenter">
+                        <span>Copyright @ {{website.site_name}}</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    {% endblock content %}
+
+    {% block scripts %}
+
+    {% if selected_gateway.name == "PayPal" %}
+    <script>
+        //PAYPAL DEPOSIT BUTTON CONFIRMATION  
+        $(document).ready(function(){
+
+            $('#paypal-deposit-nextstep').hide()
+            $('#paypal-deposit-confirm').click(function(){
+                $('#paypal-deposit-nextstep').slideToggle(200)       
+            });
+            $('#paypal-deposit-nextstep').click(function(){
+                $('#paypal-deposit-nextstep').hide()       
+            });            
+        });
+    </script>        
+    <script 
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}"data-sdk-integration-source="button-factory">
+    </script>
+
+    {% elif selected_gateway.name == "Stripe" %}
+    <script>
+        //STRIPE DEPOSIT BUTTON CONFIRMATION  
+        $(document).ready(function(){
+
+            $('#stripe-deposit-nextstep').hide()
+            $('#stripe-deposit-confirm').click(function(){
+                $('#stripe-deposit-nextstep').slideToggle(200)       
+            });
+            $('#stripe-deposit-nextstep').click(function(){
+                $('#stripe-deposit-nextstep').hide()       
+            });            
+        });
+    </script>  
+    <script src="https://js.stripe.com/v3/"></script>
+    <!-- <script src="{% static 'js/deposits/stripe-deposit.js' %}"></script> -->
+    <script>
+        function stripeDepoPay(event) {
+        event.preventDefault();
+
+        let stripeAmount = $('[name="stripeAmount"]').val();
+        let stripeNarration = $('[name="stripeNarration"]').val();
+
+        let displayError = document.getElementById('stripe-error-message')
+        let displaySuccess = document.getElementById('stripe-success-message')
+
+        if (stripeAmount == '' || stripeNarration == '') {
+            displayError.textContent = 'Ooops! All fields are required';
+            $('#stripe-error-message').addClass('alert alert-danger');
+
+            return false;
+        }
+        else {
+            displayError.textContent = '';
+            $('#stripe-error-message').removeClass('alert alert-danger');
+
+            let data = {
+                'stripeAmount': stripeAmount,
+                'stripeNarration': stripeNarration,
+            }
+
+            let stripe = Stripe('{{stripe_public_key}}');
+
+            fetch('/client/stripe-deposit/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{csrf_token}}'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+              .then(function (response) {
+                return (response)
+                //return response.json()
+              })
+              .then(function (session) {
+                return stripe.redirectToCheckout({sessionId:session.session.id})
+              })
+              .then(function (result) {
+                return console.log(result.error.message)
+              })
+              //.catch(function (error) {
+                //return console.log(error)
+              //})
+          }
+        }
+    </script>
+    {% elif selected_gateway.name == "Flutterwave" %}
+    <script>
+        //FLUTTERWAVE DEPOSIT BUTTON CONFIRMATION  
+        $(document).ready(function(){
+
+            $('#flutterwave-deposit-nextstep').hide()
+            $('#flutterwave-deposit-confirm').click(function(){
+                $('#flutterwave-deposit-nextstep').slideToggle(200)       
+            });
+            $('#flutterwave-deposit-nextstep').click(function(){
+                $('#flutterwave-deposit-nextstep').hide()       
+            });            
+        });
+    </script>    
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script src="{% static 'js/deposits/flutterwave-checkout.js' %}"></script>
+
+    {% elif selected_gateway.name == "Razorpay" %}
+    <script>
+        //RAZORPAY DEPOSIT BUTTON CONFIRMATION  
+        $(document).ready(function(){
+
+            $('#razorpay-deposit-nextstep').hide()
+            $('#razorpay-deposit-confirm').click(function(){
+                $('#razorpay-deposit-nextstep').slideToggle(200)       
+            });
+            $('#razorpay-deposit-nextstep').click(function(){
+                $('#razorpay-deposit-nextstep').hide()       
+            });            
+        });
+    </script>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    {% endif %}
+
+    {% endblock scripts %}

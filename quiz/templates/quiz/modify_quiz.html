@@ -1,0 +1,69 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+					
+					<!--Inner Home Banner Start-->
+					<div class="wt-haslayout wt-innerbannerholder">
+						<div class="container">
+							<div class="row justify-content-md-center">
+								<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+									<div class="wt-innerbannercontent">
+									<div class="wt-title"><h2>Modify Quiz</h2></div>
+									</div>					
+								</div>
+							</div>
+						</div>
+					</div>
+			
+					<!--Inner Home End-->
+					<section class="wt-haslayout">
+						<div class="container">
+							<div class="row">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="wt-greeting-holder">
+										<div class="row">                         												
+											<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+												<div class="wt-greetingcontent">
+													<div class="wt-sectionhead">
+														<div class="wt-sectiontitle">
+															<h2>Modify Quiz</h2>
+															<span>About to make changes</span>
+														</div>
+														<form method="POST"> {% csrf_token %}
+															<div class="form-group">
+																{{quiz_change_form.is_published.label}}
+																{{quiz_change_form.is_published}}
+															</div>
+															<div class="form-group">
+																{{quiz_change_form.duration.label}}
+																{{quiz_change_form.duration}}
+															</div>
+															<div class="form-group">
+																{{quiz_change_form.attempts.label}}
+																{{quiz_change_form.attempts}}
+															</div>
+															<div class="form-group">
+																{{quiz_change_form.instruction.label}}
+																{{quiz_change_form.instruction}}
+															</div>
+															<div class="form-group wt-btnarea">
+																<button type="submit" class="wt-btn"> Save Changes </button>
+															</div>											
+														</form>                   														
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!--Greetings & Welcome End-->
+
+
+			
+{% endblock %}

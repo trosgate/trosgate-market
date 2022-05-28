@@ -1,0 +1,26 @@
+{% extends "account/modals/base_auto_logout_popup.html" %}
+
+{% block modal-id %} id="warningLogoutModal" {% endblock modal-id %}
+
+{% block modal-title %} <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp; Alert ! {% endblock modal-title %}
+
+{% block modal-color %} text-warning {% endblock modal-color %}
+
+{% block modal-icon %} fas fa-stack fa-3x {% endblock modal-icon %}
+{% block modal-icon1 %} fas fa-cloud fa-stack-2x{% endblock modal-icon1 %}
+{% block modal-icon2 %} fas fa-exclamation-triangle {% endblock modal-icon2 %} {% block modal-icon2a %}fa-stack-1x fa-inverse {% endblock modal-icon2a %}
+
+{% block modal-content %} 
+The system will log you out in 5 Minutes... <p></p>
+<span class="container" style="font-size: 13px; width: 90%;">
+    Note: If you want to stay logged in {{autoLogoutSystem.interval}}, <br>click on 
+    <span class="text-primary"> {{autoLogoutSystem.interval}}</span> button below
+</span>
+{% endblock modal-content %}
+
+{% block modal-action %} 
+<a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark btn-sm" id="btn-30min" style="width: 80px;"> {{autoLogoutSystem.interval}}</a>
+
+{% endblock modal-action %}
+
+{% block modal-name-button %} Got It{% endblock modal-name-button %}

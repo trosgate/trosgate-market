@@ -1,0 +1,211 @@
+{% load widget_tweaks %}   
+   <!-- Modal -->
+    
+    <div class="modal fade" id="addContractModal" tabindex="-1" aria-labelledby="addContractModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContractModalLabel">
+                    {% block modal-title %} {% endblock modal-title %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method='POST' action=''>{% csrf_token %}
+            <div class="modal-body">
+                <div class="wt-jobdescription wt-tabsinfo">
+                    <div class="wt-tabscontenttitle">
+                        <h2>Contract Details</h2>
+                        </div>
+                        <div class="form-row">
+                        
+                            <div class="form-group col-md-6">
+                                <span><i class="fa fa-group"> Freelancer Name: {{freelancer.user.get_full_name}}</i></span><br><br>
+                                <span><i class="fa fa-group"> Team Name: {{team.title}}</i></span><br><br>
+                                <span><i class="far fa-calendar"> Team has: {{team.members.count}} Member{{team.members.count|pluralize}}</i></span><br><br>
+                            </div>
+                              
+                        </div>  	 	
+                    <div class="wt-jobdetails wt-tabsinfo">
+                        <div class="wt-tabscontenttitle">
+                            <h2>Background</h2>
+                        </div>      
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                {{intcontractform.proposal.label}}
+                                {{intcontractform.proposal}}
+                            </div>                                          
+                            <div class="form-group col-md-12">
+                                {{intcontractform.contract_duration.label}}
+								{% render_field intcontractform.contract_duration class+='form-control' %}
+                            </div>
+                        </div> 
+                    </div>  
+                    <div class="wt-jobdetails wt-tabsinfo">
+                        <div class="wt-tabscontenttitle">
+                            <h2>Product and Services</h2>
+                        </div>                                          
+                        <div class="form-row" id="line_one">
+                            <div class="form-group col-md-6">
+                                {{ intcontractform.line_one.label}}
+                                {{ intcontractform.line_one}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_one_quantity.label}}
+                                {{ intcontractform.line_one_quantity}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_one_unit_price.label}}
+                                {{ intcontractform.line_one_unit_price}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_one_total_price.label }}
+                                {{ intcontractform.line_one_total_price }}
+                            </div>
+                        </div>
+
+                        <div class="form-row" id="line_two">
+                            <div class="form-group col-md-6">
+                                {{ intcontractform.line_two.label}}
+                                {{ intcontractform.line_two}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_two_quantity.label}}
+                                {{ intcontractform.line_two_quantity}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_two_unit_price.label}}
+                                {{ intcontractform.line_two_unit_price}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_two_total_price.label }}
+                                {{ intcontractform.line_two_total_price }}
+                            </div>
+                        </div>
+
+                        <div class="form-row" id="line_three">
+                            <div class="form-group col-md-6">
+                                {{ intcontractform.line_three.label}}
+                                {{ intcontractform.line_three}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_three_quantity.label}}
+                                {{ intcontractform.line_three_quantity}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_three_unit_price.label}}
+                                {{ intcontractform.line_three_unit_price}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_three_total_price.label }}
+                                {{ intcontractform.line_three_total_price }}
+                            </div>
+                        </div>
+
+                        <div class="form-row" id="line_four">
+                            <div class="form-group col-md-6">
+                                {{ intcontractform.line_four.label}}
+                                {{ intcontractform.line_four}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_four_quantity.label}}
+                                {{ intcontractform.line_four_quantity}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_four_unit_price.label}}
+                                {{ intcontractform.line_four_unit_price}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_four_total_price.label }}
+                                {{ intcontractform.line_four_total_price }}
+                            </div>
+                        </div>
+
+                        <div class="form-row" id="line_five">
+                            <div class="form-group col-md-6">
+                                {{ intcontractform.line_five.label}}
+                                {{ intcontractform.line_five}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_five_quantity.label}}
+                                {{ intcontractform.line_five_quantity}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_five_unit_price.label}}
+                                {{ intcontractform.line_five_unit_price}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ intcontractform.line_five_total_price.label }}
+                                {{ intcontractform.line_five_total_price }}
+                            </div>
+                        </div>                                        
+                            <button type="button" id="proposal-extras" class="btn btn-success"> +/- Show Service </button>                               
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                {{ intcontractform.grand_total.label }}
+                                {{ intcontractform.grand_total }}
+                            </div>
+                        </div>      
+                        <div class="wt-jobdetails wt-tabsinfo">
+                        <div class="wt-tabscontenttitle">
+                            <h2>Description</h2>
+                        </div>     
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                {{ intcontractform.notes.label }}
+                                {{ intcontractform.notes }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                    </div>
+                        </div>
+                            <div class="wt-updatall">
+                                <i class="ti-announcement"></i>
+                                <span>Create with “Create Contract" button.</span>
+                                <button type="submit" class="wt-btn"> Create Contract </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </form>
+            </div>
+            <div class="text-center mb-2 mt-2">{% block modal-content %} {% endblock modal-content %}</div>
+            <div class="modal-footer">
+                {% block modal-action %} {% endblock modal-action %}
+                <button class="btn btn-outline-success btn-sm" data-bs-dismiss="modal" style="width: 80px;">{% block modal-name-button %} {% endblock modal-name-button %}</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal -->
+    
+    {% comment %} <div class="modal fade" id="addContractModal" tabindex="-1" aria-labelledby="addContractModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContractModalLabel">
+                    {% block modal-title %} {% endblock modal-title %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-center mt-1 {% block modal-color %} {% endblock modal-color %}">
+
+                    <span class="{% block modal-icon %} {% endblock modal-icon %}">
+                        <i class="{% block modal-icon1 %} {% endblock modal-icon1 %}"></i>
+                        <i class="{% block modal-icon2 %} {% endblock modal-icon2 %} {% block modal-icon2a %} {% endblock modal-icon2a %}"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="text-center mb-2 mt-2">{% block modal-content %} {% endblock modal-content %}</div>
+            <div class="modal-footer">
+                {% block modal-action %} {% endblock modal-action %}
+                <button class="btn btn-outline-success btn-sm" data-bs-dismiss="modal" style="width: 80px;">{% block modal-name-button %} {% endblock modal-name-button %}</button>
+            </div>
+            </div>
+        </div>
+        </div>         {% endcomment %}

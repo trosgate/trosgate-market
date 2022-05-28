@@ -1,0 +1,95 @@
+
+
+client_id: 'AQYALADOflIRdjVHlkCLwuZ9Obj1ylOUuDF0y9mBlAu7IUIjV8YyKfbTqAPqPt3OSl7-hfPd4LWH7IQp'
+secret_id: 'EOhjdJJK0VETJ3xQwHD6dW96Zw9CITEKc-tbYrYw4iszRTyvBWmwCzdSDDxvVpBOUyyvXRm8yisaAVDP'
+
+
+------------Sandbox account----------
+sb-lndpj15241105@business.example.com
+Client ID: 'AQdiblZ6eqqbA8MKOAs447ZQRKp3VKgvitHAVeCTJlhQrtAMejRA1iJlK_GWnJfsDbhAMFh0swxFAtWy'
+secret_id: 'EA5YITILUhcN0_89GNzU07WT0_3HM5lfc7OyU_vT8kuCjc4h6TyaZDZUjxMIMrJiVPyDy8UXAuHVsafd'
+
+
+
+BUSINESS
+.................................................
+Sandbox account Business
+First name:
+John
+Last name:
+Doe
+Email ID:
+sb-lndpj15241105@business.example.com
+System Generated Password: 952=u@QC
+Password:
+
+<--------NVP/SOAP Sandbox API Credentials-------------------->
+Username:
+sb-lndpj15241105_api1.business.example.com
+Password:
+VAL6KJGV7443XMZM
+Signature:
+Amno7vrBhc-y65xQH3QncYpDqkk7AhhWzMw5zjSfpHiswt6UnWKRV4ln
+Phone Number: 4088175259
+4085477577
+Account type:
+Business  Upgrade to Pro
+Account ID:
+LFBDGAXRMQZV6
+Status:
+Verified
+Country:
+US
+Notes:
+
+<--------Funding-------------------->
+Bank Account
+Account Number:
+52106096537081
+Routing Number:
+325272063
+Credit Card
+Credit Card Number:
+4032032579796241
+Credit Card Type:
+VISA
+Expiration Date:
+03/2027
+
+
+PERSONAL
+.................................................
+First name:
+John
+Last name:
+Doe
+Email ID:
+sb-ln3ci16737461@personal.example.com
+System Generated Password: EX5*b79#
+Notes:.........
+
+Phone Number:
+4084428708
+Account type:
+Personal
+Account ID:
+B7P4SZ5XSMY3G
+Status:
+Verified
+Country:
+US
+<--------Funding-------------------->
+Account Number:
+76375375124510
+Routing Number:
+325272063
+Credit Card
+Credit Card Number:
+4032036952969978
+Credit Card Type:
+VISA
+Expiration Date:
+05/2027
+PayPal
+Balance:
+5000.00 USD
