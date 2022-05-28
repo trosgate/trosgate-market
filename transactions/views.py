@@ -197,38 +197,133 @@ def final_checkout(request):
 
 
 @login_required
-def flutter_payment_order(request):
+@user_is_client
+def flutter_payment_intent(request):
     hiringbox = HiringBox(request)
-    flutterClient = FlutterwaveClientConfig
+    discount_value = hiringbox.get_discount_value()
+    total_gateway_fee = hiringbox.get_fee_payable()
+    gateway_type = str(hiringbox.get_gateway())
+    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
+    number_of_applicants = hiringbox.__len__()
+    shared_gateway_fee = total_gateway_fee/number_of_applicants
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    auth_token = flutterClient.flutterwave_public_key
-    headers = {'Authorization': 'Bearer ' + auth_token}
-    data = {
-        "tx_ref": ''+str(math.floor(1000000 + random.random()*9000000)),
-        "amount": grand_total,
-        "currency": "USD",
-        "redirect_url": "{% url 'payment:hiring_payment_success' %}",
-        "payment_options": " ",
-        "meta": {
-            "consumer_id": 23,
-            "consumer_mac": "92a3-912ba-1192a"
-        },
-        "customer": {
-            "email": request.user.email,
-            "phonenumber": +12323232323,
-            "name": request.user
-        },
-        "customizations": {
-            "title": "Supa Electronics Store",
-            "description": "Best store in town",
-            "logo": "https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
+
+    shared_gateway_fee = total_gateway_fee/number_of_applicants
+    base_currency = get_base_currency_code()
+
+    flutterwaveClient = FlutterwaveClientConfig()
+    unique_reference = flutterwaveClient.flutterwave_unique_reference()
+
+
+    if Purchase.objects.filter(unique_reference=unique_reference).exists():
+        pass
+    else:
+        purchase = Purchase.objects.create(
+            client=request.user,
+            full_name=request.user.get_full_name,
+            email=request.user.email,
+            country=str(request.user.country),
+            payment_method=gateway_type,
+            salary_paid=grand_total,
+            unique_reference=unique_reference,           
+        )           
+
+        purchase.status=Purchase.FAILED
+        purchase.save()
+
+        for proposal in hiringbox:
+            ProposalSale.objects.create(
+                team=proposal["proposal"].team, 
+                purchase=purchase,  
+                proposal=proposal["proposal"], 
+                sales_price=int(proposal["salary"]),
+                total_sales_price=round(proposal["salary"] * proposal["member_qty"]), 
+                staff_hired=proposal["member_qty"],
+                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),                   
+                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
+                Total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+                earning=round(get_earning_calculator(proposal["salary"], get_proposal_fee_calculator(proposal["salary"]), get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                total_earning=round((get_earning_calculator(proposal["salary"], get_proposal_fee_calculator(proposal["salary"]), get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]))
+            )
+
+        for proposal in hiringbox:
+            SalesReporting.objects.create(
+                client=request.user,
+                team=proposal["proposal"].team, 
+                purchase=purchase,  
+                sales_category=SalesReporting.PROPOSAL, 
+                sales_price=int(proposal["salary"]), 
+                total_sales_price=round(proposal["salary"] * proposal["member_qty"]), 
+                staff_hired=proposal["member_qty"],
+                client_fee_charged=round(shared_gateway_fee),
+                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),
+                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
+                Total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
+                earning=round(get_earning_calculator(proposal["salary"], get_proposal_fee_calculator(proposal["salary"]), get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                total_earning=round((get_earning_calculator(proposal["salary"], get_proposal_fee_calculator(proposal["salary"]), get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]))
+            )
+        auth_token = flutterwaveClient.flutterwave_secret_key()
+        headers = {'Authorization': 'Bearer ' + auth_token}
+        data = {
+            "tx_ref": unique_reference,
+            "amount": grand_total,
+            "currency": base_currency,
+            "redirect_url": "http://127.0.0.1:8000/transaction/flutter_success/",
+            "payment_options": "card, mobilemoneyghana, ussd",
+            "meta": {
+                "consumer_id": str(request.user.id),
+            },
+            "customer": {
+                "email": str(request.user.email),
+                "phonenumber": str(request.user.phone),
+                "name": str(request.user)
+            },
+            "customizations": {
+                "title": "Trosgate",
+                "description": "Payment for applications",
+                "logo": "", 
+            }
         }
+
+        url = 'https://api.flutterwave.com/v3/payments'
+        response = requests.post(url, json=data, headers=headers)
+        response_to_json = response.json()
+        redirectToCheckout = response_to_json['data']['link']
+
+        return JsonResponse({'redirectToCheckout': redirectToCheckout})
+
+
+def get_flutterwave_verification(unique_reference, flutterwave_order_key):
+    Purchase.objects.filter(
+        unique_reference=unique_reference, 
+        status=Purchase.FAILED,        
+    ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
+
+
+@login_required
+@user_is_client
+@require_http_methods(['GET', 'POST'])
+def flutter_success(request):
+    hiringbox = HiringBox(request)
+    status = request.GET.get('status', None)
+    unique_reference = request.GET.get('tx_ref', '')
+    flutterwave_order_key = request.GET.get('transaction_id', '')
+    message = ''
+    if status == 'successful' and unique_reference != '' and flutterwave_order_key != '':
+        get_flutterwave_verification(unique_reference, flutterwave_order_key)
+        
+        message = 'Payment succeeded'
+    else:
+        message = 'Payment failed'
+        return HttpResponse(status=401)
+       
+    hiringbox.clean_box()
+    context = {
+        "message": message
     }
-    url = ' https://api.flutterwave.com/v3/payments'
-    response = requests.post(url, json=data, headers=headers)
-    response = response.json()
-    link = response['data']['link']
-    return link
+    return render(request, "applications/payment_success.html", context)
 
 
 @login_required

@@ -36,8 +36,9 @@ urlpatterns = [
     path('paypal/<int:contract_id>/', views.paypal_contract_intent, name='paypal_contract_intent'),
     path('success/', views.payment_success, name='hiring_payment_success'),
     
+    path('flutter_payment_intent/', views.flutter_payment_intent, name='flutter_payment_intent'),
     # Urls for Razorpay gateway
-    path('razorpay/<int:contract_id>/', views.razorpay_contract_intent, name='razorpay_contract_intent'),
+    path('razorpay_contract_intent/', views.razorpay_contract_intent, name='razorpay_contract_intent'),
 
     path('razorpay_webhook/', views.razorpay_webhook, name='razorpay_webhook'),
     

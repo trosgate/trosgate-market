@@ -14,8 +14,10 @@ urlpatterns = [
     path('fee-structure/', views.payment_option_with_fees, name='payment_option_selection'),
     path('payment_fee_structure/', views.payment_fee_structure,name='payment_fee_structure'),
     path('api/checkout/', views.final_checkout, name='payment_checkout'),
-    path('flutter/checkout/api/', views.flutter_payment_order, name='flutter_payment_order'),
+    path('flutter/checkout/api/', views.flutter_payment_intent, name='flutter_payment_intent'),
     path('flutterwave_webhook/', views.flutterwave_webhook, name='flutterwave_webhook'),
+    path('flutter_success/', views.flutter_success, name='flutter_success'),
+    
     path('stripe/checkout/api/', views.stripe_payment_order, name='stripe_payment_order'),
     path('paypal/checkout/api/', views.paypal_payment_order, name='paypal_payment_order'),
     path('success/true/', views.payment_success, name='hiring_payment_success'),

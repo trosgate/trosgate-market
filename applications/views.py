@@ -596,7 +596,7 @@ def payment_success(request):
        
     applicant_box.clean_box()
     context = {
-        "message": message
+        "good": message
     }
     return render(request, "applications/payment_success.html", context)
 

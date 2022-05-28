@@ -1,5 +1,6 @@
 import json
 import stripe
+import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ContractorForm, InternalContractForm, ExternalContractForm, ChangeContractorForm
 from .models import Contractor, Contract, InternalContract, ContractChat
@@ -203,6 +204,115 @@ def final_contract_checkout(request, contract_id, contract_slug):
 
 
 @login_required
+@user_is_client
+def flutter_payment_intent(request):
+    contract_id = request.session["contractchosen"]["contract_id"]
+
+    print('contract_id:', contract_id)
+
+    chosen_contract = BaseContract(request)
+    gateway_type = str(chosen_contract.get_gateway())
+
+    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    
+    discount_value = chosen_contract.get_discount_value(contract)
+    total_gateway_fee = chosen_contract.get_fee_payable()
+    grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)  
+    grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
+
+    base_currency = get_base_currency_code()
+
+    flutterwaveClient = FlutterwaveClientConfig()
+    unique_reference = flutterwaveClient.flutterwave_unique_reference()
+
+
+    if Purchase.objects.filter(unique_reference=unique_reference).exists():
+        pass
+    else:        
+        purchase = Purchase.objects.create(
+            client=request.user,
+            full_name=request.user.get_full_name,
+            email=request.user.email,
+            country=str(request.user.country),
+            payment_method=gateway_type,
+            salary_paid=grand_total,
+            unique_reference=unique_reference,           
+        )           
+        purchase.status=Purchase.FAILED
+        purchase.save()
+
+        ContractSale.objects.create(
+            team=contract.team, 
+            purchase=purchase,  
+            contract=contract, 
+            sales_price=contract.grand_total, 
+            total_sales_price=contract.grand_total, 
+            staff_hired=int(1),
+            earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
+            total_earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
+            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+        )
+
+        SalesReporting.objects.create(
+            client=request.user,
+            team=contract.team, 
+            purchase=purchase,  
+            sales_category=SalesReporting.CONTRACT, 
+            sales_price=contract.grand_total, 
+            total_sales_price=contract.grand_total, 
+            staff_hired=int(1),
+            client_fee_charged=round(total_gateway_fee),
+            freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
+            total_freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
+            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+        )
+        
+    auth_token = flutterwaveClient.flutterwave_secret_key()
+    headers = {'Authorization': 'Bearer ' + auth_token}
+    data = {
+        "tx_ref": unique_reference,
+        "amount": grand_total,
+        "currency": base_currency,
+        "redirect_url": "http://127.0.0.1:8000/transaction/flutter_success/",
+        "payment_options": "card, mobilemoneyghana, ussd",
+        "meta": {
+            "consumer_id": str(request.user.id),
+        },
+        "customer": {
+            "email": str(request.user.email),
+            "phonenumber": str(request.user.phone),
+            "name": str(request.user)
+        },
+        "customizations": {
+            "title": "Trosgate",
+            "description": "Payment for applications",
+            "logo": "", 
+        }
+    }
+
+    url = 'https://api.flutterwave.com/v3/payments'
+    response = requests.post(url, json=data, headers=headers)
+    response_to_json = response.json()
+    redirectToCheckout = response_to_json['data']['link']
+
+    return JsonResponse({'redirectToCheckout': redirectToCheckout})
+
+
+def get_flutterwave_verification(unique_reference, flutterwave_order_key):
+    Purchase.objects.filter(
+        unique_reference=unique_reference, 
+        status=Purchase.FAILED,        
+    ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
+
+
+
+@login_required
 def stripe_contract_intent(request):
 
     contract_id = request.session["contractchosen"]["contract_id"]
@@ -373,10 +483,16 @@ def paypal_contract_intent(request, contract_id):
 
 @login_required
 @user_is_client
-def razorpay_contract_intent(request, contract_id):
+def razorpay_contract_intent(request):
+    contract_id = request.session["contractchosen"]["contract_id"]
+
+    print('contract_id:', contract_id)
+
     chosen_contract = BaseContract(request)
+    gateway_type = str(chosen_contract.get_gateway())
+
     contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
-    print(contract)
+    
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
 
     gateway_type = chosen_contract.get_gateway()
@@ -392,8 +508,9 @@ def razorpay_contract_intent(request, contract_id):
         payment_method=str(gateway_type),
         salary_paid=grand_total,
         unique_reference=unique_reference,
-        status = Purchase.PENDING
     )
+    purchase.status = Purchase.FAILED
+    purchase.save()
 
     notes = {'Total Price': 'The total amount may change with discount'}
     currency = base_currency_code

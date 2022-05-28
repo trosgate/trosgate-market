@@ -74,14 +74,19 @@
                                 <!-- Flutterwave section button starts -->
                                 <div class="container">
                                     <div class="row">
-                                    <form method="POST">
+                                    {% comment %} <form method="POST"> 
                                         <button type="button" id="flutterwave-payment" class="btn btn-primary w-100 fw-bold">Pay Now</button> 
-                                    </form>
+                                        
+                                    </form> {% endcomment %}
+                                    <br class="my-5">
+                                    <button onclick='flutterwavePay(event)' class="btn btn-primary w-100 fw-bold" >
+                                    Pay with flutterwave
+                                    </button>
                                     </div>
                                     </div>
                                 </div>
                                 </div>
-                            </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -296,8 +301,43 @@
       
     {% elif gateway_type.name == "Flutterwave" %}
     <script src="https://checkout.flutterwave.com/v3.js"></script>
-    <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script>
+    {% comment %} <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script> {% endcomment %}
+    <script>
+        function flutterwavePay(event) {
+        event.preventDefault();
+      
+          let data = {
+            'amount': "{{hiring_box.get_total_price_after_discount_and_fee}}",
+            'name': "{{request.user.get_full_name}}",
+            'email': "{{request.user.email}}",
+            'consumerid': "{{request.user.id}}",
+      
+          }
+      
+          fetch('{% url "transaction:flutter_payment_intent" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{csrf_token}}'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+          })
+            .then(function (response) {
+              return response.json()
+            })
+            .then(function (session) {
+                window.location.href = session.redirectToCheckout
+            })
+            .then(function (result) {
+              return console.log(result)
+            })
+            .catch(function (error) {
+              return console.log(error)
+            })
+        }
 
+    </script> 
     {% elif gateway_type.name == "Razorpay" %}
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
