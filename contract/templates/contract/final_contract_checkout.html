@@ -194,7 +194,7 @@
                     });
                 },
                 onApprove: function (data) {
-                    var url = "{% url 'contract:paypal_contract_intent' contract.id %}"
+                    var url = "{% url 'contract:paypal_contract_intent' %}"
                     return fetch(url, {
                         method: 'POST',
                         headers: {

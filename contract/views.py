@@ -409,7 +409,11 @@ def stripe_contract_intent(request):
 
 
 @login_required
-def paypal_contract_intent(request, contract_id):
+def paypal_contract_intent(request):
+    contract_id = request.session["contractchosen"]["contract_id"]
+
+    print('contract_id:', contract_id)
+
     chosen_contract = BaseContract(request)
     contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
     discount_value = chosen_contract.get_discount_value(contract)

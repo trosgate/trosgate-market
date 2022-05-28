@@ -33,7 +33,7 @@ urlpatterns = [
     # Urls for Stripe gateway
     path('stripe_contract_intent/', views.stripe_contract_intent, name='stripe_contract_intent'),
     # Urls for Paypal gateway
-    path('paypal/<int:contract_id>/', views.paypal_contract_intent, name='paypal_contract_intent'),
+    path('paypal_contract_intent/', views.paypal_contract_intent, name='paypal_contract_intent'),
     path('success/', views.payment_success, name='hiring_payment_success'),
     
     path('flutter_payment_intent/', views.flutter_payment_intent, name='flutter_payment_intent'),
