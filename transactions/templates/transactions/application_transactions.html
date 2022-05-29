@@ -1,0 +1,252 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<!--Main Start-->
+	<main id="wt-main" class="wt-main wt-haslayout">
+
+		<!--Company listing starts-->
+		<div class="wt-proposalholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-12">
+						<div class="wt-sectionhead wt-textcenter">
+							<div class="wt-sectiontitle">
+								<h3>Application Transactions</h3>
+								<div class="alert alert-info" role="alert">
+									<span style="color: green; font-weight: bold;"> All Your Transactions history</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% if request.user.freelancer %}
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Client</th>
+							<th>Purchase Date</th>
+							<th>Method</th>
+							<th>Project Applied</th>
+							<th>Price</th>
+							<th>Hired</th>
+							<th>Sales</th>
+							<th>Discount</th>
+							<th>Fees </th>
+							<th>Earning</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for application in applications %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{application.purchase.client.get_full_name|capfirst}}</td>
+							<td>{{application.created_at}}</td>
+							<td>{{application.purchase.payment_method}}</td>
+							<td class="text-left">{{application.project}}</td>
+							<td>{{application.sales_price}}</td>
+							<td>{{application.staff_hired}}</td>
+							<td>{{application.total_sales_price}}</td>     
+							<td>{{application.Total_discount_offered}}</td>
+							<td>{{application.total_earning_fee_charged}}</td>
+							<td>{{application.total_earning}}</td>
+							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
+						</tr>
+						
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not applications %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No applications made Yet. Keep hope alive</span>
+					</div>
+					{% endif %}
+			</div> 
+			{% endif %}
+
+			{% if request.user.clients %}
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Team</th>
+							<th>Purchase Date</th>
+							<th>Method</th>
+							<th>Project Hired</th>
+							<th>Price</th>
+							<th>Hired</th>
+							<th>Sales</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for application in applications %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{application.team|capfirst}}</td>
+							<td>{{application.created_at}}</td>
+							<td>{{application.purchase.payment_method}}</td>
+							<td class="text-left">{{application.project.title|truncatechars:100}}</td>
+							<td>{{application.sales_price}}</td>
+							<td>{{application.staff_hired}}</td>
+							<td>{{application.total_sales_price}}</td>     
+							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+						</tr>
+						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not applications %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No applications approved Yet. Keep hope alive</span>
+					</div>
+					{% endif %}
+				</div>  
+				{% endif %}
+		</div>
+		
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	{% endblock %}
+
+
+
+
+{% comment %} 
+
+	<!--Register Form Start-->
+	<section class="wt-haslayout wt-dbsectionspace">
+		<div class="row justify-content-md-center">				
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+				<div class="wt-dashboardbox">
+					<div class="wt-dashboardboxtitle">
+						<h2>Manage Transactions</h2>
+					</div>
+					<div class="wt-dashboardboxcontent wt-jobdetailsholder">
+						<div class="wt-freelancerholder">
+							<div class="wt-tabscontenttitle">
+								<h2>Applications Approved</h2>
+							</div>
+							<div class="wt-managejobcontent">
+								{% for application in applications.project.applicantprojectapplied.all %}
+								<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
+									<div class="wt-userlistingcontent">
+												<h3>{{ application.project.title}}</h3>
+										<div class="wt-contenthead">
+											<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
+												<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>{{application.project.get_service_level_display}}</span></li>
+												<li><span>{% if application.project.created_by.country.flag %}<img src="{{application.project.created_by.country.flag.url}}" alt="img description"> {% else %}{{application.project.created_by.country.country_code}} - {% endif %} {{application.project.created_by.country.name|truncatechars:30}}</span></li>
+												<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{application.project.get_specification_display}}</span></li>
+												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{application.project.get_dura_converter_display}}</span></li>															
+											</ul>
+										</div>
+										<div class="wt-description">
+											<p>{{ application.project.preview}} </p>
+											<p>Earning:{{ application.sales_price}} </p>
+											<p>Earning:{{ application.purchase.payment_method}} </p>
+											<p>Earning:{{ application.total_earnings}} </p>
+										</div>	
+										<div class="wt-tag wt-widgettag">
+											{% for skill in application.project.project_skill.all %}
+												<a href="javascript:void(0);">{{skill}}</a>
+											{% endfor %}	
+										</div> 
+										<div class="wt-rightarea">
+											<div class="wt-btnarea"><a href="{{application.project.get_project_absolute_url}}" class="btn btn-success"><i class="fa fa-info"></i> Preview</a>
+											<a href="{{application.get_application_detail_absolute_url}}" class="btn btn-danger"><i class="fa fa-arrow-up"></i>Applications</a></div>
+											<div class="wt-hireduserstatus">
+												<h4>{{application.project.created_by.get_full_name}}</h4><span>Job Creator</span>
+												<ul class="wt-hireduserimgs">
+													<li><figure><img src="{{application.project.created_by.clients.profile_photo.url}}" alt="img description"></figure></li>
+												</ul>									
+											</div>											
+										</div>
+									</div>	
+								</div>
+								{% endfor %}
+								{% if not applications %}
+								<div class="wt-description">
+									<span><i class="wt-btn float-center"></i>Hello Howdy! You don't have any application yet...</span>
+								</div>												
+							{% endif %}	
+						</div>												
+					</div>
+				</div>
+					<nav class="wt-pagination wt-savepagination">
+						<ul>
+							<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+							<li><a href="javascrip:void(0);">1</a></li>
+							<li><a href="javascrip:void(0);">2</a></li>
+							<li><a href="javascrip:void(0);">3</a></li>
+							<li><a href="javascrip:void(0);">4</a></li>
+							<li><a href="javascrip:void(0);">...</a></li>
+							<li><a href="javascrip:void(0);">50</a></li>
+							<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+						</ul>
+					</nav>								
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
+				<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>150</h3>
+								<span>Total Ongoing Jobs</span>
+							</div>
+						</div> 
+					</div>
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent wt-componyfolow">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>1406</h3>
+								<span>Total Completed Jobs</span>
+							</div>
+						</div> 
+					</div>								
+					<div class="wt-proposalsr">
+						<div class="wt-proposalsrcontent  wt-freelancelike">
+							<figure>
+								<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
+							</figure>
+							<div class="wt-title">
+								<h3>2075</h3>
+								<span>Total Cancelled Jobs</span>
+							</div>
+						</div> 
+					</div>								
+				</aside>
+				<div class="wt-companyad">
+					<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
+					<span>Advertisement  255px X 255px</span>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Register Form End-->
+
+
+{% endblock %} {% endcomment %}
+

@@ -15,7 +15,7 @@ urlpatterns = [
     # Urls for application table
     path('freelancer-application/', views.freelancer_application_view, name='freelancer_application'),
     path('client-application/', views.client_application_view, name='client_application'),
-    path('<slug:project_slug>apply/', views.apply_for_project, name='apply_for_project'),
+    path('<slug:project_slug>/apply/', views.apply_for_project, name='apply_for_project'),
     path('applicants/<slug:project_slug>', views.application_detail, name='application_detail'),
     # Urls for Stripe gateway
     path('api/checkout/', views.final_application_checkout, name='final_application_checkout'),

@@ -19,9 +19,9 @@ class PurchaseAdmin(admin.ModelAdmin):
 class ApplicationSaleAdmin(admin.ModelAdmin):
     model = ApplicationSale
     list_display = ['team', 'created_at', 'staff_hired', 'sales_price', 'total_earning_fee', 'total_discount', 'total_earning','status_value']    
-    list_filter = ['purchase__status']
+    list_filter = ['team', 'purchase__status']
     readonly_fields = [
-        'team', 'purchase','project', 'sales_price', 'earning_fee_charged','discount_offered',
+         'purchase','project', 'sales_price', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value',
     ]
     fieldsets = (
@@ -34,10 +34,10 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
 class ProposalSaleAdmin(admin.ModelAdmin):
     model = ProposalSale
     list_display = [
-        'team', 'proposal', 'created_at', 'staff_hired', 'total_sales_price', 
+        'team', 'created_at', 'sales_price', 'staff_hired', 'total_sales_price', 
         'total_earning_fee_charged', 'Total_discount_offered', 'total_earning','status_value'
     ]    
-    list_filter = ['purchase__status']
+    list_filter = ['team', 'purchase__status']
     readonly_fields = [
         'team', 'purchase','proposal', 'sales_price', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value',
@@ -76,7 +76,7 @@ class ContractSaleAdmin(admin.ModelAdmin):
 
 class SalesReportingAdmin(admin.ModelAdmin):
     model = SalesReporting
-    list_display = ['team', 'sales_category','created_at', 'staff_hired', 'total_sales_price', 'client_fee_charged','total_freelancer_fee_charged', 'Total_discount_offered', 'total_earning','status_value']
+    list_display = ['team', 'sales_category','created_at', 'sales_price', 'staff_hired', 'total_sales_price', 'client_fee_charged','total_freelancer_fee_charged', 'Total_discount_offered', 'total_earning','status_value']
     list_filter = ['sales_category']
     readonly_fields = [
         'team', 'sales_category','purchase','created_at', 'staff_hired', 'total_sales_price', 

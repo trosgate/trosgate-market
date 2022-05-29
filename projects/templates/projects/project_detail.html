@@ -80,6 +80,7 @@
 									{% endif %}
 									<div class="wt-proposalhead">
 										<h2>{{projectdetail.title}}</h2>
+										
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
 											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{projectdetail.get_service_level_display}}</span></li>
 											<li><span>{% if not projectdetail.created_by.country.flag %}{{projectdetail.created_by.country.country_code}} - {% endif %}{% if projectdetail.created_by.country.flag %}<img src="{{projectdetail.created_by.country.flag.url}}" alt="img description">{% endif %} {{projectdetail.created_by.country.name}}</span></li>

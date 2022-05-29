@@ -224,6 +224,13 @@ class Project(models.Model):
     def get_reopen_project_absolute_url(self):
         return reverse('projects:reopen_project', args=[self.slug])
 
+    # def get_discount(self):
+    #     discounts = 0
+    #     for discount in self.applicantprojectapplied.all():
+    #         discounts = discount.discount_offered
+    #     return discounts
+
+
 
 class ProjectSkillRequired(models.Model):
     # level_of_proficiency

@@ -44,7 +44,7 @@ from general_settings.fees_and_charges import get_application_fee_calculator
 @user_is_freelancer
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def apply_for_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
 
     applied = Application.objects.filter(team=team, project=project)
@@ -113,8 +113,7 @@ def application_detail(request, project_slug):
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
         applications = Application.objects.filter(project=project, team=team)
     elif request.user.user_type == Customer.CLIENT:
-        applications = Application.objects.filter(
-            project=project, project__created_by=request.user)
+        applications = Application.objects.filter(project=project, project__created_by=request.user)
 
     context = {
         'project': project,

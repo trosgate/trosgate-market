@@ -11,6 +11,12 @@ urlpatterns = [
     path('add/', views.add_proposal_to_box, name='add_to_hiring_box'),
     path('remove/', views.remove_from_hiring_box, name='remove_from_hiring_box'),
     path('modify/', views.modify_from_hiring_box, name='modify_from_hiring_box'),
+
+    #Transaction by type
+    path('proposals/', views.proposal_transaction, name='proposal_transaction'),
+    path('applications/', views.application_transaction, name='application_transaction'),
+    path('contract/', views.contract_transaction, name='contract_transaction'),
+
     path('fee-structure/', views.payment_option_with_fees, name='payment_option_selection'),
     path('payment_fee_structure/', views.payment_fee_structure,name='payment_fee_structure'),
     path('api/checkout/', views.final_checkout, name='payment_checkout'),
@@ -22,9 +28,8 @@ urlpatterns = [
     path('paypal/checkout/api/', views.paypal_payment_order, name='paypal_payment_order'),
     path('success/true/', views.payment_success, name='hiring_payment_success'),
     path('<str:short_name>/<slug:proposal_slug>', views.proposal_single_summary, name='hiring_summary'),
-    path('history', views.purchase_history, name='purchase_history'),
     path('stripe-webhook/', views.stripe_webhook, name='stripe_webhook'),
     path('razorpay/checkout/api/', views.razorpay_application_intent,name='razorpay_application_intent'),
     path('razorpay_webhook/', views.razorpay_webhook,name='razorpay_webhook'),    
-    path('congrats/', views.payment_success,name='payment_success'),    
+    path('congrats/', views.payment_success, name='payment_success'),    
 ]

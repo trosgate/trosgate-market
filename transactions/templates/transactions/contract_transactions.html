@@ -1,0 +1,128 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<!--Main Start-->
+	<main id="wt-main" class="wt-main wt-haslayout">
+
+		<!--Company listing starts-->
+		<div class="wt-proposalholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-12">
+						<div class="wt-sectionhead wt-textcenter">
+							<div class="wt-sectiontitle">
+								<h3>Contract Transactions</h3>
+								<div class="alert alert-info" role="alert">
+									<span style="color: green; font-weight: bold;"> All Your Transactions history</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% if request.user.freelancer %}
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Client</th>
+							<th>Purchase Date</th>
+							<th>Payment Type</th>
+							<th>Contract Proposal</th>
+							<th>Price</th>
+							<th>Hired</th>
+							<th>Sales </th>
+							<th>Discount</th>
+							<th>Fees </th>
+							<th>Earning</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for contract in contracts %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{contract.purchase.client.get_full_name|capfirst}}</td>
+							<td>{{contract.created_at}}</td>
+							<td>{{contract.purchase.payment_method}}</td>
+							<td>{{contract.contract.proposal.title|truncatechars:100}}</td>
+							<td>{{contract.sales_price}}</td>
+							<td>{{contract.staff_hired}}</td>
+							<td>{{contract.total_sales_price}}</td>     
+							<td>{{contract.Total_discount_offered}}</td>
+							<td>{{contract.total_earning_fee_charged}}</td>
+							<td>{{contract.total_earning}}</td>
+							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
+						</tr>
+						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not contracts %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No contract sale made Yet. Better times ahead</span>
+					</div>
+					{% endif %}
+			</div> 
+			{% endif %}
+
+			{% if request.user.clients %}
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Team</th>
+							<th>Purchase Date</th>
+							<th>Method</th>
+							<th>Contract Proposal</th>
+							<th>Price</th>
+							<th>Hired</th>
+							<th>Sales</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for contract in contracts %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{contract.team|capfirst}}</td>
+							<td>{{contract.created_at}}</td>
+							<td>{{contract.purchase.payment_method}}</td>
+							<td class="text-left">{{contract.contract.proposal.title|truncatechars:100}}</td>
+							<td>{{contract.sales_price}}</td>
+							<td>{{contract.staff_hired}}</td>
+							<td>{{contract.total_sales_price}}</td>     
+							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+						</tr>
+						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not contracts %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No contracts offered yet. Be the first</span>
+					</div>
+					{% endif %}
+				</div>  
+				{% endif %}
+		</div>
+		
+		
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	{% endblock %}
+

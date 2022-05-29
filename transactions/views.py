@@ -20,7 +20,7 @@ from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
-from .models import Purchase, ProposalSale, SalesReporting
+from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SalesReporting
 from . forms import PurchaseForm
 from . hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
@@ -29,6 +29,8 @@ from general_settings.discount import get_discount_calculator, get_earning_calcu
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.decorators.http import require_http_methods
+from contract.models import InternalContract
+
 
 @login_required
 def proposal_single_summary(request, short_name, proposal_slug):
@@ -459,7 +461,7 @@ def paypal_payment_order(request):
     total_gateway_fee = hiringbox.get_fee_payable()
     gateway_type = hiringbox.get_gateway()
     grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-    print('grand_total_before_expense:',grand_total_before_expense)
+
     number_of_applicants = hiringbox.__len__()
     shared_gateway_fee = total_gateway_fee/number_of_applicants
 
@@ -672,21 +674,66 @@ def flutterwave_webhook(request):
     return HttpResponse(status=200)
 
 
-
 @login_required
-@user_is_freelancer
-def purchase_history(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+def proposal_transaction(request):
+    proposals = ''
+    if request.user.user_type == Customer.FREELANCER:
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
+        proposals = ProposalSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
 
-    proposal = get_object_or_404(ProposalSale, team=team)
-    proposal_sales = proposal.proposalhired.all()
-
+    elif request.user.user_type == Customer.CLIENT:
+        proposals = ProposalSale.objects.filter(purchase__client=request.user, purchase__status=Purchase.SUCCESS)
 
     context = {
-        "proposal_sales": proposal_sales
-    }
-    return render(request, "transactions/proposal_sales.html", context)
+        'proposals':proposals,
 
+    }
+    return render(request, 'transactions/proposal_transactions.html', context)
+
+
+@login_required
+def application_transaction(request):
+    applications = ''
+    if request.user.user_type == Customer.FREELANCER:
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
+        applications = ApplicationSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
+
+    elif request.user.user_type == Customer.CLIENT:
+        applications = ApplicationSale.objects.filter(purchase__client=request.user, purchase__status=Purchase.SUCCESS)
+    
+    context = {
+        'applications':applications,
+    }
+    return render(request, 'transactions/application_transactions.html', context)
+
+
+@login_required
+def contract_transaction(request):
+    contracts = ''
+    if request.user.user_type == Customer.FREELANCER:
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
+        contracts = ContractSale.objects.filter(team=team, contract__status=InternalContract.PAID, purchase__status=Purchase.SUCCESS)
+
+    elif request.user.user_type == Customer.CLIENT:
+        contracts = ContractSale.objects.filter(contract__status=InternalContract.PAID, purchase__client=request.user, purchase__status=Purchase.SUCCESS)
+
+    context = {
+        'contracts':contracts,
+    }
+    return render(request, 'transactions/contract_transactions.html', context)
+
+
+# @login_required
+# @user_is_freelancer
+# def application_sales(request, project_slug):
+#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+#     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
+#     application_sales = project.applicantprojectapplied.filter(team=team, purchase__status=Purchase.SUCCESS)
+
+#     context = {
+#         "application_sales": application_sales,
+#     }
+#     return render(request, "transactions/application_sales.html", context)
 
 
 

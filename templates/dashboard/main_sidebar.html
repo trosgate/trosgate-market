@@ -32,6 +32,17 @@
 				</div>
 				<nav id="wt-navdashboard" class="wt-navdashboard">
 					<ul>
+						<li class="menu-item-has-children wt-active">
+							<a href="javascript:void(0);">
+								<i class="ti-dashboard"></i>
+								<span>Transactions</span>
+							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'transactions:proposal_transaction' %}">Proposal</a></li>
+								<li><hr><a href="{% url 'transactions:application_transaction' %}">Application</a></li>
+								<li><hr><a href="{% url 'transactions:contract_transaction' %}">Contract</a></li>
+							</ul>
+						</li>		
 						{% if request.user.clients %}
 						<li>
 							<a href="{% url 'client:update_client_profile' user_id=user.id %}">
@@ -101,8 +112,8 @@
 								<li><hr><a href="{% url 'projects:active_project' %}">Hourly Jobs</a></li>
 							</ul>
 						</li>						
-						
-						{% elif request.user.freelancer %}						
+						{% endif %}
+						{% if request.user.freelancer %}						
 						<li>
 							<a href="{% url 'freelancer:update_freelancer_profile' user_id=user.id %}">
 								<i class="ti-briefcase"></i>
@@ -120,16 +131,7 @@
 								<li><hr><a href="{% url 'analytics:time_tracker' %}">Time Tracker</a></li>
 							</ul>
 						</li>																		
-						<li class="menu-item-has-children wt-active">
-							<a href="javascript:void(0);">
-								<i class="ti-dashboard"></i>
-								<span>Transactions</span>
-							</a>
-							<ul class="sub-menu">
-								<li><hr><a href="{% url 'transactions:purchase_history' %}">Purchases</a></li>
-								{% comment %} <li><hr><a href="{% url 'analytics:time_tracker' %}">Time Tracker</a></li> {% endcomment %}
-							</ul>
-						</li>																		
+																						
 						<li>
 							<a href="{% url 'teams:accept_invite' %}">
 								<i class="ti-announcement"></i>

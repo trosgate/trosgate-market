@@ -94,8 +94,6 @@ class ProposalSale(models.Model):
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
 
-
-
     def __str__(self):
         return str(self.proposal)
 
