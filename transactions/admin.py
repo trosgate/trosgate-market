@@ -34,7 +34,7 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
 class ProposalSaleAdmin(admin.ModelAdmin):
     model = ProposalSale
     list_display = [
-        'team', 'created_at', 'staff_hired', 'total_sales_price', 
+        'team', 'proposal', 'created_at', 'staff_hired', 'total_sales_price', 
         'total_earning_fee_charged', 'Total_discount_offered', 'total_earning','status_value'
     ]    
     list_filter = ['purchase__status']

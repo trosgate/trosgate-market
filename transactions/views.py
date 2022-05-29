@@ -676,10 +676,11 @@ def flutterwave_webhook(request):
 @login_required
 @user_is_freelancer
 def purchase_history(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
 
-    proposal_sales = ProposalSale.objects.all() #.filter(team=team)
-    # proposal_sales = team.hiredproposalteam.all()
+    proposal = get_object_or_404(ProposalSale, team=team)
+    proposal_sales = proposal.proposalhired.all()
+
 
     context = {
         "proposal_sales": proposal_sales

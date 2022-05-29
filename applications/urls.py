@@ -28,7 +28,7 @@ urlpatterns = [
     path('congrats/', views.application_success, name='application_success'),
 
     path('flutter/checkout/api/', views.flutter_payment_intent, name='flutter_payment_intent'),
-    path('flutterwave-webhook/', views.flutterwave_webhook, name='flutterwave_webhook'),
+    # path('flutterwave-webhook/', viewsflutterwave_webhook, name='flutterwave_webhook'),
 
     path('razorpay/checkout/api/', views.razorpay_application_intent,name='razorpay_application_intent'),
 
