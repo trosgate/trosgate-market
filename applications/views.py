@@ -39,13 +39,13 @@ from general_settings.discount import get_discount_calculator, get_earning_calcu
 from general_settings.fees_and_charges import get_application_fee_calculator
 
 
+
 @login_required
 @user_is_freelancer
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def apply_for_project(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug)
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
 
     applied = Application.objects.filter(team=team, project=project)
 
@@ -85,8 +85,7 @@ def apply_for_project(request, project_slug):
 @login_required
 @user_is_client
 def client_application_view(request):
-    active_projects = Project.objects.filter(
-        created_by=request.user, status=Project.ACTIVE)
+    active_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE)
 
     context = {
         'active_projects': active_projects,
@@ -97,8 +96,7 @@ def client_application_view(request):
 @login_required
 @user_is_freelancer
 def freelancer_application_view(request):
-    team = get_object_or_404(
-        Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     applications = team.applications.filter(project__status=Project.ACTIVE)
 
     context = {
@@ -109,12 +107,10 @@ def freelancer_application_view(request):
 
 @login_required
 def application_detail(request, project_slug):
-    project = get_object_or_404(
-        Project, slug=project_slug, status=Project.ACTIVE)
+    project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
 
     if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                                 status=Team.ACTIVE, members__in=[request.user])
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
         applications = Application.objects.filter(project=project, team=team)
     elif request.user.user_type == Customer.CLIENT:
         applications = Application.objects.filter(
