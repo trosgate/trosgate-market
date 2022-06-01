@@ -150,7 +150,6 @@ def final_contract_checkout(request, contract_id, contract_slug):
     chosen_contract = BaseContract(request)
     contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
 
-
     if "contractchosen" not in request.session:
         messages.error(request, "Bad request. Please select the payment method again")
         return redirect("contract:internal_contract_fee_structure", contract_id=contract.id, contract_slug=contract.slug)
@@ -169,6 +168,7 @@ def final_contract_checkout(request, contract_id, contract_slug):
     subtotal = chosen_contract.get_total_price_before_fee_and_discount(contract)
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
     
+
     # Stripe payment api
     stripe_public_key = StripeClientConfig().stripe_public_key()
     # Paypal payment api
@@ -246,14 +246,20 @@ def flutter_payment_intent(request):
             purchase=purchase,  
             contract=contract, 
             sales_price=contract.grand_total, 
-            total_sales_price=contract.grand_total, 
             staff_hired=int(1),
             earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             total_earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total)))         
+        
         )
 
         SalesReporting.objects.create(
@@ -261,16 +267,22 @@ def flutter_payment_intent(request):
             team=contract.team, 
             purchase=purchase,  
             sales_category=SalesReporting.CONTRACT, 
-            sales_price=contract.grand_total, 
-            total_sales_price=contract.grand_total, 
+            sales_price=contract.grand_total,  
             staff_hired=int(1),
             client_fee_charged=round(total_gateway_fee),
             freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             total_freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total)))        
+        
         )
         
     auth_token = flutterwaveClient.flutterwave_secret_key()
@@ -374,15 +386,20 @@ def stripe_contract_intent(request):
             team=contract.team, 
             purchase=purchase,  
             contract=contract, 
-            sales_price=contract.grand_total, 
-            total_sales_price=contract.grand_total, 
+            sales_price=contract.grand_total,  
             staff_hired=int(1),
             earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             total_earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total)))       
         )
 
         SalesReporting.objects.create(
@@ -391,15 +408,20 @@ def stripe_contract_intent(request):
             purchase=purchase,  
             sales_category=SalesReporting.CONTRACT, 
             sales_price=contract.grand_total, 
-            total_sales_price=contract.grand_total, 
             staff_hired=int(1),
             client_fee_charged=round(total_gateway_fee),
             freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             total_freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total)))        
         )
         
         chosen_contract.clean_box()
@@ -420,7 +442,6 @@ def paypal_contract_intent(request):
     total_gateway_fee = chosen_contract.get_fee_payable()
     gateway_type = chosen_contract.get_gateway()
     grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)
-    print('grand_total_before_expense:', grand_total_before_expense)
  
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
@@ -450,14 +471,19 @@ def paypal_contract_intent(request):
             purchase=purchase,  
             contract=contract, 
             sales_price=contract.grand_total, 
-            total_sales_price=contract.grand_total, 
             staff_hired=int(1),
             earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             total_earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total)))        
         )
 
         SalesReporting.objects.create(
@@ -465,16 +491,21 @@ def paypal_contract_intent(request):
             team=contract.team, 
             purchase=purchase,  
             sales_category=SalesReporting.CONTRACT, 
-            sales_price=contract.grand_total, 
-            total_sales_price=contract.grand_total, 
+            sales_price=contract.grand_total,  
             staff_hired=int(1),
             client_fee_charged=round(total_gateway_fee),
             freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             total_freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
             discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total)))        
         )
     else:
         purchase.status = Purchase.FAILED
@@ -560,6 +591,10 @@ def razorpay_webhook(request):
         total_gateway_fee = chosen_contract.get_fee_payable()
         grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)       
     
+
+        earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total))    
+        print('earning_fee_charged:', earning_fee_charged)
+
         razorpay_client = RazorpayClientConfig().get_razorpay_client()
         purchase = Purchase.objects.get(razorpay_order_key=razorpay_order_key)
 
@@ -581,14 +616,19 @@ def razorpay_webhook(request):
                 purchase=purchase,  
                 contract=contract, 
                 sales_price=contract.grand_total, 
-                total_sales_price=contract.grand_total, 
                 staff_hired=int(1),
                 earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
                 total_earning_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
                 discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total))), 
+                total_earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total)))            
             )
 
             SalesReporting.objects.create(
@@ -596,16 +636,21 @@ def razorpay_webhook(request):
                 team=contract.team, 
                 purchase=purchase,  
                 sales_category=SalesReporting.CONTRACT, 
-                sales_price=contract.grand_total, 
-                total_sales_price=contract.grand_total, 
+                sales_price=contract.grand_total,  
                 staff_hired=int(1),
                 client_fee_charged=round(total_gateway_fee),
                 freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
                 total_freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
                 discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                Total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                total_earning=round(get_earning_calculator(contract.grand_total, get_contract_fee_calculator(contract.grand_total), get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))
+                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total))), 
+                total_earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total)))            
             )
         else:
             purchase.status = Purchase.FAILED
@@ -624,13 +669,6 @@ def contract_success(request):
         "good": "All good"
     }
     return render(request, "contract/payment_success.html", context)
-
-
-
-
-
-
-
 
 
 @login_required

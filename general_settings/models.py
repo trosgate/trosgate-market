@@ -379,20 +379,20 @@ class HiringFee(models.Model):
         _("Freelancer fees and charges"), max_length=50, default="Freelancer fees and charges")
     contract_fee_percentage = models.PositiveIntegerField(_("Contract Fee - Percentage (%)"), default=0, help_text=_(
         "This is the percentage fee per contract up to delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    contract_fee_fixed = models.PositiveIntegerField(_("Contract Extra Fee - Fixed (#)"), default=10, help_text=_(
-        "An extra contract fixed value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    contract_fee_extra = models.PositiveIntegerField(_("Contract Extra Fee - Extra (#)"), default=10, help_text=_(
+        "An extra contract Extra value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     contract_delta_amount = models.PositiveIntegerField(_("Contract Break-Point ($)"), default=400, help_text=_(
         "The break-point for charging Contract extra fee on freelancer earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
     proposal_fee_percentage = models.PositiveIntegerField(_("Proposal Fee - Percentage (%)"), default=10, help_text=_(
         "This is the percentage fee per proposal up to delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    proposal_fee_fixed = models.PositiveIntegerField(_("Proposal Extra Fee - Fixed (#)"), default=10, help_text=_(
-        "An extra Proposal fixed value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    proposal_fee_extra = models.PositiveIntegerField(_("Proposal Extra Fee - Extra (#)"), default=10, help_text=_(
+        "An extra Proposal Extra value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     proposal_delta_amount = models.PositiveIntegerField(_("Proposal Break-Point ($)"), default=400, help_text=_(
         "The break-point for charging Proposal extra fee on freelancer earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
     application_fee_percentage = models.PositiveIntegerField(_("Application Fee - Percentage (%)"), default=10, help_text=_(
         "This is the percentage fee per Proposal up to delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    application_fee_fixed = models.PositiveIntegerField(_("Application Extra Fee - Fixed (#)"), default=10, help_text=_(
-        "An extra Proposal fixed value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    application_fee_extra = models.PositiveIntegerField(_("Application Extra Fee - Extra (#)"), default=10, help_text=_(
+        "An extra Proposal Extra value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     application_delta_amount = models.PositiveIntegerField(_("Application Break-Point ($)"), default=400, help_text=_(
         "The break-point for charging Proposal extra fee on freelancer earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
 
@@ -404,13 +404,13 @@ class HiringFee(models.Model):
         return self.preview
 
     def contract_percentage(self):
-        return f'{self.contract_fee_percentage}% + {self.contract_fee_fixed}'
+        return f'{self.contract_fee_percentage}% + {self.contract_fee_extra}'
 
     def proposal_percentage(self):
-        return f'{self.proposal_fee_percentage}% + {self.proposal_fee_fixed}'
+        return f'{self.proposal_fee_percentage}% + {self.proposal_fee_extra}'
 
     def application_percentage(self):
-        return f'{self.application_fee_percentage}% + {self.application_fee_fixed}'
+        return f'{self.application_fee_percentage}% + {self.application_fee_extra}'
 
 
 class Currency(models.Model):

@@ -36,8 +36,7 @@ class HiringBox():
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
         else:
-            self.hiring_box[proposal_id] = {'salary': int(
-                proposal.salary), 'member_qty': int(member_qty)}
+            self.hiring_box[proposal_id] = {'salary': int(proposal.salary), 'member_qty': int(member_qty)}
         self.commit()
 
 
@@ -152,6 +151,10 @@ class HiringBox():
             saving_in_discount = subtotal - self.get_discount_value()
         return saving_in_discount
 
+    def get_total_price_after_discount_only(self):
+        subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        total_after_discount = (subtotal - self.get_discount_value())
+        return total_after_discount
 
     def get_total_price_after_discount_and_fee(self):
         subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())

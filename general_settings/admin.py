@@ -275,11 +275,11 @@ class HiringFeeAdmin(admin.ModelAdmin):
                        'proposal_percentage', 'application_percentage']
     fieldsets = (
         ('Contract Fee Structure', {'fields': (
-            'contract_fee_percentage', 'contract_fee_fixed', 'contract_delta_amount',)}),
+            'contract_fee_percentage', 'contract_fee_extra', 'contract_delta_amount',)}),
         ('Proposal Fee Structure', {'fields': (
-            'proposal_fee_percentage', 'proposal_fee_fixed', 'proposal_delta_amount',)}),
+            'proposal_fee_percentage', 'proposal_fee_extra', 'proposal_delta_amount',)}),
         ('Application Fee Structure', {'fields': (
-            'application_fee_percentage', 'application_fee_fixed', 'application_delta_amount',)}),
+            'application_fee_percentage', 'application_fee_extra', 'application_delta_amount',)}),
 
     )
 

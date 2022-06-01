@@ -18,7 +18,7 @@ class PurchaseAdmin(admin.ModelAdmin):
 
 class ApplicationSaleAdmin(admin.ModelAdmin):
     model = ApplicationSale
-    list_display = ['team', 'created_at', 'staff_hired', 'sales_price', 'total_earning_fee', 'total_discount', 'total_earning','status_value']    
+    list_display = ['team', 'created_at', 'sales_price', 'disc_sales_price', 'staff_hired', 'total_earning_fee', 'total_discount', 'total_earning','status_value']    
     list_filter = ['team', 'purchase__status']
     readonly_fields = [
          'purchase','project', 'sales_price', 'earning_fee_charged','discount_offered',
@@ -34,8 +34,8 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
 class ProposalSaleAdmin(admin.ModelAdmin):
     model = ProposalSale
     list_display = [
-        'team', 'created_at', 'sales_price', 'staff_hired', 'total_sales_price', 
-        'total_earning_fee_charged', 'Total_discount_offered', 'total_earning','status_value'
+        'team', 'created_at', 'sales_price','disc_sales_price', 'staff_hired', 'total_sales_price', 
+        'total_earning_fee_charged', 'total_discount_offered', 'earning', 'total_earning','status_value'
     ]    
     list_filter = ['team', 'purchase__status']
     readonly_fields = [
@@ -56,8 +56,8 @@ class ProposalSaleAdmin(admin.ModelAdmin):
 class ContractSaleAdmin(admin.ModelAdmin):
     model = ContractSale
     list_display = [
-        'team', 'created_at', 'staff_hired', 'total_sales_price', 
-        'total_earning_fee_charged', 'Total_discount_offered', 'total_earning','status_value'
+        'team', 'created_at', 'sales_price', 'disc_sales_price','staff_hired', 'total_sales_price', 
+        'earning_fee_charged','total_earning_fee_charged', 'total_discount_offered', 'total_earning','status_value'
     ]    
     list_filter = ['purchase__status']
     readonly_fields = [
@@ -76,16 +76,16 @@ class ContractSaleAdmin(admin.ModelAdmin):
 
 class SalesReportingAdmin(admin.ModelAdmin):
     model = SalesReporting
-    list_display = ['team', 'sales_category','created_at', 'sales_price', 'staff_hired', 'total_sales_price', 'client_fee_charged','total_freelancer_fee_charged', 'Total_discount_offered', 'total_earning','status_value']
+    list_display = ['team', 'sales_category','created_at', 'sales_price', 'staff_hired', 'total_sales_price', 'client_fee_charged','total_freelancer_fee_charged', 'total_discount_offered', 'total_earning','status_value']
     list_filter = ['sales_category']
     readonly_fields = [
         'team', 'sales_category','purchase','created_at', 'staff_hired', 'total_sales_price', 
-        'client_fee_charged','freelancer_fee_charged', 'Total_discount_offered', 
+        'client_fee_charged','freelancer_fee_charged', 'total_discount_offered', 
         'total_earning','status_value','earning','created_at','updated_at','status_value'
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','sales_category',)}),
-        ('Revenue', {'fields': ('total_sales_price', 'client_fee_charged', 'total_freelancer_fee_charged', 'Total_discount_offered',)}),
+        ('Revenue', {'fields': ('total_sales_price', 'client_fee_charged', 'total_freelancer_fee_charged', 'total_discount_offered',)}),
         ('Earning/Profit', {'fields': ('staff_hired','earning',)}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )

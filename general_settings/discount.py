@@ -72,11 +72,11 @@ def get_level_four_start_amount():
         return 0
 
 
-def get_discount_calculator(price, total, discount):
-    return round(price/total * discount)
+def get_discount_calculator(price_before_discount, total_before_discount, discount):
+    return round(price_before_discount/total_before_discount * discount)
 
-def get_earning_calculator(price, fee, discount):
-    return round(price - fee - discount)
+def get_earning_calculator(price_after_discount, fee):
+    return round(price_after_discount - fee)
 
 
 
