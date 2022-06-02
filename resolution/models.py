@@ -1,3 +1,4 @@
+from email.mime import application
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from proposals.utilities import (
@@ -38,11 +39,13 @@ class ProjectResolution(models.Model):
     SIX_MONTH = "06 month"
 
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='approvedteam', on_delete=models.CASCADE)
-    purchase = models.ForeignKey("transactions.Purchase", verbose_name=_("Purchase Client"), related_name="projectpurchasemade", on_delete=models.CASCADE)
+    application = models.ForeignKey("transactions.ApplicationSale", verbose_name=_("Application"), related_name="projectapplicantsaction", on_delete=models.CASCADE)
     project = models.ForeignKey("projects.Project", verbose_name=_("Project Offered"), related_name="resolutionproject", on_delete=models.CASCADE)
 
     start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
     end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+
 
     def save(self, *args, **kwargs):
 
@@ -70,7 +73,7 @@ class ProjectResolution(models.Model):
 
         
     class Meta:
-        ordering = ("-end_time",)
+        ordering = ("-created_at",)
 
     def __str__(self):
-        return f'{self.start_time} to {self.end_time}'
+        return f'{self.team.title} vrs. {self.project.created_by.get_full_name()}'

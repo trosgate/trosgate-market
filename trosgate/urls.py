@@ -23,7 +23,7 @@ urlpatterns = [
     path('team/analytics/', include('analytics.urls', namespace='analytics')),
     path('pages/', include('pages.urls', namespace='pages')),
     path('marketing/', include('marketing.urls', namespace='marketing')),
-    # path('resolution/', include('resolution.urls', namespace='resolution')),
+    path('manager/', include('resolution.urls', namespace='resolution')),
 ]
 
 if settings.DEBUG:

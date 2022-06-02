@@ -5,7 +5,7 @@ from .models import ProjectResolution
 
 class ProjectResolutionAdmin(admin.ModelAdmin):
     model = ProjectResolution
-    list_display = ['team', 'purchase', 'project', 'start_time', 'end_time']    
+    list_display = ['team', 'application', 'start_time', 'end_time']    
     # list_filter = ['purchase__status']
 
 

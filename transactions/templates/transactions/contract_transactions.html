@@ -29,17 +29,17 @@
 					<thead>
 						<tr>
 							<th>#</th>
+							<th>Reference</th>
 							<th>Client</th>
 							<th>Purchase Date</th>
 							<th>Payment Type</th>
 							<th>Contract Proposal</th>
-							<th>Price</th>
-							<th>Hired</th>
-							<th>Sales </th>
-							<th>Discount</th>
+							<th>Base Price</th>
+							{% comment %} <th>Disc. Price ({{base_currency}}) @ Qty </th> {% endcomment %}
+							<th>Sales ({{base_currency}})</th>
 							<th>Fees </th>
-							<th>Earning</th>
-							<th>Action</th>
+							<th>Est. Earning</th>
+							<th>Manager</th>
 						</tr>
 					</thead>
 					
@@ -47,14 +47,13 @@
 						{% for contract in contracts %}
 						<tr>
 							<td>{{forloop.counter}}</td>
+							<td>{{contract.contract.reference}}</td>
 							<td>{{contract.purchase.client.get_full_name|capfirst}}</td>
 							<td>{{contract.created_at}}</td>
 							<td>{{contract.purchase.payment_method}}</td>
 							<td>{{contract.contract.proposal.title|truncatechars:100}}</td>
 							<td>{{contract.sales_price}}</td>
-							<td>{{contract.staff_hired}}</td>
-							<td>{{contract.total_sales_price}}</td>     
-							<td>{{contract.Total_discount_offered}}</td>
+							<td>{{contract.total_sales_price}} ({{contract.disc_sales_price}}px @ {{contract.staff_hired}}staff)</td>     
 							<td>{{contract.total_earning_fee_charged}}</td>
 							<td>{{contract.total_earning}}</td>
 							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
@@ -77,13 +76,14 @@
 					<thead>
 						<tr>
 							<th>#</th>
+							<th>Reference</th>
 							<th>Team</th>
 							<th>Purchase Date</th>
 							<th>Method</th>
 							<th>Contract Proposal</th>
-							<th>Price</th>
+							<th>Purchase</th>
 							<th>Hired</th>
-							<th>Sales</th>
+							<th>Total</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -92,11 +92,12 @@
 						{% for contract in contracts %}
 						<tr>
 							<td>{{forloop.counter}}</td>
+							<td>{{contract.contract.reference}}</td>
 							<td>{{contract.team|capfirst}}</td>
 							<td>{{contract.created_at}}</td>
 							<td>{{contract.purchase.payment_method}}</td>
 							<td class="text-left">{{contract.contract.proposal.title|truncatechars:100}}</td>
-							<td>{{contract.sales_price}}</td>
+							<td>{{contract.disc_sales_price}}</td>
 							<td>{{contract.staff_hired}}</td>
 							<td>{{contract.total_sales_price}}</td>     
 							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>

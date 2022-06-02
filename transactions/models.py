@@ -62,6 +62,9 @@ class ApplicationSale(models.Model):
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
 
+    class Meta:
+        ordering = ("-created_at",)
+
     def __str__(self):
         return str(self.project) 
 
@@ -95,6 +98,9 @@ class ProposalSale(models.Model):
     total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
 
     def __str__(self):
         return str(self.proposal)
@@ -138,6 +144,9 @@ class ContractSale(models.Model):
     total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
 
     def __str__(self):
         return str(self.contract)
@@ -194,6 +203,9 @@ class SalesReporting(models.Model):
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     client = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Client"), related_name='created_by', on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ("-created_at",)
+
     def __str__(self):
         return str(self.purchase.client.short_name)
 
@@ -214,5 +226,8 @@ class SubscriptionItem(models.Model):
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
 
+    class Meta:
+        ordering = ("-created_at",)
+        
     def __str__(self):
         return str(self.subscriber)

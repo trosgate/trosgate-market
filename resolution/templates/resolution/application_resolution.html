@@ -1,0 +1,111 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-12 push-md-2 col-lg-12 push-lg-3">
+					<div class="wt-innerbannercontent">
+					    <div class="wt-title"><h2>Application Manager</h2></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--Inner Home End-->
+	<section class="wt-haslayout">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="wt-greeting-holder">
+						<div class="row">
+							<div class="col-12">
+								<div class="wt-greetingcontent">
+									<div class="wt-sectionhead">
+										<div class="row">
+											<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent">
+														<a href="{% url 'proposals:proposal_list' %}"> 
+															<figure><img src="{% static 'images/thumbnail/img-17.png'%}" alt="image"></figure>
+														</a>
+														<div class="wt-title">
+																<h3>Days</h3>
+																<span>Hire directly from proposals</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div> 
+											<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent wt-freelancelike">
+															<a href="{% url 'freelancer:freelancer_listing' %}">
+																<figure><img src="{% static 'images/thumbnail/img-15.png'%}" alt="image"></figure>
+															</a>
+															<div class="wt-title">
+																<h3>Hours</h3>
+																<span>Offer Contracts from profiles</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div>
+											<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent wt-repostjob">
+															<a href="{% url 'projects:create_project' %}"> 
+																<figure><img src="{% static 'images/thumbnail/img-18.png'%}" alt="image"></figure>
+															</a>
+															<div class="wt-title">
+																<h3>Minutes</h3>
+																<span>Post job and Hire applicants</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div>
+											<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">	
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent wt-componyfolow">
+															<a href="{% url 'quiz:list_quiz' %}">
+																<figure><img src="{% static 'images/thumbnail/img-16.png'%}" alt="image"></figure>
+															</a>
+															<div class="wt-title">
+																<h3>Seconds</h3>
+																<span>Shortlist high value projects</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div>
+										</div> 
+										{% comment %} ........ {% endcomment %}
+									</div>
+								</div>
+							</div>
+                        </div>									
+					</div>
+				</div>
+			</div>						
+		</div>
+    </section>
+
+    <div class="wt-proposalholder">
+        <div class="row justify-content-md-center">
+            <div class="wt-sectionhead wt-textcenter">
+                <span>I am Freelancer</span>
+            </div>
+        </div>
+    </div>
+    </main>        
+	
+{% endblock %}
+

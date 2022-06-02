@@ -217,9 +217,6 @@ def application_fee(request):
 @user_is_client
 def final_application_checkout(request):
     applicant_box = ApplicationAddon(request)
-
-    checker = get_application_fee_calculator(445)
-    print('checker:', checker)
     
     if applicant_box.__len__() < 1:
         messages.error(request, "Please add atleast one applicant to proceed")
@@ -319,18 +316,18 @@ def stripe_application_intent(request):
                 project=applicant["application"].project,
                 sales_price=int(applicant["budget"]),
                 staff_hired=int(1),
-                earning_fee_charged=int(get_application_fee_calculator(applicant["budget"])),
-                total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"])),
+                earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                 discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                 earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]))), 
+                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
                 total_earnings=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"])))             
+                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))             
             )
 
         for applicant in applicant_box:
@@ -342,18 +339,18 @@ def stripe_application_intent(request):
                 sales_price=int(applicant["budget"]),
                 staff_hired=int(1),
                 client_fee_charged=int(shared_gateway_fee),
-                freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"])),
-                total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"]) * int(1)),
+                freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                 discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                 earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]))), 
+                    get_application_fee_calculator(applicant["budget"]- get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"])))  
+                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))  
             )
 
         return JsonResponse({'session': session, 'order': payment_intent})
@@ -424,22 +421,18 @@ def paypal_application_intent(request):
                 project=applicant["application"].project,
                 sales_price=int(applicant["budget"]),
                 staff_hired=int(1),
-                earning_fee_charged=round(
-                    get_application_fee_calculator(applicant["budget"])),
-                total_earning_fee_charged=round(
-                    get_application_fee_calculator(applicant["budget"])),
-                discount_offered=get_discount_calculator(
-                    applicant["budget"], grand_total_before_expense, discount_value),
-                total_discount_offered=get_discount_calculator(
-                    applicant["budget"], grand_total_before_expense, discount_value),
+                earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                 earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]))), 
+                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
                 total_earnings=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"])))             
+                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))            
             )
 
         for applicant in applicant_box:
@@ -451,18 +444,18 @@ def paypal_application_intent(request):
                 sales_price=int(applicant["budget"]),
                 staff_hired=int(1),
                 client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_application_fee_calculator(applicant["budget"])),
-                total_freelancer_fee_charged=round(get_application_fee_calculator(applicant["budget"]) * int(1)),
-                discount_offered=get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value),
-                total_discount_offered=get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value),
+                freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                 earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]))), 
+                    get_application_fee_calculator(applicant["budget"]- get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"])))             
+                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))          
             )
     else:
         purchase.status = Purchase.FAILED
@@ -653,7 +646,7 @@ def get_flutterwave_verification(unique_reference, flutterwave_order_key):
         status=Purchase.FAILED,        
     ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
 
-
+ 
 @login_required
 @user_is_client
 def razorpay_webhook(request):
@@ -694,18 +687,18 @@ def razorpay_webhook(request):
                     project=applicant["application"].project,
                     sales_price=int(applicant["budget"]),
                     staff_hired=int(1),
-                    earning_fee_charged=round(get_application_fee_calculator(applicant["budget"])),
-                    total_earning_fee_charged=round(get_application_fee_calculator(applicant["budget"])),
-                    discount_offered=get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value),
-                    total_discount_offered=get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value),
+                    discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                     disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                     total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                     earning=int(get_earning_calculator(
                         (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"]))), 
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
                     total_earnings=int(get_earning_calculator(
                         (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"])))                 
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))               
                 )
 
             for applicant in applicant_box:
@@ -717,18 +710,18 @@ def razorpay_webhook(request):
                     sales_price=int(applicant["budget"]),
                     staff_hired=int(1),
                     client_fee_charged=round(shared_gateway_fee),
-                    freelancer_fee_charged=round(get_application_fee_calculator(applicant["budget"])),
-                    total_freelancer_fee_charged=round(get_application_fee_calculator(applicant["budget"]) * int(1)),
-                    discount_offered=get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value),
-                    total_discount_offered=get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value),
+                    freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                     disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
                     total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                     earning=int(get_earning_calculator(
                         (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"]))), 
+                        get_application_fee_calculator(applicant["budget"]- get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
                     total_earning=int(get_earning_calculator(
                         (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"])))                 
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))
                 )
         else:
             purchase.status = Purchase.FAILED

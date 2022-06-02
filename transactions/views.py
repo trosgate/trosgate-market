@@ -241,18 +241,18 @@ def flutter_payment_intent(request):
                 proposal=proposal["proposal"], 
                 sales_price=int(proposal["salary"]), 
                 staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                 discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
                 total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))), 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"])                     
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"])                     
             )
 
         for proposal in hiringbox:
@@ -264,18 +264,18 @@ def flutter_payment_intent(request):
                 sales_price=int(proposal["salary"]),  
                 staff_hired=proposal["member_qty"],
                 client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),
-                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                 discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
                 disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))), 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"]) 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
             )
         auth_token = flutterwaveClient.flutterwave_secret_key()
         headers = {'Authorization': 'Bearer ' + auth_token}
@@ -421,18 +421,18 @@ def stripe_payment_order(request):
                 proposal=proposal["proposal"], 
                 sales_price=int(proposal["salary"]), 
                 staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                 discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
                 total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))), 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"]) 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
             )
 
         for proposal in hiringbox:
@@ -444,18 +444,18 @@ def stripe_payment_order(request):
                 sales_price=int(proposal["salary"]), 
                 staff_hired=proposal["member_qty"],
                 client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),
-                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                 discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
                 disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))), 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"]) 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
             )
         hiringbox.clean_box()
         return JsonResponse({'session': session,})
@@ -536,18 +536,18 @@ def paypal_payment_order(request):
                 proposal=proposal["proposal"], 
                 sales_price=int(proposal["salary"]), 
                 staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                 discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
                 total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))), 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"]) 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
 
             )
 
@@ -560,18 +560,18 @@ def paypal_payment_order(request):
                 sales_price=int(proposal["salary"]), 
                 staff_hired=proposal["member_qty"],
                 client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),
-                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                 discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
                 disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                 total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                 earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))), 
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                 total_earning=int(get_earning_calculator(
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"])             
+                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"])             
             )
     else:
         purchase.status = Purchase.FAILED
@@ -662,18 +662,18 @@ def razorpay_webhook(request):
                     proposal=proposal["proposal"], 
                     sales_price=int(proposal["salary"]),
                     staff_hired=proposal["member_qty"],
-                    earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"])),                   
-                    total_earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                    earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+                    total_earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                     discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
                     total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                     disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                     total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                     earning=int(get_earning_calculator(
                         (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"]))), 
+                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                     total_earning=int(get_earning_calculator(
                         (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"]) 
+                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
                 )
 
             for proposal in hiringbox:
@@ -684,18 +684,18 @@ def razorpay_webhook(request):
                     sales_category=SalesReporting.PROPOSAL, 
                     sales_price=int(proposal["salary"]),
                     staff_hired=proposal["member_qty"],
-                    freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"])),
-                    total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"]) * proposal["member_qty"]),                   
+                    freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                    total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                     discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                     total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
                     disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
                     total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
                     earning=int(get_earning_calculator(
                         (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"]))), 
+                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
                     total_earning=int(get_earning_calculator(
                         (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"]))* proposal["member_qty"])
+                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"])
                 )
         else:
             purchase.status = Purchase.FAILED
@@ -719,7 +719,7 @@ def payment_success(request):
 
 @login_required
 def proposal_transaction(request):
-    proposals = ''
+    base_currency = get_base_currency_code()
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
         proposals = ProposalSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -728,7 +728,8 @@ def proposal_transaction(request):
         proposals = ProposalSale.objects.filter(purchase__client=request.user, purchase__status=Purchase.SUCCESS)
 
     context = {
-        'proposals':proposals,
+        'proposals': proposals,
+        'base_currency': base_currency,
 
     }
     return render(request, 'transactions/proposal_transactions.html', context)
@@ -736,7 +737,7 @@ def proposal_transaction(request):
 
 @login_required
 def application_transaction(request):
-    applications = ''
+    base_currency = get_base_currency_code()
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
         applications = ApplicationSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -746,13 +747,14 @@ def application_transaction(request):
     
     context = {
         'applications':applications,
+        'base_currency': base_currency,        
     }
     return render(request, 'transactions/application_transactions.html', context)
 
 
 @login_required
 def contract_transaction(request):
-    contracts = ''
+    base_currency = get_base_currency_code()
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
         contracts = ContractSale.objects.filter(team=team, contract__status=InternalContract.PAID, purchase__status=Purchase.SUCCESS)
@@ -762,6 +764,7 @@ def contract_transaction(request):
 
     context = {
         'contracts':contracts,
+        'base_currency': base_currency,        
     }
     return render(request, 'transactions/contract_transactions.html', context)
 
