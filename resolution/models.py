@@ -51,23 +51,23 @@ class ProjectResolution(models.Model):
 
         if self.project.completion_time == self.ONE_DAY:
             self.end_time = one_day()
-        if self.project.completion_time == self.TWO_DAYS:
+        elif self.project.completion_time == self.TWO_DAYS:
             self.end_time = two_days()
-        if self.project.completion_time == self.THREE_DAYS:
+        elif self.project.completion_time == self.THREE_DAYS:
             self.end_time = three_days()
-        if self.project.completion_time == self.FOUR_DAYS:
+        elif self.project.completion_time == self.FOUR_DAYS:
             self.end_time = four_days()
-        if self.project.completion_time == self.FIVE_DAYS:
+        elif self.project.completion_time == self.FIVE_DAYS:
             self.end_time = five_days()
-        if self.project.completion_time == self.SIX_DAYS:
+        elif self.project.completion_time == self.SIX_DAYS:
             self.end_time = six_days()
-        if self.project.completion_time == self.ONE_WEEK:
+        elif self.project.completion_time == self.ONE_WEEK:
             self.end_time = one_week()
-        if self.project.completion_time == self.TWO_WEEK:
+        elif self.project.completion_time == self.TWO_WEEK:
             self.end_time = two_weeks()
-        if self.project.completion_time == self.THREE_WEEK:
+        elif self.project.completion_time == self.THREE_WEEK:
             self.end_time = three_weeks()
-        if self.project.completion_time == self.ONE_MONTH:
+        elif self.project.completion_time == self.ONE_MONTH:
             self.end_time = one_month()
         super(ProjectResolution, self).save(*args, **kwargs)
 
@@ -77,3 +77,7 @@ class ProjectResolution(models.Model):
 
     def __str__(self):
         return f'{self.team.title} vrs. {self.project.created_by.get_full_name()}'
+
+# Also a review table required
+class ProjectCancelation(models.Model):
+    pass

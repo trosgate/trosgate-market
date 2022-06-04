@@ -53,7 +53,7 @@
 							<td>{{application.total_sales_price}} ({{application.disc_sales_price}} px @ {{application.staff_hired}} staff)</td> 
 							<td>{{application.total_earning_fee_charged}}</td>
 							<td>{{application.total_earning}}</td>
-							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
+							<td><a href="{% url 'resolution:application_resolution' application.id application.project.slug %} "><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
 						</tr>
 						
 						{% endfor %}

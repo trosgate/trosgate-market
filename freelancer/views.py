@@ -26,12 +26,10 @@ from future.utilities import get_transfer_feature
 
 
 
-
 @login_required
 def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
-    team = get_object_or_404(
-        Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
     monthly_contracts_limiter = monthly_offer_contracts(team)
     print(team)
     print(monthly_contracts_limiter)
@@ -45,11 +43,9 @@ def freelancer_profile(request, short_name):
 
 @login_required
 def update_freelancer(request, user_id):
-    freelancer = get_object_or_404(
-        Freelancer, user_id=user_id, user=request.user)
+    freelancer = get_object_or_404(Freelancer, user_id=user_id, user=request.user)
     if request.method == 'POST':
-        profileform = FreelancerForm(
-            request.POST, request.FILES, instance=freelancer)
+        profileform = FreelancerForm(request.POST, request.FILES, instance=freelancer)
 
         if profileform.is_valid():
             freelancer = profileform.save(commit=False)
@@ -73,8 +69,7 @@ def update_freelancer(request, user_id):
 
 
 def freelancer_listing(request):
-    freelancer_profile_list = Freelancer.objects.filter(
-        user__is_active=True, user__user_type=Customer.FREELANCER)
+    freelancer_profile_list = Freelancer.objects.filter(user__is_active=True, user__user_type=Customer.FREELANCER)
     context = {
         'freelancer_profile_list': freelancer_profile_list,
     }
@@ -84,15 +79,11 @@ def freelancer_listing(request):
 @login_required
 @user_is_freelancer
 def transfer_or_withdraw(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
-    team_staff = request.user.team_member.filter(
-        pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
+    team_staff = request.user.team_member.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
 
-    manager_transfers = FreelancerAction.objects.filter(
-        team=team, manager=request.user)
-    staff_transfers = FreelancerAction.objects.filter(
-        team=team, team_staff=request.user)
+    manager_transfers = FreelancerAction.objects.filter(team=team, manager=request.user)
+    staff_transfers = FreelancerAction.objects.filter(team=team, team_staff=request.user)
     transferform = FundTransferForm(team_staff)
     withdrawalform = WithdrawalForm()
 
