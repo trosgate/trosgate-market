@@ -28,7 +28,7 @@ const countDownMaster = setInterval(() => {
     }
     else {
         clearInterval(countDownMaster)
-        durationNotice.innerHTML = "Time Expired"
+        durationNotice.innerHTML = "- Time Expired"
     }
 }, 1000)
 

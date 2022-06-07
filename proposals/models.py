@@ -32,8 +32,11 @@ from .utilities import (
 )
 
 
+# def proposal_images_path(instance, filename):
+#     return f"proposal_image_{instance.pk}/{filename}"
+
 def proposal_images_path(instance, filename):
-    return f"proposal_image_{instance.pk}/{filename}"
+    return "proposal/%s/%s" % (instance.team.title, filename)
 
 
 class Proposal(models.Model):

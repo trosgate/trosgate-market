@@ -85,7 +85,7 @@ def transfer_or_withdraw(request):
     manager_transfers = FreelancerAction.objects.filter(team=team, manager=request.user)
     staff_transfers = FreelancerAction.objects.filter(team=team, team_staff=request.user)
     transferform = FundTransferForm(team_staff)
-    withdrawalform = WithdrawalForm()
+    withdrawalform = WithdrawalForm(request.POST)
 
     min_balance_remaining = get_min_balance()
     max_transfer_amount = get_max_transfer()

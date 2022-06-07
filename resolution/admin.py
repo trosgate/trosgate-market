@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ProjectResolution
+from .models import ProjectResolution, ProjectResolutionReview, ProjectCompletionFiles
 
 
 
@@ -10,3 +10,5 @@ class ProjectResolutionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ProjectResolution, ProjectResolutionAdmin)
+admin.site.register(ProjectResolutionReview)
+admin.site.register(ProjectCompletionFiles)

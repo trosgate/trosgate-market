@@ -22,8 +22,7 @@ class FreelancerForm(forms.ModelForm):
     end_date_two = forms.DateField(widget=DateInput, required=False)
     profile_photo = forms.ImageField(widget=forms.FileInput,)
     banner_photo = forms.ImageField(widget=forms.FileInput,)
-    department = forms.ModelChoiceField(
-        queryset=Department.objects.all(), widget=forms.RadioSelect)
+    department = forms.ModelChoiceField(queryset=Department.objects.all(), widget=forms.RadioSelect)
     business_size = forms.ModelChoiceField(
         queryset=Size.objects.all(), widget=forms.RadioSelect)
     image_one = forms.ImageField(widget=forms.FileInput, required=False)
