@@ -20,7 +20,7 @@ from django.http import JsonResponse
 from proposals.models import Proposal
 from django.db.models import F, Q
 from projects.models import Project
-# from applications.models import Application
+from applications.models import Application
 from account.models import Customer
 from datetime import datetime
 from teams.controller import max_member_per_team
@@ -118,12 +118,12 @@ def update_teams(request, team_id):
 def team_single(request, team_id):
     team = get_object_or_404(Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
     proposals = team.proposalteam.all()
-    # applications = team.applications.filter(team=team, status=Application.PENDING)
+    proposal_assigned = team.assignteam.all()
+    applications = team.applications.all()
     invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
     accepted = Invitation.objects.filter(team=team, status=Invitation.ACCEPTED)
     code = Invitation.objects.values('code')
 
-    print(PayPalClientConfig())
     # to show invite
     context = {
         "teams": team,
@@ -131,7 +131,8 @@ def team_single(request, team_id):
         'invited': invited,
         'accepted': accepted,
         "proposals": proposals,
-        # "applications": applications,
+        "applications": applications,
+        "proposal_assigned": proposal_assigned,
     }
     return render(request, 'teams/team_detail.html', context)
 
@@ -280,13 +281,11 @@ def accept_team_invitation(request):
 @login_required
 @user_is_freelancer
 def teamchat(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
     content = request.POST.get('content', '')
 
-    if content:
-        TeamChat.objects.create(
-            content=content, team=team, sender=request.user, is_sent=True)
+    if content != '':
+        TeamChat.objects.create(content=content, team=team, sender=request.user, is_sent=True)
 
     chats = team.teamchats.all()
     return render(request, 'teams/components/partial_team_message.html', {'chats': chats})
@@ -295,11 +294,9 @@ def teamchat(request):
 @login_required
 @user_is_freelancer
 def teamchatroom(request):
-    team = get_object_or_404(
-        Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     chats = team.teamchats.all()
-    admin = Customer.objects.filter(
-        user_type=Customer.ADMIN, is_active=True, is_admin=True).first()
+    admin = Customer.objects.filter(user_type=Customer.ADMIN, is_active=True, is_admin=True).first()
     if request.htmx:
         return render(request, 'teams/components/partial_team_message.html', {'chats': chats})
     else:
@@ -309,12 +306,9 @@ def teamchatroom(request):
 @login_required
 @user_is_freelancer
 def assign_proposal(request, team_slug, proposal_slug):
-    team = get_object_or_404(Team, slug=team_slug, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
-    proposal = get_object_or_404(
-        Proposal, slug=proposal_slug, team=team, status=Proposal.ACTIVE)
-    assignee = request.user.team_member.filter(
-        pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, slug=team_slug, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
+    assignee = request.user.team_member.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
 
     if request.method == 'POST':
 
@@ -327,8 +321,7 @@ def assign_proposal(request, team_slug, proposal_slug):
             assign.is_assigned = True
             assign.save()
 
-            messages.info(
-                request, f'Member - "{assign.assignor.short_name}" assigned successfuly')
+            messages.info(request, f'Member - "{assign.assignee.short_name}" assigned successfuly')
 
             return redirect('teams:team_single', team_id=team.id)
 
@@ -346,10 +339,8 @@ def assign_proposal(request, team_slug, proposal_slug):
 @login_required
 @user_is_freelancer
 def assign_proposals_to_me(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
-    assigned = team.assignteam.filter(
-        assignee=request.user, proposal__status=Proposal.ACTIVE, is_assigned=True)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
+    assigned = team.assignteam.filter(assignee=request.user, is_assigned=True)
 
     context = {
         'team': team,
@@ -361,11 +352,9 @@ def assign_proposals_to_me(request):
 @login_required
 @user_is_freelancer
 def reassign_proposals_to_myself(request, member_id):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
     if not (AssignMember.objects.filter(pk=member_id, team=team, assignee=request.user, is_assigned=True)).exists():
-        AssignMember.objects.filter(
-            pk=member_id, team=team, is_assigned=True).update(assignee=request.user)
+        AssignMember.objects.filter(pk=member_id, team=team, is_assigned=True).update(assignee=request.user)
 
     messages.success(request, 'The proposal was assigned successfully!')
 

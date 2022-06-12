@@ -23,7 +23,7 @@
 						</div>
 						<div class="wt-btnarea">
 							{% if request.user.freelancer %}
-							<a href="{% url 'proposals:create_proposal' %}" class="wt-btn">Proposal</a>
+							<a href="{% url 'proposals:proposal_step_one' %}" class="wt-btn">Proposal</a>
 							{% elif request.user.clients %}
 							<a href="{% url 'projects:create_project' %}" class="wt-btn">New Job</a>
 							{% endif %}
@@ -146,7 +146,7 @@
 						</li>
 						{% if max_proposals_per_team %}																																 
 						<li class="menu-item-has-children">
-							<a href="{% url 'proposals:create_proposal' %}">
+							<a href="{% url 'proposals:proposal_step_one' %}">
 								<i class="ti-bookmark-alt"></i>
 								<span>Create Proposal</span>
 							</a>

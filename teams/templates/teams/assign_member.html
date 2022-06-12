@@ -24,13 +24,9 @@
 							<div class="col-12">
 								<div class="wt-greetingcontent">
 									<div class="wt-sectionhead">
-										<div class="wt-sectiontitle">
-											<h4>Project Name: {{proposal.title}}</h4>
-										</div>
 										<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
                                             <div class="form-group">
-                                                <h5><label>Application:</label></h5>
-                                            <h6>{{proposal.title}}</h6>
+                                            	<h5>Proposal:</h5><span>{{proposal.title}}</span>
                                             </div>
 											<div class="form-group">
                                                 {{assignform.status.label}}
@@ -56,9 +52,15 @@
 				</div>
 			</div>						
 		</div>
-    </section>
+		
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	</section>
 
-        {% include 'dashboard/main_footer.html' %}
-	
 {% endblock %}
 

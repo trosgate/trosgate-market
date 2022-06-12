@@ -174,26 +174,26 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         if self.reference is None:
             self.reference = 'Pj-' + str(uuid4()).split('-')[4]
-        if self.dura_converter == self.ONE_DAY:
-            self.duration = one_day()
-        elif self.dura_converter == self.TWO_DAYS:
-            self.duration = two_days()
-        elif self.dura_converter == self.THREE_DAYS:
-            self.duration = three_days()
-        elif self.dura_converter == self.FOUR_DAYS:
-            self.duration = four_days()
-        elif self.dura_converter == self.FIVE_DAYS:
-            self.duration = five_days()
-        elif self.dura_converter == self.SIX_DAYS:
-            self.duration = six_days()
-        elif self.dura_converter == self.ONE_WEEK:
-            self.duration = one_week()
-        elif self.dura_converter == self.TWO_WEEK:
-            self.duration = two_weeks()
-        elif self.dura_converter == self.THREE_WEEK:
-            self.duration = three_weeks()
-        elif self.dura_converter == self.ONE_MONTH:
-            self.duration = one_month()
+        # if self.dura_converter == self.ONE_DAY:
+        #     self.duration = one_day()
+        # if self.dura_converter == self.TWO_DAYS:
+        #     self.duration = two_days()
+        # if self.dura_converter == self.THREE_DAYS:
+        #     self.duration = three_days()
+        # if self.dura_converter == self.FOUR_DAYS:
+        #     self.duration = four_days()
+        # if self.dura_converter == self.FIVE_DAYS:
+        #     self.duration = five_days()
+        # if self.dura_converter == self.SIX_DAYS:
+        #     self.duration = six_days()
+        # if self.dura_converter == self.ONE_WEEK:
+        #     self.duration = one_week()
+        # if self.dura_converter == self.TWO_WEEK:
+        #     self.duration = two_weeks()
+        # if self.dura_converter == self.THREE_WEEK:
+        #     self.duration = three_weeks()
+        # if self.dura_converter == self.ONE_MONTH:
+        #     self.duration = one_month()
         super(Project, self).save(*args, **kwargs)
 
 

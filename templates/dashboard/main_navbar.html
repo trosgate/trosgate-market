@@ -38,28 +38,25 @@
                           class="menu-item-has-children page_item_has_children">
                           <a href="{% url 'marketing:blog_list' %}">Articles</a>
                         </li>
+                       
                         {% if request.user.is_authenticated %}
                         <li
                           class="menu-item-has-children page_item_has_children">
                           <a href="{% url 'notification:notifications' %}">Notifications ({{ notifications.count }})</a>
                         </li>
                         {% endif %}
-                        {% if request.user.clients %}
+                        
+                        {% if request.user.is_authenticated and request.user.clients %}
+                        <li class="menu-item-has-children page_item_has_children"><span class="wt-dropdowarrow"><i class="lnr lnr-chevron-right"></i></span>
+                          <a href="javascript:void(0);">Bucket</a>
+                          <ul class="sub-menu">
+                            <li><a href="{% url 'transactions:hiring_box_summary' %}">Proposal Staffs &nbsp;<span id="members-qty">->({% with total_staff=hiring_box|length %}{% if total_staff > 0 %}{{total_staff}}{%else%}0{% endif %}{% endwith %})</span></a></li>
+                            <li><a href="{% url 'applications:application_multiple_summary' %}">Project Applicants &nbsp;<span id="applicantApproveCount">->({% with total_applicant=application_addon|length %}{% if total_applicant > 0 %}{{total_applicant}}{% else %}0{% endif %}{% endwith %})</span></a></li>
+                          </ul>
+                        </li>                        
                         <li
                           class="menu-item-has-children page_item_has_children">
                           <a href="{% url 'proposals:proposal_list' %}">Proposals</a>
-                        </li>
-                        <li
-                          class="menu-item-has-children page_item_has_children">
-                          <a type="button" href="{% url 'transactions:hiring_box_summary' %}" class="btn btn-outline-secondary btn-sm">
-                            {% with total_staff=hiring_box|length %}
-                            <div id="members-qty" class="d-inline-flex">
-                              {% if total_staff > 0 %}{{total_staff}} {%else%}0{% endif %}
-                            </div>
-                            <i class="fa fa-archive" aria-hidden="true">
-                              Staff</i>
-                            {% endwith %}
-                          </a>
                         </li>
                         {% endif %}
                       </ul>

@@ -1,0 +1,150 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+    <!--Inner Home Banner Start-->
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                    <div class="wt-innerbannercontent">
+                        <div class="wt-title"><h2>Create Proposal</h2></div>
+                        <ol class="wt-breadcrumb">
+                            <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                            <li class="wt-active">Background</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Inner Home End-->
+    <main id="wt-main" class="wt-main wt-haslayout">
+
+        <div class="wt-haslayout wt-main-section">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                        <div class="wt-dashboardbox">
+                            <div class="wt-dashboardboxtitle">
+                                <div class="container">
+                                    <div class="col-sm-12">
+                                        <nav>
+                                            <div class="nav nav-pills nav-justified">
+                                                <a class="nav-item nav-link text-white btn btn-info mt-2" href="{% url "proposals:proposal_step_one" %}"><i class="fa fa-arrow-left"> &nbsp; &nbsp; Introduction</i></a>
+                                                <a class="nav-item nav-link text-white btn btn-success mt-2" href="{% url "proposals:proposal_step_two" %}"><i class="fa fa-arrow-left"> &nbsp; &nbsp; Background</i></a>
+                                                <a class="nav-item nav-link text-white btn btn-primary mt-2" href="{% url "proposals:proposal_step_three" %}"><i class="fa fa-arrow-left"> &nbsp; &nbsp; Faqs</i></a>
+                                                <a class="nav-item nav-link text-white btn btn-success mt-2" href="{% url "proposals:proposal_step_four" %}"><i class="fa fa-arrow-down"> &nbsp; &nbsp; Attributes</i></a>
+                                            </div>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="wt-dashboardboxcontent">                                                               
+                            
+                                <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                                           
+                                <div class="wt-jobdescription wt-tabsinfo">
+                                    <div class="wt-jobdetails wt-tabsinfo">
+										<div class="wt-tabscontenttitle">
+											<h2>Attributes</h2>
+										</div>                                          
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th>Features</th>
+                                                    <th>Value</th>
+                                                </tr>
+                                                </thead>
+                                                <body>
+                                                <tr>
+                                                    <th>Salary</th>
+                                                    <th>{{proposalformfour.salary}}</th>
+                                                </tr>
+                                                </body>												
+                                                <body>
+                                                <tr>
+                                                    <th>Level</th>
+                                                    <th>{{proposalformfour.service_level}}</th>
+                                                </tr>
+                                                </body>													
+                                                <body>													
+                                                <tr>
+                                                    <th>Duration</th>
+                                                    <th>{{proposalformfour.dura_converter}}</th>
+                                                </tr>
+                                                </body>
+                                                <body>
+                                                <tr>
+                                                    <th>Revision</th>
+                                                    <th>{{proposalformfour.revision}}</th>
+                                                </tr>
+                                                </body>
+                                            </table> 
+                                            <div class="wt-attachmentsholder">
+                                            <div class="wt-tabscontenttitle">
+                                                <h2>Media</h2>
+                                            </div> 
+                                            <div class="form-group">
+                                                <span>{{proposalformfour.thumbnail.label}}</span>
+                                                <span><h5>{{ proposalformfour.thumbnail }}</h5></span>
+                                            </div>												
+                                        </div>												
+                                    </div>
+                                </div>
+                                    </div>
+                                        </div>
+                                            </div>
+                                                <div class="wt-updatall">
+                                                    <i class="ti-announcement"></i>
+                                                    <span>Step 1: Complete form and click on "Next Page" button</span>
+                                                    <button type="submit" class="wt-btn"> Save and Continue</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>					
+            </main>
+        {% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

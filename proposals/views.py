@@ -1,9 +1,10 @@
 import random
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Proposal
 from teams.models import Team
 from django.contrib.auth.decorators import login_required
-from .forms import ProposalCreationForm
+from .forms import ProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalCreationForm
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -20,37 +21,203 @@ from django.contrib import auth, messages
 from django.views.decorators.cache import cache_control #prevent back button on browser after form submission
 
 
-#This proposal by default, will go to Admin for approval
 @login_required
 @user_is_freelancer
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def create_proposal(request):
+def proposal_step_one(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposals = team.proposalteam.all()
+    session = request.session
+    proposal = ''
+    if "proposalstepone" not in session:
+        proposalformone = ProposalStepOneForm(request.POST)
 
-    if request.method == 'POST':
-        proposalform = ProposalCreationForm(request.POST, request.FILES)
-
-        if proposalform.is_valid():
-            proposal = proposalform.save(commit=False)
+        if proposalformone.is_valid():
+            proposal = proposalformone.save(commit=False)
             proposal.created_by = request.user
             proposal.team = team
             proposal.slug = slugify(proposal.title)
             proposal.save()
-            proposalform.save_m2m()  # for saving 'many to many' items in database
+            proposalformone.save_m2m()
 
-            messages.info(request, 'Proposal received and Under review') 
+            session["proposalstepone"] = {"proposalstepone_id": proposal.id}
+            session.modified = True
 
-            return redirect("proposals:review_proposal")
+            return redirect("proposals:proposal_step_two")
+
     else:
-        proposalform = ProposalCreationForm()
+        proposalstepone = Proposal.objects.get(pk=session["proposalstepone"]["proposalstepone_id"], team=team)
+        proposalformone = ProposalStepOneForm(request.POST, instance = proposalstepone) 
+
+        if proposalformone.is_valid():
+            proposalformone.instance.title = proposalformone.cleaned_data['title']
+            proposalformone.instance.preview = proposalformone.cleaned_data['preview']
+            proposalformone.instance.category = proposalformone.cleaned_data['category']
+            proposalformone.save()
+
+ 
+            return redirect("proposals:proposal_step_two") 
+
+        proposalformone = ProposalStepOneForm(instance = proposalstepone)           
 
     context = {
-        'proposalform': proposalform,
-        'proposals': proposals,
+        'proposalformone': proposalformone,
     }
-    return render(request, 'proposals/create_proposal.html', context)
-  
+    return render(request, 'proposals/proposal_step_one.html', context)
+
+
+@login_required
+@user_is_freelancer
+def proposal_step_two(request):
+
+    if "proposalstepone" not in request.session:
+        return redirect("proposals:proposal_step_one")
+
+    proposal = ''                                                  
+    proposalformtwo = ''           
+    session = request.session
+
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+    proposalsteptwo = Proposal.objects.get(pk=session["proposalstepone"]["proposalstepone_id"], team=team)
+
+    if "proposalsteptwo" not in session:
+        proposalformtwo = ProposalStepTwoForm(request.POST, instance = proposalsteptwo)
+
+        if proposalformtwo.is_valid():
+            proposalformtwo.instance.description = proposalformtwo.cleaned_data['description']
+            proposalformtwo.instance.sample_link = proposalformtwo.cleaned_data['sample_link']
+            proposal = proposalformtwo.save()
+
+            session["proposalsteptwo"] = {"proposalsteptwo_id": proposal.id}
+            session.modified = True
+
+            return redirect("proposals:proposal_step_three")
+
+    else:
+        proposalformtwo = ProposalStepTwoForm(request.POST, instance = proposalsteptwo)        
+        if proposalformtwo.is_valid():
+            description = proposalformtwo.cleaned_data['description']
+            sample_link = proposalformtwo.cleaned_data['sample_link']
+
+            Proposal.objects.filter(pk=session["proposalstepone"]["proposalstepone_id"], team=team).update(
+                description=description, sample_link=sample_link)
+
+            return redirect("proposals:proposal_step_three") 
+
+        proposalformtwo = ProposalStepTwoForm(instance = proposalsteptwo)
+
+    context = {
+        'proposalformtwo': proposalformtwo,
+    }
+    return render(request, 'proposals/proposal_step_two.html', context)
+
+
+
+@login_required
+@user_is_freelancer
+def proposal_step_three(request):
+    proposal = ''                                       
+    proposalstepthree = ''           
+    proposalformthree = ''           
+    session = request.session
+
+    if "proposalstepone" not in request.session:
+        return redirect("proposals:proposal_step_one")
+
+    if "proposalsteptwo" not in request.session:
+        return redirect("proposals:proposal_step_two")
+
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+
+    proposalstepthree = Proposal.objects.get(pk=session["proposalsteptwo"]["proposalsteptwo_id"], team=team)
+
+
+    if "proposalstepthree" not in session:
+        proposalformthree = ProposalStepThreeForm(request.POST, instance=proposalstepthree)
+
+        if proposalformthree.is_valid():                        
+            proposalformthree.instance.faq_one = proposalformthree.cleaned_data['faq_one']
+            proposalformthree.instance.faq_one_description = proposalformthree.cleaned_data['faq_one_description']
+            proposalformthree.instance.faq_two = proposalformthree.cleaned_data['faq_two']
+            proposalformthree.instance.faq_two_description = proposalformthree.cleaned_data['faq_two_description']
+            proposalformthree.instance.faq_three = proposalformthree.cleaned_data['faq_three']
+            proposalformthree.instance.faq_three_description = proposalformthree.cleaned_data['faq_three_description']
+            proposal = proposalformthree.save()
+
+            session["proposalstepthree"] = {"proposalstepthree_id": proposal.id}
+            session.modified = True
+
+            return redirect("proposals:proposal_step_four")
+
+    else:
+        proposalformthree = ProposalStepThreeForm(request.POST, instance = proposalstepthree)
+
+        if proposalformthree.is_valid():                        
+            faq_one = proposalformthree.cleaned_data['faq_one']
+            faq_one_description = proposalformthree.cleaned_data['faq_one_description']
+            faq_two = proposalformthree.cleaned_data['faq_two']
+            faq_two_description = proposalformthree.cleaned_data['faq_two_description']
+            faq_three = proposalformthree.cleaned_data['faq_three']
+            faq_three_description = proposalformthree.cleaned_data['faq_three_description']
+
+            proposal = Proposal.objects.filter(pk=session["proposalsteptwo"]["proposalsteptwo_id"], team=team).update(
+                faq_one=faq_one, faq_one_description=faq_one_description, 
+                faq_two=faq_two, faq_two_description=faq_two_description,
+                faq_three=faq_three, faq_three_description=faq_three_description
+            )
+            return redirect("proposals:proposal_step_four")  
+
+        proposalformthree = ProposalStepThreeForm(instance = proposalstepthree)
+
+    context = {
+        'proposalformthree': proposalformthree,
+    }
+    return render(request, 'proposals/proposal_step_three.html', context)
+
+
+
+@login_required
+@user_is_freelancer
+def proposal_step_four(request):                              
+    proposalformfour = ''           
+    session = request.session
+
+    if "proposalstepone" not in request.session:
+        return redirect("proposals:proposal_step_one")
+
+    if "proposalsteptwo" not in request.session:
+        return redirect("proposals:proposal_step_two")
+
+    if "proposalstepthree" not in request.session:
+        return redirect("proposals:proposal_step_three")
+
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+    proposalstepfour = Proposal.objects.get(pk=session["proposalstepthree"]["proposalstepthree_id"], team=team)   
+
+    proposalformfour = ProposalStepFourForm(request.POST, request.FILES, instance = proposalstepfour)
+
+    if proposalformfour.is_valid():
+        proposalformfour.instance.salary = proposalformfour.cleaned_data['salary']
+        proposalformfour.instance.service_level = proposalformfour.cleaned_data['service_level']
+        proposalformfour.instance.revision = proposalformfour.cleaned_data['revision']
+        proposalformfour.instance.dura_converter = proposalformfour.cleaned_data['dura_converter']
+        proposalformfour.instance.thumbnail = proposalformfour.cleaned_data['thumbnail']
+        proposalformfour.save()
+
+        del session["proposalstepone"]
+        del session["proposalsteptwo"]
+        del session["proposalstepthree"]
+
+        return redirect("proposals:review_proposal")
+
+    else:
+        proposalformfour = ProposalStepFourForm(instance = proposalstepfour)
+
+    context = {      
+        'proposalformfour': proposalformfour,
+    }
+    return render(request, 'proposals/proposal_step_four.html', context)
+
+
 
 #This page shows proposals with review status
 @login_required
@@ -156,6 +323,28 @@ def proposal_list(request):
         "proposals_list": proposals_list,
     }
     return render(request, 'proposals/proposal_listing.html', context)
+
+
+@login_required
+@user_is_freelancer
+def proposal_preview(request, short_name, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, team=team)
+    profile_view = get_object_or_404(Freelancer, user=proposal.created_by)
+    
+    team_members = proposal.team.members.all()
+    guides = ProposalGuides.objects.all()   
+    
+    
+    context = {
+        "proposal": proposal,
+        "team_members": team_members,
+        "profile_view": profile_view,
+        "guides": guides,
+
+    }
+    return render(request, 'proposals/proposal_detail.html', context)
+
 
 
 def proposal_detail(request, short_name, proposal_slug):

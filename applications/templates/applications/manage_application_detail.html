@@ -78,16 +78,14 @@
 													<div class="wt-proposalfeedback">
 														<span class="wt-starsvtwo">
 															<i class="fa fa-star fill"></i>
-															<i class="fa fa-star fill"></i>
-															<i class="fa fa-star fill"></i>
 														</span>
-														<span class="wt-starcontent"> 4.5/<i>5</i> <em>(860)</em></span>
+														<span class="wt-starcontent"> 4.5/<i>5</i> <em>(860 Reviews)</em></span>
 													</div>													
 												</div>
 												<div class="wt-rightarea">
 													{% if request.user == application.project.created_by %}
 													<div class="wt-hireduserstatus">
-														<button type="button" id="accept-project-applicant" data-index="{{application.id}}" class="btn btn-danger btn-sm accept-project-applicant">Click to Hire</button>
+														<button type="button" id="accept-project-applicant" data-index="{{application.id}}" class="btn btn-danger btn-sm accept-project-applicant">Hire Me</button>
 													</div>
 													<div class="wt-hireduserstatus">
 														<a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm">View</a> 
@@ -102,7 +100,7 @@
 														<span>In {{application.get_estimated_duration_display}}</span>
 													</div>
 													<div class="wt-hireduserstatus">
-														<h5 id="application" class="application" value="{{application.id}}">{{application.get_status_display}}</h5>
+														<h5 id="application-status" class="application-status" value="{{application.id}}">{{application.get_status_display}}</h5>
 														<span>Status</span>
 													</div>
 														
@@ -184,7 +182,7 @@
 						e.preventDefault();
 
 						let projectid = document.getElementById('project').getAttribute('data-value');
-						
+						let applicant = $(this).data('index');
 						$.ajax({
 						type: 'POST',
 						url: '{% url "applications:add_application" %}',
@@ -196,8 +194,9 @@
 						},
 						success: function (json) {
 							console.log(json)
-							document.getElementById('feedback-message').innerHTML = json['message']
-							document.getElementById('application').innerHTML= json['status']							
+							$('.application-status[data-index="' + applicant + '"]').innerHTML = json['app_status']
+							document.getElementById('feedback-message').innerHTML = json['message']						
+							document.getElementById('applicantApproveCount').innerHTML= json['applicant_count']							
 
 						},
 						error: function (xhr, errmsg, err) {}

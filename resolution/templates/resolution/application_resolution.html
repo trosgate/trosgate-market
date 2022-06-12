@@ -46,10 +46,10 @@
 														<div id="transfer-confirmation" class="btn btn-inline-danger text-white">Ok I Understand</div>
 													</a>
 												</div>
-												{% else %}
+												{% elif application.purchase.client %}
 												<div id = 'transfer-confirm' class="wt-updatall">
-													<span>Are you Ready to grab your {{currency}} {{application.total_sales_price}}? Click the button to start work</span>
-													<button id="start-work-now" type="button" class="wt-btn">Start Work</button>
+													<span>Team founder has not started work Yet. Please check back or contact them</span>
+													<button id="start-work-now" type="button" class="wt-btn">Pending Team Action</button>
 												</div>
 												{% endif %} 
 											</div>
@@ -178,7 +178,8 @@
 							</div>
 						</div>
 					</div>
-				</section>	
+				</section>
+				{% if resolution %}	
 				<section class="wt-haslayout wt-dbsectionspace">
 					<div class="row justify-content-md-center">				
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
@@ -219,11 +220,11 @@
 											{% if request.user == application.purchase.client %}
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-star fill" style='color:orange'></i>
-												<span><a href="javascrip:void(0);" data-toggle="modal" data-target="#projectreviewmodalbox">Approve</a></span>
+												<span><button type='button' class='btn btn-success btn-sm' data-toggle="modal" data-target="#projectreviewmodalbox">Approve</button></span>
 											</div>														
 											<div class="wt-hireduserstatus">
 												<i class="ti-na" style='color:red'></i>
-												<span><a href="javascrip:void(0);" data-toggle="modal" data-target="#wt-projectcancelmodalbox">Cancel</a></span>
+												<span><button type='button' class='btn btn-danger btn-sm' data-toggle="modal" data-target="#projectcancelmodalbox">Cancel</button></span>
 											</div>														
 											{% endif %}														
 											<div class="wt-hireduserstatus">
@@ -246,6 +247,48 @@
 					</div>
 				</div>
 			</section>
+			{% endif %}
+			<section class="wt-haslayout wt-dbsectionspace">
+				<div class="row justify-content-md-center">				
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+					<div class="wt-dashboardbox">
+						<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="wt-sectiontitle">
+									<span>Applicant Review </span>
+								</div>
+								{% if client_review %}
+								{% for review in client_review %}
+								<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+									<figure class="wt-userlistingimg">
+										<img src="{% if review.resolution.project.created_by.clients.profile_photo %} {{review.resolution.project.created_by.clients.profile_photo.url }} {% endif %}" alt="image description">
+									</figure>
+									<div class="wt-userlistingcontent">
+										<div class="wt-contenthead">
+											<div class="wt-title">
+												<i class="fa fa-check-circle" style='color:green'> Client: {{review.resolution.project.created_by.get_full_name}} ({{review.resolution.project.created_by.country|capfirst}})</i>
+												<h3>{{review.title}}</h3>
+											</div>
+											<ul class="wt-userlisting-breadcrumb">
+												<li><span><i class="fa fa-dollar-sign"></i> Team: {{review.resolution.team.title}}</span></li>
+												<li><span><img src="{{review.resolution.project.created_by.country.flag.url}}" alt="img description"> {{review.resolution.project.created_by.country|capfirst}}</span></li>
+												<li><span><i class="fa fa-star fill" style='color:orange'> Review: </i>{{review.rating}}/5</span></li>
+											</ul>
+										</div>
+									</div>
+									<div class="wt-description">
+										<p>“ {{review.message|linebreaksbr}}.”</p>
+									</div>
+								</div>
+								{% endfor %}
+								{% endif %}
+								{% if not client_review %}
+								<p class="text-center"> Hmm! No review Yet.............</p>
+								{% endif %}
+							</div>	
+						</div>	
+					</div>	
+				</div>	
+			</section>	 
 		
 			<div class="wt-proposalholder">
 				<div class="row justify-content-md-center">
@@ -258,102 +301,139 @@
 		</main>
 			<!--Main End-->	
 
-	{% comment %} Modal section {% endcomment %}
-	<div class="wt-uploadimages modal fade" id="projectreviewmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="wt-modaldialog modal-dialog" role="document">
-			<div class="wt-modalcontent modal-content">
-				<div class="wt-boxtitle">
-					<h2>Approval and Review</h2>
-				</div>
-				<div class="wt-modalbody modal-body">
-					<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
-						{% comment %} <fieldset> {% endcomment %}
-							<div class="form-group">
-								<textarea class="form-control" id="projectfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
-							</div>
-							<div class="form-group wt-ratingholder">
-								<div class="wt-ratepoints">
-									<div class="counter wt-pointscounter">
-										<input name="approveandrate" type="radio" value="5">5</input>
-									</div>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-									{% comment %} <div class="wt-jrate"></div> {% endcomment %}
+		{% comment %} Modal section for Approval and Review {% endcomment %}
+		<div class="wt-uploadimages modal fade" id="projectreviewmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="wt-modaldialog modal-dialog" role="document">
+				<div class="wt-modalcontent modal-content">
+					<div class="wt-boxtitle">
+						<h2>Approval and Review <i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
+					</div>
+					<div class="wt-boxtitle">
+						<span id="reviewerror-message" style="color:green; text-align:right;"></span>
+					</div>
+					<div class="wt-modalbody modal-body">
+						<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
+							
+								<div class="form-group">
+									<input class="form-control" id="feedbacktitle" name="reviewtitle" value="" placeholder="Add Your title*"></input>
 								</div>
-								<span class="wt-ratingdescription">This Team is a Professional</span>
-							</div>
-							<div class="form-group wt-ratingholder">
-								<div class="wt-ratepoints">
-									<div class="counter wt-pointscounter">
-										<input name="approveandrate" type="radio" value="4">4</input>
-									</div>
-									<i class="fa fa-star fill" style='color:orange'></i>
-									<i class="fa fa-star fill" style='color:orange'></i>
-									<i class="fa fa-star fill" style='color:orange'></i>
-									<i class="fa fa-star fill" style='color:orange'></i>
-									<i class="fa fa-star fill"></i>
-									{% comment %} <div class="wt-jrate"></div> {% endcomment %}
+								<div class="form-group">
+									<textarea class="form-control" id="projectfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
 								</div>
-								<span class="wt-ratingdescription">This Team is Very good</span>
-							</div>
-							<div class="form-group wt-ratingholder">
-								<div class="wt-ratepoints">
-									<div class="counter wt-pointscounter" style='color:white'>
-										<input name="approveandrate" type="radio" checked value="3">3</input>
-									</div>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill"></i>
-										<i class="fa fa-star fill"></i>
-									<div class="wt-jrate"></div>
+								<div class="wt-boxtitle">
+									<h2> Select Rating </h2>
 								</div>
-								<span class="wt-ratingdescription">This Team is Good</span>
-							</div>
-							<div class="form-group wt-ratingholder">
-								<div class="wt-ratepoints">
-									<div class="counter wt-pointscounter">
-										<input name="approveandrate" type="radio" value="2">2</input>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="wt-pointscounter" style='color:white'>
+											<input name="approveandrate" type="radio" value="5"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+										{% comment %} <div class="wt-jrate"></div> {% endcomment %}
 									</div>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill"></i>
-										<i class="fa fa-star fill"></i>
-										<i class="fa fa-star fill"></i>
-									<div class="wt-jrate"></div>
+									<span class="wt-ratingdescription">This Team is a Professional</span>
 								</div>
-								<span class="wt-ratingdescription">This Team is Average</span>
-							</div>
-							<div class="form-group wt-ratingholder">
-								<div class="wt-ratepoints">
-									<div class="counter wt-pointscounter">
-										<input name="approveandrate" type="radio" value="1">1</input>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter">
+											<input name="approveandrate" type="radio" value="4"></input>
+										</div>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill"></i>
+										{% comment %} <div class="wt-jrate"></div> {% endcomment %}
 									</div>
-										<i class="fa fa-star fill" style='color:orange'></i>
-										<i class="fa fa-star fill"></i>
-										<i class="fa fa-star fill"></i>
-										<i class="fa fa-star fill"></i>
-										<i class="fa fa-star fill"></i>
-									<div class="wt-jrate"></div>
+									<span class="wt-ratingdescription">This Team is Very good</span>
 								</div>
-								<span class="wt-ratingdescription">This Team can't be recommended</span>
-							</div>
-							<div class="form-group wt-btnarea">
-								<button id="project-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
-							</div>
-						{% comment %} </fieldset> {% endcomment %}
-					</form>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter" style='color:white'>
+											<input name="approveandrate" type="radio" checked value="3"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										<div class="wt-jrate"></div>
+									</div>
+									<span class="wt-ratingdescription">This Team is Good</span>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter">
+											<input name="approveandrate" type="radio" value="2"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										<div class="wt-jrate"></div>
+									</div>
+									<span class="wt-ratingdescription">This Team is Average</span>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter">
+											<input name="approveandrate" type="radio" value="1"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										<div class="wt-jrate"></div>
+									</div>
+									<span class="wt-ratingdescription">This Team can't be recommended</span>
+								</div>
+								<div class="form-group wt-btnarea">
+									<button id="project-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
+								</div>
+								
+							{% comment %} </fieldset> {% endcomment %}
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>					
+
+		{% comment %} Modal section for Approval and Review {% endcomment %}
+		<div class="wt-uploadimages modal fade" id="projectcancelmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="wt-modaldialog modal-dialog" role="document">
+				<div class="wt-modalcontent modal-content">
+					<div class="wt-boxtitle">
+						<h2>Cancelation<i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
+					</div>
+					<div class="wt-boxtitle">
+						<span id="reviewerror-message" style="color:green; text-align:right;"></span>
+					</div>
+					<div class="wt-modalbody modal-body">
+						<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
+								<div class="form-group">
+									<textarea class="form-control" id="projectfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
+								</div>
+								<div class="form-group wt-btnarea">
+									<button id="project-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
+								</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
 {% endblock %}
 
 
 {% block scripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
 	//TRANSFER OF FUND             
 	$(document).on('click', '#start-work-now', function (e) {
@@ -395,28 +475,39 @@
 
 <script>
 	$(document).on('click', '#project-reviews', function (e) {
-		e.preventDefault();	    
+		e.preventDefault();	
 		
-		$.ajax({
-		type: "POST",
-		url: '{% url "resolution:applicant_review" %}',
-		data: {
-			application: '{{resolution.id}}',
-			message: $('#projectfeedback').val(),
-			rating: $("input[name='approveandrate']:radio:checked").val(),
-			csrfmiddlewaretoken: "{{csrf_token}}",
-			action: 'project-review',
-		},
-		success: function (json) {
-		  console.log(json)
-			//document.getElementById("subTotal").innerHTML = json.subtotal;
-			//document.getElementById("totalDiscount").innerHTML = json.discount;
-			//document.getElementById("totalFees").innerHTML = json.selected_fee;               
-		},
-		error: function (xhr, errmsg, err) {},
-		});
-		
-	});
+		messageBody = $('#projectfeedback').val()
+		ratingBody = $("input[name='approveandrate']:radio:checked").val()
+
+		if(messageBody =='' || ratingBody == ''){
+            swal("Alert!", "All fields are required", "error");
+            return false;
+        }
+        else{
+			$.ajax({
+			type: "POST",
+			url: '{% url "resolution:applicant_review" %}',
+			data: {
+				applicationid: '{{application.id}}',
+				title: $('#feedbacktitle').val(),
+				message: $('#projectfeedback').val(),
+				rating: $("input[name='approveandrate']:radio:checked").val(),
+				csrfmiddlewaretoken: "{{csrf_token}}",
+				action: 'project-review',
+			},
+			success: function (json) {
+			console.log(json)
+				document.getElementById("reviewerror-message").innerHTML = json.success_or_error_message;
+				$('#feedbacktitle').val('')
+				$('#projectfeedback').val('')
+				$("input[name='approveandrate']:radio:checked").val('')
+				             
+			},
+			error: function (xhr, errmsg, err) {},
+			});			
+		}		
+	})		
 	</script>
 
 {% endblock scripts %}

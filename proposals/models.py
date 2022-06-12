@@ -108,16 +108,11 @@ class Proposal(models.Model):
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     dura_converter = models.CharField(_("Duration"), max_length=100, choices=DURATION_CONVERTER, default=ONE_DAY)
     duration = models.DateTimeField(_("Completion In"), blank=True, help_text=_("duration for proposal task to be completed"))
-    discount_price = models.PositiveIntegerField(_("Discount Price"), null=True, blank=True, default=5, help_text=_("discount price must be less than actual price"), validators=[MinValueValidator(5), MaxValueValidator(10000)])
-    discount_code = models.CharField(_("Discount code"), null=True, blank=True, max_length=20, help_text=_("Discount code for customer"))
-    # proposal files
-    video = video = EmbedVideoField(_("Proposal Video"), max_length=2083, help_text=_("Paste Youtube or Vimeo url here"), null=True, blank=True,)
     thumbnail = models.ImageField(_("Proposal Thumbnail"), default='proposal_files/thumbnail.jpg', help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"),upload_to=proposal_images_path, blank=True, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
-    # size is "width x height"
+    progress = models.PositiveIntegerField(_("Proposal Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     published = models.BooleanField(_("Published"), choices=((False, 'Private'), (True, 'Public')), default=False)
-    file_type = models.BooleanField(choices=((False, 'Show Video'), (True, 'Show Image')), default=False)
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="proposalauthor", on_delete=models.CASCADE)
     reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
@@ -140,7 +135,7 @@ class Proposal(models.Model):
 
     def save(self, *args, **kwargs):
         if self.reference is None:
-            self.reference = 'Pp-' + str(uuid4()).split('-')[4]
+            self.reference = 'P-' + str(uuid4()).split('-')[4]
             
         if self.dura_converter == self.ONE_DAY:
             self.duration = one_day()

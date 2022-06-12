@@ -1,4 +1,5 @@
 from email.mime import application
+from turtle import title
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
@@ -59,11 +60,10 @@ class ProjectCompletionFiles(models.Model):
         return f"{self.application.title}'s project is {self.completed}"
 
 
-class ProjectResolutionReview(models.Model):
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='reviewsteam', on_delete=models.CASCADE)
-    project = models.ForeignKey("projects.Project", verbose_name=_("Project Offered"), related_name="reviewproject", on_delete=models.CASCADE)
-    application = models.ForeignKey(ProjectResolution, verbose_name=_("Applicant Review"), related_name="reviewapplication", on_delete=models.CASCADE)
-    message = models.TextField(_("Message"), validators=[MinValueValidator(50), MaxValueValidator(500)])
+class ApplicationReview(models.Model):
+    resolution = models.ForeignKey(ProjectResolution, verbose_name=_("Applicant Review"), related_name="reviewapplication", on_delete=models.CASCADE)
+    title = models.CharField(_("Title"), max_length=100, blank=False, null=False, validators=[MinValueValidator(50)])
+    message = models.TextField(_("Message"), max_length=500, blank=False, null=False, validators=[MinValueValidator(50), MaxValueValidator(500)])
     rating = models.PositiveSmallIntegerField(_("Rating"), default=3)
     status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')))
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)

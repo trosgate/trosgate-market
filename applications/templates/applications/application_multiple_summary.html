@@ -99,7 +99,6 @@
 			success: function (json) {
 				console.log(json)
 				$('.application-item[data-index="' + appid + '"]').remove();
-				//document.getElementById("members-qty").innerHTML = json.member_qty
 				document.getElementById("subtotal").innerHTML = json.subtotal
 			},
 			error: function (xhr, errmsg, err) {}

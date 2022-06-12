@@ -27,12 +27,12 @@
 										</div>
 									<div class="wt-description">
 										<h5>About "{{ teams.title }}" </h5>
-											<span>{{teams.notice|slice:200}} ...</span>
+										<span>{{teams.notice|slice:200}} ...</span>
 									</div>	
 									<div class="wt-rightarea">
-										<div class="wt-btnarea">										
-										<a class="wt-btnarea"><a href="{% url 'teams:teamchatroom' %}" class="btn btn-danger">Group Chat</a>
-										<a class="wt-btnarea"><a href="/" class="btn btn-success">Go Back</a>
+										<div class="wt-btnarea">
+											<a href="{% url 'teams:teamchatroom' %}" class="btn btn-danger">Group Chat</a>
+											<a href="/" class="btn btn-success">Go Back</a>
 										</div>
 										<div class="wt-hireduserstatus">
 											<h4>{{teams.members.count}}</h4><span>Team Members</span>
@@ -42,13 +42,7 @@
 												{% endfor %}
 											</ul>									
 										</div>
-										<div class="wt-hireduserstatus">
-											<h4>{{teams.created_by.get_full_name}}</h4><span>Founder from {{teams.created_by.country.name}}</span>
-											<ul class="wt-hireduserimgs">
-												<li><figure><img src="{{teams.created_by.freelancer.profile_photo.url}}" alt="img description"></figure></li>
-											</ul>									
-										</div>																				
-									</div>			
+									</div>
 								</div>								
 							</div>
 							{% if teams.created_by == request.user %}
@@ -67,7 +61,6 @@
 												<tr>
 			
 													<th>Make Changes</th>
-													<th>Close Team</th>
 			
 												</tr>
 												</thead>
@@ -75,7 +68,6 @@
 			
 												<tr>
 													<td><a href="{{teams.get_team_update_absolute_url}}" class="btn btn-warning">Modify</a></td>
-													<td><a href="{{teams.get_team_delete_absolute_url}}" class="btn btn-danger" data-toggle="modal" data-target="#assignteammodal">Close Team</a></td>
 												</tr>
 			
 												</tbody>
@@ -97,7 +89,7 @@
 										<div class="col-12 col-sm-12 col-md-12 col-lg-12">
 											<div class="card">
 												<div class="card-header">
-													<h5>Team Owner Actions</h5>
+													<h5>10 Recent Applications.<a class="text-red" href="{% url 'applications:freelancer_application'%}">&nbsp; view-all</a></h5>
 												</div>
 					
 												<div class="table-responsive">
@@ -105,10 +97,11 @@
 													<thead>
 													<tr>
 														<th>#</th>
-														<th>Project(s) Applied</th>
-														<th>Date Awarded</th>
-														{% comment %} <th>Assign</th> {% endcomment %}
+														<th>Applicant</th>
+														<th>Application Projects</th>
+														<th>Date</th>
 														<th>Status</th>
+														<th>Detail</th>
 				
 													</tr>
 													</thead>
@@ -116,11 +109,12 @@
 				
 														{% for application in applications %}
 														<tr>
-														<td>{{forloop.counter}}</td> 
-														<td><a href="">{{application.project.title}}</a></td>
-														<td>{{application.created_at|date:"d-m-Y"}}</td>
-														{% comment %} <td><a href="{% url 'teams:assign_project' application.id application.project.slug %}" class="btn btn-success">Assign Me</a></td> {% endcomment %}
-														<td><a href="#" class="btn btn-xs btn-warning">Tracker</a></td>
+															<td>{{forloop.counter}}</td> 
+															<td>{{application.applied_by.short_name|capfirst}}</td>
+															<td>{{application.project.title}}</td>
+															<td>{{application.created_at|date:"d-m-Y"}}</td>
+															<td>{{application.get_status_display}}</td>
+															<td><a href="{% url 'applications:application_detail' application.project.slug %}" class="btn btn-success btn-sm">View Message</a></td>
 														</tr>
 														{% endfor %}
 				
@@ -135,7 +129,7 @@
 								<section class="wt-haslayout wt-dbsectionspace">
 									<div class="wt-freelancerholder wt-rcvproposalholder">
 										<div class="wt-tabscontenttitle">
-											<h2>{{teams.title}} has {{teams.proposals.count}} proposal{{teams.proposals.count|pluralize}}</h2>
+											<h2>{{teams.title}} has {{proposals.count}} proposal{{proposals.count|pluralize}}</h2>
 										</div>									 
 						
 										<div class="row">
@@ -151,23 +145,23 @@
 														<tr>
 					
 															<th>#</th>
-															<th>Title</th>
-															<th>Preview</th>
-															<th>Assign</th>
+															<th>Assigned Proposals</th>
+															<th>assignor</th>
+															<th>assignee</th>
+															<th>Manager</th>
 					
 														</tr>
 														</thead>
 														<tbody>
 					
-															{% for proposal in proposals %}
+															{% for assign in proposal_assigned %}
 															<tr>
 															<td>{{forloop.counter}}</td> 
-															<td><a href="">{{proposal.title}}</a></td>
+															<td>{{assign.proposal.title}}</td>
+															<td>{{assign.assignor.short_name|capfirst}}</td>
+															<td>{{assign.assignee.short_name|capfirst}}</td>
 															<td>
-																<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}" class="btn btn-info">View</a>
-															</td>
-															<td>
-																<a href="{% url 'teams:assign_proposal' proposal.team.slug proposal.slug %}" class="btn btn-success">Assign</a>
+																<a href="{% url 'teams:assign_proposal' assign.proposal.team.slug assign.proposal.slug %}" class="btn btn-success btn-sm">Manage</a>
 															</td>
 															</tr>
 															{% endfor %}
@@ -329,15 +323,10 @@
 									{{assignform.assignee.label}}
 									{{assignform.assignee}}
 								</div>								
-								{% comment %} {% for member in teams.members.all %}
-								<div class="form-group">
-									<a href="#"><i class="fa fa-check-circle"></i> Member: {{member.short_name}}</a>
-								</div>
-								{% endfor %} {% endcomment %}
+								
 								<div class="form-group wt-btnarea">
 									<button type="submit" class="btn btn-success"> Asign Member </button>
 									<button type="submit" class="btn btn-danger"> Cancel </button>
-									{% comment %} <a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a> {% endcomment %}
 								</div>											
 							</form>
 						</div>

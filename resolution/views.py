@@ -9,7 +9,7 @@ from applications.models import Application
 from proposals.models import Proposal
 from account.models import Customer
 from django.http import JsonResponse
-from . models import ProjectResolution, ProjectCompletionFiles, ProjectResolutionReview
+from . models import ProjectResolution, ProjectCompletionFiles, ApplicationReview
 from . forms import ProjectCompletionForm
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from account.permission import user_is_freelancer, user_is_client
@@ -32,7 +32,7 @@ def application_resolution(request, application_id, project_slug):
             resolution = project_resolution.first()
             duration_end_time = resolution.end_time
 
-        if completion_form.is_valid():
+        if resolution and completion_form.is_valid():
             completed_file = completion_form.save(commit=False)
             completed_file.application = resolution
             completed_file.save()
@@ -47,24 +47,10 @@ def application_resolution(request, application_id, project_slug):
             resolution = project_resolution.first()
             duration_end_time = resolution.end_time            
 
-
-    # for files in ProjectCompletionFiles.objects.filter(team=resolution.team):
-    #     attached_files = files.attachment.url
-
-
-    # fill these variables with real values
-    # fl_path = '/media/application/Gladiators/test_file.pdf'
-
-    # filename = ‘downloaded_file_name.extension’
-
-    # fl = open(fl_path, 'r’)
-    # mime_type, _ = mimetypes.guess_type(fl_path)
-    # response = HttpResponse(fl, content_type=mime_type)
-    # response['Content-Disposition'] = "attachment; filename=%s" % filename
-    #     return response
+    client_review = resolution.reviewapplication.all()
     context = {
         "application": application,
-        # "attached_files": attached_files,
+        "client_review": client_review,
         "completion_form": completion_form,
         "duration_end_time": duration_end_time,
         "resolution": resolution,
@@ -88,33 +74,42 @@ def applicant_start_work(request):
         else:
             ProjectResolution.objects.create(application=application, project=project, team=application.team, start_time=datetime.now())
             print('work started')
-        response = JsonResponse({'message': 'It happened'})
+        response = JsonResponse({'message': 'work started'})
         return response
 
 
 login_required
 @user_is_client
 def applicant_review(request):
+    success_or_error_message = ''
+    error_messages = ''
     if request.POST.get('action') == 'project-review':
-        application = int(request.POST.get('application'))
+        application_id = int(request.POST.get('applicationid'))
         rating = int(request.POST.get('rating'))
+        title = str(request.POST.get('title'))
         message = str(request.POST.get('message'))
-        print(message)
-        print(message, rating)
-        print(message, application)
 
-        # res_application = get_object_or_404(ProjectResolution, pk=application)
-        # # ProjectResolutionReview
-        # print(res_application)
+        application = get_object_or_404(ApplicationSale, pk=application_id, purchase__client = request.user, purchase__status = Purchase.SUCCESS)
+        project = get_object_or_404(Project, pk=application.project.id)
+        resolution = get_object_or_404(ProjectResolution, application=application, project=project, team=application.team)
 
-        response = JsonResponse({'message': 'It happened'})
+        reviews = ApplicationReview.objects.filter(resolution=resolution, status=True)
+        if reviews.count() > 0:
+            review = reviews.first()
+            review.application = resolution
+            review.title = title
+            review.message = message
+            review.rating = rating
+            review.status = True
+            review.save()
+            success_or_error_message = 'Your review updated successfully'
+        else:
+            try:
+                ApplicationReview.objects.create(resolution=resolution, title=title, message=message, rating=rating, status=True)
+                success_or_error_message = 'Review received Successfully'
+            except Exception as e:
+                error_messages = str(e)
+                success_or_error_message = f'Ooops! {error_messages}'
+
+        response = JsonResponse({'success_or_error_message': success_or_error_message})
         return response
-
-
-
-
-    # days = ''
-    # hours = ''
-    # minutes = ''
-    # seconds = ''
-    # duration = ''

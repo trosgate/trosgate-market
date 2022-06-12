@@ -133,6 +133,7 @@ def application_multiple_summary(request):
 @user_is_client
 def add_application(request):
     applicant_box = ApplicationAddon(request)
+    applicant_count = applicant_box.__len__()
     if request.POST.get('action') == 'accept-applicant':
         project_id = int(request.POST.get('projectid'))
         application_id = int(request.POST.get('applicationid'))
@@ -147,7 +148,7 @@ def add_application(request):
         message = 'The applicant was accepted successfully'
         app_status = application.get_status_display()
         print(app_status)
-        response = JsonResponse({'message': message, 'status': app_status})
+        response = JsonResponse({'message': message, 'app_status': app_status, 'applicant_count':applicant_count})
         return response
 
 
