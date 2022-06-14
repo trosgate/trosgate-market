@@ -8,7 +8,7 @@
             <div class="row justify-content-md-center">
                 <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
                     <div class="wt-innerbannercontent">
-                        <div class="wt-title"><h2>Create Proposal</h2></div>
+                        <div class="wt-title"><h2>Modify Proposal</h2></div>
                         <ol class="wt-breadcrumb">
                             <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
                             <li class="wt-active">Introduction</li>
@@ -44,20 +44,28 @@
                             <div class="wt-dashboardboxcontent">                                                               
 
                             <form method='POST' action=''>{% csrf_token %}
-                                                           
+                                
+                                {% if proposalformone.errors %}
+                                <div class="alert alert-danger text-center" role="alert">
+                                    Ooop! form error occured. Please check below and correct
+                                </div>
+                                {% endif %}      
                                 <div class="wt-jobdescription wt-tabsinfo">
                                     <div class="wt-jobdetails wt-tabsinfo">
                                         <div class="wt-tabscontenttitle">
                                             <h2>Introduction</h2>
                                         </div>      
                                         <div class="form-row">
+                                            
                                             <div class="form-group">
                                                 {{proposalformone.title.label}}
                                                 {{proposalformone.title}}
+                                                <span style="color:red;" role="alert">{{ proposalformone.title.errors}}</span>
                                             </div> 
                                             <div class="form-group">
                                                 {{proposalformone.preview.label}}
                                                 {{proposalformone.preview}}
+                                                <span style="color:red;" role="alert">{{ proposalformone.preview.errors}}</span>
                                             </div>
                                         </div> 
                                     </div>  
@@ -69,10 +77,12 @@
                                             <div class="form-group">
                                                 {{proposalformone.category.label}}
                                                 {{proposalformone.category}}
+                                                <span style="color:red;" role="alert">{{ proposalformone.category.errors}}</span>
                                             </div>
                                             <div class="form-group">
                                                 {{ proposalformone.skill.label}}
                                                 <select class="chosen-select Skills"{{ proposalformone.skill}}></select>
+                                                <span style="color:red;" role="alert">{{ proposalformone.skill.errors}}</span>
                                             </div>
                                         </div>
                                     </div>

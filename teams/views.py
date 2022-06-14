@@ -42,8 +42,7 @@ def send_email_to_all_users(request):
 # Instead of hard-coding tasks,
 # I want Admin to have flexibility to schedule without coding skill required
 def Admin_email_scheduler(request):
-    schedule, created = CrontabSchedule.objects.get_or_create(
-        hour=21, minute=20)
+    schedule, created = CrontabSchedule.objects.get_or_create(hour=21, minute=20)
     task = PeriodicTask.objects.create(
         crontab=schedule, name='mail_schedule_' + create_random_code()[:5], task='teams.tasks.email_all_users')
     return HttpResponse('completed')
@@ -52,8 +51,7 @@ def Admin_email_scheduler(request):
 @login_required
 @user_is_freelancer
 def team(request):
-    team = Team.objects.filter(
-        status=Team.ACTIVE, pk=request.user.freelancer.active_team_id)
+    team = Team.objects.filter(status=Team.ACTIVE, pk=request.user.freelancer.active_team_id)
     # teams = team.teams.all()
 
     context = {

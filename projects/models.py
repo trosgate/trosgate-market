@@ -155,8 +155,8 @@ class Project(models.Model):
     amount = models.IntegerField(_("Budget"), default=5, validators=[MinValueValidator(5), MaxValueValidator(50000)], error_messages={"name": {"max_length": _("Set the budget amount (eg.1000) excluding the currency sign")}},)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    dura_converter = models.CharField(_("Duration"), max_length=100, choices=PROJECT_DURATION, default = ONE_DAY)
-    duration = models.DateTimeField(_("Deadline"), blank=True, help_text=_("deadline for project"))
+    dura_converter = models.CharField(_("Deadline"), max_length=100, choices=PROJECT_DURATION, default = ONE_DAY)
+    duration = models.DateTimeField(_("Duration"), null=True, blank=True, help_text=_("deadline for project"))
     completion_time = models.CharField(_("Completion In"), max_length=100, choices=PROJECT_COMPLETION, default = ONE_DAY)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Project Author"), related_name="project", on_delete=models.CASCADE)
     published = models.BooleanField(_("Featured"), choices = ((False,'Unfeature'), (True, 'Feature')), default = False)
@@ -173,27 +173,7 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         if self.reference is None:
-            self.reference = 'Pj-' + str(uuid4()).split('-')[4]
-        # if self.dura_converter == self.ONE_DAY:
-        #     self.duration = one_day()
-        # if self.dura_converter == self.TWO_DAYS:
-        #     self.duration = two_days()
-        # if self.dura_converter == self.THREE_DAYS:
-        #     self.duration = three_days()
-        # if self.dura_converter == self.FOUR_DAYS:
-        #     self.duration = four_days()
-        # if self.dura_converter == self.FIVE_DAYS:
-        #     self.duration = five_days()
-        # if self.dura_converter == self.SIX_DAYS:
-        #     self.duration = six_days()
-        # if self.dura_converter == self.ONE_WEEK:
-        #     self.duration = one_week()
-        # if self.dura_converter == self.TWO_WEEK:
-        #     self.duration = two_weeks()
-        # if self.dura_converter == self.THREE_WEEK:
-        #     self.duration = three_weeks()
-        # if self.dura_converter == self.ONE_MONTH:
-        #     self.duration = one_month()
+            self.reference = 'P' + str(uuid4()).split('-')[4]
         super(Project, self).save(*args, **kwargs)
 
 
@@ -223,12 +203,6 @@ class Project(models.Model):
 
     def get_reopen_project_absolute_url(self):
         return reverse('projects:reopen_project', args=[self.slug])
-
-    # def get_discount(self):
-    #     discounts = 0
-    #     for discount in self.applicantprojectapplied.all():
-    #         discounts = discount.discount_offered
-    #     return discounts
 
 
 

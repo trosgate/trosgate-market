@@ -107,7 +107,6 @@ class Proposal(models.Model):
     service_level = models.CharField(_("Service level"), max_length=20, choices=SERVICE_LEVEL, default=BASIC, error_messages={"name": {"max_length": _("Service Level field is required")}},)
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     dura_converter = models.CharField(_("Duration"), max_length=100, choices=DURATION_CONVERTER, default=ONE_DAY)
-    duration = models.DateTimeField(_("Completion In"), blank=True, help_text=_("duration for proposal task to be completed"))
     thumbnail = models.ImageField(_("Proposal Thumbnail"), default='proposal_files/thumbnail.jpg', help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"),upload_to=proposal_images_path, blank=True, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     progress = models.PositiveIntegerField(_("Proposal Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
@@ -136,28 +135,6 @@ class Proposal(models.Model):
     def save(self, *args, **kwargs):
         if self.reference is None:
             self.reference = 'P-' + str(uuid4()).split('-')[4]
-            
-        if self.dura_converter == self.ONE_DAY:
-            self.duration = one_day()
-        elif self.dura_converter == self.TWO_DAYS:
-            self.duration = two_days()
-        elif self.dura_converter == self.THREE_DAYS:
-            self.duration = three_days()
-        elif self.dura_converter == self.FOUR_DAYS:
-            self.duration = four_days()
-        elif self.dura_converter == self.FIVE_DAYS:
-            self.duration = five_days()
-        elif self.dura_converter == self.SIX_DAYS:
-            self.duration = six_days()
-        elif self.dura_converter == self.ONE_WEEK:
-            self.duration = one_week()
-        elif self.dura_converter == self.TWO_WEEK:
-            self.duration = two_weeks()
-        elif self.dura_converter == self.THREE_WEEK:
-            self.duration = three_weeks()
-        elif self.dura_converter == self.ONE_MONTH:
-            self.duration = one_month()
-
         super(Proposal, self).save(*args, **kwargs)
 
     # def num_tasks_todo(self):
@@ -184,108 +161,38 @@ class Proposal(models.Model):
     #     return thumbnail
 
 
-# class OfferContract(models.Model):
+class ProposalChat(models.Model):
+    team = models.ForeignKey('teams.Team', verbose_name=_("Proposal Team"), related_name='proposalchats', on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='proposalsender', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name='proposalreceiver', on_delete=models.CASCADE)
+    content = models.TextField()
+    sent_on = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
-class OfferContract(models.Model):
-    # Invoice Duration
-    ONE_DAY = "01 day"
-    TWO_DAYS = "02 days"
-    THREE_DAYS = "03 days"
-    FOUR_DAYS = "04 days"
-    FIVE_DAYS = "05 days"
-    SIX_DAYS = "06 days"
-    ONE_WEEK = "01 week"
-    TWO_WEEK = "02 week"
-    THREE_WEEK = "03 week"
-    ONE_MONTH = "01 month"
-    TWO_MONTH = "02 month"
-    THREE_MONTH = "03 month"
-    FOUR_MONTH = "04 month"
-    FIVE_MONTH = "05 month"
-    SIX_MONTH = "06 month"
-    INVOICE_DURATION = (
-        (ONE_DAY, _("01 Day")),
-        (TWO_DAYS, _("02 Days")),
-        (THREE_DAYS, _("03 Days")),
-        (FOUR_DAYS, _("04 Days")),
-        (FIVE_DAYS, _("05 Days")),
-        (SIX_DAYS, _("06 Days")),
-        (ONE_WEEK, _("01 Week")),
-        (TWO_WEEK, _("02 Weeks")),
-        (THREE_WEEK, _("03 Weeks")),
-        (ONE_MONTH, _("01 Month")),
-        (TWO_MONTH, _("02 Months")),
-        (THREE_MONTH, _("03 Months")),
-        (FOUR_MONTH, _("04 Months")),
-        (FIVE_MONTH, _("05 Months")),
-        (SIX_MONTH, _("06 Months")),
-    )
-    #
-    # Invoice States
-    ACTIVE = 'active'
-    OVERDUE = 'overdue'
-    PAID = 'paid'
-    STATUS = (
-        (ACTIVE, _('Active')),
-        (OVERDUE, _('Overdue')),
-        (PAID, _('Paid')),
-    )
-    #
+    class Meta:
+        ordering = ['sent_on']
 
-    proposal = models.ForeignKey(Proposal, verbose_name=_(
-        "Proposal"), related_name="offercontract", on_delete=models.CASCADE)
-    team = models.ForeignKey('teams.Team', verbose_name=_(
-        "Team"), related_name="offercontract", on_delete=models.CASCADE)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(
-        "Creator"), null=True, blank=True, related_name="offercontract", on_delete=models.SET_NULL)
-    date_created = models.DateTimeField(blank=True, null=True)
-    last_updated = models.DateTimeField(blank=True, null=True)
-    payment_duration = models.CharField(
-        choices=INVOICE_DURATION, default=ONE_DAY, max_length=20)
-    status = models.CharField(choices=STATUS, default=ACTIVE, max_length=100)
-    notes = models.TextField(null=True, blank=True, max_length=500)
+    def __str__(self):
+        return self.content[:50] + '...'
 
-    reference = models.CharField(
-        unique=True, null=True, blank=True, max_length=100)
-    slug = models.SlugField(max_length=100, blank=True, null=True)
-    date_created = models.DateTimeField(blank=True, null=True)
-    last_updated = models.DateTimeField(blank=True, null=True)
 
-    line_one = models.CharField(
-        _('Product/Service One'), max_length=120, default=None, blank=True, null=True)
-    line_one_quantity = models.IntegerField(
-        _('Quantity'), default=0, blank=True, null=True)
-    line_one_unit_price = models.IntegerField(
-        _('Unit Price'), default=0, blank=True, null=True)
-    line_one_total_price = models.IntegerField(
-        _('Total'), default=0, blank=True, null=True)
 
-    line_two = models.CharField(
-        'Product/Service Two', max_length=120, default=None, blank=True, null=True)
-    line_two_quantity = models.IntegerField(
-        _('Quantity'), default=0, blank=True, null=True)
-    line_two_unit_price = models.IntegerField(
-        _('Unit Price'), default=0, blank=True, null=True)
-    line_two_total_price = models.IntegerField(
-        _('Total'), default=0, blank=True, null=True)
 
-    line_three = models.CharField(
-        'Product/Service Three', max_length=120, default=None, blank=True, null=True)
-    line_three_quantity = models.IntegerField(
-        _('Quantity'), default=0, blank=True, null=True)
-    line_three_unit_price = models.IntegerField(
-        _('Unit Price'), default=0, blank=True, null=True)
-    line_three_total_price = models.IntegerField(
-        _('Total'), default=0, blank=True, null=True)
 
-    line_four = models.CharField(
-        'Product/Service Four', max_length=120, default=None, blank=True, null=True)
-    line_four_quantity = models.IntegerField(
-        _('Quantity'), default=0, blank=True, null=True)
-    line_four_unit_price = models.IntegerField(
-        _('Unit Price'), default=0, blank=True, null=True)
-    line_four_total_price = models.IntegerField(
-        _('Total'), default=0, blank=True, null=True)
 
-    grand_total = models.IntegerField(
-        _('Grand Total'), default=0, blank=True, null=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

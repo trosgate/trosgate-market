@@ -1,0 +1,172 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+
+<main id="wt-main" class="wt-main wt-haslayout">
+    <!--Register Form Start-->
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-9">
+                <div class="wt-dashboardbox wt-messages-holder">
+                    <div class="wt-dashboardboxtitle">
+                        <h2>Messages</h2>
+                    </div>
+                    <div class="wt-dashboardboxtitle wt-titlemessages">
+                        <a href="javascript:void(0);" class="wt-back"><i class="ti-arrow-left"></i></a>
+                        <div class="wt-userlogedin">
+                            <figure class="wt-userimg">
+                                <img src="{% static 'images/user-img.jpg' %}" alt="image description">
+                            </figure>
+                            <div class="wt-username">
+                                <h3><i class="fa fa-check-circle"></i> Louanne Mattioli</h3>
+                                <span>Amento Tech</span>
+                            </div>
+                        </div>
+                        <a href="javascript:void(0);" class="wt-viewprofile">View Profile</a>
+                    </div>
+                    <div class="wt-dashboardboxcontent wt-dashboardholder wt-offersmessages">
+                        <ul>
+                            <li>
+                                <form class="wt-formtheme wt-formsearch">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <input type="text" name="Location" class="form-control" placeholder="Search Here">
+                                            <a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                <div class="wt-verticalscrollbar wt-dashboardscrollbar">
+                                    <div class="wt-ad wt-dotnotification wt-active">
+                                        <figure><img src="{% static 'images/messages/img-01.jpg' %}" alt="image description"></figure>
+                                        <div class="wt-adcontent">
+                                            <h3>Reta Milnes </h3>
+                                            <span>Consectetur adipisicing elit sed do...</span>
+                                        </div>
+                                    </div>
+                                    <div class="wt-ad wt-dotnotification">
+                                        <figure><img src="{% static 'images/messages/img-02.jpg' %}" alt="image description"></figure>
+                                        <div class="wt-adcontent">
+                                            <h3>Jed Loeffler</h3>
+                                            <span>Consectetur adipisicing elit sed do...</span>
+                                        </div>
+                                    </div>
+                                    <div class="wt-ad wt-dotnotification">
+                                        <figure><img src="{% static 'images/messages/img-03.jpg' %}" alt="image description"></figure>
+                                        <div class="wt-adcontent">
+                                            <h3>Jovan Mery</h3>
+                                            <span>Consectetur adipisicing elit sed do...</span>
+                                        </div>
+                                    </div>
+                                    <div class="wt-ad">
+                                        <figure><img src="{% static 'images/messages/img-04.jpg' %}" alt="image description"></figure>
+                                        <div class="wt-adcontent">
+                                            <h3>Nichelle Yelvington</h3>
+                                            <span>Consectetur adipisicing elit sed do...</span>
+                                        </div>
+                                    </div>
+                                    <div class="wt-ad">
+                                        <figure><img src="{% static 'images/messages/img-05.jpg' %}" alt="image description"></figure>
+                                        <div class="wt-adcontent">
+                                            <h3>Bob Grossman</h3>
+                                            <span>Consectetur adipisicing elit sed do...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="wt-chatarea">
+                                    <div class="wt-messages wt-verticalscrollbar wt-dashboardscrollbar">
+                                        <div class="wt-offerermessage">
+                                            <figure><img src="images/messages/img-12.jpg" alt="image description"></figure>
+                                            <div class="wt-description">
+                                                <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
+                                                <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
+                                                <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
+                                                <div class="clearfix"></div>
+                                                <time datetime="2017-08-08">January 12th, 2011</time>
+                                            </div>
+                                        </div>
+                                        <div class="wt-memessage wt-readmessage">
+                                            <figure><img src="images/messages/img-11.jpg" alt="image description"></figure>
+                                            <div class="wt-description">
+                                                <p>Eiusmod tempor incididunt labore et dolore magna aliqiu enim ad minim veniam qiuisru exercitation ullamco laborisen nisi ut aliquip exea.</p>
+                                                <div class="clearfix"></div>
+                                                <p><a href="https://themeforest.net/" target="_blank">https://themeforest.net</a></p>
+                                                <div class="clearfix"></div>
+                                                <p>It that ok?</p>
+                                                <div class="clearfix"></div>
+                                                <time datetime="2017-08-08">Jun 28, 2017 09:30</time>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                        <div class="wt-offerermessage">
+                                            <figure><img src="images/messages/img-12.jpg" alt="image description"></figure>
+                                            <div class="wt-description">
+                                                <div class="clearfix"></div>
+                                                <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
+                                                <div class="clearfix"></div>
+                                                <time datetime="2017-08-08">January 12th, 2011</time>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                        <div class="wt-memessage wt-readmessage">
+                                            <figure><img src="images/messages/img-11.jpg" alt="image description"></figure>
+                                            <div class="wt-description">
+                                                <div class="clearfix"></div>
+                                                <p>Eiusmod tempor incididunt labore et dolore magna aliqiu enim ad minim veniam qiuisru exercitation ullamco laborisen nisi ut aliquip exea.</p>
+                                                <div class="clearfix"></div>
+                                                <p><a href="https://themeforest.net/" target="_blank">https://themeforest.net</a></p>
+                                                <div class="clearfix"></div>
+                                                <p>It that ok?</p>
+                                                <div class="clearfix"></div>
+                                                <time datetime="2017-08-08">Jun 28, 2017 09:30</time>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wt-replaybox">
+                                        <div class="form-group">
+                                            <textarea class="form-control" name="reply" placeholder="Type message here"></textarea>
+                                        </div>
+                                        <div class="wt-iconbox">
+                                            <i class="lnr lnr-thumbs-up"></i>
+                                            <i class="lnr lnr-thumbs-down"></i>
+                                            <i class="lnr lnr-smile"></i>
+                                            <a href="javascript:void(0);" class="wt-btnsendmsg">Send</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
+                <div class="wt-dashboardbox wt-messagebox">
+                    <span class="wt-featuredtag"><img src="{% static 'images/featured.png' %}" alt="img description" data-tipso="Plus Member" class="template-content tipso_style"></span>
+                    <div class="wt-dashboardboxcontent">
+                        <div class="wt-userprofile">
+                            <figure>
+                                <img src="{% static 'images/profile/img-02.jpg' %}" alt="img description">
+                                <div class="wt-userdropdown wt-online">
+                                </div>
+                            </figure>
+                            <div class="wt-title">
+                                <h3><i class="fa fa-check-circle"></i> Valentine Mehring</h3>
+                                <span>5.0/5 <a class="javascript:void(0);">(860 Feedback)</a> <br>Member since May 30, 2013 <br><a href="javascript:void(0);">@valentine20658</a></span>
+                            </div>
+                        </div>
+                        <div class="wt-applyfilters">
+                            <span>Adpsicing elit sed do eiusmod tempor<br> incididunt ut labore et dolore.</span>
+                            <a href="javascript:void(0);" class="wt-btn">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

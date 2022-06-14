@@ -15,10 +15,6 @@ urlpatterns = [
     path('restore/<str:short_name>/<slug:proposal_slug>', views.reactivate_archive_proposal, name='reactivate_archive_proposal'),
     path('<str:short_name>/<slug:proposal_slug>', views.proposal_detail, name='proposal_detail'),
     path('preview/<str:short_name>/<slug:proposal_slug>', views.proposal_preview, name='proposal_preview'),
-    path('modify/<str:short_name>/<slug:proposal_slug>', views.update_proposal, name='update_proposal'),
-
-    # path('invoice/client', views.create_invoice_client, name='invoice_client'),
-    path('create-invoice/', views.add_invoice, name='create_invoice'),
 
     # Proposal creation Steps
     path('introduction/', views.proposal_step_one, name='proposal_step_one'),
@@ -26,6 +22,13 @@ urlpatterns = [
     path('faq/', views.proposal_step_three, name='proposal_step_three'),
     path('attribute/', views.proposal_step_four, name='proposal_step_four'),
 
+    path('introduction/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_one, name='modify_proposal_step_one'),
+    path('background/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_two, name='modify_proposal_step_two'),
+    path('faq/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_three, name='modify_proposal_step_three'),
+    path('attribute/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_four, name='modify_proposal_step_four'),
+
+    # Proposal chats   
+    path('chats/', views.proposal_chat_messages, name='proposal_chat_messages'),
 
    
 ]

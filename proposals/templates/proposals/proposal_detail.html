@@ -266,11 +266,11 @@
 										</div>
 										<div class="wt-companysdetails">
 											<figure class="wt-companysimg">
-												<img src="{% static 'images/company/img-01.jpg'%}" alt="img description">
+												<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" alt="img description">
 											</figure>
 											<div class="wt-companysinfo">
-												<figure><img src="{% static 'images/company/img-01.png'%}" alt="img description"></figure>
-												<div class="wt-title">
+												<figure><img src="{% firstof proposal.created_by.freelancer.profile_photo.url proposal.created_by.freelancer.banner_photo.url proposal.thumbnail.url %}" alt="img description"></figure>
+												<div class="wt-title"> 
 													<a href="javascript:void(0);">
 														<i class="fa fa-check-circle"> {{proposal.created_by.get_full_name|capfirst}}</i>
 													</a>

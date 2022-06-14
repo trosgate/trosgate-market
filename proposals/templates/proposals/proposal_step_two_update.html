@@ -53,10 +53,12 @@
                                         <div class="form-group">
                                             {{proposalformtwo.media|safe}}
                                             {{proposalformtwo.description}}
+                                            <span style="color:red;" role="alert">{{ proposalformtwo.description.errors}}</span>
                                         </div>
                                         <div class="form-group">
                                             {{proposalformtwo.sample_link.label}}
-                                            {{proposalformtwo.sample_link}}													
+                                            {{proposalformtwo.sample_link}}
+                                            <span style="color:red;" role="alert">{{ proposalformtwo.sample_link.errors}}</span>													
                                         </div>
                                     </div>
                                     </div>

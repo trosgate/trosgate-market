@@ -166,10 +166,8 @@ class Invitation(models.Model):
 
 
 class TeamChat(models.Model):
-    team = models.ForeignKey(Team, verbose_name=_(
-        "Chat Team"), related_name='teamchats', on_delete=models.CASCADE)
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(
-        "Sender"), related_name='teamsender', on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, verbose_name=_("Chat Team"), related_name='teamchats', on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='teamsender', on_delete=models.CASCADE)
     content = models.TextField()
     sent_on = models.DateTimeField(auto_now_add=True)
     is_sent = models.BooleanField(default=False)

@@ -12,8 +12,8 @@
 						<h2>Manage My Proposals</h2>
 					</div>
 					<div class="wt-dashboardboxcontent wt-jobdetailsholder">
-						<div class="wt-freelancerholder">
-							<a href="{% url 'proposals:create_proposal' %}"><button type="button" class="btn btn-outline-danger float-right"><i class="fa fa-folder-open" aria-hidden="true"></i> Create Proposal</button></a>
+						<div class="wt-freelancerholder"> 
+							<a href="{% url 'proposals:proposal_step_one' %}"><button type="button" class="btn btn-outline-danger float-right"><i class="fa fa-folder-open" aria-hidden="true"></i> Create Proposal</button></a>
 							<div class="wt-tabscontenttitle">
 								<h2>Active Proposals</h2>
 							</div>
@@ -42,7 +42,7 @@
 
 											{% if team and proposals.status == 'active' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fa fa-info"></i> Details</a>
-											<a href="{% url 'proposals:update_proposal' proposals.created_by.short_name proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a></div>
+											<a href="{% url 'proposals:modify_proposal_step_one' proposals.id proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a></div>
 											{% elif team and proposals.status == 'review' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fas fa-spinner fa-spin"></i> Details</a></div>
 											{% elif team and proposals.status == 'archived' %}
@@ -50,7 +50,7 @@
 											<div class="wt-btnarea"><a href="{% url 'proposals:reactivate_archive_proposal' proposals.created_by.short_name proposals.slug %}" class="btn btn-danger"><i class="fa fa-window-restore"></i> Restore</a></div>
 											{% elif team and proposals.status == 'modify' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fa fa-info"></i> Details</a></div>
-											<div class="wt-btnarea"><a href="{% url 'proposals:update_proposal' proposals.created_by.short_name proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a></div>
+											<div class="wt-btnarea"><a href="{% url 'proposals:modify_proposal_step_one' proposals.id proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a></div>
 											{% endif %}
 											
 											<div class="wt-hireduserstatus">

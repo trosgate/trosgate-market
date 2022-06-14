@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Proposal
 from teams.models import Team
 from django.contrib.auth.decorators import login_required
-from .forms import ProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalCreationForm
+from .forms import ProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalChatForm
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -13,8 +13,6 @@ from account.permission import user_is_freelancer
 from general_settings.models import Category, ProposalGuides
 from datetime import datetime, timezone, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import OfferContractForm
-from .models import OfferContract
 from teams.models import Team
 from django.utils.text import slugify
 from django.contrib import auth, messages
@@ -218,6 +216,100 @@ def proposal_step_four(request):
     return render(request, 'proposals/proposal_step_four.html', context)
 
 
+@login_required
+@user_is_freelancer
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def modify_proposal_step_one(request, proposal_id, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
+
+    proposalformone = ProposalStepOneForm(request.POST, instance=proposal)
+
+    if proposalformone.is_valid():
+        proposalformone.save()
+        
+
+        return redirect("proposals:modify_proposal_step_two", proposal_id=proposal.id, proposal_slug=proposal.slug)
+
+    else:
+        proposalformone = ProposalStepOneForm(instance = proposal)           
+
+    context = {
+        'proposalformone': proposalformone,
+    }
+    return render(request, 'proposals/proposal_step_one_update.html', context)
+
+
+@login_required
+@user_is_freelancer
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def modify_proposal_step_two(request, proposal_id, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
+
+    proposalformtwo = ProposalStepTwoForm(request.POST, instance=proposal)
+
+    if proposalformtwo.is_valid():
+        proposalformtwo.save()
+
+        return redirect("proposals:modify_proposal_step_three", proposal_id=proposal.id, proposal_slug=proposal.slug)
+
+    else:
+        proposalformtwo = ProposalStepTwoForm(instance = proposal)           
+
+    context = {
+        'proposalformtwo': proposalformtwo,
+    }
+    return render(request, 'proposals/proposal_step_two_update.html', context)
+
+
+@login_required
+@user_is_freelancer
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def modify_proposal_step_three(request, proposal_id, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
+
+    proposalformthree = ProposalStepThreeForm(request.POST, instance=proposal)
+
+    if proposalformthree.is_valid():
+        proposalformthree.save()
+
+        return redirect("proposals:modify_proposal_step_four", proposal_id=proposal.id, proposal_slug=proposal.slug)
+
+    else:
+        proposalformthree = ProposalStepThreeForm(instance = proposal)           
+
+    context = {
+        'proposalformthree': proposalformthree,
+    }
+    return render(request, 'proposals/proposal_step_three_update.html', context)
+
+
+@login_required
+@user_is_freelancer
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def modify_proposal_step_four(request, proposal_id, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
+
+    proposalformfour = ProposalStepFourForm(request.POST, request.FILES, instance=proposal)
+
+    if proposalformfour.is_valid():
+        proposalformfour.save()
+
+        messages.success(request, 'The Changes were saved successfully!')
+
+        return redirect("proposals:active_proposal")
+
+    else:
+        proposalformfour = ProposalStepFourForm(instance = proposal)           
+
+    context = {
+        'proposalformfour': proposalformfour,
+    }
+    return render(request, 'proposals/proposal_step_four_update.html', context)
+
 
 #This page shows proposals with review status
 @login_required
@@ -244,32 +336,6 @@ def active_proposal(request):
         'proposal':proposal,
     }
     return render(request, 'proposals/active_proposal.html', context)
-
-
-@login_required
-@user_is_freelancer
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def update_proposal(request, short_name, proposal_slug):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, team=team, created_by__short_name=short_name,  slug=proposal_slug)
-
-    if request.method == 'POST':
-        proposalform = ProposalCreationForm(request.POST, request.FILES, instance=proposal)
-        if proposalform.is_valid():
-            proposalform.save()
-            
-
-            messages.success(request, 'The Changes were saved successfully!')
-
-            return redirect('proposals:active_proposal')
-
-    else:
-        proposalform = ProposalCreationForm(instance=proposal)
-    context = {
-        "proposalform": proposalform,
-        'proposals':proposal,
-    }
-    return render(request, 'proposals/update_proposal.html', context)
 
 
 @login_required
@@ -386,61 +452,16 @@ def proposal_detail(request, short_name, proposal_slug):
 
 
 
-# def create_invoice_client(request):
-#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-#     invoice_client = ClientInvoice.objects.filter(team=team)
+@login_required
+@user_is_freelancer
+def proposal_chat_messages(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
+    chats = team.proposalchats.all() #.filter(status = Proposal.ACTIVE)
 
-#     if request.method == 'POST':
-#         invoiceclientform = ClientInvoiceCreationForm(request.POST)
-#         if invoiceclientform.is_valid():
-#             invoiceclient = invoiceclientform.save(commit=False)
-#             invoiceclient.created_by = request.user
-#             invoiceclient.team = team
-#             invoiceclient.save()
-
-#             messages.success(request, 'The client was added successfully!')
-#     else:
-#         invoiceclientform = ClientInvoiceCreationForm()
-#     context ={
-#         'invoiceclientform':invoiceclientform,
-#         'team':team,
-#         'invoice_client':invoice_client,
-#         'invoice_client':invoice_client,
-#     }
-#     return render (request, 'proposals/create_invoice_client.html', context )    
-           
-
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def add_invoice(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    
-    invoiceform = OfferContractForm(team, request.POST)
-    # invoiceclientform = ClientInvoiceCreationForm(request.POST)
-
-    # if request.method == 'POST' and invoiceclientform.is_valid():
-    #         invoiceclient = invoiceclientform.save(commit=False)
-    #         invoiceclient.created_by = request.user
-    #         invoiceclient.team = team
-    #         invoiceclient.save()
-    
-    if request.method == 'POST':
-        if invoiceform.is_valid():
-            new_invoice = invoiceform.save(commit=False)
-            new_invoice.created_by = request.user
-            new_invoice.team = team
-            new_invoice.slug = slugify(new_invoice.client.name)
-            new_invoice.save()
-
-            messages.success(request, 'The invoice was created successfully!')
-
-    else:
-        invoiceform = OfferContractForm(team)
-    context ={
-        'invoiceform':invoiceform,
-        # 'invoiceclientform':invoiceclientform,
+    context = {
         'team':team,
+        'chats':chats,
     }
-    return render (request, 'proposals/create_invoice.html', context )            
+    return render(request, 'proposals/chat_messages.html', context)
 
-
-#
+    # ProposalChatForm

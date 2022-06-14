@@ -77,11 +77,18 @@
 													{{projectform.dura_converter}}
 													<span style="color:red;" role="alert">{{ projectform.dura_converter.errors}}</span>
 												</div>									
+
 												<div class="form-group form-group-half">
-													{{projectform.feature.label}}
-													{{projectform.feature}}
-													<span style="color:red;" role="alert">{{ projectform.feature.errors}}</span>
-												</div>										
+													{{projectform.rating.label}}
+													{{projectform.rating}}
+													<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>			
+												</div>	
+
+												<div class="form-group">
+													{{projectform.amount.label}}
+													{{projectform.amount}}
+													<span style="color:red;" role="alert">{{ projectform.amount.errors}}</span>			
+												</div>
 											</div>
 											<div class="wt-jobdetails wt-tabsinfo">
 												<div class="wt-tabscontenttitle">
@@ -107,18 +114,7 @@
 													<select class="chosen-select Skills" {{ projectform.project_skill}}></select>														
 													<span style="color:red;" role="alert">{{ projectform.project_skill.errors}}</span>
 												</div>
-
-												<div class="form-group form-group-half wt-formwithlabel">
-													{{projectform.rating.label}}
-													{{projectform.rating}}
-													<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>			
-												</div>	
-
-												<div class="form-group form-group-half wt-formwithlabel">
-													{{projectform.amount.label}}
-													{{projectform.amount}}
-													<span style="color:red;" role="alert">{{ projectform.amount.errors}}</span>			
-												</div>																																									
+																																									
 											</div>
 									</div>
 								</div>
