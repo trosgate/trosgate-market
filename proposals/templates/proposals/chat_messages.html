@@ -13,19 +13,23 @@
                     <div class="wt-dashboardboxtitle">
                         <h2>Messages</h2>
                     </div>
+                    
                     <div class="wt-dashboardboxtitle wt-titlemessages">
                         <a href="javascript:void(0);" class="wt-back"><i class="ti-arrow-left"></i></a>
                         <div class="wt-userlogedin">
                             <figure class="wt-userimg">
-                                <img src="{% static 'images/user-img.jpg' %}" alt="image description">
+                                <img src="{{chat.team.created_by.freelancer.profile_photo.url}}" alt="image description">
                             </figure>
+                            
                             <div class="wt-username">
-                                <h3><i class="fa fa-check-circle"></i> Louanne Mattioli</h3>
+                                <h3><i class="fa fa-check-circle"></i> {{chat.team.title}}</h3>
                                 <span>Amento Tech</span>
                             </div>
+                            
                         </div>
                         <a href="javascript:void(0);" class="wt-viewprofile">View Profile</a>
                     </div>
+                    
                     <div class="wt-dashboardboxcontent wt-dashboardholder wt-offersmessages">
                         <ul>
                             <li>
@@ -38,13 +42,17 @@
                                     </fieldset>
                                 </form>
                                 <div class="wt-verticalscrollbar wt-dashboardscrollbar">
+                                    {% comment %} {% if chats %} {% endcomment %}
+                                    {% for chat in chats %}
                                     <div class="wt-ad wt-dotnotification wt-active">
-                                        <figure><img src="{% static 'images/messages/img-01.jpg' %}" alt="image description"></figure>
+                                        <figure><img src="{{chat.team.created_by.freelancer.profile_photo.url}}" alt="image description"></figure>
                                         <div class="wt-adcontent">
-                                            <h3>Reta Milnes </h3>
+                                            <h3>{{chat.team.title}} </h3>
                                             <span>Consectetur adipisicing elit sed do...</span>
                                         </div>
                                     </div>
+                                    {% endfor %}
+                                    {% comment %} {% endif %} {% endcomment %}
                                     <div class="wt-ad wt-dotnotification">
                                         <figure><img src="{% static 'images/messages/img-02.jpg' %}" alt="image description"></figure>
                                         <div class="wt-adcontent">
@@ -79,7 +87,7 @@
                                 <div class="wt-chatarea">
                                     <div class="wt-messages wt-verticalscrollbar wt-dashboardscrollbar">
                                         <div class="wt-offerermessage">
-                                            <figure><img src="images/messages/img-12.jpg" alt="image description"></figure>
+                                            <figure><img src="{% static 'images/messages/img-12.jpg' %}" alt="image description"></figure>
                                             <div class="wt-description">
                                                 <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
                                                 <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
@@ -89,7 +97,7 @@
                                             </div>
                                         </div>
                                         <div class="wt-memessage wt-readmessage">
-                                            <figure><img src="images/messages/img-11.jpg" alt="image description"></figure>
+                                            <figure><img src="{% static 'images/messages/img-11.jpg' %}" alt="image description"></figure>
                                             <div class="wt-description">
                                                 <p>Eiusmod tempor incididunt labore et dolore magna aliqiu enim ad minim veniam qiuisru exercitation ullamco laborisen nisi ut aliquip exea.</p>
                                                 <div class="clearfix"></div>
@@ -102,7 +110,7 @@
                                             </div>
                                         </div>
                                         <div class="wt-offerermessage">
-                                            <figure><img src="images/messages/img-12.jpg" alt="image description"></figure>
+                                            <figure><img src="{% static 'images/messages/img-12.jpg' %}" alt="image description"></figure>
                                             <div class="wt-description">
                                                 <div class="clearfix"></div>
                                                 <p>Consectetur adipisicing elit sei do eiusmod tempor incididunt labore et dolore.</p>
@@ -112,7 +120,7 @@
                                             </div>
                                         </div>
                                         <div class="wt-memessage wt-readmessage">
-                                            <figure><img src="images/messages/img-11.jpg" alt="image description"></figure>
+                                            <figure><img src="{% static 'images/messages/img-11.jpg' %}" alt="image description"></figure>
                                             <div class="wt-description">
                                                 <div class="clearfix"></div>
                                                 <p>Eiusmod tempor incididunt labore et dolore magna aliqiu enim ad minim veniam qiuisru exercitation ullamco laborisen nisi ut aliquip exea.</p>
