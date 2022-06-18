@@ -22,10 +22,11 @@ def create_or_only_one_default_currency(sender, instance, created, **kwargs):
 #This is for Test Email sending
 @receiver(post_save, sender=TestEmail)
 def send_test_mail(sender, instance, created, **kwargs): 
-
-    # send_new_test_mail(instance.test_email)
-    send_new_test_mail_two(instance.test_email)
-    print('mail sent to:', instance.test_email)
+    try:
+        send_new_test_mail_two(instance.test_email)
+        print('mail sent to:', instance.test_email)
+    except:
+        print('mail not sent to:', instance.test_email)
 
 __all__ = ['send_test_mail']
 

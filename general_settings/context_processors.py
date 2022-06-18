@@ -1,4 +1,10 @@
-from .models import WebsiteSetting, AutoLogoutSystem
+from .models import Category, WebsiteSetting, AutoLogoutSystem
+
+
+def categories(request):
+    return {
+        'categories': Category.objects.filter(visible=True)
+    }
 
 
 def website(request):

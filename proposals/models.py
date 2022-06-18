@@ -32,9 +32,6 @@ from .utilities import (
 )
 
 
-# def proposal_images_path(instance, filename):
-#     return f"proposal_image_{instance.pk}/{filename}"
-
 def proposal_images_path(instance, filename):
     return "proposal/%s/%s" % (instance.team.title, filename)
 
@@ -163,6 +160,7 @@ class Proposal(models.Model):
 
 class ProposalChat(models.Model):
     team = models.ForeignKey('teams.Team', verbose_name=_("Proposal Team"), related_name='proposalchats', on_delete=models.CASCADE)
+    proposal = models.ForeignKey(Proposal, verbose_name=_("Proposal"), related_name='proposalschats', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='proposalsender', on_delete=models.CASCADE)
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name='proposalreceiver', on_delete=models.CASCADE)
     content = models.TextField()

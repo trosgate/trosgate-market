@@ -12,9 +12,10 @@ from account.permission import user_is_client
 
 
 def category(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug, visible=True) 
-    proposals = Proposal.objects.filter(category=category, status = Proposal.ACTIVE)
-
+    category = get_object_or_404(Category, slug=category_slug, visible=True)
+    proposals = category.proposal.filter(status = Proposal.ACTIVE)  
+    # proposals = Proposal.objects.filter(category=category, status = Proposal.ACTIVE)
+    print(proposals)
     context = {
         "category": category,
         'proposals':proposals,

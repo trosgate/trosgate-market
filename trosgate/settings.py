@@ -114,7 +114,7 @@ TEMPLATES = [
                 # custom processors
                 'proposals.context_processors.published_proposal',
                 'teams.context_processors.active_team',
-                'proposals.context_processors.categories',
+                'general_settings.context_processors.categories',
                 'general_settings.context_processors.website',
                 'general_settings.context_processors.autoLogoutSystem',
                 'transactions.context_processors.hiring_box',
@@ -225,12 +225,13 @@ LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
 
 ####option one for email setup in development mode###
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+####option two for email setup in development mode###
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 #Custom Email Backend to be used with internet
-# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 
 ### option two for email setup in development mode ###
@@ -238,10 +239,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'myvoistudio@gmail.com'
-# EMAIL_HOST_PASSWORD = 'qkvzsnbzrypkwywy'
+# EMAIL_HOST_PASSWORD = 'nsndvgrisaxrdyei'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
-DEFAULT_EMAIL_FROM = 'Trosgate <myvoistudio@gmail.com>'
+# DEFAULT_EMAIL_FROM = 'Trosgate <myvoistudio@gmail.com>'
 
 
 WEBSITE_URL = 'http://127.0.0.1:8000'

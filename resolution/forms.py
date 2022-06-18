@@ -1,4 +1,4 @@
-from .models import ProjectCompletionFiles
+from .models import ProjectCompletionFiles, ProposalCompletionFiles
 from django import forms
 
 
@@ -18,3 +18,17 @@ class ProjectCompletionForm(forms.ModelForm):
         self.fields['attachment'].widget.attrs.update(
             {'class': 'form-control'})
 
+
+class ProposalCompletionForm(forms.ModelForm):
+
+    class Meta:
+        model = ProposalCompletionFiles
+        fields = ['attachment'] 
+
+
+    def __init__(self, *args, **kwargs):
+        super(ProposalCompletionForm, self).__init__(*args, **kwargs)
+        
+        # 'Basic Info'
+        self.fields['attachment'].widget.attrs.update(
+            {'class': 'form-control'})

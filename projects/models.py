@@ -66,21 +66,16 @@ class Project(models.Model):
         (PREMIUM, _('Premium')),
     )  
 
-    ONE_DAY = "01 day"
-    TWO_DAYS = "02 days"
-    THREE_DAYS = "03 days"
-    FOUR_DAYS = "04 days"
-    FIVE_DAYS = "05 days"
-    SIX_DAYS = "06 days"
-    ONE_WEEK = "01 week"
-    TWO_WEEK = "02 week"
-    THREE_WEEK = "03 week"
-    ONE_MONTH = "01 month"
-    TWO_MONTH = "02 month"
-    THREE_MONTH = "03 month"
-    FOUR_MONTH = "04 month"
-    FIVE_MONTH = "05 month"
-    SIX_MONTH = "06 month"
+    ONE_DAY = "one_day"
+    TWO_DAYS = "two_days"
+    THREE_DAYS = "three_days"
+    FOUR_DAYS = "four_days"
+    FIVE_DAYS = "five_days"
+    SIX_DAYS = "six_days"
+    ONE_WEEK = "one_week"
+    TWO_WEEK = "two_weeks"
+    THREE_WEEK = "three_weeks"
+    ONE_MONTH = "one_month"
     PROJECT_DURATION = (
         (ONE_DAY, _("01 Day")),
         (TWO_DAYS, _("02 Days")),

@@ -53,9 +53,9 @@
 							<td>{{proposal.total_sales_price}} ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td> 
 							<td>{{proposal.total_earning_fee_charged}}</td>
 							<td>{{proposal.total_earning}}</td>
-							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Take Action</button></a></td>
+							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm">Manage</button></a></td>
 						</tr>
-						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
+						{% comment %} {% url 'proposals:proposal_resolution' %} {% endcomment %}
 						{% endfor %}
 					</tbody>
 				</table>
@@ -80,7 +80,7 @@
 							<th>Purchase</th>
 							<th>Hired</th>
 							<th>Total</th>
-							<th>Action</th>
+							<th>Manager</th>
 						</tr>
 					</thead>
 					
@@ -95,7 +95,7 @@
 							<td>{{proposal.disc_sales_price}}</td>
 							<td>{{proposal.staff_hired}}</td>
 							<td>{{proposal.total_sales_price}}</td>     
-							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Manage</button></a></td>
 						</tr>
 						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
 						{% endfor %}

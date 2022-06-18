@@ -1,0 +1,515 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+				<div class="wt-haslayout wt-innerbannerholder">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-innerbannercontent">
+								<div class="wt-title"><h3 style="color:white">{{proposal_sold.team}} <> vrs <>{{proposal_sold.purchase.client.get_short_name}} </h3></div>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									<li class="wt-active"> Manager </li>
+								</ol>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+							<div class="wt-dashboardbox">
+								<div class="wt-dashboardboxcontent wt-rcvproposala">
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+
+									<div class="wt-freelancerholder wt-rcvproposalholder">
+										<div class="wt-sectiontitle">
+											<span>Action #1: Team(Start and Track)</span>
+										</div>
+										{% if not resolution %}
+											<div class="wt-jobdescription wt-tabsinfo">
+												
+												{% if active_team.created_by == request.user %}
+												<div id = 'transfer-confirm' class="wt-updatall">
+													<span>Are you Ready to grab your {{currency}} {{proposal_sold.total_sales_price}}? Click the button to start work</span>
+													<button id="start-work-now" type="button" class="wt-btn">Start Work</button>
+												</div>
+												<div id = 'transfer-nextstep' class="wt-updatall">
+													<span>As a Next step, we will let you track your progress</span>
+													<a href="" class="wt-btn">
+														<div id="transfer-confirmation" class="btn btn-inline-danger text-white">Ok I Understand</div>
+													</a>
+												</div>
+												{% elif proposal_sold.purchase.client %}
+												<div id = 'transfer-confirm' class="wt-updatall">
+													<span>Team founder has not started work Yet. Please check back or contact them</span>
+													<button id="start-work-now" type="button" class="wt-btn">Pending Team Action</button>
+												</div>
+												{% endif %} 
+											</div>
+										{% endif %} 
+										{% if resolution %}
+										<div class="row justify-content-md-center">
+											<div class="wt-sectionhead wt-textcenter">
+												<div id="startwork-timer" style="color: green; font-weight: bold; display: none;">{{ duration_end_time|date:"M d, Y H:m:s"}} </div>
+												<div class="alert alert-info" role="alert">
+													<strong>Expires In: </strong>{{ duration_end_time|date:"M d, Y H:m:s"}}<span id="duration-countdown-timer" style="color: green; font-weight: bold;"></span>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-12 col-sm-12 col-md-2 col-lg-6 col-xl-3">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent">
+														<figure>
+															<svg xmlns="http://www.w3.org/2000/svg" width="50" style="color:green" height="50" fill="currentColor" class="bi bi-hourglass-top" viewBox="0 0 16 16">
+																<path d="M2 14.5a.5.5 0 0 0 .5.5h11a.5.5 0 1 0 0-1h-1v-1a4.5 4.5 0 0 0-2.557-4.06c-.29-.139-.443-.377-.443-.59v-.7c0-.213.154-.451.443-.59A4.5 4.5 0 0 0 12.5 3V2h1a.5.5 0 0 0 0-1h-11a.5.5 0 0 0 0 1h1v1a4.5 4.5 0 0 0 2.557 4.06c.29.139.443.377.443.59v.7c0 .213-.154.451-.443.59A4.5 4.5 0 0 0 3.5 13v1h-1a.5.5 0 0 0-.5.5zm2.5-.5v-1a3.5 3.5 0 0 1 1.989-3.158c.533-.256 1.011-.79 1.011-1.491v-.702s.18.101.5.101.5-.1.5-.1v.7c0 .701.478 1.236 1.011 1.492A3.5 3.5 0 0 1 11.5 13v1h-7z"/>
+															</svg>
+														</figure>
+														<div class="wt-title">
+																<h3 id="days" style="color:green">0</h3>
+																<span>Days</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div> 
+											<div class="col-12 col-sm-12 col-md-2 col-lg-6 col-xl-3">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent wt-freelancelike">
+															<figure>
+																<svg xmlns="http://www.w3.org/2000/svg" width="50" style="color:blue" height="50" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16">
+																	<path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2h-7zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48V8.35zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+																</svg>
+															</figure>
+															<div class="wt-title">
+																<h3 id="hours" style="color:blue">0</h3>
+																<span>Hours</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div>
+											<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent wt-repostjob">
+															<figure>
+																<svg xmlns="http://www.w3.org/2000/svg" width="50" style="color:violet" height="50" fill="currentColor" class="bi bi-hourglass-bottom" viewBox="0 0 16 16">
+																	<path d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5zm2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2h-7z"/>
+																</svg>
+															</figure>
+															<div class="wt-title">
+																<h3 id="minutes" style="color:violet">0</h3>
+																<span>Minutes</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div>
+											<div class="col-12 col-sm-4 col-md-2 col-lg-6 col-xl-3">
+												<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">	
+													<div class="wt-proposalsr wt-box-shadow">
+														<div class="wt-proposalsrcontent wt-componyfolow">
+															<figure>
+																<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" style="color:red" fill="currentColor" class="bi bi-alarm" viewBox="0 0 16 16">
+																	<path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5z"/>
+																	<path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1h-3zm1.038 3.018a6.093 6.093 0 0 1 .924 0 6 6 0 1 1-.924 0zM0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5zM13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1z"/>
+																</svg>
+															</figure>
+															<div class="wt-title">
+																<h3 id="seconds" style="color:red">0</h3>
+																<span>Seconds</span>
+															</div>
+														</div> 
+													</div>
+												</aside>
+											</div>
+										</div>
+										{% endif %}
+
+										{% if active_team.created_by == request.user %}
+										{% if resolution %}
+										<div class="row">
+											<form method="post" action="." enctype="multipart/form-data" autocomplete="off"> 
+												{% csrf_token %}
+												<span id="transfer-message" style="color:green; text-align:right;"></span>
+												<br>
+												<h4> Submit your Project</h4>
+												
+												<div class="form-group">
+													{{completion_form.attachment.label}}
+													{{completion_form.attachment}}
+												</div> 
+												<div class="form-group">
+													{{completion_form.completed.label}}
+													{{completion_form.completed}}
+												</div>
+												
+												<button type="submit" class="wt-btn"> Submit </button>
+											</form>  
+										</div>
+										{% endif %}
+										{% endif %}		
+
+										{% if active_team.created_by == request.user %}
+										{% if not resolution %}
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Some Facts</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: If this project can be reopened, then such option will be available after completion</span></li>
+											<li><span><i class="fa fa-check"></i>#2: You will be taken to the list of freelancers page</span></li>
+											<li><span><i class="fa fa-check"></i>#3: Click on <em>'user Avatar', or 'User fullname' or tagline</em> to open details</span></li>
+											<li><span><i class="fa fa-check"></i>#4: locate the button 'invite Freelancer' and Click to invite</span></li>
+										</ul>
+										{% endif %}
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				{% if resolution %}	
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="wt-sectiontitle">
+									<span>Action #2: Client (Approve and Review) </span>
+								</div>
+								
+								<div class="wt-managejobcontent">
+									<div class="wt-userlistinghold wt-featured wt-proposalitem">
+										<figure class="wt-userlistingimg">
+											{% if proposal_sold.team.created_by.freelancer.profile_photo %}
+												<img src="{{proposal_sold.team.created_by.freelancer.profile_photo.url}}" alt="image description" class="mCS_img_loaded">
+											{% endif %}
+										</figure>
+										<div class="wt-proposaldetails">
+											<div class="wt-contenthead">
+												<div class="wt-title">
+													<a href="{{proposal_sold.applied_by.freelancer.profile_get_absolute_url}}"> {{ proposal_sold.team.created_by.get_full_name }}</a>
+												</div>
+											</div>
+											<div class="wt-proposalfeedback">
+												<span class="wt-starsvtwo">
+													<i class="fa fa-star fill"></i>
+													<i class="fa fa-star fill"></i>
+													<i class="fa fa-star fill"></i>
+												</span>
+												<span class="wt-starcontent"> 4.5/<i>5</i> <em>(860 Reviews)</em></span>
+											</div>													
+										</div>
+										
+										<div class="wt-rightarea text-center">
+											<div class="wt-hireduserstatus">
+												<i class="fa fa-dollar"></i>
+												<span>{{currency}}{{proposal_sold.total_sales_price}}</span>
+											</div>
+											{% if request.user == proposal_sold.purchase.client %}
+											<div class="wt-hireduserstatus">
+												<i class="fa fa-star fill" style='color:orange'></i>
+												<span><button type='button' class='btn btn-success btn-sm' data-toggle="modal" data-target="#projectreviewmodalbox">Approve</button></span>
+											</div>														
+											<div class="wt-hireduserstatus">
+												<i class="ti-na" style='color:red'></i>
+												<span><button type='button' class='btn btn-danger btn-sm' data-toggle="modal" data-target="#projectcancelmodalbox">Cancel</button></span>
+											</div>														
+											{% endif %}														
+											<div class="wt-hireduserstatus">
+												<i class="far fa-envelope"></i>
+												<span>Cover Letter</span>
+											</div>														
+											<div class="wt-hireduserstatus">
+												<i class="fa fa-paperclip"><a href=""></a></i>
+												<span>0 Files</span>
+											</div>														
+											<div class="wt-hireduserstatus">
+												<i class="far fa-envelope"></i>
+												<span>Status</span>
+											</div>														
+										</div>
+									</div>
+								</div>											                  														
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			{% endif %}
+			{% if resolution %}
+			<section class="wt-haslayout wt-dbsectionspace">
+				<div class="row justify-content-md-center">				
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+					<div class="wt-dashboardbox">
+						<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="wt-sectiontitle">
+									<span>Proposal Review </span>
+								</div>
+								
+								
+								{% for review in resolution.reviewapplication.all %}
+								<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+									<figure class="wt-userlistingimg">
+										<img src="{% if review.resolution.project.created_by.clients.profile_photo %} {{review.resolution.project.created_by.clients.profile_photo.url }} {% endif %}" alt="image description">
+									</figure>
+									<div class="wt-userlistingcontent">
+										<div class="wt-contenthead">
+											<div class="wt-title">
+												<i class="fa fa-check-circle" style='color:green'> Client: {{review.resolution.project.created_by.get_full_name}} ({{review.resolution.project.created_by.country|capfirst}})</i>
+												<h3>{{review.title}}</h3>
+											</div>
+											<ul class="wt-userlisting-breadcrumb">
+												<li><span><i class="fa fa-dollar-sign"></i> Team: {{review.resolution.team.title}}</span></li>
+												<li><span><img src="{{review.resolution.project.created_by.country.flag.url}}" alt="img description"> {{review.resolution.project.created_by.country|capfirst}}</span></li>
+												<li><span><i class="fa fa-star fill" style='color:orange'> Review: </i>{{review.rating}}/5</span></li>
+											</ul>
+										</div>
+									</div>
+									<div class="wt-description">
+										<p>“ {{review.message|linebreaksbr}}.”</p>
+									</div>
+								</div>
+								{% endfor %}
+								
+								{% if not resolution %}
+								<p class="text-center"> Hmm! No review Yet.............</p>
+								{% endif %}
+							</div>	
+						</div>	
+					</div>	
+				</div>	
+			</section>	 
+			{% endif %}
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{website.site_name}}</span>
+					</div>
+				</div>
+			</div>
+
+		</main>
+			<!--Main End-->	
+
+		{% comment %} Modal section for Approval and Review {% endcomment %}
+		<div class="wt-uploadimages modal fade" id="projectreviewmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="wt-modaldialog modal-dialog" role="document">
+				<div class="wt-modalcontent modal-content">
+					<div class="wt-boxtitle">
+						<h2>Approval and Review <i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
+					</div>
+					<div class="wt-boxtitle">
+						<span id="reviewerror-message" style="color:green; text-align:right;"></span>
+					</div>
+					<div class="wt-modalbody modal-body">
+						<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
+							
+								<div class="form-group">
+									<input class="form-control" id="feedbacktitle" name="reviewtitle" value="" placeholder="Add Your title*"></input>
+								</div>
+								<div class="form-group">
+									<textarea class="form-control" id="proposalfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
+								</div>
+								<div class="wt-boxtitle">
+									<h2> Select Rating </h2>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="wt-pointscounter" style='color:white'>
+											<input name="approveandrate" type="radio" value="5"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+										{% comment %} <div class="wt-jrate"></div> {% endcomment %}
+									</div>
+									<span class="wt-ratingdescription">This Team is a Professional</span>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter">
+											<input name="approveandrate" type="radio" value="4"></input>
+										</div>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill" style='color:orange'></i>
+										<i class="fa fa-star fill"></i>
+										{% comment %} <div class="wt-jrate"></div> {% endcomment %}
+									</div>
+									<span class="wt-ratingdescription">This Team is Very good</span>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter" style='color:white'>
+											<input name="approveandrate" type="radio" checked value="3"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										<div class="wt-jrate"></div>
+									</div>
+									<span class="wt-ratingdescription">This Team is Good</span>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter">
+											<input name="approveandrate" type="radio" value="2"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										<div class="wt-jrate"></div>
+									</div>
+									<span class="wt-ratingdescription">This Team is Average</span>
+								</div>
+								<div class="form-group wt-ratingholder">
+									<div class="wt-ratepoints">
+										<div class="counter wt-pointscounter">
+											<input name="approveandrate" type="radio" value="1"></input>
+										</div>
+											<i class="fa fa-star fill" style='color:orange'></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										<div class="wt-jrate"></div>
+									</div>
+									<span class="wt-ratingdescription">This Team can't be recommended</span>
+								</div>
+								<div class="form-group wt-btnarea">
+									<button id="project-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
+								</div>
+								
+							{% comment %} </fieldset> {% endcomment %}
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{% comment %} Modal section for Approval and Review {% endcomment %}
+		<div class="wt-uploadimages modal fade" id="projectcancelmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="wt-modaldialog modal-dialog" role="document">
+				<div class="wt-modalcontent modal-content">
+					<div class="wt-boxtitle">
+						<h2>Cancelation<i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
+					</div>
+					<div class="wt-boxtitle">
+						<span id="reviewerror-message" style="color:green; text-align:right;"></span>
+					</div>
+					<div class="wt-modalbody modal-body">
+						<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
+								<div class="form-group">
+									<textarea class="form-control" id="proposalfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
+								</div>
+								<div class="form-group wt-btnarea">
+									<button id="project-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
+								</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+	//TRANSFER OF FUND             
+	$(document).on('click', '#start-work-now', function (e) {
+	e.preventDefault();
+
+	$.ajax({
+		type: 'POST',
+		url: '{% url "resolution:proposal_start_work" %}',
+		data: {
+			proposalSoldId: '{{proposal_sold.id}}',
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'start-work'
+		},
+		success: function (json) {
+			$('#id_team_staff').val('');
+			$('#id_position').val('');
+			$('#id_debit_amount').val('');                   
+			//document.getElementById('transfer-message').innerHTML = json.message            
+		},
+		error: function (error) {
+			//document.getElementById('transfer-message').innerHTML = error.message
+		}
+	});
+	})
+</script>
+
+<script>
+ 
+	$(document).ready(function(){
+
+		$('#transfer-nextstep').hide()
+		$('#transfer-confirm').click(function(){
+			$('#transfer-nextstep').slideToggle(200)       
+		});		          
+	});
+</script>
+
+<script src={% static 'js/startwork.js' %} ></script>
+
+<script>
+	$(document).on('click', '#project-reviews', function (e) {
+		e.preventDefault();	
+		
+		messageBody = $('#proposalfeedback').val()
+		ratingBody = $("input[name='approveandrate']:radio:checked").val()
+
+		if(messageBody =='' || ratingBody == ''){
+            swal("Alert!", "All fields are required", "error");
+            return false;
+        }
+        else{
+			$.ajax({
+			type: "POST",
+			url: '{% url "resolution:applicant_review" %}',
+			data: {
+				proposalSoldId: '{{proposal_sold.id}}',
+				title: $('#feedbacktitle').val(),
+				message: $('#proposalfeedback').val(),
+				rating: $("input[name='approveandrate']:radio:checked").val(),
+				csrfmiddlewaretoken: "{{csrf_token}}",
+				action: 'project-review',
+			},
+			success: function (json) {
+			console.log(json)
+				document.getElementById("reviewerror-message").innerHTML = json.success_or_error_message;
+				$('#feedbacktitle').val('')
+				$('#proposalfeedback').val('')
+				$("input[name='approveandrate']:radio:checked").val('')
+				             
+			},
+			error: function (xhr, errmsg, err) {},
+			});			
+		}		
+	})		
+	</script>
+
+{% endblock scripts %}

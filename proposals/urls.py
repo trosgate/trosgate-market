@@ -29,6 +29,7 @@ urlpatterns = [
 
     # Proposal chats   
     path('chats/', views.proposal_chat_messages, name='proposal_chat_messages'),
+    path('chats/<slug:proposal_slug>', views.proposal_chat_details, name='proposal_chat_details'),
 
    
 ]

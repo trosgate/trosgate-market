@@ -236,6 +236,7 @@ def modify_proposal_step_one(request, proposal_id, proposal_slug):
 
     context = {
         'proposalformone': proposalformone,
+        'proposal': proposal,
     }
     return render(request, 'proposals/proposal_step_one_update.html', context)
 
@@ -259,6 +260,7 @@ def modify_proposal_step_two(request, proposal_id, proposal_slug):
 
     context = {
         'proposalformtwo': proposalformtwo,
+        'proposal': proposal,        
     }
     return render(request, 'proposals/proposal_step_two_update.html', context)
 
@@ -282,6 +284,7 @@ def modify_proposal_step_three(request, proposal_id, proposal_slug):
 
     context = {
         'proposalformthree': proposalformthree,
+        'proposal': proposal,        
     }
     return render(request, 'proposals/proposal_step_three_update.html', context)
 
@@ -307,6 +310,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
 
     context = {
         'proposalformfour': proposalformfour,
+        'proposal': proposal,        
     }
     return render(request, 'proposals/proposal_step_four_update.html', context)
 
@@ -463,5 +467,19 @@ def proposal_chat_messages(request):
         'chats':chats,
     }
     return render(request, 'proposals/chat_messages.html', context)
+    
+
+
+@login_required
+@user_is_freelancer
+def proposal_chat_details(request, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE) 
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
+    chat_form = ProposalChatForm()
+    context = {
+        'team':team,
+        'chat_form':chat_form,
+    }
+    return render(request, 'proposals/chat_messages_details.html', context)
 
     # ProposalChatForm
