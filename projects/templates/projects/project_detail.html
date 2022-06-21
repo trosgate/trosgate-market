@@ -44,9 +44,7 @@
 				</div>
 			</div>
 			
-			<!--Main Start-->
-			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
-				<div class="wt-haslayout wt-main-section">
+			<div class="wt-haslayout wt-main-section">
 					<!-- User Listing Start-->
 				<div class="container">
 					<div class="row">
@@ -77,14 +75,18 @@
 											<li><span><i class="far fa-clock"></i> Completion In: {{project.get_completion_time_display}}</span></li>
 										</ul>
 									</div>
+
+									{% if not request.user.is_authenticated %}									  
+										<div class="wt-btnarea"><a href="{% url 'account:login' %}" class="wt-btn">Apply</a></div>
+									{% endif %}
+
 									{% if request.user.freelancer %}									  
 										{% if not monthly_project_application %}
 										<div class="wt-btnarea"><a href="{% url 'applications:apply_for_project' project.slug %}" class="wt-btn">Apply</a></div>
 										{% endif %}
 									{% endif %}
 								</div>
-								</div>
-								
+							</div>
 								<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
 									<div class="wt-projectdetail-holder">
 										<div class="wt-projectdetail">
@@ -173,9 +175,11 @@
 						</div>					
 					</div>
 				</div>
-			</main>
-		</div>
+			</div>
 		<!--Content Wrapper End-->
+		{% if not request.user.is_authenticated%}
+		{% include 'dashboard/main_footer.html' %}
+		{% endif %}
 	</div>
 	<script src={% static 'js/projecttimer.js' %} ></script>
 

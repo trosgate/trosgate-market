@@ -36,6 +36,10 @@ def proposal_images_path(instance, filename):
     return "proposal/%s/%s" % (instance.team.title, filename)
 
 
+class ActiveProposals(models.Manager):
+    def get_queryset(self):
+        return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
+
 class Proposal(models.Model):
     # proposal Duration converter
     ONE_DAY = "one_day"
@@ -112,6 +116,9 @@ class Proposal(models.Model):
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="proposalauthor", on_delete=models.CASCADE)
     reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
+    objects = models.Manager()
+    active = ActiveProposals()
+
 
     class Meta:
         ordering = ('-created_at',)

@@ -10,7 +10,7 @@
 			<div class="row justify-content-md-center">
 				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 					<div class="wt-innerbannercontent">
-					<div class="wt-title"><h2>Proposals</h2></div>
+					<div class="wt-title"><h2>Proposal Search</h2></div>
 					<ol class="wt-breadcrumb">
 						<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
 						<li class="wt-active">Job</li>
@@ -47,7 +47,35 @@
 					<div class="row">
 						<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
 							<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
-								<aside id="wt-sidebar" class="wt-sidebar">
+								<div class="wt-usersidebaricon">
+									<span class="fa fa-cog wt-usersidebardown"></span>
+								</div>
+								<aside id="wt-sidebar" class="wt-sidebar wt-usersidebar">
+									<div class="wt-widget wt-effectiveholder">
+										<div class="wt-widgettitle">
+											<h2>Countries</h2>
+										</div>
+										<div class="wt-widgetcontent">
+											<form class="wt-formtheme wt-formsearch">
+												<fieldset>
+													<div class="form-group">
+														<input type="text" name="fullname" class="form-control" placeholder="Search Location">
+														<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
+													</div>
+												</fieldset>
+												<fieldset>
+													<div class="wt-checkboxholder wt-verticalscrollbar">
+														{% for country in countries %}
+														<span class="wt-checkbox">
+															<input id="{{country.name}}" class="proposal-checked" type="checkbox" data-filter="country" name="{{country.name}}" value="{{country.id}}">
+															<label for="{{country.name}}"><img src="{% if country.flag %} {{country.flag.url}} {% endif %}" alt="img description"> {{country.name}}</label>
+														</span>
+														{% endfor %}
+													</div>
+												</fieldset>
+											</form>
+										</div>
+									</div>
 									<div class="wt-widget wt-effectiveholder">
 										<div class="wt-widgettitle">
 											<h2>Categories</h2>
@@ -62,86 +90,10 @@
 												</fieldset>
 												<fieldset>
 													<div class="wt-checkboxholder wt-verticalscrollbar">
+														{% for category in categorie%}
 														<span class="wt-checkbox">
-															<input id="wordpress" type="checkbox" name="description" value="company" checked>
-															<label for="wordpress"> WordPress</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="graphic" type="checkbox" name="description" value="company">
-															<label for="graphic"> Graphic Design</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="website" type="checkbox" name="description" value="company">
-															<label for="website"> Website Design</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="article" type="checkbox" name="description" value="company">
-															<label for="article"> Article Writing</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="software" type="checkbox" name="description" value="company">
-															<label for="software"> Software Architecture</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="wordpress1" type="checkbox" name="description" value="company">
-															<label for="wordpress1"> WordPress</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="graphic1" type="checkbox" name="description" value="company">
-															<label for="graphic1"> Graphic Design</label>
-														</span>
-													</div>
-												</fieldset>
-											</form>
-										</div>
-									</div>
-									<div class="wt-widget wt-effectiveholder">
-										<div class="wt-widgettitle">
-											<h2>Project Type</h2>
-										</div>
-										<div class="wt-widgetcontent">
-											<form class="wt-formtheme wt-formsearch">
-												<fieldset>
-													<div class="wt-checkboxholder">
-														<span class="wt-radio">
-															<input id="project" type="radio" name="description" value="company" checked>
-															<label for="project"> Any Project Type</label>
-														</span>
-														<span class="wt-radio">
-															<input id="hourly" type="radio" name="description" value="company">
-															<label for="hourly"> Hourly Based Project</label>
-														</span>
-														<div id="wt-productrangeslider" class="wt-productrangeslider wt-themerangeslider"></div>
-														<div class="wt-amountbox">
-															<input type="text" id="wt-consultationfeeamount" readonly>
-														</div>
-														<span class="wt-radio">
-															<input id="fixed" type="radio" name="description" value="company">
-															<label for="fixed"> Fixed Price Project</label>
-														</span>
-													</div>
-												</fieldset>
-											</form>
-										</div>
-									</div>
-									<div class="wt-widget wt-effectiveholder">
-										<div class="wt-widgettitle">
-											<h2>Location</h2>
-										</div>
-										<div class="wt-widgetcontent">
-											<form class="wt-formtheme wt-formsearch">
-												<fieldset>
-													<div class="form-group">
-														<input type="text" name="fullname" class="form-control" placeholder="Search Location">
-														<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
-													</div>
-												</fieldset>
-												<fieldset>
-													<div class="wt-checkboxholder wt-verticalscrollbar">
-														{% for proposal in proposal_list %}
-														<span class="wt-checkbox">
-															<input type="checkbox" name="description" value="company">
-															<label for="wt-description"> <img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {{proposal.created_by.country.name}}</label>
+															<input id="{{category.name}}" class="proposal-checked" type="checkbox" data-filter="category" name="{{category.name}}" value="{{category.id}}">
+															<label for="{{category.name}}"> {{category.name}}</label>
 														</span>
 														{% endfor %}
 													</div>
@@ -156,106 +108,110 @@
 										<div class="wt-widgetcontent">
 											<form class="wt-formtheme wt-formsearch">
 												<fieldset>
-													<div class="wt-checkboxholder">
-														<span class="wt-checkbox">
-															<input id="proindependent" type="checkbox" name="description" value="company" checked>
-															<label for="proindependent">Pro Independent Freelancers</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="proagency" type="checkbox" name="description" value="company">
-															<label for="proagency"> Pro Agency Freelancers</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="independent" type="checkbox" name="description" value="company">
-															<label for="independent"> Independent Freelancers</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="agency" type="checkbox" name="description" value="company">
-															<label for="agency">Agency Freelancers</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="rising" type="checkbox" name="description" value="company">
-															<label for="rising"> New Rising Talent</label>
-														</span>
-													</div>
-												</fieldset>
-											</form>
-										</div>
-									</div>
-									<div class="wt-widget wt-effectiveholder">
-										<div class="wt-widgettitle">
-											<h2>Project Length</h2>
-										</div>
-										<div class="wt-widgetcontent">
-											<form class="wt-formtheme wt-formsearch">
-												<fieldset>
-													<div class="wt-checkboxholder">
-														<span class="wt-checkbox">
-															<input id="anyproject" type="checkbox" name="anyproject" value="project" checked>
-															<label for="anyproject">Any Project Length</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="01month" type="checkbox" name="01month" value="month">
-															<label for="01month"> Less Than 01 Month</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="3months" type="checkbox" name="3months" value="months">
-															<label for="3months"> 01 to 03 Months</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="6months" type="checkbox" name="months" value="months">
-															<label for="6months"> 03 to 06 Months</label>
-														</span>
-														<span class="wt-checkbox">
-															<input id="moremonths" type="checkbox" name="months" value="months">
-															<label for="moremonths"> More Than 06 Months</label>
-														</span>
-													</div>
-												</fieldset>
-											</form>
-										</div>
-									</div>
-									<div class="wt-widget wt-effectiveholder">
-										<div class="wt-widgettitle">
-											<h2>Languages</h2>
-										</div>
-										<div class="wt-widgetcontent">
-											<form class="wt-formtheme wt-formsearch">
-												<fieldset>
 													<div class="form-group">
-														<input type="text" name="fullname" class="form-control" placeholder="Search Language">
+														<input type="text" name="Search" class="form-control" placeholder="Search Category">
 														<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
 													</div>
 												</fieldset>
 												<fieldset>
 													<div class="wt-checkboxholder wt-verticalscrollbar">
+														{% for skill in skills %}
 														<span class="wt-checkbox">
-															<input id="chinese" type="checkbox" name="description" value="company" checked>
-															<label for="chinese">Chinese</label>
+															<input id="{{skill.name}}" class="proposal-checked" type="checkbox" data-filter="skill" name="{{skill.name}}" value="{{skill.id}}">
+															<label for="{{skill.name}}">{{skill.name}}</label>
+														</span>
+														{% endfor %}
+													</div>
+												</fieldset>
+											</form>
+										</div>
+									</div>
+									<div class="wt-widget wt-effectiveholder">
+										<div class="wt-widgettitle">
+											<h2>Revision</h2>
+										</div>
+										<div class="wt-widgetcontent">
+											<form class="wt-formtheme wt-formsearch">
+												<fieldset>
+													<div class="wt-checkboxholder">
+														<span class="wt-checkbox">
+															<input id="true" class="proposal-checked" type="checkbox" data-filter="true" name="true" value="true">
+															<label for="true"> Has Revision</label>
 														</span>
 														<span class="wt-checkbox">
-															<input id="spanish" type="checkbox" name="description" value="company">
-															<label for="spanish">Spanish</label>
+															<input id="false" class="proposal-checked" type="checkbox" data-filter="false" name="false" value="false">
+															<label for="false"> No Revision</label>
+														</span>
+													</div>
+												</fieldset>
+											</form>
+										</div>
+									</div>
+									<div class="wt-widget wt-effectiveholder">
+										<div class="wt-widgettitle">
+											<h2>Agencies</h2>
+										</div>
+										<div class="wt-widgetcontent">
+											<form class="wt-formtheme wt-formsearch">
+												<fieldset>
+													<div class="wt-checkboxholder">
+														<span class="wt-checkbox">
+															<input id="upgradedTeams" class="proposal-checked" type="checkbox" data-filter="upgradedTeams" name="upgradedTeams" value="upgradedTeams">
+															<label for="upgradedTeams"> Upgraded Teams</label>
+														</span>
+													</div>
+												</fieldset>
+											</form>
+										</div>
+									</div>
+									
+									<div class="wt-widget wt-effectiveholder">
+										<div class="wt-widgettitle">
+											<h2> Duration </h2>
+										</div>
+										<div class="wt-widgetcontent">
+											<form class="wt-formtheme wt-formsearch">
+												<fieldset>
+													<div class="wt-checkboxholder  wt-verticalscrollbar">
+														<span class="wt-checkbox">
+															<input id="one_day" class="proposal-checked" type="checkbox" data-filter="one_day" name="one_day" value="one_day">
+															<label for="one_day">01 Day</label>
 														</span>
 														<span class="wt-checkbox">
-															<input id="english" type="checkbox" name="description" value="company">
-															<label for="english">English</label>
+															<input id="two_days" class="proposal-checked" type="checkbox" data-filter="two_days" name="two_days" value="two_days">
+															<label for="two_days">02 Days</label>
 														</span>
 														<span class="wt-checkbox">
-															<input id="arabic" type="checkbox" name="description" value="company">
-															<label for="arabic">Arabic</label>
+															<input id="three_days" class="proposal-checked" type="checkbox" data-filter="three_days" name="three_days" value="three_days">
+															<label for="three_days">03 Day</label>
 														</span>
 														<span class="wt-checkbox">
-															<input id="russian" type="checkbox" name="description" value="company">
-															<label for="russian">Russian</label>
+															<input id="four_days" class="proposal-checked" type="checkbox" data-filter="four_days" name="four_days" value="four_days">
+															<label for="four_days">04 Day</label>
 														</span>
 														<span class="wt-checkbox">
-															<input id="chinese1" type="checkbox" name="description" value="company">
-															<label for="chinese1">Chinese</label>
+															<input id="five_days" class="proposal-checked" type="checkbox" data-filter="five_days" name="five_days" value="five_days">
+															<label for="five_days">05 Day</label>
 														</span>
 														<span class="wt-checkbox">
-															<input id="spanish1" type="checkbox" name="description" value="company">
-															<label for="spanish1">Spanish</label>
+															<input id="six_days" class="proposal-checked" type="checkbox" data-filter="six_days" name="six_days" value="six_days">
+															<label for="six_days">06 Day</label>
+														</span>
+														<span class="wt-checkbox">
+															<input id="one_week" class="proposal-checked" type="checkbox" data-filter="one_week" name="one_week" value="one_week">
+															<label for="one_week">01 Week</label>
+														</span>
+														<span class="wt-checkbox">
+															<input id="two_weeks" class="proposal-checked" type="checkbox" data-filter="two_weeks" name="two_weeks" value="two_weeks">
+															<label for="two_weeks">02 Week</label>
+														</span>
+														<span class="wt-checkbox">
+															<input id="three_weeks" class="proposal-checked" type="checkbox" data-filter="three_weeks" name="three_weeks" value="three_weeks">
+															<label for="three_weeks">03 Week</label>
+														</span>
+														<span class="wt-checkbox">
+															<input id="one_month" class="proposal-checked" type="checkbox" data-filter="one_month" name="one_month" value="one_month">
+															<label for="one_month">01 Month</label>
 														</span>
 													</div>
 												</fieldset>
@@ -272,40 +228,17 @@
 									</div>
 								</aside>
 							</div>
-							<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+							<div class="ajaxLoader">Loading...</div>
+							<div id="proposalSuccessFilter" class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
 								<div class="wt-userlistingholder wt-haslayout">
-									<div class="wt-userlistingtitle">
-										<span>01 - 48 of 57143 results for <em>"PHP Developer"</em></span>
-									</div>
-									<div class="wt-filterholder">
-										<ul class="wt-filtertag">
-											<li class="wt-filtertagclear">
-												<a href="javascrip:void(0)"><i class="fa fa-times"></i> <span>Clear All Filter</span></a>
-											</li>
-											<li class="alert alert-dismissable fade in">
-												<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Graphic Design</span></a>
-											</li>
-											<li class="alert alert-dismissable fade in">
-												<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Any Hourly Rate</span></a>
-											</li>
-											<li class="alert alert-dismissable fade in">
-												<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Any Freelancer Type</span></a>
-											</li>
-											<li class="alert alert-dismissable fade in">
-												<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Chinese</span></a>
-											</li>
-											<li class="alert alert-dismissable fade in">
-												<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>English</span></a>
-											</li>
-										</ul>
-									</div>
-									{% for proposal in proposal_list %}
+									{% comment %} <div id="proposalTotal"></div> {% endcomment %}
+									{% for proposal in proposals %}
 									<div class="wt-userlistinghold wt-featured wt-userlistingholdvtwo">
 										<div class="wt-userlistingcontent">
 											<div class="wt-contenthead">
 												<div class="wt-title">
 													<a href="{% url 'freelancer:freelancer_profile' proposal.created_by.short_name %}"><i class="fa fa-user">&nbsp;&nbsp;Author: </i> {% firstof  proposal.created_by.get_full_name|capfirst proposal.team.created_by.get_full_name|capfirst %}</a>
-													<a href="usersingle.html"><i class="fa fa-group">&nbsp;&nbsp;Team: </i> {% firstof proposal.team.title|capfirst proposal.team.created_by.get_full_name|capfirst %}</a>
+										<a href="usersingle.html"><i class="fa fa-group">&nbsp;&nbsp;Team: </i> {% firstof proposal.team.title|capfirst proposal.team.created_by.get_full_name|capfirst %}</a>
 													<h2>{{proposal.title}}</h2>
 												</div>
 												<div class="wt-description">
@@ -319,12 +252,13 @@
 											</div>
 											<div class="wt-viewjobholder">
 												<ul>
-													<li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i>{{proposal.get_service_level_display}}</span></li>
+													<li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i> {{base_currency}} {{proposal.salary}}</span></li>
+													<li><span><i class="far fa-folder"></i>{{proposal.get_service_level_display}}</span></li>
 													<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}} - {% endif %} &nbsp;&nbsp; {{proposal.created_by.country.name}}</span></li>
 													<li><span><i class="far fa-folder wt-viewjobfolder"></i>Revision: {{proposal.get_revision_display}}</span></li>
 													<li><span><i class="far fa-clock wt-viewjobclock"></i>Duration: {{proposal.get_dura_converter_display }}</span></li>
 													<li><span><i class="fa fa-tag wt-viewjobtag"></i>Ref: {{proposal.reference}}</span></li>
-													<li><a href="javascript:void(0);" class="wt-clicklike wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+													<li><span><i class="fa fa-group" style='color:blue'></i>Team: {{proposal.team.members.count}} Member{{proposal.team.members.count|pluralize}}</span></li>
 													<li class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}" class="wt-btn">View Detail</a></li>
 												</ul>
 											</div>
@@ -354,6 +288,8 @@
 		</div>
 	</main>
 
+	{% endblock %}
 
-
-{% endblock %}
+	{% block scripts %}
+	<script type="text/javascript" src="{% static 'js/proposal-filters.js' %}"></script>
+	{% endblock scripts %}

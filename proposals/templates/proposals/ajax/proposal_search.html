@@ -1,0 +1,33 @@
+{% for proposal in proposals %}
+<div class="wt-userlistinghold wt-featured wt-userlistingholdvtwo">
+    <div class="wt-userlistingcontent">
+        <div class="wt-contenthead">
+            <div class="wt-title">
+                <a href="{% url 'freelancer:freelancer_profile' proposal.created_by.short_name %}"><i class="fa fa-user">&nbsp;&nbsp;Author: </i> {% firstof  proposal.created_by.get_full_name|capfirst proposal.team.created_by.get_full_name|capfirst %}</a>
+                <a href="usersingle.html"><i class="fa fa-group">&nbsp;&nbsp;Team: </i> {% firstof proposal.team.title|capfirst proposal.team.created_by.get_full_name|capfirst %}</a>
+                <h2>{{proposal.title}}</h2>
+            </div>
+            <div class="wt-description">
+                <p>{{proposal.preview}}</p>
+            </div>
+            <div class="wt-tag wt-widgettag">
+                {% for skill in proposal.skill.all %}
+                <a href="javascript:void(0);">{{skill}}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="wt-viewjobholder">
+            <ul>
+                <li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i>{{proposal.get_service_level_display}}</span></li>
+                <li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}} - {% endif %} &nbsp;&nbsp; {{proposal.created_by.country.name}}</span></li>
+                <li><span><i class="far fa-folder wt-viewjobfolder"></i>Revision: {{proposal.get_revision_display}}</span></li>
+                <li><span><i class="far fa-clock wt-viewjobclock"></i>Duration: {{proposal.get_dura_converter_display }}</span></li>
+                <li><span><i class="fa fa-tag wt-viewjobtag"></i>Ref: {{proposal.reference}}</span></li>
+                <li><span><i class="fa fa-group" style='color:blue'></i>Team: {{proposal.team.members.count}} Member{{proposal.team.members.count|pluralize}}</span></li>
+                <li><a href="javascript:void(0);" class="wt-clicklike wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+                <li class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}" class="wt-btn">View Detail</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endfor %}

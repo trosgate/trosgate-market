@@ -1,5 +1,5 @@
 import random
-from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Proposal
 from teams.models import Team
@@ -10,13 +10,95 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from freelancer.models import Freelancer
 from account.permission import user_is_freelancer
-from general_settings.models import Category, ProposalGuides
+from general_settings.models import Category, ProposalGuides, Skill
 from datetime import datetime, timezone, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from teams.models import Team
 from django.utils.text import slugify
 from django.contrib import auth, messages
 from django.views.decorators.cache import cache_control #prevent back button on browser after form submission
+from account.models import Country
+from django.template.loader import render_to_string
+from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+
+
+#this will appear in search results
+def proposal_listing(request):
+    categorie = Category.objects.filter(visible = True).distinct()
+    countries = Country.objects.filter(supported = True).distinct()
+    skills = Skill.objects.all().distinct()
+    proposals = Proposal.active.all().distinct()
+    base_currency = get_base_currency_symbol()
+    
+    context = {
+        "skills":skills, 
+        "countries":countries, 
+        "categorie":categorie, 
+        "proposals": proposals,
+        "base_currency": base_currency,
+    }
+    return render(request, 'proposals/proposal_listing.html', context)
+
+
+def proposal_filter(request):
+    country = request.GET.getlist('country[]')
+    category = request.GET.getlist('category[]')
+    skill = request.GET.getlist('skill[]')
+    revision_true = request.GET.get('true[]', '')
+    revision_false = request.GET.get('false[]', '')
+    one_day = request.GET.get('one_day[]', '')
+    two_days = request.GET.get('two_days[]', '')
+    three_days = request.GET.get('three_days[]', '')
+    four_days = request.GET.get('four_days[]', '')
+    five_days = request.GET.get('five_days[]', '')
+    six_days = request.GET.get('six_days[]', '')
+    one_week = request.GET.get('one_week[]', '')
+    two_weeks = request.GET.get('two_weeks[]', '')
+    three_weeks = request.GET.get('three_weeks[]', '')
+    one_month = request.GET.get('one_month[]', '')
+    upgraded_teams = request.GET.get('upgradedTeams[]', '')
+
+    proposals = Proposal.active.all()
+    if len(country) > 0:
+        proposals = proposals.filter(team__created_by__country__id__in=country).distinct()
+    if len(category) > 0:
+        proposals = proposals.filter(category__id__in=category).distinct()
+    if len(skill) > 0:
+        proposals = proposals.filter(skill__id__in=skill).distinct()
+    if revision_true != '':
+        proposals = proposals.filter(revision=True).distinct()
+    if revision_false != '':
+        proposals = proposals.filter(revision=False).distinct()
+    if one_day != '':
+        proposals = proposals.filter(dura_converter = one_day).distinct()
+    if two_days != '':
+        proposals = proposals.filter(dura_converter = two_days).distinct()
+    if three_days != '':
+        proposals = proposals.filter(dura_converter = three_days).distinct()
+    if four_days != '':
+        proposals = proposals.filter(dura_converter = four_days).distinct()
+    if five_days != '':
+        proposals = proposals.filter(dura_converter = five_days).distinct()
+    if six_days != '':
+        proposals = proposals.filter(dura_converter = six_days).distinct()
+    if one_week != '':
+        proposals = proposals.filter(dura_converter = one_week).distinct()
+    if two_weeks != '':
+        proposals = proposals.filter(dura_converter = two_weeks).distinct()
+    if three_weeks != '':
+        proposals = proposals.filter(dura_converter = three_weeks).distinct()
+    if one_month != '':
+        proposals = proposals.filter(dura_converter = one_month).distinct()
+    if upgraded_teams != '':
+        proposals = proposals.filter(team__package__type = 'Team').distinct()
+
+    returned_proposal = render_to_string('proposals/ajax/proposal_search.html', {'proposals':proposals})
+    if len(proposals) > 0:       
+        return JsonResponse({'proposals': returned_proposal})
+    else:
+        returned_proposal = f'<div class="alert alert-warning text-center" role="alert" style="color:red;"> Hmm! nothing to show for this search</div>'
+        return JsonResponse({'proposals': returned_proposal})
+
 
 
 @login_required
@@ -107,7 +189,6 @@ def proposal_step_two(request):
         'proposalformtwo': proposalformtwo,
     }
     return render(request, 'proposals/proposal_step_two.html', context)
-
 
 
 @login_required
@@ -384,16 +465,6 @@ def modify_proposal_page(request, proposal_slug):
     Proposal.objects.filter(team=team, slug=proposal_slug).update(status = Proposal.MODIFY)
 
 
-#this will appear in search result even without login
-def proposal_list(request):
-    category = Category.objects.filter(visible = True)
-    proposals_list = Proposal.objects.filter(status = Proposal.ACTIVE)
-    context = {
-        "category":category, 
-        "proposals_list": proposals_list,
-    }
-    return render(request, 'proposals/proposal_listing.html', context)
-
 
 @login_required
 @user_is_freelancer
@@ -413,12 +484,11 @@ def proposal_preview(request, short_name, proposal_slug):
         "guides": guides,
 
     }
-    return render(request, 'proposals/proposal_detail.html', context)
-
+    return render(request, 'proposals/proposal_preview.html', context)
 
 
 def proposal_detail(request, short_name, proposal_slug):
-    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE, published=True)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)
     
     team_members = proposal.team.members.all()
@@ -453,7 +523,6 @@ def proposal_detail(request, short_name, proposal_slug):
         "all_viewed_proposals":all_viewed_proposals,
     }
     return render(request, 'proposals/proposal_detail.html', context)
-
 
 
 @login_required

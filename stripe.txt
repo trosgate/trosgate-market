@@ -17,7 +17,9 @@ stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/
 
 or 
 
-./stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/ 
+.\stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/ 
+
+or 
 
 stripe listen --api-key sk_test_51JxEfNF4wH80TkNlwb7kYyjvWkJnB3BjBantEbw5akhnOZCSnCb4nqxBW8mjpMvnjJUWvKRq745IMrb5Ri9CbLTw00f7IG6QDi
 

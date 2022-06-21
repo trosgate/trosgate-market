@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.template.defaultfilters import truncatechars
 from django.utils.safestring import mark_safe
+from account.fund_exception import ReviewException
+
 # from django.utils import timezone
 
 # self.last_updated = timezone.localtime(timezone.now())
@@ -70,8 +72,8 @@ class ProjectCompletionFiles(models.Model):
 
 class ApplicationReview(models.Model):
     resolution = models.ForeignKey(ProjectResolution, verbose_name=_("Applicant Review"), related_name="reviewapplication", on_delete=models.CASCADE)
-    title = models.CharField(_("Title"), max_length=100, blank=False, null=False, validators=[MinValueValidator(50)])
-    message = models.TextField(_("Message"), max_length=250, blank=False, null=False, validators=[MinValueValidator(50), MaxValueValidator(500)])
+    title = models.CharField(_("Title"), max_length=100)
+    message = models.TextField(_("Message"), max_length=650)
     rating = models.PositiveSmallIntegerField(_("Rating"), default=3)
     status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')))
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
@@ -84,12 +86,8 @@ class ApplicationReview(models.Model):
 
 
     def __str__(self):
-        return f'{self.message_slice}({self.status})'
+        return self.title
 
-
-    @property
-    def message_slice(self):
-        return truncatechars(self.message, 50)
 
 
 
@@ -149,10 +147,10 @@ class ProposalCompletionFiles(models.Model):
 
 class ProposalReview(models.Model):
     resolution = models.ForeignKey(ProposalResolution, verbose_name=_("Proposal Review"), related_name="reviewproposal", on_delete=models.CASCADE)
-    title = models.CharField(_("Title"), max_length=100, blank=False, null=False, validators=[MinValueValidator(50)])
-    message = models.TextField(_("Message"), max_length=250, blank=False, null=False, validators=[MinValueValidator(50), MaxValueValidator(500)])
+    title = models.CharField(_("Title"), max_length=100)
+    message = models.TextField(_("Message"), max_length=650)
     rating = models.PositiveSmallIntegerField(_("Rating"), default=3)
-    status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')))
+    status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')), default=True)
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
 
     class Meta:
@@ -161,23 +159,28 @@ class ProposalReview(models.Model):
         verbose_name_plural = _("Proposal Review")
 
     def __str__(self):
-        return f'{self.message_slice}({self.status})'
+        return self.title
 
 
-    @classmethod
-    def create(cls, resolution, title, message:str, rating:int, status:bool):
+    # @classmethod
+    # def create(cls, resolution, title, message:str, rating:int):
 
-        with db_transaction.atomic():
-            payout = cls.objects.create(
-                resolution=resolution, message=message, rating=rating, status='pending',
-            )
+    #     with db_transaction.atomic(): #nowait=True
+    #         if resolution is None:
+    #             raise ReviewException(_("Bad request.Please contact Admin"))
+    #         if title is None:
+    #             raise ReviewException(_("Title is required"))
+    #         if message is None:
+    #             raise ReviewException(_("message is required"))
+    #         if rating is None:
+    #             raise ReviewException(_("message is required"))               
 
-            # Create related objects etc...
-        return payout
+    #         review = cls.objects.select_for_update(nowait=True).get(resolution=resolution)
 
-    @property
-    def message_slice(self):
-        return truncatechars(self.message, 50)
+    #         review.save(update_fields=['resolution','title','message','rating'])
+
+    #     return review
+
 
 
 

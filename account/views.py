@@ -38,12 +38,9 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_a
 from general_settings.models import Mailer
 
 
-
 def autoLogout(request):
     logout(request)
     request.user = None
-    messages.info(
-        request, "The system has logged you out and your Account is now secure")
     return redirect('account:homepage')
 
 

@@ -91,14 +91,12 @@ def modify_from_hiring_box(request):
         proposal_id = int(request.POST.get('proposalid'))
         member_qty = int(request.POST.get('memberqty'))
         hiringbox.modify(proposal=proposal_id, member_qty=member_qty)
-        proposal = get_object_or_404(
-            Proposal, id=proposal_id, status=Proposal.ACTIVE)
+        proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
 
         line_total_price = member_qty * proposal.salary
         memberqty = hiringbox.__len__()
         grand_total = hiringbox.get_total_price_before_fee_and_discount()
-        response = JsonResponse({'member_qty': memberqty, 'grandtotal': grand_total,
-                                'total_price': line_total_price})
+        response = JsonResponse({'member_qty': memberqty, 'grandtotal': grand_total, 'total_price': line_total_price})
         return response
 
 
@@ -313,7 +311,6 @@ def get_flutterwave_verification(unique_reference, flutterwave_order_key):
         unique_reference=unique_reference, 
         status=Purchase.FAILED,        
     ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
-
 
 
 @require_http_methods(['POST'])

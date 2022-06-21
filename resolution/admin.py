@@ -18,8 +18,8 @@ class ProjectResolutionFilesAdmin(admin.ModelAdmin):
 
 class ApplicationReviewAdmin(admin.ModelAdmin):
     model = ApplicationReview
-    list_display = ['resolution', 'title', 'rating','status']
-    list_display_links = ['resolution']
+    list_display = ['title', 'resolution', 'rating','status']
+    list_display_links = ['title']
     list_editable = [ 'status','rating']
     search_fields = ['title', 'resolution__team__title']
 
@@ -31,15 +31,15 @@ class ProposalResolutionAdmin(admin.ModelAdmin):
 
 class ProposalCompletionFilesAdmin(admin.ModelAdmin):
     model = ProposalCompletionFiles
-    list_display = ['proposal', 'attachment',]
+    list_display = ['proposal', 'attachment']
 
 
 class ProposalReviewAdmin(admin.ModelAdmin):
     model = ProposalReview
-    list_display = ['resolution', 'title', 'rating','status']
+    list_display = ['title', 'resolution', 'rating', 'status']
     list_display_links = ['title']
-    list_editable = [ 'status','rating']
-    search_fields = ['title', 'resolution__team__title']
+    list_editable = [ 'status', 'rating']
+    search_fields = ['title']
 
 
 admin.site.register(ProjectResolution, ProjectResolutionAdmin)

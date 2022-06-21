@@ -11,26 +11,27 @@ from proposals.utilities import (
 
 @receiver(post_save, sender=Project)
 def create_deadline_of_project(sender, instance, created, **kwargs):
-    if instance.dura_converter == instance.ONE_DAY:
+    if instance.dura_converter == "one_day":
         Project.objects.filter(pk=instance.id).update(duration = one_day())
-    if instance.dura_converter == instance.TWO_DAYS:
+    if instance.dura_converter == "two_days":
         Project.objects.filter(pk=instance.id).update(duration = two_days())
-    if instance.dura_converter == instance.THREE_DAYS:
+    if instance.dura_converter == "three_days":
         Project.objects.filter(pk=instance.id).update(duration = three_days())
-    if instance.dura_converter == instance.FOUR_DAYS:
+    if instance.dura_converter == "four_days":
         Project.objects.filter(pk=instance.id).update(duration = four_days())
-    if instance.dura_converter == instance.FIVE_DAYS:
+    if instance.dura_converter == "five_days":
         Project.objects.filter(pk=instance.id).update(duration = five_days())
-    if instance.dura_converter == instance.SIX_DAYS:
+    if instance.dura_converter == "six_days":
         Project.objects.filter(pk=instance.id).update(duration = six_days())
-    if instance.dura_converter == instance.ONE_WEEK:
+    if instance.dura_converter == "one_week":
         Project.objects.filter(pk=instance.id).update(duration = one_week())
-    if instance.dura_converter == instance.TWO_WEEK:
+    if instance.dura_converter == "two_weeks":
         Project.objects.filter(pk=instance.id).update(duration = two_weeks())
-    if instance.dura_converter == instance.THREE_WEEK:
+    if instance.dura_converter == "three_weeks":
         Project.objects.filter(pk=instance.id).update(duration = three_weeks())
-    if instance.dura_converter == instance.ONE_MONTH:
+    if instance.dura_converter == "one_month":
         Project.objects.filter(pk=instance.id).update(duration = one_month())
+        
 
 
 

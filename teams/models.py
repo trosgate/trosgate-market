@@ -82,30 +82,20 @@ class Team(models.Model):
 
     title = models.CharField(_("Title"), max_length=100, unique=True)
     notice = models.TextField(_("Notice"), max_length=500)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_(
-        "Team Members"), related_name="team_member")
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(
-        "Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
-    status = models.CharField(
-        _("Team Status"), max_length=20, choices=STATUS, default=ACTIVE)
-    package = models.ForeignKey(
-        Package, related_name='teams', on_delete=models.CASCADE)
-    package_status = models.CharField(
-        _("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
-    package_expiry = models.DateTimeField(
-        _("Package Expiry Date"), blank=True, null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
+    status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=ACTIVE)
+    package = models.ForeignKey(Package, related_name='teams', on_delete=models.CASCADE)
+    package_status = models.CharField(_("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
+    package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     slug = models.SlugField(_("Slug"), max_length=100, editable=True)
     # payment method to be used by User to activate plan
-    stripe_customer_id = models.CharField(
-        _("Stripe Customer ID"), max_length=255, blank=True, null=True)
-    stripe_subscription_id = models.CharField(
-        _("Stripe Subscription ID"), max_length=255, blank=True, null=True)
-    paypal_customer_id = models.CharField(
-        _("Paypal Customer ID"), max_length=255, blank=True, null=True)
-    paypal_subscription_id = models.CharField(
-        _("Paypal Subscription ID"), max_length=255, blank=True, null=True)
+    stripe_customer_id = models.CharField(_("Stripe Customer ID"), max_length=255, blank=True, null=True)
+    stripe_subscription_id = models.CharField(_("Stripe Subscription ID"), max_length=255, blank=True, null=True)
+    paypal_customer_id = models.CharField(_("Paypal Customer ID"), max_length=255, blank=True, null=True)
+    paypal_subscription_id = models.CharField(_("Paypal Subscription ID"), max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -149,8 +139,7 @@ class Invitation(models.Model):
         (ACCEPTED, _('Accepted'))
     )
 
-    team = models.ForeignKey(
-        Team, related_name='invitations', on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, related_name='invitations', on_delete=models.CASCADE)
     email = models.EmailField(max_length=100)
     code = models.CharField(unique=True, max_length=10, blank=True,)
     status = models.CharField(max_length=20, choices=STATUS, default=INVITED)

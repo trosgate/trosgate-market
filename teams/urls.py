@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 # , stripe_webhook
-from .stripe_subscription import create_stripe_checkout_session, init_stripe_config
+from .stripe_subscription import create_stripe_checkout_session, init_stripe_config, stripe_subscription_checkout_session
 
 app_name = 'teams'
 
@@ -52,5 +52,6 @@ urlpatterns = [
     path('api/init_stripe_config/', init_stripe_config),
     path('api/stripe_checkout_session/', create_stripe_checkout_session, name='create_stripe_checkout_session'),
     #     path('api/stripe_webhook/', stripe_webhook, name='stripe_webhook'),
+    path('api/stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
 
 ]

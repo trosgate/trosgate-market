@@ -23,7 +23,7 @@
 				</div>
 			</div>
 
-			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+			{% comment %} <main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor"> {% endcomment %}
 
             <div class="wt-haslayout wt-main-section">
                 <div class="container">
@@ -94,14 +94,13 @@
             </div>
         </div>
         {% include 'dashboard/main_footer.html' %}
-        </main>
 			<!--Main End-->
     <script>
         $(document).on('click', '#add-box', function (e) {
             e.preventDefault();
             $.ajax({
             type: 'POST',
-            url: '{% url "payment:add_to_hiring_box" %}',
+            url: '{% url "transactions:add_to_hiring_box" %}',
             data: {
                 proposalid: $('#add-box').val(),
                 memberqty: $('#select option:selected').text(),

@@ -498,6 +498,7 @@ def delete_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
 @login_required
 def purchase_package(request, type):
     PayPalClient = PayPalClientConfig().paypal_public_key()
+    stripe_public_key = StripeClientConfig().stripe_public_key()
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     if not team.created_by == request.user:
         messages.error(
@@ -505,10 +506,11 @@ def purchase_package(request, type):
         return redirect("account:dashboard")
 
     package = ''
+
     if team:
         package = get_object_or_404(Package, type=type)
 
-    return render(request, 'teams/purchase_package.html', {'package': package, 'publishable_key': PayPalClient})
+    return render(request, 'teams/purchase_package.html', {'package': package, 'stripe_public_key': stripe_public_key})
 
 
 @login_required

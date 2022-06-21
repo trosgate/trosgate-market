@@ -1,8 +1,8 @@
-        {% extends "dashboard/main_base.html" %}
-        {% load static %}
-        {% block content%}
-        <link rel="stylesheet" href="{% static 'css/bootstrap-5.min.css'%}">
-        
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% comment %} <link rel="stylesheet" href="{% static 'css/bootstrap-5.min.css'%}"> {% endcomment %}
+
         
     <div class="wt-dashboardbox">
         <div class="wt-proposalsr">
@@ -48,7 +48,8 @@
                                 <h3 class="card-text ps-2 pb-3">Option #1: Stripe Checkout</h3>
                                 </div>
                                 </div>
-                                <button type="submit" id="submitBtn" class="wt-btn">Stripe</button>
+                                {% comment %} <button type="submit" id="submitBtn" class="wt-btn">Stripe</button> {% endcomment %}
+                                <button onclick='stripeSubscriber(event)' class="btn btn-primary w-100 fw-bold">Pay with Stripe </button>
                             </div>
                             </div>
                             <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
@@ -79,65 +80,47 @@
                 </div>
             </div>
         </div> 
-     
-        {% comment %} <script src="https://www.paypal.com/sdk/js?client-id={{publishable_key}}" data-sdk-integration-source="button-factory"></script>       
-
-        <script>
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                    }
-                }
-                return cookieValue;
-            }
-            var csrftoken = getCookie('csrftoken');
-
-            function packagePayPalButton(){
-                paypal.Buttons({
-                    style: {
-                        shape: 'rect',
-                        color: 'gold',
-                        layout: 'vertical',
-                        label: 'subscribe'
-                    },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        /* Creates the subscription */
-                        plan_id: 'P-2U544007T7929025VMIR5YJI'
-                      });
-                    },
-                onApprove: function (data) {
-                    var url = "{% url 'teams:paypal_package_order' %}"
-                    return fetch(url, {
-                        method: 'POST',
-                        headers: {
-                        'content-type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                        },
-                        body: JSON.stringify({
-                        orderID: data.orderID
-                        })
-                    }).then(function () {
-                        location.href = "{% url 'teams:package_success' %}" 
-                    })
-                    },
-                }).render('#paypal-button-container');
-            }
-            packagePayPalButton();  
-               
-        </script> {% endcomment %}
-
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="{% static 'js/payments/stripe-subscription.js' %}"></script>
-
+          
 {% endblock %}
+{% block scripts %}
+<script src="https://js.stripe.com/v3/"></script>
+{% comment %} <script src="{% static 'js/payments/stripe-subscription.js' %}"></script> {% endcomment %}
+
+<script>
+    function stripeSubscriber(event) {
+        event.preventDefault();
+        let data = {
+            'package': '{{package.id}}', 
+      
+          }
+      
+          let stripe = Stripe('{{stripe_public_key}}');
+      
+          fetch('/team/api/stripe_subscription_checkout_session/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{csrf_token}}'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+          })
+            .then(function (response) {
+              return response.json()
+            })
+            .then(function (session) {
+              return stripe.redirectToCheckout({ sessionId: session.sessionId.id })
+            })
+            .then(function (result) {
+              return console.log(result.error.message)
+            })
+            .catch(function (error) {
+              return console.log(error)
+            })
+        }
+</script>
+
+{% endblock scripts %}
         
         
         
