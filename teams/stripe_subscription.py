@@ -10,25 +10,30 @@ from django.http.response import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from . models import Team, Package
-from transactions.models import Purchase
+from transactions.models import SubscriptionItem
 from general_settings.gateways import StripeClientConfig
+from django.contrib import messages
+from django.utils import timezone
 
-# success_url='http://' + str(get_current_site(request))+'/application/success/',
-# cancel_url='http://' + str(get_current_site(request))+'/dashboard/'
 
 @login_required
 def stripe_subscription_checkout_session(request):
-    # site_url = 'http://127.0.0.1:8000'
+    data = json.loads(request.body)
+    team_id = data['team_id']
+    
+    team = Team.objects.filter(pk=team_id, created_by=request.user, status=Team.ACTIVE)
+    if not team:
+        error_message = messages.error(request, 'Bad request. Let the team owner subscribe')
+        return HttpResponse({'error_message': error_message})
+         
     site_url =  'http://' + str(get_current_site(request))
 
     stripe_obj = StripeClientConfig()
-    stripe_reference = stripe_obj.stripe_unique_reference()
     stripe.api_key = stripe_obj.stripe_secret_key()    
     price_id = stripe_obj.stripe_subscription_price_id()
-    team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     try:
         checkout_session = stripe.checkout.Session.create(
-            client_reference_id=request.user.freelancer.active_team_id,
+            client_reference_id=team_id,
             success_url='%s%s?session_id={CHECKOUT_SESSION_ID}' % (site_url, reverse('teams:package_success')),
             cancel_url='%s%s' % (site_url, reverse('teams:packages')),
             payment_method_types=['card'],
@@ -41,17 +46,17 @@ def stripe_subscription_checkout_session(request):
             mode='subscription',
             
         )
-        
+
         return JsonResponse({'sessionId': checkout_session})
-            # return JsonResponse({'sessionId': checkout_session['id']})
     except Exception as e:
         return JsonResponse({'error': str(e)})
 
 
 # @csrf_exempt
-# def stripe_webhook(request):
-#     stripe.api_key = stripe_api.stripe_secret_key()
-#     webhook_key = stripe_api.stripe_webhook_key()
+# def stripe_subscription_webhook(request):
+#     stripe_obj = StripeClientConfig()
+#     stripe.api_key = stripe_obj.stripe_secret_key()
+#     webhook_key = stripe_obj.stripe_webhook_key()
 
 #     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
 #     payload = request.body

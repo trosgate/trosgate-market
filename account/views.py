@@ -50,10 +50,8 @@ def homepage(request):
 
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
-    proposals = Proposal.objects.filter(
-        status=Proposal.ACTIVE, published=True)[0:12]
-    projects = Project.objects.filter(
-        status=Project.ACTIVE, published=True)[0:6]
+    proposals = Proposal.active.filter(published=True)[0:12]
+    projects = Project.objects.filter(status=Project.ACTIVE, published=True)[0:6]
 
     context = {
         'proposals': proposals,

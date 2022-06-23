@@ -214,20 +214,18 @@ class SalesReporting(models.Model):
 
 
 class SubscriptionItem(models.Model):
-    team = models.ForeignKey("teams.Team", verbose_name=_(
-        "Team"), related_name='subscriptionteam', on_delete=models.CASCADE)
-    subscriber = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="teamsubscriber")
-    payment_method = models.CharField(
-        _("Payment Method"), max_length=200, blank=True)
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='subscriptionteam', on_delete=models.CASCADE)
+    payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
     price = models.PositiveIntegerField()
-    status = models.BooleanField(_("Paid"), choices=(
-        (False, 'No'), (True, 'Yes')), default=False)
-    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+    status = models.BooleanField(_("Paid"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    customer_id = models.CharField(_("Customer ID"), max_length=255, blank=True, null=True)
+    subscription_id = models.CharField(_("Subscription ID"), max_length=255, blank=True, null=True)    
+    created_at = models.DateTimeField(_("Subscription Start"), blank=True, null=True)
+    activation_time = models.DateTimeField(_("Activation Time"), blank=True, null=True)
+    expired_time = models.DateTimeField(_("Est. Expiration"), blank=True, null=True)
 
     class Meta:
         ordering = ("-created_at",)
         
     def __str__(self):
-        return str(self.subscriber)
+        return str(self.team.title)

@@ -20,7 +20,7 @@ from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
-from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SalesReporting
+from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SalesReporting, SubscriptionItem
 from . forms import PurchaseForm
 from . hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
@@ -30,6 +30,12 @@ from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.decorators.http import require_http_methods
 from contract.models import InternalContract
+from django.utils import timezone
+from datetime import timedelta
+
+
+def get_expiration():
+    return (timezone.now() + timedelta(days = 30))
 
 
 @login_required
@@ -470,9 +476,11 @@ def stripe_webhook(request):
     payload = request.body
     stripe.api_key = StripeClientConfig().stripe_secret_key()
     webhook_key = StripeClientConfig().stripe_webhook_key()    
-    event = None
-
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
+    team = ''
+    package = ''
+    
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, webhook_key)
@@ -485,11 +493,34 @@ def stripe_webhook(request):
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-
         if session.payment_status == 'paid':
-            stripe_specific_payment_confirmation(session.payment_intent)            
+            try:
+                stripe_specific_payment_confirmation(session.payment_intent)            
+                team = Team.objects.get(pk=session.get('client_reference_id'))
+                team.stripe_customer_id = session.get('customer')
+                team.stripe_subscription_id = session.get('subscription')
+                team.save()
+                
+                package = Package.objects.get(is_default=False, type='Team')
+                SubscriptionItem.objects.create(
+                    team=team,
+                    customer_id = team.stripe_customer_id,
+                    subscription_id=team.stripe_subscription_id,
+                    payment_method='Stripe', 
+                    price=package.price, 
+                    created_at = timezone.now(),
+                    activation_time = timezone.now(),
+                    expired_time = get_expiration(),
+                    status = True,
+                )
+                           
+            except:
+                print('Payment unsuccessful')
+        else:
+            print('Payment unsuccessful')  
+
     else:
-        print('Unhandled event type {}'.format(event.type))
+        print('Payment unsuccessful')
 
     return HttpResponse(status=200)
   

@@ -45,13 +45,12 @@ urlpatterns = [
     path('packages/', views.packages, name='packages'),
     path('package/<slug:type>/', views.purchase_package, name='purchase_package'),
     path('packages/success/', views.plans_activated, name='package_success'),
-    path('packages/paypal/create/', views.paypal_package_order,
-         name='paypal_package_order'),
+    path('packages/paypal/create/', views.paypal_package_order, name='paypal_package_order'),
 
     # payment api with stripe urls
     path('api/init_stripe_config/', init_stripe_config),
     path('api/stripe_checkout_session/', create_stripe_checkout_session, name='create_stripe_checkout_session'),
-    #     path('api/stripe_webhook/', stripe_webhook, name='stripe_webhook'),
     path('api/stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
+#     path('stripe_subscription_webhook/', stripe_subscription_webhook, name='stripe_subscription_webhook'),
 
 ]

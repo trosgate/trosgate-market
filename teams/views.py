@@ -267,11 +267,10 @@ def accept_team_invitation(request):
 
                 return redirect('account:dashboard')
             else:
-                messages.error(
-                    request, 'Sorry! No invitation for the given information')
+                messages.error(request, 'Sorry! No invitation for the given information')
         else:
             messages.error(
-                request, f'Sorry! the code provided is invalid. Please contact team founder')
+                request, f'Invalid code. Please contact team founder to assist')
 
     return render(request, 'teams/accept_team_invitation.html')
 
@@ -362,8 +361,7 @@ def reassign_proposals_to_myself(request, member_id):
 @login_required
 @user_is_freelancer
 def assigned_proposals_to_members(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
     assigned = team.assignteam.filter(
         proposal__status=Proposal.ACTIVE, is_assigned=True)
 
@@ -412,11 +410,9 @@ def re_assign_proposal_to_any_member(request, assign_id, proposal_slug):
 @login_required
 @user_is_freelancer
 def proposal_tracking(request,  proposal_slug, assign_id):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
     proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
-    assigned = get_object_or_404(
-        AssignMember, pk=assign_id, team=team)  # , is_tracked=True
+    assigned = get_object_or_404(AssignMember, pk=assign_id, team=team)  # , is_tracked=True
 
     if request.method == 'POST':
         hours = int(request.POST.get('hours', 0))
@@ -443,12 +439,10 @@ def proposal_tracking(request,  proposal_slug, assign_id):
 @login_required
 @user_is_freelancer
 def modify_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
     proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
     assigned = get_object_or_404(AssignMember, pk=assign_id, team=team)
-    tracking = get_object_or_404(
-        Tracking, pk=tracking_id, team=team, is_tracked=True)
+    tracking = get_object_or_404(Tracking, pk=tracking_id, team=team, is_tracked=True)
 
     if request.method == 'POST':
         hours = int(request.POST.get('hours', 0))
@@ -544,11 +538,9 @@ def plans_activated(request):
 
 @login_required
 def packages(request):
-    team = get_object_or_404(
-        Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     if not team.created_by == request.user:
-        messages.error(
-            request, 'You must be the owner of this team to access subscription page')
+        messages.error(request, 'Bad request. Page is restricted to non-founders')
         return redirect("account:dashboard")
 
     StripeClient = StripeClientConfig()
@@ -558,15 +550,15 @@ def packages(request):
     if request.GET.get('cancel_package', ''):
         try:
             default_package = Package.objects.get(is_default=True)
-
             team.package = default_package
-            team.package_status = Team.CANCELED
+            team.package_status = Team.DEFAULT
             team.package_expiry = datetime.now()
             team.save()
+            
             stripe.api_key = StripeClient.stripe_secret_key
             stripe.Subscription.delete(team.stripe_subscription_id)
         except:
-            error = 'Ooops! Something went wrong with the cancelation. Please try again!'
+            error = 'Ooops! Something went wrong. Please try again later!'
 
     context = {
         'team': team,

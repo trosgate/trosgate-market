@@ -93,8 +93,13 @@ class SalesReportingAdmin(admin.ModelAdmin):
 
 class SubscriptionItemAdmin(admin.ModelAdmin):
     model = SubscriptionItem
-    list_display = ['subscriber', 'team', 'payment_method', 'price', 'created_at', ]
-
+    list_display = ['team', 'payment_method', 'price', 'status', 'activation_time','expired_time']
+    readonly_fields = ['created_at']
+    fieldsets = (
+        ('Customer', {'fields': ('team', 'customer_id', 'subscription_id',)}),
+        ('State and Attributes', {'fields': ('price', 'status','payment_method',)}),
+        ('Timestamp', {'fields': ('created_at', 'activation_time','expired_time',)}),
+    )
 
 admin.site.register(Purchase, PurchaseAdmin)
 admin.site.register(ApplicationSale, ApplicationSaleAdmin)
