@@ -50,14 +50,16 @@ def homepage(request):
 
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
-    proposals = Proposal.active.filter(published=True)[0:12]
-    projects = Project.objects.filter(status=Project.ACTIVE, published=True)[0:6]
+    proposals = Proposal.active.filter(published=True).distinct()[0:12]
+    projects = Project.objects.filter(status=Project.ACTIVE, published=True).distinct()[0:6]
+    users = Freelancer.objects.filter(user__is_active=True).distinct()[0:12]
 
     context = {
         'proposals': proposals,
         'projects': projects,
         'packages': packages,
         'pypist': pypist,
+        'users': users,
     }
     return render(request, 'homepage.html', context)
 

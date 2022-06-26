@@ -147,16 +147,16 @@
 									<div class="wt-companysdetails">
 										<figure class="wt-companysimg">
 										{% if proposal.thumbnail %}
-											<img src="{{proposal.thumbnail.url}}" alt="img description">
+											<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
 										{% else %}
-											<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" alt="img description">
+											<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" style="height:80px;" alt="img description">
 										{% endif %}
 										</figure>
 										<div class="wt-companysinfo">
 											<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description"></figure>
 											<div class="wt-title">
 												<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_short_name}}{% endif %}</a>
-												<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title}}</p></a> 
+												<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a>
 												<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
 											<hr>
 											<ul class="wt-postarticlemeta">
@@ -183,7 +183,49 @@
 						</div>
 					</div>
 				</section>
-
+				{% if not request.user.is_authenticated %}
+				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>Top Freelancers</h2>
+										<span>Verified Freelancers</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>		
+					<div class="container">
+						<div class="row justify-content-md-center">
+						{% for user in users %}
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+							<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+								<div class="wt-proposalsr wt-box-shadow">
+									<div class="wt-proposalsrcontent">
+									<a href="{% url 'proposals:proposal_list' %}"> 
+										<figure><img src="{% if user.profile_photo %} {{user.profile_photo.url }}{% endif %}" style="height:60px; width:60px" alt="image"></figure>
+									</a>
+									<h4>{{user.user.get_full_name}}</h4>
+									<span>{{user.tagline}}</span>
+									<div class="wt-title">
+										<div class="wt-proposalhead">
+											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+												<li><span><i class="fa fa-dollar-sign"></i> Worth: {{proposal.get_service_level_display}}</span></li>
+												<li><span>{% if user.user.country.flag %}<img src="{{user.user.country.flag.url}}" alt="img description"> {% else %}{{user.user.country.country_code}} - {% endif %} {{user.user.country.name}}</span></li>
+												<li><span><i class="far fa-clock"></i> Sales: {{proposal.get_dura_converter_display }}</span></li>
+												<li><span><i class="far fa-star"></i> Review: {{proposal.get_revision_display}}</span></li>
+											</ul>
+											<a href="">Chat</a>
+										</div>
+									</div> 
+								</div>
+							</aside>
+						</div>
+						{% endfor %} 
+				</section>
+				{% endif %}
 				<section class="wt-haslayout wt-main-section">
 					<div class="container">
 						<div class="row justify-content-md-center">

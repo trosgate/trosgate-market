@@ -58,12 +58,10 @@
                                 </div>
                                 <div class="col-md-9 ps-md-1">
                                 <div class="card-body p-1">
-                                    <h3 class="card-text ps-2 pb-3">Option #1: PayPal Checkout</h3>
+                                    <h3 class="card-text ps-2 pb-3">Option #2: Razorpay Checkout</h3>
                                 </div>
                                 </div>
-                                <div id="paypal-button-container"></div>
-                                {% comment %} <div id="paypal-button-container-P-2U544007T7929025VMIR5YJI"></div> {% endcomment %}
-                            </div>
+                                <button id='razorpaySubscriber' class="btn btn-primary w-100 fw-bold">Pay with Razorpay</button></div>
                             </div>
 
                         </div>
@@ -85,7 +83,6 @@
 {% block scripts %}
 <script src="https://js.stripe.com/v3/"></script>
 {% comment %} <script src="{% static 'js/payments/stripe-subscription.js' %}"></script> {% endcomment %}
-
 <script>
     function stripeSubscriber(event) {
         event.preventDefault();
@@ -120,8 +117,80 @@
         }
 </script>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    //Script to add proposal quantity in session             
+    $(document).on('click', '#razorpaySubscriber', function (e) {
+    e.preventDefault();
+    $.ajax({
+        method: 'GET',
+        url: '{% url "teams:razorpay_subscription_checkout_session" %}',
+        success: function (response) {
+            console.log(response)
+            var options = {
+                "key": "{{razorpay_public_key}}",
+                "subscription_id": "sub_JlU2kCShkWoKVq",
+                "name": "My Billing Label",
+                "description": "Auth txn for sub_JlU2kCShkWoKVq",
+                "handler": function (response){
+
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'teams:razorpay_subscription_callback' %}",
+                        data: {
+                            orderid: responseOne.razorpay_order_id,
+                            paymentid: responseOne.razorpay_payment_id,
+                            signature: responseOne.razorpay_signature,
+                            csrfmiddlewaretoken: "{{csrf_token}}",
+                            action: "razorpay-subscription",
+                        },
+                        success: function (responseTwo) {
+                            console.log(responseTwo)
+                            swal("Perfect!", 'All looked good', "success").then((value) =>{
+                                window.location.href = '/transaction/congrats/'
+                            });                        
+                        }
+                    });
+                },
+
+                "prefill": {
+                    "name": "{{request.user.get_full_name}}",
+                    "email": "{{request.user.email}}",
+                    "contact": "{{request.user.phone}}"
+                },
+                "notes": {
+                    "address": "{{request.user.country}}"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();                
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+    });
+</script>
+
 {% endblock scripts %}
         
         
-        
+
+{% comment %} <script src="https://checkout.razorpay.com/v1/checkout.js"></script>      
+<script>         
+   var options = {
+       "key": "{{razorpay_public_key}}",
+       "subscription_id": "sub_JlU2kCShkWoKVq",
+       "name": "My Billing Label",
+       "description": "Auth txn for sub_JlU2kCShkWoKVq",
+       "handler": function (response){
+           alert(response.razorpay_payment_id);
+       }
+   };
+   var rzp1 = new Razorpay(options);
+   document.getElementById('razorpaySubscriber').onclick = function(e){
+       rzp1.open();
+   }
+</script>            {% endcomment %}
         

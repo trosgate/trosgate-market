@@ -193,7 +193,7 @@ class PaymentAPIsAdmin(admin.ModelAdmin):
         ('Flutterwave API', {
          'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
         ('Razorpay API', {
-         'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id',)}),
+         'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
     )
 
     def has_add_permission(self, request):

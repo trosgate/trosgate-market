@@ -49,17 +49,23 @@
 											<li><span><i class="fa fa-dollar-sign"></i> {{proposal.get_service_level_display}}</span></li>
 											<li><span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
 											<li><span><i class="far fa-clock"></i> Duration: {{proposal.get_dura_converter_display }}</span></li>
-											{% comment %} |timeuntil {% endcomment %}
 											<li><span><i class="far fa-folder"></i> Revision: {{proposal.get_revision_display}}</span></li>
 											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Min Salary: ${{proposal.salary}}</span></li>
 										</ul>
 									</div>
 									{% if request.user.is_authenticated and request.user.clients %}
-									<div class="wt-btnarea"><a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="wt-btn">Hire Freelancer</a></div>
+									<div class="wt-btnarea"><a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="wt-btn">Hire Expert</a></div>
+									{% elif request.user.is_authenticated and request.user.freelancer %}
+									<div class="wt-btnarea"><button class="wt-btn" disabled><strike style="color:blue">Hire Expert</strike></button></div>
 									{% elif not request.user.is_authenticated %}
-									<div class="wt-btnarea"><a href="{% url 'account:dashboard' %}" class="wt-btn">Hire Freelancer</a></div>
+									<div class="wt-btnarea"><a href="{% url 'account:dashboard' %}" class="wt-btn">Hire Expert</a></div>
 									{% endif %}
 								</div>
+								</div>
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
+									<figure class="wt-companysimg">
+										<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="width:1920px;" alt="img description">
+									</figure>
 								</div>
 								
 								<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
@@ -268,83 +274,118 @@
 												{% endfor %}
 											</div>
 										</div>
-																			
 									</div>
+									
+									{% if other_proposals|length > 0 %}
+									{% if request.user.clients %}
+									<div class="wt-proposalsr"></div>
+									<div class="wt-dashboardbox">
+										<div class="wt-dashboardboxtitle">
+											<h2>Other Proposals</h2>
+										</div>
+										<div class="wt-dashboardboxcontent wt-hiredfreelance">
+											{% for oth_proposal in other_proposals %}
+											<div class="wt-userlistinghold wt-featured">
+												<a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}">
+													<figure class="wt-userlistingimg">
+														<img src="{% firstof oth_proposal.thumbnail.url oth_proposal.team.created_by.freelancer.profile_photo.url oth_proposal.created_by.freelancer.profile_photo.url%}" style="height:60px; width:60px" alt="image description" class="img description">
+													</figure>
+												</a>
+												<div class="wt-proposaldetails">
+													<div class="wt-contenthead">
+														<div class="wt-title">
+															<h3>{% if request.user.is_authenticated %} {{proposal.created_by.get_full_name|capfirst}} {% else %} {{proposal.created_by.short_name|capfirst}} {% endif %}</h3><span>{{oth_proposal.title|truncatechars:255}}</span>
+															<a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
+														</div>
+													</div>													
+												</div>	
+											</div>
+											{% endfor %}
+										</div>
+									</div>
+									{% endif %}
+									{% endif %}
 								</div>
+
 								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
 								<aside id="wt-sidebar" class="wt-sidebar">
-									<div class="wt-proposalsr">
-										<div class="wt-companysinfo"></div>								
-											{% if request.user.clients %}
-											<div class="wt-clicksavearea">
-												<span>Save in the Box</span>
-												<a href="{% url 'transactions:hiring_box_summary' %}" class="btn btn-primary"><i class="fas fa-eye"></i> AddOns</a>
-											</div>
-											{% endif %}
-										</div>
-										<div class="wt-companysdetails">
-											<figure class="wt-companysimg">
-												<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" alt="img description">
+								<div class="wt-dashboardbox">
+									<div class="wt-dashboardboxtitle text-center">
+										<h2>About Author</h2>
+									</div>
+									<div class="wt-dashboardboxcontent wt-hiredfreelance">
+										<div class="wt-companysinfo">
+											<figure class="wt-companyad">
+												<img src="{% firstof proposal.created_by.freelancer.profile_photo.url proposal.created_by.freelancer.banner_photo.url proposal.thumbnail.url %}" style="height:100px;" alt="img description">
 											</figure>
-											<div class="wt-companysinfo">
-												<figure><img src="{% firstof proposal.created_by.freelancer.profile_photo.url proposal.created_by.freelancer.banner_photo.url proposal.thumbnail.url %}" alt="img description"></figure>
-												<div class="wt-title"> 
+											<div class="wt-title"> 
+												<a href="javascript:void(0);">
+													<i class="fa fa-check-circle"> {% if request.user.is_authenticated %} {{proposal.created_by.get_full_name|capfirst}} {% else %} {{proposal.created_by.short_name|capfirst}} {% endif %}</i>
+												</a>
+											</div>
+											<ul class="wt-postarticlemeta">
+												<li>
 													<a href="javascript:void(0);">
-														<i class="fa fa-check-circle"> {{proposal.created_by.get_full_name|capfirst}}</i>
+														<span>Jobs</span>
 													</a>
-												</div>
-												<ul class="wt-postarticlemeta">
-													<li>
-														<a href="javascript:void(0);">
-															<span>Jobs</span>
-														</a>
-													</li>
-													<li>
-														<a href="{{profile_view.freelancer_profile_absolute_url}}">
-															<span>Profile</span>
-														</a>
-													</li>
-													<li class="wt-following">
-														<a href="javascript:void(0);">
-															<span>Following</span>
-														</a>
-													</li>
-												</ul>
-											</div>
-												<div class="wt-clicksavearea">
-													<a href="javascrip:void(0);" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Chat Me</a>
-												</div>
+												</li>
+												<li>
+													<a href="{{profile_view.freelancer_profile_absolute_url}}">
+														<span>Profile</span>
+													</a>
+												</li>
+												<li class="wt-following">
+													<a href="javascript:void(0);">
+														<span>Following</span>
+													</a>
+												</li>
+											</ul>
 										</div>
-										<!-- <div class="wt-haslayout wt-dbsectionspace"> -->
-											<div class="wt-dashboardbox">
-												<div class="wt-dashboardboxtitle">
-													<h2>{% if request.user.clients %} Recommended Proposals {% elif request.user.freelancer %} This Team's Proposals {% endif %}</h2>
-												</div>
-												{% if not request.user.is_authenticated %}
-												<div class="wt-clicksavearea">
-													<a href="{% url 'account:login'%}" class="btn btn-info justify-content-md-center">Login to view</a>
-												</div>
-												
-												{% endif %}
-												<div class="wt-dashboardboxcontent wt-hiredfreelance">
-													{% for captured_proposal in all_viewed_proposals %}
-													<div class="wt-userlistinghold wt-featured">
-														<figure class="wt-userlistingimg">
-															<img src="{% firstof captured_proposal.thumbnail.url captured_proposal.team.created_by.freelancer.profile_photo.url captured_proposal.created_by.freelancer.profile_photo.url%}" alt="image description" class="img description">
-														</figure>
-														<div class="wt-proposaldetails">
-															<div class="wt-contenthead">
-																<div class="wt-title">
-																	<h3><a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">{{captured_proposal.team|truncatechars:27}}</a><span>{{captured_proposal.title|truncatechars:27}}</span></h3>
-																	<a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
-																</div>
-															</div>													
-														</div>	
+									</div>
+									<div class="wt-clicksavearea">
+										<a href="javascrip:void(0);" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Chat Me</a>
+									</div>
+								</div>
+									
+								<div class="wt-proposalsr"></div>
+								<div class="wt-dashboardbox text-center">
+									<span>Advertisement</span>
+									<div class="wt-companyad">
+										<figure class="wt-companyadimg">
+											<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="height:350px; width:350px;" alt="img description">
+										</figure>
+									</div>
+								</div>
+
+								{% if request.user.is_authenticated %}
+								<div class="wt-proposalsr"></div>
+									<div class="wt-dashboardbox">
+										<div class="wt-dashboardboxtitle">
+											<h2>{% if request.user.clients %} Recommended Proposals {% elif request.user.freelancer %} This Team's Proposals {% endif %}</h2>
+										</div>
+										<div class="wt-dashboardboxcontent wt-hiredfreelance">
+											{% for captured_proposal in all_viewed_proposals %}
+											<div class="wt-userlistinghold wt-featured">
+											<a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">
+												<figure class="wt-userlistingimg">
+													<img src="{% firstof captured_proposal.thumbnail.url captured_proposal.team.created_by.freelancer.profile_photo.url captured_proposal.created_by.freelancer.profile_photo.url%}" style="height:60px; width:60px" alt="image description" class="img description">
+												</figure>
+											</a>
+											<div class="wt-proposaldetails">
+												<div class="wt-contenthead">
+													<div class="wt-title">
+														<h3><a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">{{captured_proposal.team|truncatechars:27}}</a><span>{{captured_proposal.title|truncatechars:27}}</span></h3>
+														<a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
 													</div>
-													{% endfor %}
-												</div>
+												</div>													
+											</div>	
 											</div>
-										<!-- </div> -->
+											{% empty %}
+											<p>No recommendation at the moment</p>
+											{% endfor %}
+										</div>
+									</div>
+									{% endif %}
 									</aside>
 								</div>
 							</div>

@@ -44,9 +44,11 @@ class TeamAdmin(admin.ModelAdmin):
         ('Team Manager', {'fields': ('created_by',)}),
         ('Team Member(s)', {'fields': ('members',)}),
         ('Package', {'fields': ('package','package_status', 'package_expiry',)}),
-        ('Subscription Option #1', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
-        ('Subscription Option #2', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),
+        ('Subscription Type - Stripe', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
+        ('Subscription Type - Razorpay', {'fields': ('razorpay_plan_item','razorpay_payment_url','razorpay_subscription_id',)}),
+        ('Subscription Type - PayPal', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),
     )  
+
     radio_fields = {'status': admin.HORIZONTAL}
 
     def get_actions(self, request):

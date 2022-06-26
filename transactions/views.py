@@ -519,9 +519,6 @@ def stripe_webhook(request):
         else:
             print('Payment unsuccessful')  
 
-    else:
-        print('Payment unsuccessful')
-
     return HttpResponse(status=200)
   
 

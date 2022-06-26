@@ -136,6 +136,12 @@ class RazorpayClientConfig:
         except:
             return None
 
+    def razorpay_subscription_price_id(self):
+        try:
+            return PaymentAPIs.objects.get(id=1).razorpay_subscription_price_id 
+        except:
+            return None
+
     def razorpay_unique_reference(self):
         return ref_generator()
 

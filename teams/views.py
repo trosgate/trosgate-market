@@ -26,7 +26,7 @@ from datetime import datetime
 from teams.controller import max_member_per_team
 from django.views.decorators.http import require_http_methods
 from freelancer.models import Freelancer
-from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig
+from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from transactions.models import Purchase, SubscriptionItem
 from general_settings.models import PaymentAPIs
@@ -493,6 +493,7 @@ def delete_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
 def purchase_package(request, type):
     PayPalClient = PayPalClientConfig().paypal_public_key()
     stripe_public_key = StripeClientConfig().stripe_public_key()
+    razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     if not team.created_by == request.user:
         messages.error(

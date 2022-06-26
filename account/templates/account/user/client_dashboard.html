@@ -366,14 +366,14 @@
 								<div class="wt-companysdetails">
 									<figure class="wt-companysimg">
 									{% if proposal.thumbnail %}
-										<img src="{{proposal.thumbnail.url}}" alt="img description">
+										<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
 									{% endif %}
 									</figure>
 									<div class="wt-companysinfo">
-										<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description"></figure>
+										<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" style="height:80px;" alt="img description"></figure>
 										<div class="wt-title">
 											<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_full_name}}{% endif %}</a>
-											<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><h2>{{proposal.title}}</h2></a> 
+											<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a> 
 											<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
 										<hr>
 										<ul class="wt-postarticlemeta">

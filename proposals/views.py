@@ -489,10 +489,10 @@ def proposal_preview(request, short_name, proposal_slug):
 
 def proposal_detail(request, short_name, proposal_slug):
     proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
-    profile_view = get_object_or_404(Freelancer, user=proposal.created_by)
-    
+    profile_view = get_object_or_404(Freelancer, user=proposal.created_by)   
+    other_proposals = Proposal.active.exclude(pk=proposal.id)[:4]    
     team_members = proposal.team.members.all()
-    guides = ProposalGuides.objects.all()
+    guides = ProposalGuides.objects.all()[:4]
 
     all_viewed_proposals = ''
     proposal_id = proposal.id
@@ -517,9 +517,11 @@ def proposal_detail(request, short_name, proposal_slug):
     request.session.modified = True
     context = {
         "proposal": proposal,
+        "other_proposals": other_proposals,
         "team_members": team_members,
         "profile_view": profile_view,
         "guides": guides,
+        "sesion_proposal":sesion_proposal,
         "all_viewed_proposals":all_viewed_proposals,
     }
     return render(request, 'proposals/proposal_detail.html', context)

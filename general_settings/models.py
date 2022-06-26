@@ -134,40 +134,27 @@ class TestEmail(models.Model):
 
 
 class PaymentAPIs(models.Model):
-    preview = models.CharField(_("Preamble"), max_length=255,
-                               default="This is the API Section for the integrated payment gateways", blank=True)
-    gateway_count = models.PositiveSmallIntegerField(
-        _("Number of Gateways"), default=4, blank=True, null=True)
+    preview = models.CharField(_("Preamble"), max_length=255, default="This is the API Section for the integrated payment gateways", blank=True)
+    gateway_count = models.PositiveSmallIntegerField(_("Number of Gateways"), default=4, blank=True, null=True)
 
     # Stripe API Credentials
-    stripe_public_key = encrypt(models.CharField(
-        _("STRIPE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    stripe_secret_key = encrypt(models.CharField(
-        _("STRIPE SECRET KEY"), max_length=255, blank=True, null=True))
-    stripe_webhook_key = encrypt(models.CharField(
-        _("STRIPE WEEBHOOK KEY(OPTIONAL)"), max_length=255, blank=True, null=True))
-    stripe_subscription_price_id = encrypt(models.CharField(
-        _("STRIPE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
+    stripe_public_key = encrypt(models.CharField(_("STRIPE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
+    stripe_secret_key = encrypt(models.CharField(_("STRIPE SECRET KEY"), max_length=255, blank=True, null=True))
+    stripe_webhook_key = encrypt(models.CharField(_("STRIPE WEEBHOOK KEY(OPTIONAL)"), max_length=255, blank=True, null=True))
+    stripe_subscription_price_id = encrypt(models.CharField(_("STRIPE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     # PayPal API Credentials
-    paypal_public_key = encrypt(models.CharField(
-        _("PAYPAL PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    paypal_secret_key = encrypt(models.CharField(
-        _("PAYPAL SECRET KEY"), max_length=255, blank=True, null=True))
-    paypal_subscription_price_id = encrypt(models.CharField(
-        _("PAYPAL SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
+    paypal_public_key = encrypt(models.CharField(_("PAYPAL PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
+    paypal_secret_key = encrypt(models.CharField(_("PAYPAL SECRET KEY"), max_length=255, blank=True, null=True))
+    paypal_subscription_price_id = encrypt(models.CharField(_("PAYPAL SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     # Flutterwave API Credentials
-    flutterwave_public_key = encrypt(models.CharField(
-        _("FLUTTERWAVE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    flutterwave_secret_key = encrypt(models.CharField(
-        _("FLUTTERWAVE SECRET KEY"), max_length=255, blank=True, null=True))
+    flutterwave_public_key = encrypt(models.CharField(_("FLUTTERWAVE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
+    flutterwave_secret_key = encrypt(models.CharField(_("FLUTTERWAVE SECRET KEY"), max_length=255, blank=True, null=True))
     flutterwave_secret_hash = models.UUIDField(unique=True, verbose_name="Flutterwave secret Hash", editable=True, default=uuid.uuid4,)
-    flutterwave_subscription_price_id = encrypt(models.CharField(
-        _("FLUTTERWAVE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
+    flutterwave_subscription_price_id = encrypt(models.CharField(_("FLUTTERWAVE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     # Razorpay API Credentials
-    razorpay_public_key_id = encrypt(models.CharField(
-        _("RAZORPAY PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    razorpay_secret_key_id = encrypt(models.CharField(
-        _("RAZORPAY SECRET KEY"), max_length=255, blank=True, null=True))
+    razorpay_public_key_id = encrypt(models.CharField(_("RAZORPAY PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
+    razorpay_secret_key_id = encrypt(models.CharField(_("RAZORPAY SECRET KEY"), max_length=255, blank=True, null=True))
+    razorpay_subscription_price_id = encrypt(models.CharField(_("RAZORPAY SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
 
     def __str__(self):
         return self.preview
