@@ -23,7 +23,7 @@
 				</div>
 			</div>
 
-			<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+			{% comment %} <main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor"> {% endcomment %}
 				<!--Categories Start-->
 				<div class="wt-haslayout wt-main-section">
 					<div class="container">
@@ -48,11 +48,11 @@
 												<div class="col-12 col-sm-12 col-md-6 col-lg-6">
 													<div class="wt-article">
 														<figure>
-															<img src="{{blog.thumbnail.url}}" style="height:80; width:100" alt="img description">
+															<img src="{% if blog.thumbnail %} {{blog.thumbnail.url}} {% endif %}" style="height:350px; width:600px;" alt="img description">
 														</figure>
 														<div class="wt-articlecontent">
 															<div class="wt-title">
-																<h2><a href="{% url 'marketing:blog_detail' blog.slug %}">{{blog.title}}</a></h2>
+																<h2><a href="{% url 'marketing:article_detail' blog.slug %}">{{blog.title}}</a></h2>
 															</div>
 															<ul class="wt-postarticlemeta">
 																<li>
@@ -85,11 +85,11 @@
 												<div class="col-12 col-sm-12 col-md-6 col-lg-6">
 													<div class="wt-article">
 														<figure>
-															<img src="{{blog.thumbnail.url}}" alt="img description">
+															<img src="{% if blog.thumbnail %} {{blog.thumbnail.url}} {% endif %}" style="height:350px; width:600px;" alt="img description">
 														</figure>
 														<div class="wt-articlecontent">
 															<div class="wt-title">
-																<h2><a href="{% url 'marketing:blog_detail' blog.slug %}">{{blog.title}}</a></h2>
+																<h2><a href="{% url 'marketing:article_detail' blog.slug %}">{{blog.title}}</a></h2>
 															</div>
 															<ul class="wt-postarticlemeta">
 																<li>
@@ -122,11 +122,11 @@
 												<div class="col-12 col-sm-12 col-md-6 col-lg-6">
 													<div class="wt-article">
 														<figure>
-															<img src="{{blog.thumbnail.url}}" alt="img description">
+															<img src="{% if blog.thumbnail %} {{blog.thumbnail.url}} {% endif %}" style="height:350px; width:600px;" alt="img description">
 														</figure>
 														<div class="wt-articlecontent">
 															<div class="wt-title">
-																<h2><a href="{% url 'marketing:blog_detail' blog.slug %}">{{blog.title}}</a></h2>
+																<h2><a href="{% url 'marketing:article_detail' blog.slug %}">{{blog.title}}</a></h2>
 															</div>
 															<ul class="wt-postarticlemeta">
 																<li>
@@ -168,7 +168,7 @@
 					</div>
 				</div>
 				<!--Limitless Experience End-->
-			</main>
+			{% comment %} </main> {% endcomment %}
 			<!--Main End-->
 
 {% endblock content %}

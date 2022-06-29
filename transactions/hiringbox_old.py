@@ -21,10 +21,9 @@ class HiringBox():
     """
     def __init__(self, request):
         self.session = request.session
-        # hiring_box = self.session.get('proposal_box')
-        hiring_box = self.session.get(settings.HIRINGBOX_SESSION_ID)
-        if settings.HIRINGBOX_SESSION_ID not in request.session:
-            hiring_box = self.session[settings.HIRINGBOX_SESSION_ID] = {}
+        hiring_box = self.session.get('proposal_box')
+        if 'proposal_box' not in request.session:
+            hiring_box = self.session['proposal_box'] = {}
         self.hiring_box = hiring_box
 
 
@@ -60,7 +59,7 @@ class HiringBox():
     def __iter__(self):
         """
         Collect the proposal_id in the session data to query the database
-        and return iterable proposals
+        and return proposals
         """
         proposal_ids = self.hiring_box.keys()
         proposals = Proposal.objects.filter(id__in=proposal_ids)
@@ -90,14 +89,14 @@ class HiringBox():
 
 
     def get_gateway(self):
-        if settings.PROPOSALGATEWAY_SESSION_ID in self.session:
-            return PaymentGateway.objects.get(id=self.session[settings.PROPOSALGATEWAY_SESSION_ID]["gateway_id"])
+        if "proposalgateway" in self.session:
+            return PaymentGateway.objects.get(id=self.session["proposalgateway"]["gateway_id"])
         return None
 
 
     def get_fee_payable(self):
         newprocessing_fee = 0
-        if settings.PROPOSALGATEWAY_SESSION_ID in self.session:
+        if "proposalgateway" in self.session:
             newprocessing_fee = self.get_gateway().processing_fee
         return newprocessing_fee
 
@@ -148,7 +147,7 @@ class HiringBox():
         saving_in_discount = 0
         subtotal = self.get_total_price_before_fee_and_discount()
 
-        if settings.PROPOSALGATEWAY_SESSION_ID in self.session:
+        if "proposalgateway" in self.session:
             saving_in_discount = subtotal - self.get_discount_value()
         return saving_in_discount
 
@@ -178,8 +177,8 @@ class HiringBox():
 
 
     def clean_box(self):
-        del self.session[settings.HIRINGBOX_SESSION_ID]
-        del self.session[settings.PROPOSALGATEWAY_SESSION_ID]
+        del self.session['proposal_box']
+        del self.session['proposalgateway']
         self.commit()
 
 

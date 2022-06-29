@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Blog, HelpDesk, AutoTyPist, Announcement
+from .models import Blog, HelpDesk, AutoTyPist, Announcement, Ticket
 
 # Register your models here.
 class BlogAdmin(admin.ModelAdmin):
@@ -39,6 +39,21 @@ class HelpDeskAdmin(admin.ModelAdmin):
     )
     radio_fields = {'published': admin.HORIZONTAL}
 
+
+class TicketAdmin(admin.ModelAdmin):
+    list_display = ['title', 'modified_at', 'reference', 'states']
+    list_display_links = ['title']
+    list_editable = ['states']
+    readonly_fields = ['modified_at','reference', 'query_type_reference', 'created_by', 'assisted_by','created_at', 'team']
+
+    fieldsets = (
+        ('Introduction', {'fields': ('title', 'reference','states',)}),
+        ('Detail', {'fields': ('query_type', 'query_type_reference', 'content',)}),
+        ('Other Info', {'fields': ('created_by', 'assisted_by','created_at', 'modified_at', 'team',)}),
+    )
+    radio_fields = {'states': admin.HORIZONTAL}
+
+
 class AutoTyPistAdmin(admin.ModelAdmin):
     list_display = ['title', 'is_active', 'ordering']
     list_display_links = None
@@ -57,3 +72,4 @@ admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Blog, BlogAdmin)
 admin.site.register(HelpDesk, HelpDeskAdmin)
 admin.site.register(AutoTyPist, AutoTyPistAdmin)
+admin.site.register(Ticket, TicketAdmin)

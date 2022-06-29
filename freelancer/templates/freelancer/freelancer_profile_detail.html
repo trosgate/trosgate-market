@@ -26,16 +26,6 @@
 										<div class="row">
 											
 											<div class="wt-userprofile">
-												{% comment %} {% if not max_member_per_team %}
-												{%if team %}
-												<div class="alert alert-danger" role="alert">
-													<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-														Alert: You have reached the application limit for this month 
-														<a href=""> Upgrade Package</a>
-													</span>
-												</div>
-												{% endif %}
-												{% endif %} {% endcomment %}
 												<figure>
 													<img src="{{freelancer.profile_photo.url}}" alt="img description">
 													<div class="wt-userdropdown wt-online"></div>
@@ -44,9 +34,10 @@
 													<h3><i class="fa fa-check-circle"></i> {{freelancer.user.get_full_name}}</h3>
 													<span>5.0/5 <a class="javascript:void(0);">(860 Feedback)</a> <br>Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
 
-													{% if request.user.freelancer %}
+													{% if active_team.created_by == request.user %}
+													<div id="invitation-message"></div>
 													<div class="form-group wt-btnarea">
-														<a href="{% url 'teams:internal_invitation' freelancer.user.short_name %}"><button type="submit" class="btn btn-outline-danger-light"><i class="fa fa-handshake-o"></i> Invite to Team</a>
+														<button id="userInvitation" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"> Invite to Team</i></button>
 													</div>
 													{% endif %}
 												</div>
@@ -89,6 +80,7 @@
 													<p>* Adpsicing elit sed do eiusmod tempor incididunt ut labore et dolore.</p>
 													{% if request.user.clients %}
 													{% if monthly_contracts_limiter %}
+													
 													<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
 													{% endif %}
 													{% endif %}
@@ -365,4 +357,38 @@
 	{% endif %}
 
 {% endblock %}
+
+{% block scripts %}
+
+<script>
+	//INVITATION TO TEAM             
+	$(document).on('click', '#userInvitation', function (e) {
+	e.preventDefault();
+
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'teams:internal_invitation' %}",
+			data: {
+				freelancerId: "{{freelancer.user.id}}",
+				csrfmiddlewaretoken: "{{csrf_token}}",
+				action: 'send-invite'
+			},
+			success: function (json) {
+				console.log(json)
+				if (json.result){
+					document.getElementById('invitation-message').innerHTML = json.result
+					$('#invitation-message').addClass('alert alert-success');
+					
+				}
+				else if (json.errors){
+					document.getElementById('invitation-message').innerHTML = json.errors
+					$('#invitation-message').addClass('alert alert-danger');
+				}
+			},
+			error: function (error) {}            
+		});
+	});
+</script>
+
+{% endblock scripts %}
 

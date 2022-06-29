@@ -8,6 +8,16 @@ from django.utils import timezone
 from embed_video.fields import EmbedVideoField
 from uuid import uuid4
 from django.template.defaultfilters import slugify
+import secrets
+
+
+def ticket_reference_generator():
+        generated_reference = secrets.token_urlsafe(12)[:12]
+        similar_ref = Ticket.objects.filter(reference=generated_reference)
+        while not similar_ref:
+            reference = generated_reference
+            break
+        return reference
 
 
 class Announcement(models.Model):
@@ -111,15 +121,42 @@ class HelpDesk(models.Model):
     published = models.BooleanField(_("Make Default"), choices = ((False,'Private'), (True, 'Public')), help_text=_("Only one instance will be shown based on the one that is default"), default = True)    
 
 
-# class Ticket(models.Model):
-#     title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
-#     reference = models.CharField(unique=True, blank=True, max_length=100)
+class Ticket(models.Model):
+    OPEN = 'open'
+    REVIEW = 'review'
+    CLOSED = 'closed'
+    STATES = (
+        (OPEN, 'Open'),
+        (REVIEW, 'Review'),
+        (CLOSED, 'Closed')
+    )
 
-#     def save(self, *args, **kwargs):
-#         if self.reference == "":
-#             self.reference = '#' + str(uuid4()).split('-')[4]
-#         self.slug = slugify(self.line_one)
-#         super(HelpDesk, self).save(*args, **kwargs)
+    # Package status
+    PROPOSAL = 'proposal'
+    PROJECT = 'project'
+    CONTRACT = 'active'
+    QUERY_TYPE = (
+        (PROPOSAL, 'Proposal'),
+        (PROJECT, 'Project'),
+        (CONTRACT, 'Contract')
+    )    
+    title = models.CharField(_("Title"), max_length=150, help_text=_("title field is Required"))
+    content = models.TextField(_("Message"), max_length=500)
+    reference = models.CharField(unique=True, blank=True, max_length=100)
+    query_type = models.CharField(_("Query Type"), max_length=20, choices=QUERY_TYPE, default=None)
+    query_type_reference = models.CharField(_("Query Reference"), max_length=20, help_text=_("Reference for the Query type selected"))
+    states = models.CharField(_("Query Type"), max_length=20, choices=STATES, default=OPEN)
+    
+    team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="reporterteam", on_delete=models.SET_NULL, blank=True, null=True, help_text=_("Only Applicable to Freelancer Queries"))
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Reporter"), related_name="reportersupport", on_delete=models.CASCADE)
+    assisted_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Support Team"), related_name="adminsupport", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.reference == "":
+            self.reference = ticket_reference_generator()
+        super(Ticket, self).save(*args, **kwargs)
 
     
 

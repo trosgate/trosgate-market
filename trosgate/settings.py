@@ -230,7 +230,7 @@ LOGIN_REDIRECT_URL = "account:dashboard"
 ####option two for email setup in development mode###
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-#Custom Email Backend to be used with internet
+#Custom Email Backend for this software
 EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 
@@ -248,36 +248,8 @@ EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 WEBSITE_URL = 'http://127.0.0.1:8000'
 ACCEPTATION_URL = WEBSITE_URL + '/account/register/'
 
-# STRIPE PAYMENT GATEWAY
-BASE_PAYMENT_GATEWAYS = ""
-# #STRIPE PAYMENT GATEWAY
-# STRIPE_PUBLISHABLE_KEY = ""
-# STRIPE_SECRET_KEY = ""
-# STRIPE_WEEBHOOK_KEY = ""
-# SUBSCRIPTION_PACKAGE_PRICE_ID = ""
-
-# #DISCOUNT LEVEL SYSTEM
-# DISCOUNT_LEVEL_SYSTEM = ''
-
-# #PAYPAL PAYMENT GATEWAY
-# PAYPAL_PUBLISHABLE_KEY = ""
-# PAYPAL_SECRET_KEY = ""
-
-# #FLUTTERWAVE PAYMENT GATEWAY
-# FLUTTERWAVE_PUBLISHABLE_KEY = ""
-# FLUTTERWAVE_STRIPE_SECRET_KEY = ""
-# FLUTTERWAVE_ENCRYPTION_KEY = ""
-
-GOOGLE_RECAPTCHA_SITE_KEY = "6LfOEzQdAAAAANLyK4qVJphjrnBBDVvEV9QJLAEl"
-GOOGLE_RECAPTCHA_SECRET_KEY = "6LfOEzQdAAAAAKFYGkiiPsbDfPPYfjlczcDxoa4L"
-
-
-ZOON_CLIENT_ID = 'YP9WPWBhQZiT7TC6GFekgQ'
-ZOOM_SECRET_KEY = 't6m4ZPedGkcK0FIWKnJP6kPnOYsLfT0D'
-
-
 ADMINS = (
-    ('Trosgate', 'isaacagbedam@gmail.com'),
+    ('Trosgate', 'voistudio@gmail.com'),
 )
 MANAGERS = ADMINS
 
@@ -314,9 +286,13 @@ result_backend = 'django-db'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
-# Basket session ID
-# HIRINGBOX_SESSION_ID = "hiring_box"
-
+# CUSTOM SESSIONS
 SESSION_COOKIE_AGE = 86400
+HIRINGBOX_SESSION_ID = "proposal_box"
+PROPOSALGATEWAY_SESSION_ID = "proposalgateway"
+APPLICATION_SESSION_ID = "application"
+APPLICATION_GATEWAY_SESSION_ID = "applicationgateway"
+CONTRACT_SESSION_ID = "contract"
+CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from account.models import Customer
-# from general_settings.models import SiteSetting
+from general_settings.backends import get_website_email
 
 #
 # Import from python
@@ -60,7 +60,7 @@ def create_shortened_url(model_instance):
 
 
 def send_new_team_email(to_email, team):
-    from_email = settings.DEFAULT_EMAIL_FROM
+    from_email = get_website_email()
     acceptation_url = settings.WEBSITE_URL
     subject = 'Activate your Team'
     text_content = f'Invitation to {team.title}.'
@@ -77,9 +77,9 @@ def send_new_team_email(to_email, team):
 
 # Utility function for sending envites to team
 def send_invitation_email(to_email, code, team):
-    from_email = settings.DEFAULT_EMAIL_FROM
+    from_email = get_website_email()
     acceptation_url = settings.WEBSITE_URL
-    subject = 'Activate your Team'
+    subject = 'Invitation to Team'
     text_content = f'Invitation to {team.title}. Your code is: %s' % code
     html_content = render_to_string('teams/email_invitation.html', {
         'protocol': Protocol,

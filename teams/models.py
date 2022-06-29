@@ -1,7 +1,7 @@
 from io import BytesIO
 from PIL import Image
 from django.core.files import File
-from django.db import models
+from django.db import models, transaction
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -14,7 +14,17 @@ from django.core.mail import send_mail
 from . utilities import send_invitation_email, create_random_code, send_new_team_email
 from django.core.exceptions import ValidationError
 from uuid import uuid4
+from account.fund_exception import InvitationException
+import secrets
 
+
+def code_generator():
+        generated_code = secrets.token_urlsafe(6)[:6]
+        similar_ref = Invitation.objects.filter(code=generated_code)
+        while not similar_ref:
+            code = generated_code
+            break
+        return code
 
 # NB ---> create seperate status for each of the fields and display to users
 class Package(models.Model):
@@ -31,28 +41,17 @@ class Package(models.Model):
 
     #
     # Initial Plan Configuration
-    type = models.CharField(_("Package Type"), unique=True, help_text=_(
-        "package type can be eg. BASIC"), max_length=50)
-    verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_(
-        "Customize name for the package. If empty, the default names will be displayed"), max_length=50)
-    max_member_per_team = models.PositiveIntegerField(_("Max member Per Team"), default=1, help_text=_(
-        "You can only add up to 4 members for the biggest package"), validators=[MinValueValidator(1), MaxValueValidator(5)])
-    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts Per Team"), default=0, help_text=_(
-        "Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_(
-        "You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Max Job/Project Applicable Per Team"), default=10, help_text=_(
-        "Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    daily_Handshake_mails_to_clients = models.PositiveIntegerField(_("Daily Handshake Mails Per Invoice to client"), default=0, help_text=_(
-        "team can send followup mail per invoice to client. Daily min is 1 amd max is 3"), validators=[MinValueValidator(1), MaxValueValidator(3)])
-    price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_(
-        "Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
-    status = models.CharField(
-        _("Package Label"), max_length=20, choices=STATUS, default=STARTER)
-    is_default = models.BooleanField(_("Make Default"), choices=((False, 'No'), (True, 'Yes')), help_text=_(
-        "Only 1 package should have a default set to 'Yes'"), default=False)
-    ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_(
-        "This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
+    type = models.CharField(_("Package Type"), unique=True, help_text=_("package type can be eg. BASIC"), max_length=50)
+    verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_("Customize name for the package. If empty, the default names will be displayed"), max_length=50)
+    max_member_per_team = models.PositiveIntegerField(_("Max member Per Team"), default=1, help_text=_("You can only add up to 4 members for the biggest package"), validators=[MinValueValidator(1), MaxValueValidator(5)])
+    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts Per Team"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Max Job/Project Applicable Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    daily_Handshake_mails_to_clients = models.PositiveIntegerField(_("Daily Handshake Mails Per Invoice to client"), default=0, help_text=_("team can send followup mail per invoice to client. Daily min is 1 amd max is 3"), validators=[MinValueValidator(1), MaxValueValidator(3)])
+    price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
+    status = models.CharField(_("Package Label"), max_length=20, choices=STATUS, default=STARTER)
+    is_default = models.BooleanField(_("Make Default"), choices=((False, 'No'), (True, 'Yes')), help_text=_("Only 1 package should have a default set to 'Yes'"), default=False)
+    ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
 
     def __str__(self):
         return self.type
@@ -121,40 +120,114 @@ class Team(models.Model):
     def get_team_preview_url(self):
         return reverse('teams:preview_inactive_team', args=[self.id])
 
-    # def member_indexing(self):
-    #     members = self.members.all()
-    #     for index, member in enumerate(members, start=1):
-    #         member.index = index
-    #         print(member.index, member.short_name)
-            # yield member
-
 
 # this is for External User Invitations
 class Invitation(models.Model):
-    #
+    # Type
+    INTERNAL = 'internal'
+    EXTERNAL = 'external'
+    TYPE = (
+        (INTERNAL, _('Internal')),
+        (EXTERNAL, _('External'))
+    )
     # Status
-
     INVITED = 'invited'
     ACCEPTED = 'accepted'
-
     STATUS = (
         (INVITED, _('Invited')),
         (ACCEPTED, _('Accepted'))
     )
 
     team = models.ForeignKey(Team, related_name='invitations', on_delete=models.CASCADE)
-    email = models.EmailField(max_length=100)
-    code = models.CharField(unique=True, max_length=10, blank=True,)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.PROTECT) #CASCADE
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
+    email = models.EmailField(max_length=100, blank=True) #External Email
+    code = models.CharField(unique=True, max_length=10, blank=True)
     status = models.CharField(max_length=20, choices=STATUS, default=INVITED)
+    type = models.CharField(max_length=20, choices=TYPE)
     sent_on = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if self.code == "":
-            self.code = create_random_code()[:6]
+            self.code = code_generator()[:6]            
         super(Invitation, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.email
+
+
+    @classmethod
+    def internal_invitation(cls, team, sender, type, receiver, email):
+
+        if not team:
+            raise InvitationException(_("Your team is unknown"))
+
+        if not sender:
+            raise InvitationException(_("Bad and unknown request"))
+
+        if not receiver:
+            raise InvitationException(_("credentials of invitee incomplete"))
+
+        if not email:
+            raise InvitationException(_("credentials of invitee incomplete"))
+
+        if not (team.package_status == 'active'):
+            raise InvitationException(_("Please upgrade your team to invite others"))
+
+        if not (team.package.type == 'Team'):
+            raise InvitationException(_("Please activate subscription to invite others"))
+
+        if team.created_by != sender:
+            raise InvitationException(_("This action requires upgraded team founder"))
+
+        if team.created_by == receiver:
+            raise InvitationException(_("You cannot invite youself"))
+
+        if  receiver in team.members.all():
+            raise InvitationException(_("User already a member"))
+
+        if cls.objects.filter(receiver=receiver).exists():
+            raise InvitationException(_("User already invited"))     
+
+        internal_invite = cls.objects.create(team=team, sender=sender, type=type, receiver=receiver, email=email)
+        return internal_invite
+
+
+    @classmethod
+    def external_invitation(cls, team, sender, email, type):
+        #TODO Check for maximum number of members
+        if not team:
+            raise InvitationException(_("Your team is unknown"))
+
+        if not sender:
+            raise InvitationException(_("Bad and unknown request"))
+
+        if not email:
+            raise InvitationException(_("credential of invitee invalid"))
+
+        if team.created_by.email == email:
+            raise InvitationException(_("You cannot invite yourself"))
+
+        if cls.objects.filter(team__members__email=email).exists():
+            raise InvitationException(_("User already a member of your Team"))
+
+        if cls.objects.filter(team=team, email=email).exists():
+            raise InvitationException(_("Email User already invited"))
+
+        if cls.objects.filter(receiver__email=email).exists():
+            raise InvitationException(_("User of this email already invited"))
+
+        if not (team.package_status == 'active'):
+            raise InvitationException(_("Please upgrade your team to invite others"))
+
+        if not (team.package.type == 'Team'):
+            raise InvitationException(_("Please subscribe to invite others"))
+
+        if team.created_by != sender:
+            raise InvitationException(_("This action requires upgraded team founder"))
+
+        external_invite = cls.objects.create(team=team, sender=sender, type=type, email=email)
+        return external_invite
 
 
 class TeamChat(models.Model):

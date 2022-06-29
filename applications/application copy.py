@@ -1,6 +1,5 @@
 from .models import Application
 from general_settings.models import PaymentGateway
-from django.conf import settings
 from general_settings.discount import (
     get_level_one_rate,
     get_level_two_rate,
@@ -23,9 +22,9 @@ class ApplicationAddon():
 
     def __init__(self, request):
         self.session = request.session
-        applicant_box = self.session.get(settings.APPLICATION_SESSION_ID)
-        if settings.APPLICATION_SESSION_ID not in request.session:
-            applicant_box = self.session[settings.APPLICATION_SESSION_ID] = {}
+        applicant_box = self.session.get('application')
+        if 'application' not in request.session:
+            applicant_box = self.session['application'] = {}
         self.applicant_box = applicant_box
 
     def addon(self, application):
@@ -50,7 +49,7 @@ class ApplicationAddon():
         applicant_box = self.applicant_box.copy()
 
         for application in applications:
-            applicant_box[str(application.id)][settings.APPLICATION_SESSION_ID] = application
+            applicant_box[str(application.id)]["application"] = application
 
         for item in applicant_box.values():
             item["total_price"] = item["budget"]
@@ -75,13 +74,13 @@ class ApplicationAddon():
         return sum((application["budget"]) for application in self.applicant_box.values())
 
     def get_gateway(self):
-        if settings.APPLICATION_GATEWAY_SESSION_ID in self.session:
-            return PaymentGateway.objects.get(id=self.session[settings.APPLICATION_GATEWAY_SESSION_ID]["gateway_id"])
+        if "applicationgateway" in self.session:
+            return PaymentGateway.objects.get(id=self.session["applicationgateway"]["gateway_id"])
         return None
 
     def get_fee_payable(self):
         newprocessing_fee = 0
-        if settings.APPLICATION_GATEWAY_SESSION_ID in self.session:
+        if "applicationgateway" in self.session:
             newprocessing_fee = self.get_gateway().processing_fee
         return newprocessing_fee
 
@@ -130,17 +129,18 @@ class ApplicationAddon():
         saving_in_discount = 0
         subtotal = self.get_total_price_before_fee_and_discount()
 
-        if settings.APPLICATION_GATEWAY_SESSION_ID in self.session:
+        if "applicationgateway" in self.session:
             saving_in_discount = subtotal - self.get_discount_value()
         return saving_in_discount
 
     def get_total_price_after_discount_and_fee(self):
-        subtotal = sum((application["budget"]) for application in self.applicant_box.values())
+        subtotal = sum((application["budget"])
+                       for application in self.applicant_box.values())
         processing_fee = 0
 
-        if settings.APPLICATION_GATEWAY_SESSION_ID in self.session and subtotal > 0:
+        if "applicationgateway" in self.session and subtotal > 0:
             processing_fee = PaymentGateway.objects.get(
-                id=self.session[settings.APPLICATION_GATEWAY_SESSION_ID]["gateway_id"]).processing_fee
+                id=self.session["applicationgateway"]["gateway_id"]).processing_fee
 
         grandtotal = ((subtotal - self.get_discount_value()) + processing_fee)
         return grandtotal
@@ -149,6 +149,6 @@ class ApplicationAddon():
         self.session.modified = True
 
     def clean_box(self):
-        del self.session[settings.APPLICATION_SESSION_ID]
-        del self.session[settings.APPLICATION_GATEWAY_SESSION_ID]
+        del self.session['application']
+        del self.session['applicationgateway']
         self.commit()

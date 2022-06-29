@@ -22,7 +22,7 @@ from general_settings.gateways import PayPalClientConfig, StripeClientConfig, Fl
 from django.views.decorators.csrf import csrf_exempt
 from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SalesReporting, SubscriptionItem
 from . forms import PurchaseForm
-from . hiringbox import HiringBox
+from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator

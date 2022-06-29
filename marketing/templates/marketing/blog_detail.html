@@ -32,7 +32,7 @@
                             <div class="wt-articlesingle-holder wt-bgwhite">
                                 <div class="wt-articlesingle-content">
                                     <figure class="wt-singleimg-one">
-                                        <img src="{{blog.thumbnail.url}}" alt="img description">
+                                        <img src="{% if blog.thumbnail %} {{blog.thumbnail.url}} {% endif %}" alt="img description">
                                     </figure>
                                     <div class="wt-title">
                                         <h2>{{blog.title}}</h2>
@@ -95,7 +95,7 @@
         </div>
         {% include 'dashboard/main_footer.html' %}
 			<!--Main End-->
-    <script>
+    {% comment %} <script>
         $(document).on('click', '#add-box', function (e) {
             e.preventDefault();
             $.ajax({
@@ -114,7 +114,7 @@
             error: function (xhr, errmsg, err) {}
             });
         })
-    </script>
+    </script> {% endcomment %}
 
 {% endblock content %}
 

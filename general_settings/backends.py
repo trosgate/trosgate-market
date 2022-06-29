@@ -2,6 +2,12 @@ from django.core.mail.backends.smtp import EmailBackend
 from . models import Mailer
 
 
+def get_website_email():
+    try:
+        return Mailer.objects.get(id=1).from_email 
+    except:
+        return None
+
 def get_email_hosting_server():
     try:
         return Mailer.objects.get(id=1).email_hosting_server 

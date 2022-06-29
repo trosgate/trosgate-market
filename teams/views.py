@@ -32,7 +32,7 @@ from transactions.models import Purchase, SubscriptionItem
 from general_settings.models import PaymentAPIs
 from django.conf import settings
 from . controller import monthly_projects_applicable_per_team
-
+from account.fund_exception import InvitationException
 
 def send_email_to_all_users(request):
     email_all_users.delay()
@@ -156,32 +156,7 @@ def invitation(request):
 
     monthly_projects_applicable_per_team(request)
 
-    if request.method == 'POST':
-        inviteform = InvitationForm(request.POST)
-
-        if inviteform.is_valid():
-            email = inviteform.save(commit=False)
-
-            if email:
-                invitation = Invitation.objects.filter(email=email, team=team)
-
-                if not invitation:
-                    email.team = team
-                    email.save()
-
-                    messages.info(request, 'The user was invited successfully')
-
-                    send_invitation_email(email, code, team)
-
-                else:
-                    messages.warning(
-                        request, 'sorry! We already have this email associated wih your team')
-        else:
-            messages.warning(
-                request, f'sorry! We already have this email owner associated wih your team {team.title}')
-
-    else:
-        inviteform = InvitationForm()
+    inviteform = InvitationForm()
 
     context = {
         "teams": team,
@@ -198,41 +173,93 @@ def invitation(request):
 # Inviting a user that already exist to your team via user profile page
 @login_required
 @user_is_freelancer
-def internal_invitation(request, short_name):
-    package = get_object_or_404(Package, pk=2, type='Team')
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             package=package, status=Team.ACTIVE, created_by=request.user)
-    code = Invitation.objects.values('code')[0]
+def internal_invitation(request):
+    result = ''
+    errors = ''
+    if request.POST.get("action") == "send-invite":
+        pk = int(request.POST.get('freelancerId'))
 
-    if team:
-        for invitee in Customer.objects.filter(short_name=short_name, is_active=True, user_type=Customer.FREELANCER):
-            try:
-                if invitee:
-                    invitation = Invitation.objects.filter(
-                        team=team, email=invitee.email)
+        receiver = Customer.objects.get(pk=pk, is_active=True)       
+        team = Team.objects.get(pk=request.user.freelancer.active_team_id, created_by=request.user)
 
-                    if not invitation:
+        try:
+            new_invite = Invitation.internal_invitation(
+                team=team, 
+                sender=request.user, 
+                type=Invitation.INTERNAL, 
+                receiver=receiver, 
+                email=receiver.email
+            )
+            send_invitation_email(new_invite.email, new_invite.code, new_invite.team)
+            result = 'The user was invited successfully'
+        except InvitationException as e: 
+            errors = str(e)
 
-                        member = Invitation.objects.create(
-                            team=team, email=invitee.email, status=Invitation.INVITED)
+        return JsonResponse({'result':result, 'errors':errors})
 
-                        email = member.email
+@login_required
+@user_is_freelancer
+def external_invitation(request):
+    result = ''
+    errors = ''
+    if request.POST.get("action") == "email-invite":
+        email = str(request.POST.get('emailId'))
 
-                        send_invitation_email(email, code, team)
+        team = Team.objects.get(pk=request.user.freelancer.active_team_id, created_by=request.user)
 
-                        if member:
-                            return redirect('account:dashboard')
-                        else:
-                            messages.error(
-                                request, 'Something went wrong. Please contact Admin')
-                    else:
-                        messages.info(
-                            request, f'The new member "{invitee.short_name}" was invited to {team.title}')
-            except:
-                messages.error(
-                    request, 'Something went wrong. Please contact Admin')
+        try:
+            new_invite = Invitation.external_invitation(
+                team=team, 
+                sender=request.user, 
+                type=Invitation.EXTERNAL, 
+                email=email
+            )
+            send_invitation_email(new_invite.email, new_invite.code, new_invite.team)
+            result = 'The user was invited successfully'
+        except InvitationException as e: 
+            errors = str(e)
 
-    return redirect('account:dashboard')
+        return JsonResponse({'result':result, 'errors':errors})
+        
+
+# email-invite
+
+# @login_required
+# @user_is_freelancer
+# def internal_invitation_old(request, short_name):
+#     package = get_object_or_404(Package, pk=2, type='Team')
+#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, package=package, status=Team.ACTIVE, created_by=request.user)
+#     code = Invitation.objects.values('code')[0]
+
+#     if team:
+#         for invitee in Customer.objects.filter(short_name=short_name, is_active=True, user_type=Customer.FREELANCER):
+#             try:
+#                 if invitee:
+#                     invitation = Invitation.objects.filter(
+#                         team=team, email=invitee.email)
+
+#                     if not invitation:
+
+#                         member = Invitation.objects.create(
+#                             team=team, email=invitee.email, status=Invitation.INVITED)
+
+#                         email = member.email
+
+#                         send_invitation_email(email, code, team)
+
+#                         if member:
+#                             return redirect('account:dashboard')
+#                         else:
+#                             messages.error(
+#                                 request, 'Something went wrong. Please contact Admin')
+#                     else:
+#                         messages.info(
+#                             request, f'The new member "{invitee.short_name}" was invited to {team.title}')
+#             except:
+#                 messages.error(
+#                     request, 'Something went wrong. Please contact Admin')
+
+#     return redirect('account:dashboard')
 
 
 @login_required

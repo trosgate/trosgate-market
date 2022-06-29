@@ -24,7 +24,7 @@ class InvitationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['email'].widget.attrs.update(
-            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center', 'placeholder': 'Enter external or existing user email'})
+            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center'})
 
 
 class TeamChatForm(forms.ModelForm):

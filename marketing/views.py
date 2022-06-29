@@ -6,8 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 
 
-
-def blog_list(request):
+def article_list(request):
     all_blogs  = Blog.objects.filter(published=True)
     freelancer_blogs = Blog.objects.filter(published=True, type=Blog.FREELANCER)
     client_blogs = Blog.objects.filter(published=True, type=Blog.CLIENT)
@@ -20,8 +19,8 @@ def blog_list(request):
     return render( request, "marketing/blog_list.html", context)
 
 
-def blog_detail(request, blog_slug):
-    blog = get_object_or_404(Blog, slug=blog_slug, published=True)
+def article_detail(request, article_slug):
+    blog = get_object_or_404(Blog, slug=article_slug, published=True)
 
     context ={
         "blog":blog,
@@ -31,11 +30,12 @@ def blog_detail(request, blog_slug):
 
 @login_required
 def support(request):
+    support = ''
     for supports in HelpDesk.objects.filter(published=True):
         support = supports
-
+    all_support = support
     context ={
-        "support":support,
+        "support":all_support,
     }
     return render( request, "marketing/support.html", context)
 

@@ -4,3 +4,6 @@ class FundException(Exception):
 
 class ReviewException(Exception):
     pass
+
+class InvitationException(Exception):
+    pass

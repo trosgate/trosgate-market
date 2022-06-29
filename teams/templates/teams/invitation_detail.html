@@ -10,7 +10,7 @@
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 								<div class="wt-innerbannercontent">
-								<div class="wt-title"><h2>Invitation to {{ teams.title }} </h2></div>
+								<div class="wt-title"><h2>Invitation to Team</h2></div>
 								<ol class="wt-breadcrumb">
 									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
 									<li class="wt-active">Invites </li>
@@ -85,27 +85,16 @@
 											<span>Option #2: External Invitation</span>
 										</div>
 
-
-										<form method="POST", action='.'> {% csrf_token %}
-											{% if inviteform.errors %}
-												{% for field in inviteform %}
-													{% for error in field.errors %} 
-													<div class="wt-jobalerts col-lg-6 float-center">
-														<div class="alert alert-danger alert-dismissible fade show">
-															<span> {{ error|escape }}</span>
-															<a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
-														</div> 
-													</div>
-													{% endfor %}
-												{% endfor %}
-											{% endif %}
+										<form method="POST", autocomplete='off'> {% csrf_token %}
+											
 											{% if max_team_members %}
 											<div class="form-group ">
+											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="invitation-message"></div>
 												{{inviteform.label}}
-												{{inviteform}}
+												{{inviteform.email}}
 											</div> 
 											<div class="form-group wt-btnarea">
-												<button type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite member </button>
+												<button id="emailInvitation" type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite member </button>
 											</div>											
 											{% else %}
 											<div class="form-group wt-btnarea">
@@ -222,3 +211,38 @@
 
 				
 {% endblock %}
+
+{% block scripts %}
+
+<script>
+	//INVITATION TO TEAM             
+	$(document).on('click', '#emailInvitation', function (e) {
+	e.preventDefault();
+
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'teams:external_invitation' %}",
+			data: {
+				emailId: $('#id_email').val(),
+				csrfmiddlewaretoken: "{{csrf_token}}",
+				action: 'email-invite'
+			},
+			success: function (json) {
+				console.log(json)
+				if (json.result){
+					$('#id_email').val(''),
+					document.getElementById('invitation-message').innerHTML = json.result
+					$('#invitation-message').addClass('alert alert-success');
+					
+				}
+				else if (json.errors){
+					document.getElementById('invitation-message').innerHTML = json.errors
+					$('#invitation-message').addClass('alert alert-danger');
+				}
+			},
+			error: function (error) {}            
+		});
+	});
+</script>
+
+{% endblock scripts %}

@@ -69,17 +69,14 @@ def homepage(request):
 def loginView(request):
 
     session = request.session
-    if request.user.is_authenticated:
-        return redirect('account:two_factor_auth')
-    
+
     loginform = UserLoginForm(request.POST or None)
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-
         user = authenticate(request, email=email, password=password)
 
-        # Admin is exempted from two step verification
+        # Admin is exempted from two step verification via sms
         # Otherwise if there is server error in sms sending, admin is also lock out 
         if user is not None and user.user_type == Customer.ADMIN and user.is_active == True:
              
@@ -105,9 +102,7 @@ def loginView(request):
 
             messages.info(request, f'Welcome back {user.short_name}')
 
-            return redirect('account:dashboard')            
-        
-        # return redirect("account:login")
+            return redirect('account:dashboard')                    
 
         if user is not None and user.user_type == Customer.CLIENT and user.is_active == True and get_sms_feature():
 
@@ -142,10 +137,12 @@ def two_factor_auth(request):
         return redirect("account:login")
 
     returned_user_pk = request.session["twofactoruser"]["user_pk"]
-
-    returned_user = TwoFactorAuth.objects.get(user__pk=returned_user_pk, user__is_active=True)
-    pass_code = returned_user.pass_code
-    user = Customer.objects.get(pk=returned_user_pk, is_active=True)
+    try:
+        returned_user = TwoFactorAuth.objects.get(user__pk=returned_user_pk, user__is_active=True)
+        pass_code = returned_user.pass_code
+        user = Customer.objects.get(pk=returned_user_pk, is_active=True)
+    except:
+        print('error occured with 2FA')
 
     twofactorform = TwoFactorAuthForm(request.POST or None)
 

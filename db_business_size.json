@@ -1,44 +1,44 @@
 [
-{
-    "model": "general_settings.size",
-    "pk": 1,
-    "fields": {
-        "size": "1 - 9 Staffs"
+    {
+        "model": "general_settings.size",
+        "pk": 1,
+        "fields": {
+            "size": "1 - 9 Staffs"
+        }
+    },
+    {
+        "model": "general_settings.size",
+        "pk": 2,
+        "fields": {
+            "size": "10 - 49 Staffs"
+        }
+    },
+    {
+        "model": "general_settings.size",
+        "pk": 3,
+        "fields": {
+            "size": "50 - 99 Staffs"
+        }
+    },
+    {
+        "model": "general_settings.size",
+        "pk": 4,
+        "fields": {
+            "size": "100 - 499 Staffs"
+        }
+    },
+    {
+        "model": "general_settings.size",
+        "pk": 5,
+        "fields": {
+            "size": "500 - 1000 Staffs"
+        }
+    },
+    {
+        "model": "general_settings.size",
+        "pk": 6,
+        "fields": {
+            "size": "Above 1000"
+        }
     }
-},
-{
-    "model": "general_settings.size",
-    "pk": 2,
-    "fields": {
-        "size": "10 - 49 Staffs"
-    }
-},
-{
-    "model": "general_settings.size",
-    "pk": 3,
-    "fields": {
-        "size": "50 - 99 Staffs"
-    }
-},
-{
-    "model": "general_settings.size",
-    "pk": 4,
-    "fields": {
-        "size": "100 - 499 Staffs"
-    }
-},
-{
-    "model": "general_settings.size",
-    "pk": 5,
-    "fields": {
-        "size": "500 - 1000 Staffs"
-    }
-},
-{
-    "model": "general_settings.size",
-    "pk": 6,
-    "fields": {
-        "size": "Above 1000"
-    }
-}
 ]
