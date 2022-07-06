@@ -11,7 +11,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from embed_video.fields import EmbedVideoField
 from django.core.mail import send_mail
-from . utilities import send_invitation_email, create_random_code, send_new_team_email
+from . utilities import create_random_code
 from django.core.exceptions import ValidationError
 from uuid import uuid4
 from account.fund_exception import InvitationException
@@ -183,11 +183,17 @@ class Invitation(models.Model):
         if team.created_by == receiver:
             raise InvitationException(_("You cannot invite youself"))
 
+        if cls.objects.filter(team=team, receiver=receiver).exists():
+            raise InvitationException(_("User already invited"))     
+
+        if cls.objects.filter(team=team, team__members__email=email).exists():
+            raise InvitationException(_("User already a member of your Team"))
+
+        if cls.objects.filter(team=team, receiver__email=email).exists():
+            raise InvitationException(_("User of this email already invited"))
+
         if  receiver in team.members.all():
             raise InvitationException(_("User already a member"))
-
-        if cls.objects.filter(receiver=receiver).exists():
-            raise InvitationException(_("User already invited"))     
 
         internal_invite = cls.objects.create(team=team, sender=sender, type=type, receiver=receiver, email=email)
         return internal_invite
@@ -208,13 +214,13 @@ class Invitation(models.Model):
         if team.created_by.email == email:
             raise InvitationException(_("You cannot invite yourself"))
 
-        if cls.objects.filter(team__members__email=email).exists():
+        if cls.objects.filter(team=team, team__members__email=email).exists():
             raise InvitationException(_("User already a member of your Team"))
 
         if cls.objects.filter(team=team, email=email).exists():
             raise InvitationException(_("Email User already invited"))
 
-        if cls.objects.filter(receiver__email=email).exists():
+        if cls.objects.filter(team=team, receiver__email=email).exists():
             raise InvitationException(_("User of this email already invited"))
 
         if not (team.package_status == 'active'):

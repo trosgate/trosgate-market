@@ -40,7 +40,7 @@ def create_default_team_and_package_and_invitation(sender, instance, created, **
         freelancer.active_team_id = team.id
         freelancer.save()
 
-        invitation = Invitation.objects.create(team=team, email=email, code=code, status = Invitation.INVITED)
+        invitation = Invitation.objects.create(team=team, sender=instance, email=email, type=Invitation.INTERNAL)
         invitation.save()
 
 
@@ -65,12 +65,11 @@ def update_default_team_and_package_and_invitation(sender, instance, created, **
         )
         team.update(status = Team.ACTIVE)
 
-        invitation = Invitation.objects.filter(email=instance.email, team__package=package, status = Invitation.INVITED)
+        invitation = Invitation.objects.filter(email=instance.email, sender=instance, team__package=package, status = Invitation.INVITED)
         invitation.update(status = Invitation.ACCEPTED)
 
 
 @receiver(post_save, sender=Package)
 def maintain_state_of_the_two_packages(sender, instance, created, **kwargs):
-    if created or not created:
-        Package.objects.filter(id=1, type='Basic').update(max_member_per_team=1, price=0, is_default=True)        
-        Package.objects.filter(id=2, type='Team').update(is_default=False)        
+    Package.objects.filter(id=1, type='Basic').update(max_member_per_team=1, price=0, is_default=True)        
+    Package.objects.filter(id=2, type='Team').update(is_default=False)        

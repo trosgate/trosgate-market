@@ -11,25 +11,28 @@ class FreelancerAdmin(admin.ModelAdmin):
     search_fields = ('user__short_name','gender','tagline',)
     fieldsets = (
         ('Personal info', {'fields': ('gender', 'hourly_rate', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
-        ('Interest and Description', {'fields': ('brand_name', 'tagline','description','business_size', 'department',)}),
+        ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'skill', 'business_size', 'department',)}),
         ('Education and Experience #1', {'fields': ('company_name','job_position', 'start_date', 'end_date', 'job_description',)}),
         ('Education and Experience #2', {'fields': ('company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',)}),
         ('Projects and Awards #1', {'fields': ( 'project_title', 'project_url', 'image_one',)}),
         ('Projects and Awards #2', {'fields': ( 'project_title_two', 'project_url_two', 'image_two',)}),
         ('Projects and Awards #3', {'fields': ( 'project_title_three','project_url_three', 'image_three',)}),
-        ('Number of Teams', {'fields': ( 'active_team_id',)}),
     )    
 
     radio_fields = {'gender': admin.HORIZONTAL}
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+    def has_add_permission(self, request):
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 class FreelancerAccountAdmin(admin.ModelAdmin):

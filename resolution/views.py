@@ -130,13 +130,12 @@ def applicant_review(request):
         return response
 
 
-
 @login_required
 def proposal_resolution(request, proposal_id, proposal_slug):
     resolution = ''
     duration_end_time = ''
     proposal_sold = get_object_or_404(ProposalSale, pk=proposal_id, proposal__slug=proposal_slug)
-    client_review = ProposalReview.objects.all()
+    client_review = ProposalReview.objects.filter(resolution__proposal_sale=proposal_sold)
 
     completion_form = ProposalCompletionForm(request.POST, request.FILES)
     if request.user.user_type == Customer.FREELANCER:

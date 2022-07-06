@@ -1,0 +1,38 @@
+{% for profile in freelancer_list %}
+<div class="wt-userlistinghold wt-featured">
+    <figure class="wt-userlistingimg">
+        <a href="{{profile.freelancer_profile_absolute_url}}"><img src="{{profile.profile_photo.url}}" alt="image description"></a>
+    </figure>
+    <div class="wt-userlistingcontent">
+        <div class="wt-contenthead">
+            <div class="wt-title">
+                <a href="{{profile.freelancer_profile_absolute_url}}"><i class="fa fa-check-circle"></i> {{profile.user.get_full_name}}</a>
+                <a href="{{profile.freelancer_profile_absolute_url}}">{{profile.tagline}} </a>
+            </div>
+            <ul class="wt-userlisting-breadcrumb">
+                <li><span><i class="far fa-money-bill-alt"></i> ${{profile.hourly_rate}}/ hr</span></li>
+                <li><span> {% if profile.user.country.flag %}<img src="{{profile.user.country.flag.url}}" alt="img description"> {% else %}{{profile.user.country.country_code}} - {% endif %} {{profile.user.country.name}}<span></li>
+                <li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+            </ul>
+        </div>
+        <div class="wt-rightarea">
+            <span class="wt-starsvtwo">
+                <i class="fa fa-star fill"></i>
+                <i class="fa fa-star fill"></i>
+                <i class="fa fa-star fill"></i>
+                <i class="fa fa-star fill"></i>
+                <i class="fa fa-star fill"></i>
+            </span>
+            <span class="wt-starcontent">4.5/<sub>5</sub> <em>(860 Feedback)</em></span>
+        </div>
+    </div>
+    <div class="wt-description">
+        <p>{{profile.description|truncatechars:290}}...</p>
+    </div>
+    <div class="wt-tag wt-widgettag">
+    {% for skill in profile.my_skill.all %}
+        <a href="javascript:void(0);">{{skill}}</a>
+    {% endfor %}
+    </div>
+</div>
+{% endfor %}

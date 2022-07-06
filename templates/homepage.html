@@ -144,7 +144,7 @@
 							<div class="row justify-content-md-center">
 							{% for proposal in proposal_list %}
 								<div class="col-12 col-sm-12 col-md-12 col-lg-3">
-									<div class="wt-companysdetails">
+									<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 										<figure class="wt-companysimg">
 										{% if proposal.thumbnail %}
 											<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
@@ -157,25 +157,29 @@
 											<div class="wt-title">
 												<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_short_name}}{% endif %}</a>
 												<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a>
-												<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
 											<hr>
 											<ul class="wt-postarticlemeta">
-												<li>
+												<li class="wt-following">
 													<a href="javascript:void(0);">
-														<span>Views()</span>
+														<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
 													</a>
 												</li>
 												<li class="wt-following">
 													<a href="javascript:void(0);">
-														<span>Bookmark</span>
+														<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
+													</a>
+												</li>
+												<li class="wt-following">
+													<a href="javascript:void(0);">
+														<span><i class="far fa-star"></i>5</span>
 													</a>
 												</li>
 											</ul>
-											</div>
 										</div>
 									</div>
 								</div>
-								{% endfor %}
+							</div>
+							{% endfor %}
 								{% if not proposal_list %}
 									<p> No featured proposals to show yet </p>
 								{% endif %}
@@ -190,8 +194,8 @@
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
 								<div class="wt-sectionhead wt-textcenter">
 									<div class="wt-sectiontitle">
-										<h2>Top Freelancers</h2>
-										<span>Verified Freelancers</span>
+										<h2>Top Freelancer</h2>
+										<span>Our Freelancer Picks</span>
 									</div>
 								</div>
 							</div>
@@ -213,11 +217,11 @@
 										<div class="wt-proposalhead">
 											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
 												<li><span><i class="fa fa-dollar-sign"></i> Worth: {{proposal.get_service_level_display}}</span></li>
-												<li><span>{% if user.user.country.flag %}<img src="{{user.user.country.flag.url}}" alt="img description"> {% else %}{{user.user.country.country_code}} - {% endif %} {{user.user.country.name}}</span></li>
+												<li><span>{% if user.user.country.flag %}<img src="{{user.user.country.flag.url}}" alt="img description"> {% else %}{{user.user.country.country_code}} - {% endif %} {{user.user.country.name|truncatechars:50}}</span></li>
 												<li><span><i class="far fa-clock"></i> Sales: {{proposal.get_dura_converter_display }}</span></li>
 												<li><span><i class="far fa-star"></i> Review: {{proposal.get_revision_display}}</span></li>
+												<li><a href="" class="btn btn-danger btn-sm text-white"><i class="far fa-envelope">&nbsp;&nbsp;Chat Me</i></a></li>
 											</ul>
-											<a href="">Chat</a>
 										</div>
 									</div> 
 								</div>

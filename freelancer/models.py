@@ -15,6 +15,11 @@ from teams.models import Team
 from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
 
 
+class ActiveFreelancer(models.Manager):
+    def get_queryset(self):
+        return super(ActiveFreelancer, self).get_queryset().filter(user__is_active=True, user__user_type=Customer.FREELANCER)
+
+
 class Freelancer(models.Model):
     MALE = 'male'
     FEMALE = 'female'
@@ -59,6 +64,11 @@ class Freelancer(models.Model):
     image_three = models.ImageField(_("Image 3"), upload_to='freelancer/awards/',default='freelancer/awards/banner.png', null=True, blank=True,)
     slug = models.SlugField(_("Slug"), max_length=30, null=True, blank=True,)
     active_team_id = models.PositiveIntegerField(_("Active Team ID"), default=0)
+    active = ActiveFreelancer()
+
+    class Meta:
+        verbose_name = 'Freelancer Profile'
+        verbose_name_plural = 'Freelancer Profile'
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'

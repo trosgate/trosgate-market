@@ -40,6 +40,7 @@ class ActiveProposals(models.Manager):
     def get_queryset(self):
         return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
 
+
 class Proposal(models.Model):
     # proposal Duration converter
     ONE_DAY = "one_day"

@@ -69,10 +69,10 @@ INSTALLED_APPS = [
     'django_countries',
     'ckeditor',
     # 'mptt',
-    'channels',
-    'embed_video',
-    'django_celery_results',
-    'django_celery_beat',
+    # 'channels',
+    # 'embed_video',
+    # 'django_celery_results',
+    # 'django_celery_beat',
     # Two factor Authentication
     'django_otp',
     'django_otp.plugins.otp_static',
@@ -128,18 +128,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
-ASGI_APPLICATION = 'trosgate.asgi.application'
+# ASGI_APPLICATION = 'trosgate.asgi.application'
 
 
 # in place of redis while on windows in development environment
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 
 # Database
@@ -272,18 +272,18 @@ MESSAGE_TAGS = {
 }
 
 # CELERY CONFIGURATIONS
-# CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-accept_content = ['application/json']
-result_serializer = 'json'
-task_serializer = 'json'
+### CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+# accept_content = ['application/json']
+# result_serializer = 'json'
+# task_serializer = 'json'
 ### default timezone is "UTC". Activate this if you want a different timzone ###
 timezone = 'Africa/Accra'
 
 # STORAGE CHOICE OF CELERY TASKS
-result_backend = 'django-db'
+# result_backend = 'django-db'
 
 # CELERY BEAT CONFIGURATIONS
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
 # CUSTOM SESSIONS

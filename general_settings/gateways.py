@@ -10,12 +10,19 @@ from django.conf import settings
 import razorpay
 
 def ref_generator():
+    new_unique_reference = ''
     generated_reference = secrets.token_urlsafe(30)[:30]
-    similar_ref = Purchase.objects.filter(unique_reference=generated_reference)
-    if not similar_ref:
+    while not Purchase.objects.filter(unique_reference=generated_reference).exists():
         new_unique_reference = generated_reference
+        break
     return new_unique_reference
 
+# def ref_generator():
+#     generated_reference = secrets.token_urlsafe(30)[:30]
+#     similar_ref = Purchase.objects.filter(unique_reference=generated_reference)
+#     if not similar_ref:
+#         new_unique_reference = generated_reference
+#     return new_unique_reference
   
 # PAYPAL PAYMENT GATEWAY
 class PayPalClientConfig:
@@ -46,7 +53,6 @@ class PayPalClientConfig:
 
     def paypal_httpclient(self):
         return PayPalHttpClient(self.paypal_environment())
-
 
     def paypal_unique_reference(self):
         return ref_generator()

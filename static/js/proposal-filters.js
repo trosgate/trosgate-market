@@ -22,9 +22,10 @@ $(document).ready(function(){
                 $('.ajaxLoader').show();
             },
             success: function (json) {
+                console.log(json)
                 $('.ajaxLoader').hide();
+                document.getElementById("proposalTotal").innerHTML = json.totalcount;
                 $('#proposalSuccessFilter').html(json.proposals);
-                //$('#proposalTotal').html = (json.total + ' ' + 'found for this search')
             },
             error: function (error) {
                 console.log(error)

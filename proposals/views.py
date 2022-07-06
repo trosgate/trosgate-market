@@ -11,10 +11,6 @@ from django.utils.text import slugify
 from freelancer.models import Freelancer
 from account.permission import user_is_freelancer
 from general_settings.models import Category, ProposalGuides, Skill
-from datetime import datetime, timezone, timedelta
-from django.shortcuts import render, redirect, get_object_or_404
-from teams.models import Team
-from django.utils.text import slugify
 from django.contrib import auth, messages
 from django.views.decorators.cache import cache_control #prevent back button on browser after form submission
 from account.models import Country
@@ -29,23 +25,32 @@ def proposal_listing(request):
     skills = Skill.objects.all().distinct()
     proposals = Proposal.active.all().distinct()
     base_currency = get_base_currency_symbol()
-    
+    all_proposals = proposals.count()
+
+    totalcount = f'{all_proposals} found for the search'
     context = {
         "skills":skills, 
         "countries":countries, 
         "categorie":categorie, 
         "proposals": proposals,
         "base_currency": base_currency,
+        "totalcount": totalcount,
     }
     return render(request, 'proposals/proposal_listing.html', context)
 
 
 def proposal_filter(request):
+    base_currency = get_base_currency_symbol()
+    #Country
     country = request.GET.getlist('country[]')
+    # Category
     category = request.GET.getlist('category[]')
+    # Skills
     skill = request.GET.getlist('skill[]')
+    # Revision Status
     revision_true = request.GET.get('true[]', '')
     revision_false = request.GET.get('false[]', '')
+    # Duration
     one_day = request.GET.get('one_day[]', '')
     two_days = request.GET.get('two_days[]', '')
     three_days = request.GET.get('three_days[]', '')
@@ -56,19 +61,32 @@ def proposal_filter(request):
     two_weeks = request.GET.get('two_weeks[]', '')
     three_weeks = request.GET.get('three_weeks[]', '')
     one_month = request.GET.get('one_month[]', '')
+    # Upgraded Teams
     upgraded_teams = request.GET.get('upgradedTeams[]', '')
+    # Price Filter
+    less_than_50_dollar = request.GET.get('less_than_50_dollar[]', '')
+    fify_dollar_to_100_dollar = request.GET.get('fify_dollar_to_100_dollar[]', '')
+    hundred_dollar_to_350_dollar = request.GET.get('hundred_dollar_to_350_dollar[]', '')
+    three_fifty_dollar_to_500_dollar = request.GET.get('three_fifty_dollar_to_500_dollar[]', '')
+    above_500_dollar = request.GET.get('above_500_dollar[]', '')
 
     proposals = Proposal.active.all()
+    all_proposals = proposals.count()
+    #Country
     if len(country) > 0:
         proposals = proposals.filter(team__created_by__country__id__in=country).distinct()
+    # Category    
     if len(category) > 0:
         proposals = proposals.filter(category__id__in=category).distinct()
+    # Skills    
     if len(skill) > 0:
         proposals = proposals.filter(skill__id__in=skill).distinct()
+    # Revision Status
     if revision_true != '':
         proposals = proposals.filter(revision=True).distinct()
     if revision_false != '':
         proposals = proposals.filter(revision=False).distinct()
+    # Duration
     if one_day != '':
         proposals = proposals.filter(dura_converter = one_day).distinct()
     if two_days != '':
@@ -89,16 +107,29 @@ def proposal_filter(request):
         proposals = proposals.filter(dura_converter = three_weeks).distinct()
     if one_month != '':
         proposals = proposals.filter(dura_converter = one_month).distinct()
+    # Upgraded Teams
     if upgraded_teams != '':
         proposals = proposals.filter(team__package__type = 'Team').distinct()
+    # Price Filter    
+    if less_than_50_dollar != '':
+        proposals = proposals.filter(salary__lte = 50).distinct()
+    if fify_dollar_to_100_dollar != '':
+        proposals = proposals.filter(salary__gte = 50, salary__lte=100).distinct()
+    if hundred_dollar_to_350_dollar != '':
+        proposals = proposals.filter(salary__gte = 100, salary__lte=350).distinct()
+    if three_fifty_dollar_to_500_dollar != '':
+        proposals = proposals.filter(salary__gte = 350, salary__lte=500).distinct()
+    if above_500_dollar != '':
+        proposals = proposals.filter(salary__gte=500).distinct()
 
-    returned_proposal = render_to_string('proposals/ajax/proposal_search.html', {'proposals':proposals})
-    if len(proposals) > 0:       
-        return JsonResponse({'proposals': returned_proposal})
+    search_count = len(proposals)
+    totalcount = f'<div id="proposalTotal" class="alert alert-info text-center" role="alert" style="color:black;">{search_count} of {all_proposals} search results found</div>'
+    returned_proposal = render_to_string('proposals/ajax/proposal_search.html', {'proposals':proposals, 'base_currency':base_currency})
+    if len(proposals) > 0: 
+        return JsonResponse({'proposals': returned_proposal, 'base_currency':base_currency, 'totalcount':totalcount})
     else:
         returned_proposal = f'<div class="alert alert-warning text-center" role="alert" style="color:red;"> Hmm! nothing to show for this search</div>'
-        return JsonResponse({'proposals': returned_proposal})
-
+        return JsonResponse({'proposals': returned_proposal, 'base_currency':base_currency, 'totalcount':totalcount})
 
 
 @login_required
@@ -251,7 +282,6 @@ def proposal_step_three(request):
         'proposalformthree': proposalformthree,
     }
     return render(request, 'proposals/proposal_step_three.html', context)
-
 
 
 @login_required

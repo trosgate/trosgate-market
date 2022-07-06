@@ -31,7 +31,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 class ClientAccountAdmin(admin.ModelAdmin):
     model = ClientAccount
-    list_display = ['user', 'created_at', 'modified_on', 'reference', 'available_balance']
+    list_display = ['user', 'created_at', 'modified_on', 'reference', 'debug_balance', 'available_balance']
     list_editable = ['available_balance']
     list_display_links = None
 

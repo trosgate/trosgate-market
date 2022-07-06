@@ -12,5 +12,6 @@ urlpatterns = [
     path('profile/<slug:short_name>/', views.freelancer_profile, name='freelancer_profile'),
     path('update-profile/id/<str:user_id>/', views.update_freelancer, name='update_freelancer_profile'),
     path('listing/', views.freelancer_listing, name='freelancer_listing'),    
+    path('freelancer_search/', views.freelancer_search, name='freelancer_search'),    
 ]
 

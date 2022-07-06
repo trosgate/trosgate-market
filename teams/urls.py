@@ -2,7 +2,7 @@
 from django.urls import path
 from . import views
 
-# , stripe_webhook
+# IMPORT SUBSCRIPTIONS
 from .stripe_subscription import stripe_subscription_checkout_session
 from .razorpay_subscription import razorpay_subscription_checkout_session, razorpay_subscription_callback
 
@@ -14,8 +14,6 @@ urlpatterns = [
     path('', views.team, name='team'),
     path('message/', views.teamchat, name='teamchat'),
     path('chat/', views.teamchatroom, name='teamchatroom'),
-    path('email/', views.send_email_to_all_users, name='email_freelancer'),
-    path('schedule/', views.Admin_email_scheduler, name='email_schedule'),
     path('accept/', views.accept_team_invitation, name='accept_invite'),
     path('assigned/to/me/', views.assign_proposals_to_me, name='assign_to_me'),
     path('assigned/to/members/', views.assigned_proposals_to_members, name='assign_to_members'),
@@ -31,7 +29,6 @@ urlpatterns = [
     path('detail/<int:team_id>/', views.team_single, name='team_single'),
     path('internal_invitation/', views.internal_invitation, name='internal_invitation'),
     path('external_invitation/', views.external_invitation, name='external_invitation'),
-#     path('internal-user/<slug:short_name>/', views.internal_invitation, name='internal_invitation'),
     path('assign/<slug:team_slug>/<slug:proposal_slug>/',
          views.assign_proposal, name='assign_proposal'),
     path('tracker/<slug:proposal_slug>/<int:assign_id>/',
@@ -52,4 +49,6 @@ urlpatterns = [
     path('razorpay_subscription_checkout_session/', razorpay_subscription_checkout_session, name='razorpay_subscription_checkout_session'),
     path('razorpay_subscription_callback/', razorpay_subscription_callback, name='razorpay_subscription_callback'),
 
+#     path('email/', views.send_email_to_all_users, name='email_freelancer'),
+#     path('schedule/', views.Admin_email_scheduler, name='email_schedule'),
 ]

@@ -1,7 +1,6 @@
 {% extends "dashboard/main_base.html" %}
 
 {% load static %}
-{% load embed_video_tags %}
 
 {% block content %}
 
@@ -47,7 +46,7 @@
 										<h2>{{proposal.title}}</h2>
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
 											<li><span><i class="fa fa-dollar-sign"></i> {{proposal.get_service_level_display}}</span></li>
-											<li><span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
+											<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
 											<li><span><i class="far fa-clock"></i> Duration: {{proposal.get_dura_converter_display }}</span></li>
 											<li><span><i class="far fa-folder"></i> Revision: {{proposal.get_revision_display}}</span></li>
 											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Min Salary: ${{proposal.salary}}</span></li>
@@ -56,9 +55,9 @@
 									{% if request.user.is_authenticated and request.user.clients %}
 									<div class="wt-btnarea"><a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="wt-btn">Hire Expert</a></div>
 									{% elif request.user.is_authenticated and request.user.freelancer %}
-									<div class="wt-btnarea"><button class="wt-btn" disabled><strike style="color:blue">Hire Expert</strike></button></div>
+									<div class="wt-btnarea"><button class="wt-btn"><strike style="color:white">... Hire Expert ...</strike></button></div>
 									{% elif not request.user.is_authenticated %}
-									<div class="wt-btnarea"><a href="{% url 'account:dashboard' %}" class="wt-btn">Hire Expert</a></div>
+									<div class="wt-btnarea"><a href="{% url 'account:login' %}" class="wt-btn">Hire Expert</a></div>
 									{% endif %}
 								</div>
 								</div>

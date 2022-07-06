@@ -13,9 +13,8 @@ from django.utils.text import slugify
 from account.models import Customer
 from account.permission import user_is_freelancer
 from django.http import HttpResponseRedirect
-from .tasks import email_all_users
-from django_celery_beat.models import PeriodicTask, CrontabSchedule
-from .utilities import create_random_code, send_invitation_email, send_invitation_accepted_mail
+from .utilities import create_random_code
+from notification.mailer import send_invitation_email, send_invitation_accepted_mail
 from django.http import JsonResponse
 from proposals.models import Proposal
 from django.db.models import F, Q
@@ -33,19 +32,21 @@ from general_settings.models import PaymentAPIs
 from django.conf import settings
 from . controller import monthly_projects_applicable_per_team
 from account.fund_exception import InvitationException
+# from .tasks import email_all_users
+# from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
-def send_email_to_all_users(request):
-    email_all_users.delay()
-    return HttpResponse('Mail Sent')
+# def send_email_to_all_users(request):
+#     email_all_users.delay()
+#     return HttpResponse('Mail Sent')
 
 
 # Instead of hard-coding tasks,
 # I want Admin to have flexibility to schedule without coding skill required
-def Admin_email_scheduler(request):
-    schedule, created = CrontabSchedule.objects.get_or_create(hour=21, minute=20)
-    task = PeriodicTask.objects.create(
-        crontab=schedule, name='mail_schedule_' + create_random_code()[:5], task='teams.tasks.email_all_users')
-    return HttpResponse('completed')
+# def Admin_email_scheduler(request):
+#     schedule, created = CrontabSchedule.objects.get_or_create(hour=21, minute=20)
+#     task = PeriodicTask.objects.create(
+#         crontab=schedule, name='mail_schedule_' + create_random_code()[:5], task='teams.tasks.email_all_users')
+#     return HttpResponse('completed')
 
 
 @login_required
@@ -197,6 +198,7 @@ def internal_invitation(request):
 
         return JsonResponse({'result':result, 'errors':errors})
 
+
 @login_required
 @user_is_freelancer
 def external_invitation(request):
@@ -221,46 +223,6 @@ def external_invitation(request):
 
         return JsonResponse({'result':result, 'errors':errors})
         
-
-# email-invite
-
-# @login_required
-# @user_is_freelancer
-# def internal_invitation_old(request, short_name):
-#     package = get_object_or_404(Package, pk=2, type='Team')
-#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, package=package, status=Team.ACTIVE, created_by=request.user)
-#     code = Invitation.objects.values('code')[0]
-
-#     if team:
-#         for invitee in Customer.objects.filter(short_name=short_name, is_active=True, user_type=Customer.FREELANCER):
-#             try:
-#                 if invitee:
-#                     invitation = Invitation.objects.filter(
-#                         team=team, email=invitee.email)
-
-#                     if not invitation:
-
-#                         member = Invitation.objects.create(
-#                             team=team, email=invitee.email, status=Invitation.INVITED)
-
-#                         email = member.email
-
-#                         send_invitation_email(email, code, team)
-
-#                         if member:
-#                             return redirect('account:dashboard')
-#                         else:
-#                             messages.error(
-#                                 request, 'Something went wrong. Please contact Admin')
-#                     else:
-#                         messages.info(
-#                             request, f'The new member "{invitee.short_name}" was invited to {team.title}')
-#             except:
-#                 messages.error(
-#                     request, 'Something went wrong. Please contact Admin')
-
-#     return redirect('account:dashboard')
-
 
 @login_required
 @user_is_freelancer

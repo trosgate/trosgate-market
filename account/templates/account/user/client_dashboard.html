@@ -163,12 +163,6 @@
 									<div class="alert alert-info" role="alert">
 										<span style="color: green; font-weight: bold;"> These projects are open for applications</span>
 									</div>
-									<form action="" method="post">
-										<div class="input-group">
-											<input type="text" class="form-control" name="" id="">
-											<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-										</div>
-									</form>
 								</div>
 							</div>
 						</div>
@@ -204,8 +198,9 @@
 						</tbody>
 					</table>
 					{% if not open_projects %}
-						<div class="alert alert-info justify-content-md-center" role="alert">
-							<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
+					<hr>
+						<div class="text-center">
+							<span style="font-weight: bold;"> Ooops! No Applications to show at the moment</span>
 						</div>
 						{% endif %}
 				</div>
@@ -221,12 +216,6 @@
 									<div class="alert alert-info" role="alert">
 										<span style="color: green; font-weight: bold;"> You can re-open these projects when you preview to modify the deadlines</span>
 									</div>
-									<form action="" method="post">
-										<div class="input-group">
-											<input type="text" class="form-control" name="" id="">
-											<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-										</div>
-									</form>
 								</div>
 							</div>
 						</div>
@@ -257,10 +246,11 @@
 						</tbody>
 					</table>
 					{% if not closed_projects %}
-						<div class="alert alert-info justify-content-md-center" role="alert">
-							<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
-						</div>
-						{% endif %}
+					<hr>
+					<div class="text-center">
+						<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
+					</div>
+					{% endif %}
 					</div>
 				</div>
 
@@ -275,12 +265,6 @@
 										<div class="alert alert-info" role="alert">
 											<span style="color: green; font-weight: bold;"> All Your Internal contracts Created</span>
 										</div>
-										<form action="" method="post">
-											<div class="input-group">
-												<input type="text" class="form-control" name="" id="">
-												<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-											</div>
-										</form>
 									</div>
 								</div>
 							</div>
@@ -323,16 +307,16 @@
 								{% endfor %}
 							</tbody>
 						</table>
-							{% if not contracts %}
-							<div class="alert alert-info justify-content-md-center" role="alert">
-								<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
-							</div>
-							{% endif %}
+						{% if not contracts %}
+						<hr>
+						<div class="text-center">
+							<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
+						</div>
+						{% endif %}
 					</div>
 					{% if contracts|length > 5 %}
 					<div class="wt-commentsbtn">
 						<a href="{% url 'contract:internal_contract_list' %}" class="wt-btn"> View More</a>
-						{% comment %} <button class="wt-btn" type="button">Load More</button> {% endcomment %}
 					</div>
 					{% endif %}
 				</div>
@@ -346,24 +330,16 @@
 										<div class="alert alert-info" role="alert">
 											<span style="color: green; font-weight: bold;"> Latest Proposals for Hire</span>
 										</div>
-										<form action="" method="post">
-											<div class="input-group">
-												<input type="text" class="form-control" name="" id="">
-												<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-											</div>
-										</form>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>			
-				</div>				
-				<section class="wt-haslayout wt-dbsectionspace">	
-					<div class="container">
+					</div>				
+					<section class="wt-haslayout wt-dbsectionspace">
 						<div class="row justify-content-md-center">
 						{% for proposal in proposals %}
 							<div class="col-12 col-sm-12 col-md-12 col-lg-3">
-								<div class="wt-companysdetails">
+								<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 									<figure class="wt-companysimg">
 									{% if proposal.thumbnail %}
 										<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
@@ -377,14 +353,19 @@
 											<span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span>
 										<hr>
 										<ul class="wt-postarticlemeta">
-											<li>
+											<li class="wt-following">
 												<a href="javascript:void(0);">
-													<span>Views()</span>
+													<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
 												</a>
 											</li>
 											<li class="wt-following">
 												<a href="javascript:void(0);">
-													<span>Bookmark</span>
+													<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
+												</a>
+											</li>
+											<li class="wt-following">
+												<a href="javascript:void(0);">
+													<span><i class="far fa-star"></i>5</span>
 												</a>
 											</li>
 										</ul>
@@ -394,7 +375,10 @@
 							</div>
 							{% endfor %}
 							{% if not proposals %}
-								<p> No featured proposals to show yet </p>
+							<hr>
+							<div class="text-center">
+								<span style="color: green; font-weight: bold;"> No Proposals to show yet</span>
+							</div>
 							{% endif %}
 						</div>
 					</div>
@@ -406,7 +390,6 @@
 						</div>
 					</div>
 				</div>
-    			{% comment %} {% include 'dashboard/main_footer.html' %} {% endcomment %}
 			</main>
 
 {% endblock %}

@@ -46,6 +46,10 @@ class Client(models.Model):
     announcement = models.TextField(
         _("Announcement"), max_length=1000, null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Client Profile'
+        verbose_name_plural = 'Client Profile'
+
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
@@ -75,9 +79,10 @@ class Client(models.Model):
 class ClientAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='clientfunduser', on_delete=models.PROTECT,)
     reference = models.UUIDField(unique=True, verbose_name="Reference Number", editable=False, default=uuid.uuid4,)
-    available_balance = models.PositiveIntegerField(_("Account Balance"), default=0,)
-    created_at = models.DateTimeField(auto_now_add=True,)
-    modified_on = models.DateTimeField(auto_now=True,)
+    debug_balance = models.PositiveIntegerField(_("Pending Balance"), default=0)
+    available_balance = models.PositiveIntegerField(_("Account Balance"), default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_on = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Client Account'
@@ -88,30 +93,74 @@ class ClientAccount(models.Model):
 
 
     @classmethod
-    def level_one_deposit_check(cls, depositor, deposit_amount, narration, reference, deposit_fee):
-        with transaction.atomic():
-            client_account = cls.objects.select_for_update().get(user=depositor)
+    def internal_invitation(cls, team, sender, type, receiver, email):
 
-            if not deposit_amount:
-                raise FundException(_("Deposit amount is required"))
+        if not team:
+            raise FundException(_("Your team is unknown"))
 
-            if not (int(get_min_deposit()) <= int(deposit_amount) <= int(get_max_deposit())):
-                raise FundException(_('Deposit amount is out of range'))
+        if not sender:
+            raise FundException(_("Bad and unknown request"))
 
-            if int(client_account.available_balance) + int(deposit_amount) > int(get_max_depositor_balance()):
-                raise FundException(_('Maximum account balance exceeded'))
+        if not receiver:
+            raise FundException(_("credentials of invitee incomplete"))
 
-            if int(client_account.available_balance) + int(deposit_amount) < int(get_min_depositor_balance()):
-                raise FundException(_('Deposited account is below minimum'))
+        if not email:
+            raise FundException(_("credentials of invitee incomplete"))
 
-            client_account.available_balance += int(0)
-            client_account.save(update_fields=['available_balance'])
+        if not (team.package_status == 'active'):
+            raise FundException(_("Please upgrade your team to invite others"))
 
-            account_action = ClientAction.create(
-                account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, reference=reference, status=False
-            )
+        if not (team.package.type == 'Team'):
+            raise FundException(_("Please activate subscription to invite others"))
+
+        if team.created_by != sender:
+            raise FundException(_("This action requires upgraded team founder"))
+
+        if team.created_by == receiver:
+            raise FundException(_("You cannot invite youself"))
+
+        if cls.objects.filter(team=team, receiver=receiver).exists():
+            raise FundException(_("User already invited"))     
+
+        if cls.objects.filter(team=team, team__members__email=email).exists():
+            raise FundException(_("User already a member of your Team"))
+
+        if cls.objects.filter(team=team, receiver__email=email).exists():
+            raise FundException(_("User of this email already invited"))
+
+        if  receiver in team.members.all():
+            raise FundException(_("User already a member"))
+
+        internal_invite = cls.objects.create(team=team, sender=sender, type=type, receiver=receiver, email=email)
+        return internal_invite
+
+
+    @classmethod
+    def level_one_deposit_check(cls, user, deposit_amount, narration, reference, deposit_fee):
+        # with transaction.atomic():
+        client_account = cls.objects.select_for_update().get(user=user)
+
+        if not deposit_amount:
+            raise FundException(_("Deposit amount is required"))
+
+        if not (int(get_min_deposit()) <= int(deposit_amount) <= int(get_max_deposit())):
+            raise FundException(_('Deposit amount is out of range'))
+
+        if int(client_account.available_balance) + int(deposit_amount) > int(get_max_depositor_balance()):
+            raise FundException(_('Maximum account balance exceeded'))
+
+        if int(client_account.available_balance) + int(deposit_amount) < int(get_min_depositor_balance()):
+            raise FundException(_('Deposited account is below minimum'))
+
+        client_account.available_balance += int(0)
+        client_account.save(update_fields=['available_balance'])
+
+        account_action = ClientAction.create(
+            account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, reference=reference, status=False
+        )
 
         return client_account, account_action
+
 
     @classmethod
     def level_two_deposit_check(cls, transaction_id, depositor, deposit_amount, deposit_fee, reference):

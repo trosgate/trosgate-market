@@ -1,5 +1,3 @@
-
-from datetime import datetime
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +8,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from uuid import uuid4
 from django.template.defaultfilters import slugify
-from datetime import datetime, timezone, timedelta
+from django.utils import timezone
 from teams.utilities import create_random_code
 from django.template.defaultfilters import truncatechars
 from proposals.utilities import (

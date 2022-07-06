@@ -30,8 +30,7 @@ def client_profile(request, short_name):
     client = get_object_or_404(Client, user__short_name=short_name)
     client_staffs = client.employees.all()
 
-    projects = Project.objects.filter(
-        created_by=client.user, status=Project.ACTIVE)
+    projects = Project.objects.filter(created_by=client.user, status=Project.ACTIVE)
 
     if request.method == 'POST':
         announcementform = AnnouncementForm(request.POST, instance=client)
@@ -84,8 +83,7 @@ def update_client(request, user_id):
 
 
 def client_listing(request):
-    client_profile_list = Client.objects.filter(
-        user__is_active=True, user__user_type=Customer.CLIENT)
+    client_profile_list = Client.objects.filter(user__is_active=True, user__user_type=Customer.CLIENT)
     context = {
         'client_profile_list': client_profile_list,
     }
@@ -111,10 +109,8 @@ def deposit_fee_structure(request):
 def deposit_fee_session(request):
     session = request.session
     if request.POST.get('action') == 'deposit-gateway':
-        gateway_type = int(request.POST.get('depogateway'))
-        gateway = PaymentGateway.objects.get(id=gateway_type, status=True)
-        print(gateway)
-        print('gateway fee:', gateway.processing_fee)
+        gateway_id = int(request.POST.get('depogateway'))
+        gateway = PaymentGateway.objects.get(id=gateway_id, status=True)
 
         if "depositgateway" not in request.session:
             session["depositgateway"] = {"gateway_id": gateway.id}
@@ -139,18 +135,27 @@ def final_deposit(request):
         messages.error(request, "Please select deposit option to proceed")
         return redirect("client:deposit_fee_structure")
 
+    stripe_public_key = ''
+    paypal_public_key = ''
+    flutterwave_public_key = ''
+    razorpay_public_key = ''
+    
     client = get_object_or_404(Client, user=request.user, user__is_active=True)    
     gateway_id = request.session["depositgateway"]["gateway_id"]
     selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
 
     # Stripe payment api
-    stripe_public_key = StripeClientConfig().stripe_public_key()
+    if selected_gateway.name =="Stripe":
+        stripe_public_key = StripeClientConfig().stripe_public_key()
     # Paypal payment api
-    paypal_public_key = PayPalClientConfig().paypal_public_key()
+    if selected_gateway.name =="PayPal":
+        paypal_public_key = PayPalClientConfig().paypal_public_key()
     # Futterwave payment api
-    flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key()
+    if selected_gateway.name =="Flutterwave":
+        flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key()
     # Razorpay payment api
-    razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
+    if selected_gateway.name =="Razorpay":
+        razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
 
     base_currency = get_base_currency_code()
 

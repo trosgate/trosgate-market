@@ -37,315 +37,221 @@
 			<!--Inner Home End-->
 			<!--Main Start-->
 
-			<main id="wt-main" class="wt-haslayout wt-innerbgcolor">
-				<div class="wt-main-section wt-haslayout">
-					<!-- User Listing Start-->
-					<div class="wt-haslayout">
-						<div class="container">
-							<div class="row">
-								<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
-									<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
-										<div class="wt-usersidebaricon">
-											<span class="fa fa-cog wt-usersidebardown">
-												<i></i>
-											</span>
+			<div class="wt-main-section wt-haslayout">
+				<!-- User Listing Start-->
+				<div class="wt-haslayout">
+					<div class="container">
+						<div class="row">
+							<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+								<div class="wt-usersidebaricon">
+								<span class="fa fa-cog wt-usersidebardown">
+									<i></i>
+								</span>
+							</div>
+						<aside id="wt-sidebar" class="wt-sidebar wt-usersidebar">
+							<div class="wt-widget wt-effectiveholder">
+								<div class="wt-widgettitle">
+									<h2>Countries</h2>
+								</div>
+								<div class="wt-widgetcontent">
+									<form class="wt-formtheme wt-formsearch">
+										<fieldset>
+											<div class="wt-checkboxholder wt-verticalscrollbar">
+												{% for country in countries %}
+												<span class="wt-checkbox">
+													<input id="{{country.name}}" class="freelancer-checked" type="checkbox" data-filter="country" name="{{country.name}}" value="{{country.id}}">
+													<label for="{{country.name}}"><img src="{% if country.flag %} {{country.flag.url}} {% endif %}" alt="img description"> {{country.name}}</label>
+												</span>
+												{% endfor %}
+											</div>
+										</fieldset>
+									</form>
+								</div>
+							</div>
+
+							<div class="wt-widget wt-effectiveholder">
+								<div class="wt-widgettitle">
+									<h2>Skills Required</h2>
+								</div>
+								<div class="wt-widgetcontent">
+									<form class="wt-formtheme wt-formsearch">
+										<fieldset>
+											<div class="wt-checkboxholder wt-verticalscrollbar">
+												{% for skill in skills %}
+												<span class="wt-checkbox">
+													<input id="{{skill.name}}" class="freelancer-checked" type="checkbox" data-filter="skill" name="{{skill.name}}" value="{{skill.id}}">
+													<label for="{{skill.name}}">{{skill.name}}</label>
+												</span>
+												{% endfor %}
+											</div>
+										</fieldset>
+									</form>
+								</div>
+							</div>
+							
+							<div class="wt-widget wt-effectiveholder">
+								<div class="wt-widgettitle">
+									<h2>Freelancer Type</h2>
+								</div>
+								<div class="wt-widgetcontent">
+									<form class="wt-formtheme wt-formsearch">
+										<fieldset>
+											<div class="wt-checkboxholder">
+												<span class="wt-checkbox">
+													<input id="upgradedfreelancer" class="freelancer-checked" type="checkbox" data-filter="upgradedfreelancer" name="upgradedfreelancer" value="upgradedfreelancer">
+													<label for="upgradedfreelancer"> Agency Freelancers</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="basicfreelancer" class="freelancer-checked" type="checkbox" data-filter="basicfreelancer" name="basicfreelancer" value="basicfreelancer">
+													<label for="basicfreelancer"> Independent Freelancers</label>
+												</span>
+											</div>
+										</fieldset>
+									</form>
+								</div>
+							</div>
+							<div class="wt-widget wt-effectiveholder">
+								<div class="wt-widgettitle">
+									<h2>Freelancer Status</h2>
+								</div>
+								<div class="wt-widgetcontent">
+									<form class="wt-formtheme wt-formsearch">
+										<fieldset>
+											<div class="wt-checkboxholder">
+												<span class="wt-checkbox">
+													<input id="freelancersonline" class="freelancer-checked" type="checkbox" data-filter="freelancersonline" name="freelancersonline" value="freelancersonline">
+													<label for="freelancersonline"> Online Now</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="freelancersoffline" class="freelancer-checked" type="checkbox" data-filter="freelancersoffline" name="freelancersoffline" value="freelancersoffline">
+													<label for="freelancersoffline"> Offline Now</label>
+												</span>
+											</div>
+										</fieldset>
+									</form>
+								</div>
+							</div>
+							<div class="wt-widget wt-effectiveholder">
+								<div class="wt-widgettitle">
+									<h2> Membership</h2>
+								</div>
+								<div class="wt-widgetcontent">
+									<form class="wt-formtheme wt-formsearch">
+										<fieldset>
+											<div class="wt-checkboxholder  wt-verticalscrollbar">
+												<span class="wt-checkbox">
+													<input id="join_one_month" class="freelancer-checked" type="checkbox" data-filter="join_one_month" name="join_one_month" value="join_one_month">
+													<label for="join_one_month">Joined 1 Month Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_two_month" class="freelancer-checked" type="checkbox" data-filter="join_two_month" name="join_two_month" value="join_two_month">
+													<label for="join_two_month">Joined 2 Month Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_three_month" class="freelancer-checked" type="checkbox" data-filter="join_three_month" name="join_three_month" value="join_three_month">
+													<label for="join_three_month">Joined 3 Month Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_four_month" class="freelancer-checked" type="checkbox" data-filter="join_four_month" name="join_four_month" value="join_four_month">
+													<label for="join_four_month">Joined 4 Month Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_five_month" class="freelancer-checked" type="checkbox" data-filter="join_five_month" name="join_five_month" value="join_five_month">
+													<label for="join_five_month">Joined 5 Month Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_six_month" class="freelancer-checked" type="checkbox" data-filter="join_six_month" name="join_six_month" value="join_six_month">
+													<label for="join_six_month">Joined 6 Month Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_one_year" class="freelancer-checked" type="checkbox" data-filter="join_one_year" name="join_one_year" value="join_one_year">
+													<label for="join_one_year">Joined 1 Year Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_two_year" class="freelancer-checked" type="checkbox" data-filter="join_two_year" name="join_two_year" value="join_two_year">
+													<label for="join_two_year">Joined 2 Years Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_three_year" class="freelancer-checked" type="checkbox" data-filter="join_three_year" name="join_three_year" value="join_three_year">
+													<label for="join_three_year">Joined 3 Years Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_four_year" class="freelancer-checked" type="checkbox" data-filter="join_four_year" name="join_four_year" value="join_four_year">
+													<label for="join_four_year">Joined 4 Years Ago</label>
+												</span>
+												<span class="wt-checkbox">
+													<input id="join_over_five_year" class="freelancer-checked" type="checkbox" data-filter="join_over_five_year" name="join_over_five_year" value="join_over_five_year">
+													<label for="join_over_five_year">Joined 5 and More</label>
+												</span>
+											</div>
+										</fieldset>
+									</form>
+								</div>
+							</div>
+						</aside>
+					</div>
+					<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
+						<div id="freelancerTotal" class="wt-userlistingtitle text-center"><em>{{totalcount}}</em></div>
+						<div id="freelancerSuccessFilter" class="wt-userlistingholder wt-userlisting wt-haslayout">
+							
+							{% for profile in freelancer_list %}
+							<div class="wt-userlistinghold wt-featured">
+								<figure class="wt-userlistingimg">
+									<a href="{{profile.freelancer_profile_absolute_url}}"><img src="{{profile.profile_photo.url}}" alt="image description"></a>
+								</figure>
+								<div class="wt-userlistingcontent">
+									<div class="wt-contenthead">
+										<div class="wt-title">
+											<a href="{{profile.freelancer_profile_absolute_url}}"><i class="fa fa-check-circle"></i> {{profile.user.get_full_name}}</a>
+											<a href="{{profile.freelancer_profile_absolute_url}}">{{profile.tagline}} </a>
 										</div>
-										<aside id="wt-sidebar" class="wt-sidebar wt-usersidebar">
-											<div class="wt-widget wt-effectiveholder">
-												<div class="wt-widgettitle">
-													<h2>Categories</h2>
-												</div>
-												<div class="wt-widgetcontent">
-													<form class="wt-formtheme wt-formsearch">
-														<fieldset>
-															<div class="form-group">
-																<input type="text" name="Search" class="form-control" placeholder="Search Category">
-																<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
-															</div>
-														</fieldset>
-														<fieldset>
-															<div class="wt-checkboxholder wt-verticalscrollbar">
-                                                                {% for category in categories %}
-																<span class="wt-checkbox">
-																	<input id="category_id" type="checkbox" name="category" value="category" checked>
-																	<label for="category"> {{category.name}}</label>
-																</span>
-                                                                {% endfor %}
-															</div>
-														</fieldset>
-													</form>
-												</div>
-											</div>
-											<div class="wt-widget wt-effectiveholder">
-												<div class="wt-widgettitle">
-													<h2>Location</h2>
-												</div>
-												<div class="wt-widgetcontent">
-													<form class="wt-formtheme wt-formsearch">
-														<fieldset>
-															<div class="form-group">
-																<input type="text" name="fullname" class="form-control" placeholder="Search Location">
-																<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
-															</div>
-														</fieldset>
-														<fieldset>
-															<div class="wt-checkboxholder wt-verticalscrollbar">
-                                                                {% for profile in freelancer_profile_list %}
-																<span class="wt-checkbox">
-																	<input id="country" type="checkbox" name="country" value="country">
-																	<label for="country"> {% if profile.user.country.flag %}<img src="{{profile.user.country.flag.url}}" alt="img description"> {% else %}{{profile.user.country.country_code}} - {% endif %} {{profile.user.country.name}}</label>
-																</span>
-                                                                {% endfor %}
-															</div>
-														</fieldset>
-													</form>
-												</div>
-											</div>
-											<div class="wt-widget wt-effectiveholder">
-												<div class="wt-widgettitle">
-													<h2>Hourly Rate</h2>
-												</div>
-												<div class="wt-widgetcontent">
-													<form class="wt-formtheme wt-formsearch">
-														<fieldset>
-															<div class="wt-checkboxholder wt-verticalscrollbar">
-																<span class="wt-checkbox">
-																	<input id="rate1" type="checkbox" name="description" value="company" checked>
-																	<label for="rate1">$10 and below</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rate2" type="checkbox" name="description" value="company">
-																	<label for="rate2"> $10 - $30</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rate3" type="checkbox" name="description" value="company">
-																	<label for="rate3"> $30 - $60</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rate4" type="checkbox" name="description" value="company">
-																	<label for="rate4"> $60 - $90</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rate5" type="checkbox" name="description" value="company">
-																	<label for="rate5"> $90 &amp;above</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rate2v" type="checkbox" name="description" value="company">
-																	<label for="rate2v">$10 and below</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rate3v" type="checkbox" name="description" value="company">
-																	<label for="rate3v"> $10 - $30</label>
-																</span>
-															</div>
-														</fieldset>
-													</form>
-												</div>
-											</div>
-											<div class="wt-widget wt-effectiveholder">
-												<div class="wt-widgettitle">
-													<h2>Freelancer Type</h2>
-												</div>
-												<div class="wt-widgetcontent">
-													<form class="wt-formtheme wt-formsearch">
-														<fieldset>
-															<div class="wt-checkboxholder">
-																<span class="wt-checkbox">
-																	<input id="proindependent" type="checkbox" name="description" value="company" checked>
-																	<label for="proindependent">Pro Independent Freelancers</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="proagency" type="checkbox" name="description" value="company">
-																	<label for="proagency"> Pro Agency Freelancers</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="independent" type="checkbox" name="description" value="company">
-																	<label for="independent"> Independent Freelancers</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="agency" type="checkbox" name="description" value="company">
-																	<label for="agency">Agency Freelancers</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="rising" type="checkbox" name="description" value="company">
-																	<label for="rising"> New Rising Talent</label>
-																</span>
-															</div>
-														</fieldset>
-													</form>
-												</div>
-											</div>
-											<div class="wt-widget wt-effectiveholder">
-												<div class="wt-widgettitle">
-													<h2>English level</h2>
-												</div>
-												<div class="wt-widgetcontent">
-													<form class="wt-formtheme wt-formsearch">
-														<fieldset>
-															<div class="wt-checkboxholder">
-																<span class="wt-checkbox">
-																	<input id="basic" type="checkbox" name="description" value="company" checked>
-																	<label for="basic">Basic</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="conversational" type="checkbox" name="description" value="company">
-																	<label for="conversational"> Conversational</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="fluent" type="checkbox" name="description" value="company">
-																	<label for="fluent"> Fluent</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="native" type="checkbox" name="description" value="company">
-																	<label for="native"> Native or bilingual</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="professional" type="checkbox" name="description" value="company">
-																	<label for="professional"> Professional</label>
-																</span>
-															</div>
-														</fieldset>
-													</form>
-												</div>
-											</div>
-											<div class="wt-widget wt-effectiveholder">
-												<div class="wt-widgettitle">
-													<h2>Languages</h2>
-												</div>
-												<div class="wt-widgetcontent">
-													<form class="wt-formtheme wt-formsearch">
-														<fieldset>
-															<div class="form-group">
-																<input type="text" name="fullname" class="form-control" placeholder="Search Language">
-																<a href="javascrip:void(0);" class="wt-searchgbtn"><i class="lnr lnr-magnifier"></i></a>
-															</div>
-														</fieldset>
-														<fieldset>
-															<div class="wt-checkboxholder wt-verticalscrollbar">
-																<span class="wt-checkbox">
-																	<input id="chinese" type="checkbox" name="description" value="company" checked>
-																	<label for="chinese">Chinese</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="spanish" type="checkbox" name="description" value="company">
-																	<label for="spanish">Spanish</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="english" type="checkbox" name="description" value="company">
-																	<label for="english">English</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="arabic" type="checkbox" name="description" value="company">
-																	<label for="arabic">Arabic</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="russian" type="checkbox" name="description" value="company">
-																	<label for="russian">Russian</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="chinese1" type="checkbox" name="description" value="company">
-																	<label for="chinese1">Chinese</label>
-																</span>
-																<span class="wt-checkbox">
-																	<input id="spanish1" type="checkbox" name="description" value="company">
-																	<label for="spanish1">Spanish</label>
-																</span>
-															</div>
-														</fieldset>
-													</form>
-												</div>
-											</div>
-											<div class="wt-widget wt-applyfilters-holder">
-												<div class="wt-widgetcontent">
-													<div class="wt-applyfilters">
-														<span>Click “Apply Filter” to apply latest<br> changes made by you.</span>
-														<a href="javascript:void(0);" class="wt-btn">Apply Filters</a>
-													</div>
-												</div>
-											</div>
-										</aside>
+										<ul class="wt-userlisting-breadcrumb">
+											<li><span><i class="far fa-money-bill-alt"></i> ${{profile.hourly_rate}}/ hr</span></li>
+											<li><span> {% if profile.user.country.flag %}<img src="{{profile.user.country.flag.url}}" alt="img description"> {% else %}{{profile.user.country.country_code}} - {% endif %} {{profile.user.country.name}}<span></li>
+											<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+										</ul>
 									</div>
-									<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
-										<div class="wt-userlistingholder wt-userlisting wt-haslayout">
-											<div class="wt-userlistingtitle">
-												<span>01 - 48 of 57143 results for <em>"Logo Design"</em></span>
-											</div>
-											<div class="wt-filterholder">
-												<ul class="wt-filtertag">
-													<li class="wt-filtertagclear">
-														<a href="javascrip:void(0)"><i class="fa fa-times"></i> <span>Clear All Filter</span></a>
-													</li>
-												 	<li class="alert alert-dismissable fade in">
-														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Graphic Design</span></a>
-													</li>
-													<li class="alert alert-dismissable fade in">
-														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Any Hourly Rate</span></a>
-													</li>
-													<li class="alert alert-dismissable fade in">
-														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Any Freelancer Type</span></a>
-													</li>
-													<li class="alert alert-dismissable fade in">
-														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>Chinese</span></a>
-													</li>
-													<li class="alert alert-dismissable fade in">
-														<a href="javascrip:void(0)"><i class="fa fa-times close" data-dismiss="alert" aria-label="close"></i> <span>English</span></a>
-													</li>
-												</ul>
-											</div>
-                                            {% for profile in freelancer_profile_list %}
-											<div class="wt-userlistinghold wt-featured">
-												<figure class="wt-userlistingimg">
-													<a href="{{profile.freelancer_profile_absolute_url}}"><img src="{{profile.profile_photo.url}}" alt="image description"></a>
-												</figure>
-												<div class="wt-userlistingcontent">
-													<div class="wt-contenthead">
-														<div class="wt-title">
-															<a href="{{profile.freelancer_profile_absolute_url}}"><i class="fa fa-check-circle"></i> {{profile.user.get_full_name}}</a>
-															<a href="{{profile.freelancer_profile_absolute_url}}">{{profile.tagline}} </a>
-														</div>
-														<ul class="wt-userlisting-breadcrumb">
-															<li><span><i class="far fa-money-bill-alt"></i> ${{profile.hourly_rate}}/ hr</span></li>
-															<li><span> {% if profile.user.country.flag %}<img src="{{profile.user.country.flag.url}}" alt="img description"> {% else %}{{profile.user.country.country_code}} - {% endif %} {{profile.user.country.name}}<span></li>
-															<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
-														</ul>
-													</div>
-													<div class="wt-rightarea">
-														<span class="wt-starsvtwo">
-															<i class="fa fa-star fill"></i>
-															<i class="fa fa-star fill"></i>
-															<i class="fa fa-star fill"></i>
-															<i class="fa fa-star fill"></i>
-															<i class="fa fa-star fill"></i>
-														</span>
-														<span class="wt-starcontent">4.5/<sub>5</sub> <em>(860 Feedback)</em></span>
-													</div>
-												</div>
-												<div class="wt-description">
-													<p>{{profile.description|truncatechars:290}}...</p>
-												</div>
-												<div class="wt-tag wt-widgettag">
-                                                {% for skill in profile.my_skill.all %}
-													<a href="javascript:void(0);">{{skill}}</a>
-                                                {% endfor %}
-												</div>
-											</div>
-                                            {% endfor %}
-									    </div>
+									<div class="wt-rightarea">
+										<span class="wt-starsvtwo">
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+											<i class="fa fa-star fill"></i>
+										</span>
+										<span class="wt-starcontent">4.5/<sub>5</sub> <em>(860 Feedback)</em></span>
 									</div>
-                                        <nav class="wt-pagination">
-                                            <ul>
-                                                <li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
-                                                <li><a href="javascrip:void(0);">1</a></li>
-                                                <li><a href="javascrip:void(0);">2</a></li>
-                                                <li><a href="javascrip:void(0);">3</a></li>
-                                                <li><a href="javascrip:void(0);">4</a></li>
-                                                <li><a href="javascrip:void(0);">...</a></li>
-                                                <li><a href="javascrip:void(0);">50</a></li>
-                                                <li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
-                                            </ul>
-                                        </nav>                                    
-                                    </div>
-                                </div>
-                            </div>
+								</div>
+								<div class="wt-description">
+									<p>{{profile.description|truncatechars:290}}...</p>
+								</div>
+								<div class="wt-tag wt-widgettag">
+								{% for skill in profile.my_skill.all %}
+									<a href="javascript:void(0);">{{skill}}</a>
+								{% endfor %}
+								</div>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+						<nav class="wt-pagination">
+							<ul>
+								<li class="wt-prevpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-left"></i></a></li>
+								<li><a href="javascrip:void(0);">1</a></li>
+								<li><a href="javascrip:void(0);">2</a></li>
+								<li><a href="javascrip:void(0);">3</a></li>
+								<li><a href="javascrip:void(0);">4</a></li>
+								<li><a href="javascrip:void(0);">...</a></li>
+								<li><a href="javascrip:void(0);">50</a></li>
+								<li class="wt-nextpage"><a href="javascrip:void(0);"><i class="lnr lnr-chevron-right"></i></a></li>
+							</ul>
+						</nav>                                    
+					</div>
+				</div>
+			</div>
                             <!-- User Listing End-->
      {% endblock content %}
+	 {% block scripts %}
+	 <script type="text/javascript" src="{% static 'js/freelancer-filters.js' %}"></script>
+	 {% endblock scripts %}	 

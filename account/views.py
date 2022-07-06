@@ -18,11 +18,12 @@ from django.utils.text import slugify
 from projects.models import Project
 from . utilities import new_user_registration, send_verification_sms
 from future.utilities import get_sms_feature, get_more_team_per_user_feature
-from teams.utilities import send_new_team_email
+from notification.mailer import send_new_team_email
 from teams.controller import max_proposals_allowable_per_team
 from quiz.models import Quizes
 from contract . models import InternalContract
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from general_settings.decorators import confirm_recaptcha
@@ -36,6 +37,7 @@ from general_settings.gateways import PayPalClientConfig
 from django.contrib.auth.hashers import check_password
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_application_fee_calculator, get_proposal_fee_calculator
 from general_settings.models import Mailer
+from general_settings.currency import get_base_currency_symbol
 
 
 def autoLogout(request):
@@ -47,12 +49,13 @@ def autoLogout(request):
 def homepage(request):
     if request.user.is_authenticated:
         return redirect('account:dashboard')
-
+    
+    base_currency = get_base_currency_symbol()
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
     proposals = Proposal.active.filter(published=True).distinct()[0:12]
     projects = Project.objects.filter(status=Project.ACTIVE, published=True).distinct()[0:6]
-    users = Freelancer.objects.filter(user__is_active=True).distinct()[0:12]
+    users = Freelancer.active.all().distinct()[0:12]
 
     context = {
         'proposals': proposals,
@@ -60,6 +63,7 @@ def homepage(request):
         'packages': packages,
         'pypist': pypist,
         'users': users,
+        'base_currency': base_currency,
     }
     return render(request, 'homepage.html', context)
 
@@ -244,8 +248,8 @@ def user_dashboard(request):
     package = ''
     if request.user.user_type == Customer.FREELANCER and request.user.is_active == True:
         user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-        freelancer_profile = Freelancer.objects.get(user__id=request.user.id)
-        open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gt=datetime.now())[:10]
+        freelancer_profile = Freelancer.active.get(user__id=request.user.id)
+        open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gt=timezone.now())[:10]
         contracts = user_active_team.internalcontractteam.filter(status=InternalContract.PENDING)[:10]
         proposals = user_active_team.proposalteam.all()[:12]
         quizz = Quizes.objects.filter(is_published=True)[:10]
@@ -298,8 +302,8 @@ def user_dashboard(request):
     if request.user.user_type == Customer.CLIENT and request.user.is_active == True:
         client_profile = Client.objects.get(user=request.user)
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
-        open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=datetime.now())
-        closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=datetime.now())
+        open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
+        closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(status=InternalContract.PENDING, created_by=request.user)[:10]
 
         context = {

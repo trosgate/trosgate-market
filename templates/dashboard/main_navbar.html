@@ -67,7 +67,7 @@
 											<a class="nav-link" href="{% url 'account:login' %}"><img src="{% static 'images/user-login.png'%}" alt="img description"></a>
 										</div>
 										<div class="wt-loginoption">
-											<a class="nav-link btn btn-danger" type="button" href="{% url 'account:register' %}">Join</a>
+											<a class="nav-link btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}">Join</a>
 										</div>
 									{% endif  %}			
 									{% if request.user.is_authenticated %}

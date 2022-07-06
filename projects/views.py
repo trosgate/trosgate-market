@@ -20,7 +20,6 @@ import requests
 import base64
 import json
 from django.http import HttpResponseRedirect, HttpResponse
-from datetime import datetime, timezone, timedelta
 from teams.controller import monthly_projects_applicable_per_team
 from notification.utilities import create_notification
 

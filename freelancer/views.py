@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
 from . forms import FreelancerForm, FundTransferForm, WithdrawalForm
-from django.contrib.auth import login
-from account.models import Customer
 from . models import Freelancer, FreelancerAccount, FreelancerAction
-from proposals.models import Proposal
-from projects.models import Project
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.urls import reverse
 from account.permission import user_is_freelancer
 from teams.forms import TeamCreationForm
@@ -17,13 +13,120 @@ from teams.controller import max_member_per_team
 from contract.forms import InternalContractForm
 from django.db.models import F
 from teams.controller import monthly_offer_contracts
-from django.db import transaction
 from account.fund_exception import FundException
 import json
 from general_settings.fund_control import get_min_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
-from general_settings.currency import get_base_currency_symbol
 from future.utilities import get_transfer_feature
+from account.models import Country
+from general_settings.models import Category, Skill
+from teams.models import Team
+from account.models import Customer
+from proposals.models import Proposal
+from django.template.loader import render_to_string
+from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
+#this will appear in search results
+def freelancer_listing(request):
+    freelancer_list = Freelancer.active.all()
+    categorie = Category.objects.filter(visible = True).distinct()
+    countries = Country.objects.filter(supported = True).distinct()
+    skills = Skill.objects.all().distinct()
+    base_currency = get_base_currency_symbol()
+    base_currency = get_base_currency_symbol()
+    all_freelancers = freelancer_list.count()
+
+    totalcount = f' There are {all_freelancers} Freelancers available for search'
+    context = {
+        'freelancer_list': freelancer_list,
+        "skills":skills, 
+        "countries":countries, 
+        "categorie":categorie, 
+        "base_currency": base_currency,
+        "totalcount": totalcount,        
+    }
+    return render(request, 'freelancer/freelancer_listing.html', context)
+
+
+def freelancer_search(request):
+    freelancer_list = ''
+    base_currency = get_base_currency_symbol()
+    #Country
+    country = request.GET.getlist('country[]')
+    # Skills
+    skill = request.GET.getlist('skill[]')
+    # # Upgraded Teams
+    upgraded_founder = request.GET.get('upgradedfreelancer[]', '')
+
+    # # Duration
+    # one_day = request.GET.get('one_day[]', '')
+    # two_days = request.GET.get('two_days[]', '')
+    # three_days = request.GET.get('three_days[]', '')
+    # four_days = request.GET.get('four_days[]', '')
+    # five_days = request.GET.get('five_days[]', '')
+    # six_days = request.GET.get('six_days[]', '')
+    # one_week = request.GET.get('one_week[]', '')
+    # two_weeks = request.GET.get('two_weeks[]', '')
+    # three_weeks = request.GET.get('three_weeks[]', '')
+    # one_month = request.GET.get('one_month[]', '')
+    # # Upgraded Teams
+    # upgraded_teams = request.GET.get('upgradedTeams[]', '')
+
+    freelancers = Freelancer.active.all()
+    all_freelancers = freelancers.count()
+    #Country
+    if len(country) > 0:
+        freelancer_list = freelancers.filter(user__country__id__in=country).distinct()
+
+    # Skills    
+    if len(skill) > 0:
+        freelancer_list = freelancers.filter(skill__id__in=skill).distinct()
+
+    # Upgraded Teams
+    if upgraded_founder != '':
+        teams = Team.objects.filter(status=Team.ACTIVE, package_status=Team.ACTIVE)
+        for founder in teams:
+            print('names:', founder.created_by.short_name)
+            all_founders = founder.created_by.id
+            print('all_founders:::', founder.title)
+
+        freelancer_list = freelancers.filter(user__id__in=[all_founders])
+        print('freelancer_list:::', freelancer_list)
+    # if revision_false != '':
+    #     proposals = proposals.filter(revision=False).distinct()
+    # # Duration
+    # if one_day != '':
+    #     proposals = proposals.filter(dura_converter = one_day).distinct()
+    # if two_days != '':
+    #     proposals = proposals.filter(dura_converter = two_days).distinct()
+    # if three_days != '':
+    #     proposals = proposals.filter(dura_converter = three_days).distinct()
+    # if four_days != '':
+    #     proposals = proposals.filter(dura_converter = four_days).distinct()
+    # if five_days != '':
+    #     proposals = proposals.filter(dura_converter = five_days).distinct()
+    # if six_days != '':
+    #     proposals = proposals.filter(dura_converter = six_days).distinct()
+    # if one_week != '':
+    #     proposals = proposals.filter(dura_converter = one_week).distinct()
+    # if two_weeks != '':
+    #     proposals = proposals.filter(dura_converter = two_weeks).distinct()
+    # if three_weeks != '':
+    #     proposals = proposals.filter(dura_converter = three_weeks).distinct()
+    # if one_month != '':
+    #     proposals = proposals.filter(dura_converter = one_month).distinct()
+    # # Upgraded Teams
+    # if upgraded_teams != '':
+    #     proposals = proposals.filter(team__package__type = 'Team').distinct()
+
+    search_count = len(freelancer_list)
+    totalcount = f'<div id="freelancerTotal" class="alert alert-info text-center" role="alert" style="color:black;">{search_count} of {all_freelancers} search results found</div>'
+
+    searched_freelancer = render_to_string('freelancer/ajax/freelancer_search.html', {'freelancer_list':freelancer_list, 'base_currency':base_currency})
+    if len(freelancer_list) > 0: 
+        return JsonResponse({'freelancer_list': searched_freelancer, 'base_currency':base_currency, 'totalcount':totalcount})
+    else:
+        searched_freelancer = f'<div class="alert alert-warning text-center" role="alert" style="color:red;"> Hmm! nothing to show for this search</div>'
+        return JsonResponse({'freelancer_list': searched_freelancer, 'base_currency':base_currency, 'totalcount':totalcount})
 
 
 @login_required
@@ -66,14 +169,6 @@ def update_freelancer(request, user_id):
         'freelancer': freelancer,
     }
     return render(request, 'freelancer/freelancer_profile_update.html', context)
-
-
-def freelancer_listing(request):
-    freelancer_profile_list = Freelancer.objects.filter(user__is_active=True, user__user_type=Customer.FREELANCER)
-    context = {
-        'freelancer_profile_list': freelancer_profile_list,
-    }
-    return render(request, 'freelancer/freelancer_listing.html', context)
 
 
 @login_required

@@ -38,9 +38,10 @@
                                         <nav>
                                             <div class="nav nav-pills nav-justified">
                                                 <a class="nav-item nav-link text-white btn btn-info mt-2" href="{% url "client:deposit_fee_structure" %}"><i class="fa fa-arrow-left"> &nbsp; &nbsp; Previous Step</i></a>
-                                                <a class="nav-item nav-link text-white btn btn-success mt-2"><i class="fa fa-arrow-down">&nbsp; &nbsp; Time to Deposit</i></a>
+                                                <a class="nav-item nav-link text-white btn btn-warning mt-2"><i class="fa fa-arrow-down">&nbsp; &nbsp; Time to Deposit</i></a>
                                             </div>
                                         </nav>
+                                        
                                         {% if selected_gateway.name == "PayPal" %}
                                         <br>
                                             <div id="paypal-error-message" class="a" role="alert">.</div>
@@ -51,11 +52,11 @@
                                                     
                                                 <div class="form-group">
                                                     <label for="depositAmount" class="form-label">Deposit Amount </label>
-                                                    <input name="depositAmount" type="number" value="" class="form-control" id="depositAmount">
+                                                    <input name="depositAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositAmount">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
-                                                    <input name="depositNarration" type="text" class="form-control" id="depositNarration" value="">
+                                                    <input name="depositNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositNarration" value="">
                                                 </div>
                                                 <div id = 'paypal-deposit-confirm' class="wt-updatall">
                                                     <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
@@ -76,7 +77,8 @@
                                                     <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
                                                 </ul>
                                             </div>
-                                            {% elif selected_gateway.name == "Flutterwave" %}  
+                                            {% endif %}
+                                            {% if selected_gateway.name == "Flutterwave" %}  
                                             <br> 
                                             <div id="flutterwave-error-message" class="a" role="alert">.</div>
                                             <div id="flutterwave-success-message" class="a" role="alert">.</div>
@@ -86,11 +88,11 @@
                                                     
                                                 <div class="form-group">
                                                     <label for="depositAmount" class="form-label">Deposit Amount </label>
-                                                    <input name="depositAmount" type="number" value="" class="form-control" id="depositAmount">
+                                                    <input name="depositAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositAmount">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
-                                                    <input name="depositNarration" type="text" class="form-control" id="depositNarration" value="">
+                                                    <input name="depositNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositNarration" value="">
                                                 </div>
                                                 <div id = 'flutterwave-deposit-confirm' class="wt-updatall">
                                                     <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
@@ -111,22 +113,25 @@
                                                     <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
                                                 </ul>
                                             </div>
-                                            {% elif selected_gateway.name == "Stripe" %}
+                                            {% endif %}
+                                            {% if selected_gateway.name == "Stripe" %}
                                             <br>  
                                             <div id="stripe-error-message" class="text-center" role="alert">.</div>
                                             <div id="stripe-success-message" class="a" role="alert">.</div>
+                                            
                                             <div class="row">
                                                 
                                                 <h3> Deposit Method - {{selected_gateway}} </h3>
                                                 
                                                 <div class="form-group">
                                                     <label for="stripeAmount" class="form-label">Deposit Amount </label>
-                                                    <input name="stripeAmount" type="number" value="" class="form-control" id="stripeAmount">
+                                                    <input name="stripeAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="stripeAmount">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="stripeNarration" class="form-label">Narration <span class="text-muted"></span></label>
-                                                    <input name="stripeNarration" type="text" class="form-control" id="stripeNarration" value="">
+                                                    <input name="stripeNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="stripeNarration" value="">
                                                 </div>
+                                                
                                                 <div id = 'stripe-deposit-confirm' class="wt-updatall">
                                                     <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
                                                     <a href="javascript:void(0);" class="wt-btn">
@@ -146,8 +151,10 @@
                                                     <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
                                                     <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
                                                 </ul>
-                                            </div> 
-                                            {% elif selected_gateway.name == "Razorpay" %} 
+         
+                                            </div>
+                                            {% endif %} 
+                                            {% if selected_gateway.name == "Razorpay" %} 
                                             <br> 
                                             <div id="razorpay-error-message" class="a" role="alert">.</div>
                                             <div id="razorpay-success-message" class="a" role="alert">.</div>
@@ -156,11 +163,11 @@
                                                 <h3> Deposit Method - {{selected_gateway}} </h3>
                                                 <div class="form-group">
                                                     <label for="depositAmount" class="form-label">Deposit Amount </label>
-                                                    <input name="depositAmount" type="number" value="" class="form-control" id="depositAmount">
+                                                    <input name="depositAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositAmount">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
-                                                    <input name="depositNarration" type="text" class="form-control" id="depositNarration" value="">
+                                                    <input name="depositNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositNarration" value="">
                                                 </div>
                                                 <div id = 'razorpay-deposit-confirm' class="wt-updatall">
                                                     <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
