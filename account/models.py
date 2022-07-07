@@ -83,6 +83,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         _("User Type"), choices=USER_TYPE, max_length=30)
 
     class Meta:
+        ordering = ("-date_joined",)
         verbose_name = "User Manager"
         verbose_name_plural = "User Manager"
 
