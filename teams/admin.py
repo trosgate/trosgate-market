@@ -31,12 +31,18 @@ class PackageAdmin(admin.ModelAdmin):
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['title','created_by', 'created_at', 'status', 'package_status', 'package']
+    list_display = ['title','created_by', 'created_at', 'package_status', 'status',]
     list_display_links = ['title', 'created_by']
-    search_fields = ['title']
+    search_fields = ['title',]
     prepopulated_fields = {'slug': ('title',)}
-    list_editable = ['status', 'package']
-    readonly_fields = ['stripe_customer_id','stripe_subscription_id','paypal_customer_id','paypal_subscription_id']
+    list_editable = ['status']
+    list_filter =  ['package']
+    readonly_fields = [
+        'notice','created_by','package','members','package_status', 'package_expiry',
+        'stripe_customer_id','stripe_subscription_id',
+        'paypal_customer_id', 'paypal_subscription_id',
+        'razorpay_plan_item','razorpay_payment_url','razorpay_subscription_id',  
+    ]
 
     fieldsets = (
         ('Introduction', {'fields': ('title', 'slug',)}),

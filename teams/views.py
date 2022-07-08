@@ -497,33 +497,10 @@ def purchase_package(request, type):
     return render(request, 'teams/purchase_package.html', {'package': package, 'stripe_public_key': stripe_public_key})
 
 
-@login_required
-def plans_activated(request):
-    stripe_api = StripeClientConfig()
-    error = ''
-    check_package = Team.objects.filter(pk=request.user.freelancer.active_team_id,
-        status=Team.ACTIVE, created_by=request.user, package__type='Team')
-    if check_package:
-        messages.error(request, 'You already have an active package.')
-        return redirect("teams:packages")
-
-    else:
-        try:
-            team = Team.objects.get(pk=request.user.freelancer.active_team_id,status=Team.ACTIVE)
-            stripe.api_key = stripe_api.stripe_secret_key()
-            subscription = stripe.Subscription.retrieve(team.stripe_subscription_id)
-            product = stripe.Product.retrieve(subscription.plan.product)
-            print(product.name)
-            team.package_status = Team.ACTIVE
-            team.package_expiry = datetime.fromtimestamp(subscription.current_period_end)
-            team.package = Package.objects.get(type=product.name)
-            print(team.package)
-            team.save()
-
-        except Exception:
-            error = 'There something wrong. Please try again!'
-
-    return render(request, 'teams/subscription_success.html', {'error': error})
+@login_required #success subscription
+def package_success(request):
+    messages.info(request, 'Congratulations. It went successful')
+    return render(request, 'teams/subscription_success.html')
 
 
 @login_required

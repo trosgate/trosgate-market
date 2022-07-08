@@ -481,28 +481,28 @@ def stripe_webhook(request):
     team = ''
     package = ''
     
-
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, webhook_key)
     except ValueError as e:
-        # returns Invalid payload
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError as e:
-        # returns Invalid signature
         return HttpResponse(status=400)
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         if session.payment_status == 'paid':
             try:
+                package = Package.objects.get(is_default=False, type='Team')
                 stripe_specific_payment_confirmation(session.payment_intent)            
                 team = Team.objects.get(pk=session.get('client_reference_id'))
                 team.stripe_customer_id = session.get('customer')
                 team.stripe_subscription_id = session.get('subscription')
+                team.package = package
+                team.package_status = Team.ACTIVE
+                team.package_expiry = get_expiration()
                 team.save()
                 
-                package = Package.objects.get(is_default=False, type='Team')
-                SubscriptionItem.objects.create(
+                SubscriptionItem.objects.create(    
                     team=team,
                     customer_id = team.stripe_customer_id,
                     subscription_id=team.stripe_subscription_id,

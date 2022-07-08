@@ -55,7 +55,7 @@ class CustomerAdmin(BaseUserAdmin,):
     form = CustomerChangeForm
     add_form = CustomerCreationForm
 
-    list_display = ['email', 'date_joined', 'short_name', 'country','user_type', 'is_active', 'is_staff', 'is_admin']
+    list_display = ['email', 'short_name', 'country','user_type', 'is_active', 'is_staff', 'is_admin']
     readonly_fields = ['date_joined', 'user_type', 'last_login']  # , 'is_active'
     list_display_links = ['email','short_name']
     list_filter = ['user_type', 'is_admin', 'is_staff']
