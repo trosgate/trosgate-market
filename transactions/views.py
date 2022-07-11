@@ -32,10 +32,7 @@ from django.views.decorators.http import require_http_methods
 from contract.models import InternalContract
 from django.utils import timezone
 from datetime import timedelta
-
-
-def get_expiration():
-    return (timezone.now() + timedelta(days = 30))
+from teams.utilities import get_expiration
 
 
 @login_required
@@ -536,7 +533,6 @@ def paypal_payment_order(request):
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
     data = body["orderID"]
-    print(data)
 
     if data:
         paypal_request_order = OrdersGetRequest(data)

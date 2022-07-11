@@ -5,6 +5,8 @@ from . import views
 # IMPORT SUBSCRIPTIONS
 from .stripe_subscription import stripe_subscription_checkout_session
 from .razorpay_subscription import razorpay_subscription_checkout_session, razorpay_subscription_callback
+from .paypal_subscription import activate_paypal_subscription, deactivate_paypal_subscription
+
 
 app_name = 'teams'
 
@@ -49,6 +51,8 @@ urlpatterns = [
     path('razorpay_subscription_checkout_session/', razorpay_subscription_checkout_session, name='razorpay_subscription_checkout_session'),
     path('razorpay_subscription_callback/', razorpay_subscription_callback, name='razorpay_subscription_callback'),
 
-#     path('email/', views.send_email_to_all_users, name='email_freelancer'),
-#     path('schedule/', views.Admin_email_scheduler, name='email_schedule'),
+    # payment api with paypal urls
+    path('activate_paypal_subscription/', activate_paypal_subscription, name='activate_paypal_subscription'),
+    path('deactivate_paypal_subscription/', deactivate_paypal_subscription, name='deactivate_paypal_subscription'),
+
 ]

@@ -49,37 +49,6 @@ class WebsiteSettingAdmin(admin.ModelAdmin):
         return actions
 
 
-# class EmailBackendAdmin(admin.ModelAdmin):
-#     model = EmailConfig
-#     list_display = ['email_hosting_server_email', 'email_hosting_server']
-#     list_display_links = ['email_hosting_server_email', 'email_hosting_server']
-#     list_per_page = sys.maxsize
-#     fieldsets = (
-#         ('Email API', {'fields': ('email_hosting_server_email', 'email_hosting_server', 'email_hosting_server_password',
-#          'email_hosting_server_port', 'email_hosting_certificate', 'email_fail_silently',)}),
-#         ('Twilio SMS API', {'fields': ('twilio_account_sid',
-#          'twilio_auth_token', 'twilio_phone_number',)}),
-#     )
-
-#     radio_fields = {'email_hosting_certificate': admin.HORIZONTAL}
-
-#     def has_add_permission(self, request):
-#         if self.model.objects.count() >= MAX_OBJECTS:
-#             return False
-#         return super().has_add_permission(request)
-
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-
-#     def get_actions(self, request):
-#         actions = super().get_actions(request)
-
-#         if 'delete_selected' in actions:
-#             del actions['delete_selected']
-#         return actions
-
-
-
 class MailerAdmin(admin.ModelAdmin):
     model = Mailer
     list_display = ['from_email', 'email_hosting_server', 'email_use_tls', 'email_use_ssl']
@@ -183,13 +152,15 @@ class PaymentAPIsAdmin(admin.ModelAdmin):
     list_display = ['preview', 'gateway_count']
     list_display_links = ['preview', 'gateway_count']
     readonly_fields = ['preview']
+    radio_fields = {'sandbox': admin.HORIZONTAL}
     fieldsets = (
+        ('API Environment', {'fields': ('sandbox',)}),
         ('Stripe API', {'fields': ('stripe_public_key',
          'stripe_secret_key', 'stripe_webhook_key',)}),
         ('Stripe Package Subscription', {
          'fields': ('stripe_subscription_price_id',)}),
         ('PayPal API', {
-         'fields': ('paypal_public_key', 'paypal_secret_key',)}),
+         'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id',)}),
         ('Flutterwave API', {
          'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
         ('Razorpay API', {

@@ -281,8 +281,8 @@
                 body: JSON.stringify(data)
             })
               .then(function (response) {
-                return (response)
-                //return response.json()
+                //return (response)
+                return response.json()
               })
               .then(function (session) {
                 return stripe.redirectToCheckout({sessionId:session.session.id})
@@ -290,9 +290,9 @@
               .then(function (result) {
                 return console.log(result.error.message)
               })
-              //.catch(function (error) {
-                //return console.log(error)
-              //})
+              .catch(function (error) {
+                return console.log(error)
+              })
           }
         }
     </script>

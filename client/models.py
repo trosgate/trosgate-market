@@ -91,73 +91,29 @@ class ClientAccount(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
-
-    @classmethod
-    def internal_invitation(cls, team, sender, type, receiver, email):
-
-        if not team:
-            raise FundException(_("Your team is unknown"))
-
-        if not sender:
-            raise FundException(_("Bad and unknown request"))
-
-        if not receiver:
-            raise FundException(_("credentials of invitee incomplete"))
-
-        if not email:
-            raise FundException(_("credentials of invitee incomplete"))
-
-        if not (team.package_status == 'active'):
-            raise FundException(_("Please upgrade your team to invite others"))
-
-        if not (team.package.type == 'Team'):
-            raise FundException(_("Please activate subscription to invite others"))
-
-        if team.created_by != sender:
-            raise FundException(_("This action requires upgraded team founder"))
-
-        if team.created_by == receiver:
-            raise FundException(_("You cannot invite youself"))
-
-        if cls.objects.filter(team=team, receiver=receiver).exists():
-            raise FundException(_("User already invited"))     
-
-        if cls.objects.filter(team=team, team__members__email=email).exists():
-            raise FundException(_("User already a member of your Team"))
-
-        if cls.objects.filter(team=team, receiver__email=email).exists():
-            raise FundException(_("User of this email already invited"))
-
-        if  receiver in team.members.all():
-            raise FundException(_("User already a member"))
-
-        internal_invite = cls.objects.create(team=team, sender=sender, type=type, receiver=receiver, email=email)
-        return internal_invite
-
-
     @classmethod
     def level_one_deposit_check(cls, user, deposit_amount, narration, reference, deposit_fee):
-        # with transaction.atomic():
-        client_account = cls.objects.select_for_update().get(user=user)
+        with transaction.atomic():
+            client_account = cls.objects.select_for_update().get(user=user)
 
-        if not deposit_amount:
-            raise FundException(_("Deposit amount is required"))
+            if not deposit_amount:
+                raise FundException(_("Deposit amount is required"))
 
-        if not (int(get_min_deposit()) <= int(deposit_amount) <= int(get_max_deposit())):
-            raise FundException(_('Deposit amount is out of range'))
+            if not (int(get_min_deposit()) <= int(deposit_amount) <= int(get_max_deposit())):
+                raise FundException(_('Deposit amount is out of range'))
 
-        if int(client_account.available_balance) + int(deposit_amount) > int(get_max_depositor_balance()):
-            raise FundException(_('Maximum account balance exceeded'))
+            if int(client_account.available_balance) + int(deposit_amount) > int(get_max_depositor_balance()):
+                raise FundException(_('Maximum account balance exceeded'))
 
-        if int(client_account.available_balance) + int(deposit_amount) < int(get_min_depositor_balance()):
-            raise FundException(_('Deposited account is below minimum'))
+            if int(client_account.available_balance) + int(deposit_amount) < int(get_min_depositor_balance()):
+                raise FundException(_('Deposited amount is below minimum'))
 
-        client_account.available_balance += int(0)
-        client_account.save(update_fields=['available_balance'])
+            client_account.available_balance += int(0)
+            client_account.save(update_fields=['available_balance'])
 
-        account_action = ClientAction.create(
-            account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, reference=reference, status=False
-        )
+            account_action = ClientAction.create(
+                account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, reference=reference, status=False
+            )
 
         return client_account, account_action
 
@@ -203,7 +159,7 @@ class ClientAction(models.Model):
         return self.account.user.get_full_name()
 
     @classmethod
-    def create(cls, account, deposit_amount, deposit_fee, reference, narration):
+    def create(cls, account, deposit_amount, deposit_fee, reference, narration, status=None):
 
         if not account:
             raise FundException(_("You donnot qualify for this operation"))
@@ -212,13 +168,13 @@ class ClientAction(models.Model):
             raise FundException(_("Amount must be specified"))
 
         if not deposit_fee:
-            raise FundException(_("Unknown fee specified"))
+            raise FundException(_("fee type not specified"))
 
         if not reference:
             raise FundException(_("Reference must be specified"))
 
         if not narration:
-            raise FundException(_("Transfer Amount is required"))
+            raise FundException(_("Narration not specified"))
 
         action = cls.objects.create(
             account=account, deposit_amount=deposit_amount, deposit_fee=deposit_fee, narration=narration, reference=reference)

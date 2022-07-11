@@ -33,12 +33,12 @@ from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.cache import cache_control
 from marketing.models import AutoTyPist
 from django.conf import settings
-from general_settings.gateways import PayPalClientConfig
+from general_settings.gateways import PayPalClientConfig, get_gateway_environment
 from django.contrib.auth.hashers import check_password
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_application_fee_calculator, get_proposal_fee_calculator
 from general_settings.models import Mailer
 from general_settings.currency import get_base_currency_symbol
-
+from .fund_exception import InvitationException
 
 def autoLogout(request):
     logout(request)
@@ -256,8 +256,7 @@ def user_dashboard(request):
         teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
 
-        # mailer = Mailer.objects.get('**kwargs')
-
+        # print('get_gateway_environment:', PayPalClientConfig().subscription_access_token())
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)
             try:
@@ -277,9 +276,14 @@ def user_dashboard(request):
                 freelancer.active_team_id = team.id
                 freelancer.save()
 
-                # Invitation.objects.create(team=team, email=email, status = Invitation.INVITED)
+                # TODO There should be a special class to add founder to accepted members automatically
+                Invitation.founder_invitation(team=team, sender= request.user, type=Invitation.INTERNAL, email=team.created_by.email, status=Invitation.ACCEPTED)
+                # try:
+                # except InvitationException as e:
+                #     error = str(e)
+                #     return HttpResponse(error)
 
-                messages.success(request, 'The team was created successfully!')
+                messages.success(request, f'The {team.title} was created successfully!')
                 # send_new_team_email(email, team)
 
                 return redirect('account:dashboard')

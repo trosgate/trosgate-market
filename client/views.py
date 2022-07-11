@@ -181,22 +181,17 @@ def stripe_deposit(request):
     account = ''
     action = ''
     data = json.loads(request.body)
-    print('payload:', data)
     gateway_id = request.session["depositgateway"]["gateway_id"]
     selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
 
     deposit_amount = data['stripeAmount']
-    print('deposit_amount:', deposit_amount)
     narration = data['stripeNarration']
-    print('narration:', narration)
     deposit_fee = selected_gateway.processing_fee
-    print('deposit_fee:', deposit_fee)
     total_amount = int((deposit_amount + deposit_fee) * 100)
-    print('total_amount:', total_amount)
     
-    stripe_obj = StripeClientConfig()
-    stripe_reference = stripe_obj.stripe_unique_reference()
-    stripe.api_key = stripe_obj.stripe_secret_key()
+    # stripe_obj = StripeClientConfig()
+    # stripe_reference = stripe_obj.stripe_unique_reference()
+    # stripe.api_key = stripe_obj.stripe_secret_key()
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items = [
@@ -215,35 +210,26 @@ def stripe_deposit(request):
         success_url='http://' + str(get_current_site(request)) + '/client/congrats/',
         cancel_url='http://' + str(get_current_site(request)) + '/dashboard/'
     )
-    # try:
-    account=ClientAccount.level_one_deposit_check(
-        depositor=request.user, deposit_amount=deposit_amount, deposit_fee = deposit_fee, 
-        narration=narration, reference = stripe_reference
-        # , stripe_order_id = stripe_reference
-    )
-    print('account ID', account.id)
-    action = ClientAction.objects.filter(account=account)
-    print('action', action)
-    message = 'The deposit was initiated. Please stay with us ...'
-
-    # except FundException as e:
-    #     mes = str(e)
-    #     message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
-    
 
     print('sessionId', session)
     payment_intent = session.payment_intent
     print('payment_intent', payment_intent)
 
-    # ClientAccount.level_one_deposit_check(
-    #     depositor=request.user,
-    #     deposit_amount=deposit_amount,
-    #     deposit_fee = deposit_fee,
-    #     narration=narration,
-    #     reference = stripe_reference,
-    #     stripe_order_id = stripe_reference
+    try:
+        ClientAccount.level_one_deposit_check(
+            depositor=request.user, 
+            deposit_amount=deposit_amount, 
+            deposit_fee = deposit_fee, 
+            narration=narration, 
+            reference = payment_intent
+        )
+        message = 'The deposit was successful'
 
-    return JsonResponse({'session':session, 'order':payment_intent})
+    except FundException as e:
+        mes = str(e)
+        message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
+        
+    return JsonResponse({'session':session, 'order':payment_intent, 'message':message})
 
 
 # level_two_deposit_check

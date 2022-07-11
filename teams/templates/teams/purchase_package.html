@@ -14,12 +14,10 @@
                     <div class="wt-updatall">
                         <span>These are multiple options available for subscription</span>
                     </div>	
-                    
                 </div>
                 
                 <div class="container">
                     <div class="row g-3">
-
                         <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
                             <div class="d-flex bd-highlight ms-0">
                                 <div class="p-2 flex-grow-1 bd-highlight">Package Type:</div>
@@ -41,46 +39,113 @@
                         
                             <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
                             <div class="row g-0">
-                                <div class="col-md-2 ps-3 ps-md-4">
-                                </div>
+                                <div class="col-md-2 ps-3 ps-md-4"></div>
                                 <div class="col-md-9 ps-md-1">
-                                <div class="card-body p-1">
-                                <h3 class="card-text ps-2 pb-3">Option #1: Stripe Checkout</h3>
+                                    <div class="card-body p-1">
+                                    <h3 class="card-text ps-2 pb-3">Option #1: Stripe Checkout</h3>
+                                    </div>
                                 </div>
-                                </div>
-                                {% comment %} <button type="submit" id="submitBtn" class="wt-btn">Stripe</button> {% endcomment %}
                                 <button onclick='stripeSubscriber(event)' class="btn btn-primary w-100 fw-bold">Pay with Stripe </button>
                             </div>
                             </div>
+
                             <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
                             <div class="row g-0">
                                 <div class="col-md-2 ps-3 ps-md-4">
                                 </div>
                                 <div class="col-md-9 ps-md-1">
                                 <div class="card-body p-1">
-                                    <h3 class="card-text ps-2 pb-3">Option #2: Razorpay Checkout</h3>
+                                    <h3 class="card-text ps-2 pb-3">Option #2: PayPal Checkout</h3>
                                 </div>
-                                </div>
-                                <button id='razorpaySubscriber' class="btn btn-primary w-100 fw-bold">Pay with Razorpay</button></div>
                             </div>
-
+                            <div id="paypal-button-container" class="w-100 fw-bold"></div>
+                            </div>
+                            
+                            <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
+                            <div class="row g-0">
+                                <div class="col-md-2 ps-3 ps-md-4"></div>
+                                <div class="col-md-9 ps-md-1">
+                                <div class="card-body p-1">
+                                    <h3 class="card-text ps-2 pb-3">Option #3: Razorpay Checkout</h3>
+                                </div>
+                            </div>
+                            <button id='razorpaySubscriber' class="btn btn-primary w-100 fw-bold">Pay with Razorpay</button></div>
+                            </div>
                         </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-        <div class="wt-proposalholder mt-6">
-            <div class="row justify-content-md-center">
-                <div class="wt-sectionhead wt-textcenter">
-                    <span>Copyright @ {{website.site_name}}</span>
-                </div>
+    </div>
+    <div class="wt-proposalholder mt-6">
+        <div class="row justify-content-md-center">
+            <div class="wt-sectionhead wt-textcenter">
+                <span>Copyright @ {{website.site_name}}</span>
             </div>
-        </div> 
+        </div>
+    </div> 
           
 {% endblock %}
 {% block scripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    let csrftoken = getCookie('csrftoken');
+    
+    function subscribePayPalButton() { 
+        paypal.Buttons({
+        style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'subscribe'
+        },
+        createSubscription: function(data, actions) {
+            return actions.subscription.create({
+                plan_id: '{{paypal_subscription_price_id}}'
+            });
+        },
+        onApprove: function(data) {
+            console.log(data.subscriptionID)
+            let url = "{% url 'teams:activate_paypal_subscription' %}"
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'X-CSRFToken': '{{csrf_token}}',
+                },
+                body: JSON.stringify({
+                    subscriptionID: data.subscriptionID,
+                    customerID: '{{request.user.freelancer.active_team_id}}'
+                })
+                }).then(function (json) {
+                    swal("Perfect!", 'All looked good', "success").then((value) =>{
+                        window.location.href = "/team/packages/"
+                    });              
+                    
+                })
+            },      
+            }).render('#paypal-button-container');
+        }
+        subscribePayPalButton(); // Renders the PayPal button
+    </script>
+
+
 <script src="https://js.stripe.com/v3/"></script>
 {% comment %} <script src="{% static 'js/payments/stripe-subscription.js' %}"></script> {% endcomment %}
 <script>

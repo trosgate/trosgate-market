@@ -1,6 +1,7 @@
 import random
 import json
 import stripe
+import requests
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Team, Invitation, TeamChat, AssignMember, Tracking, Package
@@ -22,6 +23,7 @@ from projects.models import Project
 from applications.models import Application
 from account.models import Customer
 from datetime import datetime
+from django.utils import timezone
 from teams.controller import max_member_per_team
 from django.views.decorators.http import require_http_methods
 from freelancer.models import Freelancer
@@ -32,6 +34,8 @@ from general_settings.models import PaymentAPIs
 from django.conf import settings
 from . controller import monthly_projects_applicable_per_team
 from account.fund_exception import InvitationException
+from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token
+
 # from .tasks import email_all_users
 # from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
@@ -480,7 +484,9 @@ def delete_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
 
 @login_required
 def purchase_package(request, type):
-    PayPalClient = PayPalClientConfig().paypal_public_key()
+    payPalClient = PayPalClientConfig()
+    paypal_public_key = payPalClient.paypal_public_key()
+    paypal_subscription_price_id = payPalClient.paypal_subscription_price_id()
     stripe_public_key = StripeClientConfig().stripe_public_key()
     razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
@@ -494,7 +500,15 @@ def purchase_package(request, type):
     if team:
         package = get_object_or_404(Package, type=type)
 
-    return render(request, 'teams/purchase_package.html', {'package': package, 'stripe_public_key': stripe_public_key})
+    context = {
+        'package': package,
+        'stripe_public_key': stripe_public_key,
+        'paypal_public_key':paypal_public_key,
+        'paypal_subscription_price_id':paypal_subscription_price_id,
+        'razorpay_public_key':razorpay_public_key
+
+    }
+    return render(request, 'teams/purchase_package.html', context)
 
 
 @login_required #success subscription
@@ -509,29 +523,53 @@ def packages(request):
     if not team.created_by == request.user:
         messages.error(request, 'Bad request. Page is restricted to non-founders')
         return redirect("account:dashboard")
-
-    StripeClient = StripeClientConfig()
+    
     packages = Package.objects.all()
     error = ''
+    stripeClient = StripeClientConfig()
+    paypalClient = PayPalClientConfig()
+    access_token = ''
+    headers = ''
+    url = ''
+    if SubscriptionItem.objects.filter(team__created_by=request.user, team=team).exists():
+        latest_team_subscription = SubscriptionItem.objects.filter(team__created_by=request.user, team=team).order_by('id').last()
+        print(latest_team_subscription.id, latest_team_subscription.payment_method)
+        if latest_team_subscription.payment_method == 'Stripe' and request.GET.get('cancel_package', ''):
+            try:
+                default_package = Package.objects.get(is_default=True)
+                team.package = default_package
+                team.package_status = Team.DEFAULT
+                team.package_expiry = timezone.now()
+                team.save()
+                
+                stripe.api_key = stripeClient.stripe_secret_key
+                stripe.Subscription.delete(team.stripe_subscription_id)
+            except:
+                error = 'Ooops! Something went wrong. Please try again later!'
 
-    if request.GET.get('cancel_package', ''):
-        try:
-            default_package = Package.objects.get(is_default=True)
-            team.package = default_package
-            team.package_status = Team.DEFAULT
-            team.package_expiry = datetime.now()
-            team.save()
-            
-            stripe.api_key = StripeClient.stripe_secret_key
-            stripe.Subscription.delete(team.stripe_subscription_id)
-        except:
-            error = 'Ooops! Something went wrong. Please try again later!'
+        if latest_team_subscription.payment_method == 'PayPal' and request.GET.get('cancel_package', ''):
+            try:
+                default_package = Package.objects.get(is_default=True)
+                team.package = default_package
+                team.package_status = Team.DEFAULT
+                team.package_expiry = timezone.now()
+                team.save()
+                
+                access_token = get_subscription_access_token()
+                # bearer_token = 'Bearer ' + access_token
+                headers = {'Content-Type':'application/json', 'Authorization':'Bearer ' + access_token}
+                url = get_paypal_subscription_url() + 'v1/billing/subscriptions/' + team.paypal_subscription_id  + '/cancel'
+                # requests.get(url, headers=headers).json()
+                data = requests.post(url, auth=(paypalClient.paypal_public_key(), paypalClient.paypal_secret_key()), headers=headers).json()
+                print(data)
+            except:
+                error = 'Ooops! Something went wrong. Please try again later!'
 
     context = {
         'team': team,
         'error': error,
         'packages': packages,
-        'stripe_pub_key': StripeClient.stripe_public_key
+        'stripe_pub_key': stripeClient.stripe_public_key
     }
 
     return render(request, 'teams/packages.html', context)

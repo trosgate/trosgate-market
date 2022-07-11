@@ -226,6 +226,7 @@ class SubscriptionItem(models.Model):
 
     class Meta:
         ordering = ("-created_at",)
+        get_latest_by = ("-created_at",)
         
     def __str__(self):
         return str(self.team.title)

@@ -38,7 +38,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_editable = ['status']
     list_filter =  ['package']
     readonly_fields = [
-        'notice','created_by','package','members','package_status', 'package_expiry',
+        'notice','created_by','members',#'package','package_status', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',
         'paypal_customer_id', 'paypal_subscription_id',
         'razorpay_plan_item','razorpay_payment_url','razorpay_subscription_id',  
@@ -73,6 +73,7 @@ class InvitationAdmin(admin.ModelAdmin):
     list_editable = ['status']
     search_fields = ['code','email']
     list_filter = ['status']
+    readonly_fields = ['email','team', 'sender','receiver', 'type','code', 'sent_on']
 
     def get_actions(self, request):
         actions = super().get_actions(request)

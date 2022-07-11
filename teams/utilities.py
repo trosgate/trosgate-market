@@ -16,7 +16,13 @@ from general_settings.backends import get_website_email
 
 from random import choice
 from string import ascii_letters, digits
+from django.utils import timezone
+from datetime import timedelta
 #
+# This will estimate subscription expiry by 30 days interval
+def get_expiration():
+    return (timezone.now() + timedelta(days = 30))
+
 # This will get the domain name we are on
 
 def get_host_domain(request):

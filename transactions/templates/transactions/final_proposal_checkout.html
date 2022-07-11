@@ -196,7 +196,7 @@
             }
             return cookieValue;
         }
-        var csrftoken = getCookie('csrftoken');
+        let csrftoken = getCookie('csrftoken');
         
         function hiringPayPalButton() {
             paypal.Buttons({
@@ -216,7 +216,7 @@
                     });
                 },
                 onApprove: function (data) {
-                    var url = "{% url 'transactions:paypal_payment_order' %}"
+                    let url = "{% url 'transactions:paypal_payment_order' %}"
                     return fetch(url, {
                         method: 'POST',
                         headers: {

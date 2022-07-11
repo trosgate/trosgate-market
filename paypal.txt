@@ -1,7 +1,14 @@
 
-
 client_id: 'AQYALADOflIRdjVHlkCLwuZ9Obj1ylOUuDF0y9mBlAu7IUIjV8YyKfbTqAPqPt3OSl7-hfPd4LWH7IQp'
 secret_id: 'EOhjdJJK0VETJ3xQwHD6dW96Zw9CITEKc-tbYrYw4iszRTyvBWmwCzdSDDxvVpBOUyyvXRm8yisaAVDP'
+
+SUBSCRIPTION
+...............
+Product name: Team
+Product description: User subscription to upgraded team
+Product ID: PROD-03T2314456539535U, PROD-9L607465PP7936056
+ 
+Paypal Sub sample test ID: I-A2WCRT10SLCK, 
 
 
 ------------Sandbox account----------

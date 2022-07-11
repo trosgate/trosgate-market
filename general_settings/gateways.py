@@ -1,8 +1,9 @@
-from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
+from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnvironment
 import sys
 import os
 import stripe
 import secrets
+import requests
 from transactions.models import Purchase
 from general_settings.models import PaymentAPIs
 from django.conf import settings
@@ -25,6 +26,13 @@ def ref_generator():
 #     return new_unique_reference
   
 # PAYPAL PAYMENT GATEWAY
+def get_gateway_environment():
+    try:
+        return PaymentAPIs.objects.get(id=1).sandbox
+    except:
+        return True
+
+
 class PayPalClientConfig:
     def __init__(self):
         print('PayPal')
@@ -48,7 +56,11 @@ class PayPalClientConfig:
             return None
 
     def paypal_environment(self):
-        environment = SandboxEnvironment(client_id=self.paypal_public_key(), client_secret=self.paypal_secret_key())
+        environment = ''
+        if get_gateway_environment() == True:
+            environment = SandboxEnvironment(client_id=self.paypal_public_key(), client_secret=self.paypal_secret_key())
+        else:
+            environment = LiveEnvironment(client_id=self.paypal_public_key(), client_secret=self.paypal_secret_key())
         return environment                        
 
     def paypal_httpclient(self):
@@ -56,9 +68,12 @@ class PayPalClientConfig:
 
     def paypal_unique_reference(self):
         return ref_generator()
+       
+
 
 
 # STRIPE PAYMENT GATEWAY
+#Stripe will handle test and live scenarios
 class StripeClientConfig:
     def __init__(self):
         print('Stripe')

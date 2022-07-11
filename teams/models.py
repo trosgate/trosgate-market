@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from uuid import uuid4
 from account.fund_exception import InvitationException
 import secrets
-
+from account.models import Customer
 
 def code_generator():
         generated_code = secrets.token_urlsafe(6)[:6]
@@ -157,6 +157,40 @@ class Invitation(models.Model):
 
 
     @classmethod
+    def founder_invitation(cls, team, sender, type, email, status):
+
+        if not team:
+            raise InvitationException(_("Your team is unknown"))
+
+        if not sender:
+            raise InvitationException(_("Bad and unknown request"))
+
+        if not email:
+            raise InvitationException(_("credentials of invitee incomplete"))
+
+        if not (team.package_status == 'active'):
+            raise InvitationException(_("Please upgrade your team to invite others"))
+
+        if not (team.package.type == 'Team'):
+            raise InvitationException(_("Please activate subscription to invite others"))
+
+        if team.created_by != sender:
+            raise InvitationException(_("This action requires upgraded team founder"))
+
+        if cls.objects.filter(team=team, sender=sender).exists():
+            raise InvitationException(_("You are already on this team"))     
+
+        if cls.objects.filter(team=team, team__members__email=email).exists():
+            raise InvitationException(_("User already a member of your Team"))
+
+        if sender in team.members.all():
+            raise InvitationException(_("User already a member"))
+
+        internal_invite = cls.objects.create(team=team, sender=sender, type=type, email=email, status=status)
+        return internal_invite
+
+
+    @classmethod
     def internal_invitation(cls, team, sender, type, receiver, email):
 
         if not team:
@@ -192,7 +226,7 @@ class Invitation(models.Model):
         if cls.objects.filter(team=team, receiver__email=email).exists():
             raise InvitationException(_("User of this email already invited"))
 
-        if  receiver in team.members.all():
+        if receiver in team.members.all():
             raise InvitationException(_("User already a member"))
 
         internal_invite = cls.objects.create(team=team, sender=sender, type=type, receiver=receiver, email=email)
@@ -223,6 +257,12 @@ class Invitation(models.Model):
         if cls.objects.filter(team=team, receiver__email=email).exists():
             raise InvitationException(_("User of this email already invited"))
 
+        if Customer.objects.filter(user_type=Customer.CLIENT, email=email).exists():
+            raise InvitationException(_("Email owner is already a client and can't be invited"))
+        
+        if Customer.objects.filter(user_type=Customer.ADMIN, email=email).exists():
+            raise InvitationException(_("This Email user is reserved and can't be invited"))
+
         if not (team.package_status == 'active'):
             raise InvitationException(_("Please upgrade your team to invite others"))
 
@@ -234,6 +274,11 @@ class Invitation(models.Model):
 
         external_invite = cls.objects.create(team=team, sender=sender, type=type, email=email)
         return external_invite
+
+
+    @classmethod
+    def accept_invitation(cls, team, sender, email, type):
+        pass
 
 
 class TeamChat(models.Model):
