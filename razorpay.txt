@@ -5,8 +5,10 @@ client = razorpay.Client(auth=("<YOUR_API_KEY>", "<YOUR_API_SECRET>"))
 
 
 key_id: rzp_test_9CL4LXYUsQnb5M
-
 KEY_SECRET: 9sLJnp7KRiLetp1gaSgOAbZU
+
+<----------------------Test informatiion-------------->
+https://razorpay.com/docs/payments/payments/test-card-upi-details/
 
 
 <button id="rzp-button1">Pay</button>
@@ -32,3 +34,8 @@ document.getElementById('rzp-button1').onclick = function(e){
     rzp1.open();    
     e.preventDefault();
 }</script>
+
+razorpay_order_note https://rzp.io/i/NSPRlv10G
+new_subscription {'id': 'sub_JsYgYEXFMyJ7yD', 'entity': 'subscription', 'plan_id': 'plan_Jkzbn887bGCjs1', 'customer_id': None, 'status': 'created', 'current_start': None, 'current_end': None, 'ended_at': None, 'quantity': 1, 'notes': {'key1': 'value3', 'key2': 'value2'}, 'charge_at': None, 'start_at': None, 'end_at': None, 'auth_attempts': 0, 'total_count': 1, 'paid_count': 0, 'customer_notify': True, 'created_at': 1657651562, 'expire_by': None, 'short_url': 'https://rzp.io/i/NSPRlv10G', 'has_scheduled_changes': False, 'change_scheduled_at': None, 'source': 'api', 'payment_method': None, 'offer_id': None, 'remaining_count': 0}        
+[12/Jul/2022 18:46:05] "GET /team/razorpay_subscription_checkout_session/ HTTP/1.1" 200 600
+

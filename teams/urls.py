@@ -4,7 +4,7 @@ from . import views
 
 # IMPORT SUBSCRIPTIONS
 from .stripe_subscription import stripe_subscription_checkout_session
-from .razorpay_subscription import razorpay_subscription_checkout_session, razorpay_subscription_callback
+from .razorpay_subscription import razorpay_subscription_checkout_session, razorpay_subscription_webhook
 from .paypal_subscription import activate_paypal_subscription, deactivate_paypal_subscription
 
 
@@ -49,7 +49,7 @@ urlpatterns = [
     # payment api with stripe urls
     path('api/stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
     path('razorpay_subscription_checkout_session/', razorpay_subscription_checkout_session, name='razorpay_subscription_checkout_session'),
-    path('razorpay_subscription_callback/', razorpay_subscription_callback, name='razorpay_subscription_callback'),
+    path('razorpay_subscription_webhook/', razorpay_subscription_webhook, name='razorpay_subscription_webhook'),
 
     # payment api with paypal urls
     path('activate_paypal_subscription/', activate_paypal_subscription, name='activate_paypal_subscription'),

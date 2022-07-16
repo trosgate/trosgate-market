@@ -117,8 +117,12 @@ class CountryAdmin(admin.ModelAdmin):
 
 class TwoFactorAuthAdmin(admin.ModelAdmin):
     model = TwoFactorAuth    
-    list_display = ['user', 'last_login', 'pass_code']
-    readonly_fields = ['last_login']      
+    list_display = ['user', 'get_user_type', 'last_login', 'pass_code']
+    readonly_fields = ['last_login']     
+
+    @admin.display(description='User Types', ordering='user__user_type')
+    def get_user_type(self, obj):
+        return obj.user.user_type
 
     def has_add_permission(self, request):
         return False

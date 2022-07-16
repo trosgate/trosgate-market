@@ -95,7 +95,7 @@ class Team(models.Model):
     stripe_subscription_id = models.CharField(_("Stripe Subscription ID"), max_length=255, blank=True, null=True)
     paypal_customer_id = models.CharField(_("Paypal Customer ID"), max_length=255, blank=True, null=True)
     paypal_subscription_id = models.CharField(_("Paypal Subscription ID"), max_length=255, blank=True, null=True)
-    razorpay_plan_item = models.CharField(_("Razorpay Plan ID"), max_length=255, blank=True, null=True)
+    razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=255, blank=True, null=True)
     razorpay_subscription_id = models.CharField(_("Razorpay Subscription ID"), max_length=255, blank=True, null=True)
     razorpay_payment_url = models.CharField(_("Razorpay Short_Link"), max_length=255, blank=True, null=True)
 

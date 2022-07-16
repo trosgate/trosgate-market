@@ -15,6 +15,7 @@
                         {% if active_team.package_status == 'active' %}
                         <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Next Payment Due On: <b>{{active_team.package_expiry|date:'M-d-Y'}}</b></span>
                         {% endif %}
+                        
                     </div>
                     <div id="packaging" class="wt-dashboardboxcontent wt-packages">
                         <div class="wt-package wt-packagedetails">

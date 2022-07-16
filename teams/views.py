@@ -1,6 +1,7 @@
 import random
 import json
 import stripe
+import razorpay
 import requests
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -526,11 +527,14 @@ def packages(request):
     
     packages = Package.objects.all()
     error = ''
+    subscription = ''
     stripeClient = StripeClientConfig()
     paypalClient = PayPalClientConfig()
+    razorpay_client = RazorpayClientConfig()
     access_token = ''
     headers = ''
     url = ''
+    cancelled = ''
     if SubscriptionItem.objects.filter(team__created_by=request.user, team=team).exists():
         latest_team_subscription = SubscriptionItem.objects.filter(team__created_by=request.user, team=team).order_by('id').last()
         print(latest_team_subscription.id, latest_team_subscription.payment_method)
@@ -564,6 +568,20 @@ def packages(request):
                 print(data)
             except:
                 error = 'Ooops! Something went wrong. Please try again later!'
+        if latest_team_subscription.payment_method == 'Razorpay' and request.GET.get('cancel_package', ''):
+            try:                
+                razor_client = razorpay_client.get_razorpay_client()
+                subscription = razor_client.subscription.cancel(team.razorpay_subscription_id)
+                if subscription['status'] == 'cancelled':
+
+                    default_package = Package.objects.get(is_default=True)
+                    team.package = default_package
+                    team.package_status = Team.DEFAULT
+                    team.package_expiry = timezone.now()
+                    team.save()
+            except Exception as e:
+                error = str(e)
+                return HttpResponse(error)
 
     context = {
         'team': team,

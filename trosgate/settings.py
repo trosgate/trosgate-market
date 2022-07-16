@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.ngrok.io'] 
 # '127.0.0.1', 'localhost'
 
 AUTH_USER_MODEL = 'account.Customer'

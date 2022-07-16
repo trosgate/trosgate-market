@@ -41,7 +41,7 @@ class TeamAdmin(admin.ModelAdmin):
         'notice','created_by','members',#'package','package_status', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',
         'paypal_customer_id', 'paypal_subscription_id',
-        'razorpay_plan_item','razorpay_payment_url','razorpay_subscription_id',  
+        'razorpay_payment_id','razorpay_payment_url','razorpay_subscription_id',  
     ]
 
     fieldsets = (
@@ -51,7 +51,7 @@ class TeamAdmin(admin.ModelAdmin):
         ('Team Member(s)', {'fields': ('members',)}),
         ('Package', {'fields': ('package','package_status', 'package_expiry',)}),
         ('Subscription Type - Stripe', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
-        ('Subscription Type - Razorpay', {'fields': ('razorpay_plan_item','razorpay_payment_url','razorpay_subscription_id',)}),
+        ('Subscription Type - Razorpay', {'fields': ('razorpay_payment_id','razorpay_subscription_id','razorpay_payment_url',)}),
         ('Subscription Type - PayPal', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),
     )  
 

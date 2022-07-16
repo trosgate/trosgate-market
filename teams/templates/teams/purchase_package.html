@@ -191,20 +191,21 @@
         method: 'GET',
         url: '{% url "teams:razorpay_subscription_checkout_session" %}',
         success: function (response) {
-            console.log(response)
             var options = {
                 "key": "{{razorpay_public_key}}",
-                "subscription_id": "sub_JlU2kCShkWoKVq",
-                "name": "My Billing Label",
-                "description": "Auth txn for sub_JlU2kCShkWoKVq",
-                "handler": function (response){
-
+                "subscription_id": response.razorpay_subscription_id,
+                "name": response.description,
+                "amount": response.amount,
+                "description": response.description,
+                "image": "{{website.site_Logo.url}}",
+                "handler": function (responseOne){
+                    
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'teams:razorpay_subscription_callback' %}",
+                        url: "{% url 'teams:razorpay_subscription_webhook' %}",
                         data: {
-                            orderid: responseOne.razorpay_order_id,
-                            paymentid: responseOne.razorpay_payment_id,
+                            subscriptionID: responseOne.razorpay_subscription_id,
+                            paymentID: responseOne.razorpay_payment_id,
                             signature: responseOne.razorpay_signature,
                             csrfmiddlewaretoken: "{{csrf_token}}",
                             action: "razorpay-subscription",
@@ -224,7 +225,7 @@
                     "contact": "{{request.user.phone}}"
                 },
                 "notes": {
-                    "address": "{{request.user.country}}"
+                    "info": response.description
                 },
                 "theme": {
                     "color": "#3399cc"

@@ -34,8 +34,9 @@ def get_subscription_access_token():
     data = {'grant_type':'client_credentials'}
     headers = {'Accept':'application/json', 'Accept-Language':'en_US'}
     url = get_paypal_subscription_url()
-    get_token_path = url + 'v1/oauth2/token'
-    data_request = requests.post(get_token_path, auth=(paypalClient.paypal_public_key(), paypalClient.paypal_secret_key()), headers=headers, data=data).json()
+    url_prefix = 'v1/oauth2/token'
+    url_full_path = f'{url}{url_prefix}'
+    data_request = requests.post(url_full_path, auth=(paypalClient.paypal_public_key(), paypalClient.paypal_secret_key()), headers=headers, data=data).json()
     access_token = data_request['access_token']
     return access_token
 
@@ -44,13 +45,14 @@ def activate_paypal_subscription(request):
     package_id = body["subscriptionID"]
     client_reference_id = body["customerID"]
 
-    url = get_paypal_subscription_url()
     access_token = get_subscription_access_token()
     bearer_token = 'Bearer ' + access_token
     headers = {'Content-Type':'application/json', 'Authorization':bearer_token}
 
-    url = get_paypal_subscription_url() + 'v1/billing/subscriptions/' + package_id
-    data = requests.get(url, headers=headers).json()
+    url = get_paypal_subscription_url()
+    url_prefix = 'v1/billing/subscriptions/'
+    url_full_path =  f'{url}{url_prefix}{package_id}'
+    data = requests.get(url_full_path, headers=headers).json()
 
     subscription_id = data['id']
     status = data['status']
@@ -104,6 +106,7 @@ def deactivate_paypal_subscription(request):
             url = get_paypal_subscription_url() + 'v1/billing/subscriptions/' + team.paypal_subscription_id  + '/cancel'
             data = requests.post(url, headers=headers, data=body).json()
             print('data:::',data)
+            print('data:::',data['status_code'])
 
             default_package = Package.objects.get(is_default=True)
             team.package = default_package
