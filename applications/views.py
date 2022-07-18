@@ -302,6 +302,7 @@ def stripe_application_intent(request):
             full_name=request.user.get_full_name,
             email=request.user.email,
             country=str(request.user.country),
+            category = Purchase.PROJECT,
             payment_method=gateway_type,
             salary_paid=grand_total,
             unique_reference=stripe_reference,           
@@ -492,6 +493,7 @@ def flutter_payment_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            category = Purchase.PROJECT,
             salary_paid=grand_total,
             unique_reference=tx_ref,           
         )           
@@ -618,6 +620,7 @@ def razorpay_application_intent(request):
         client=request.user,
         full_name=f'{request.user.first_name} {request.user.last_name}',
         payment_method=str(gateway_type),
+        category = Purchase.PROJECT,
         salary_paid=grand_total,
         unique_reference=unique_reference,
         status=Purchase.FAILED

@@ -4,11 +4,11 @@ from . models import Purchase, ApplicationSale, ProposalSale, ContractSale, Sale
 
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
-    list_display = ['client', 'payment_method','salary_paid', 'created_at', 'status']
+    list_display = ['client', 'category', 'payment_method','salary_paid', 'created_at', 'status']
     list_filter = ['status']
     readonly_fields = ['client', 'payment_method','salary_paid','created_at'] # 'status',
     fieldsets = (
-        ('Transaction Details', {'fields': ('client', 'status','salary_paid', 'unique_reference', 'created_at',)}),
+        ('Transaction Details', {'fields': ('client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',)}),
         ('PayPal Payment Mode (If PayPal was used)', {'fields': ('paypal_order_key',)}),
         ('Stripe Payment Mode (If Stripe was used)', {'fields': ('stripe_order_key',)}),
         ('Flutterwave Payment Mode (If Flutterwave was used)', {'fields': ('flutterwave_order_key',)}),

@@ -122,7 +122,7 @@ def update_teams(request, team_id):
 def team_single(request, team_id):
     team = get_object_or_404(Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
     proposals = team.proposalteam.all()
-    proposal_assigned = team.assignteam.all()
+    # proposal_assigned = team.assignteam.all()
     applications = team.applications.all()
     invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
     accepted = Invitation.objects.filter(team=team, status=Invitation.ACCEPTED)
@@ -136,7 +136,7 @@ def team_single(request, team_id):
         'accepted': accepted,
         "proposals": proposals,
         "applications": applications,
-        "proposal_assigned": proposal_assigned,
+        # "proposal_assigned": proposal_assigned,
     }
     return render(request, 'teams/team_detail.html', context)
 

@@ -253,6 +253,7 @@
 								<div class="wt-sectiontitle">
 									<span>Proposal Review </span>
 								</div>
+								<div id="refreshProposal" class="table-responsive"><button class="btn btn-success btn-sm mb-4 text-white float-left"><i class="fas fa-sync fa-spin"></i>Refresh</button>
 								{% for review in client_review %}
 								<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
 									<figure class="wt-userlistingimg">
@@ -274,6 +275,7 @@
 									<div class="wt-description">
 										<p>“ {{review.message|linebreaksbr}}.”</p>
 									</div>
+								</div>
 								</div>
 								{% endfor %}
 								
@@ -427,6 +429,13 @@
 {% endblock %}
 
 {% block scripts %}
+<script> 
+	$(document).on('click', '#refreshProposal', function (e) {
+        e.preventDefault();
+		$("#refreshProposal").load(window.location.href + " #refreshProposal" );
+	});
+</script>
+
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>

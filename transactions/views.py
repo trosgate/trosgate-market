@@ -228,6 +228,7 @@ def flutter_payment_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            category = Purchase.PROPOSAL,
             salary_paid=grand_total,
             unique_reference=unique_reference,           
         )           
@@ -407,6 +408,7 @@ def stripe_payment_order(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            category = Purchase.PROPOSAL,
             salary_paid=grand_total,
             unique_reference=stripe_reference,           
         )           
@@ -497,8 +499,8 @@ def stripe_webhook(request):
                 team.package = package
                 team.package_status = Team.ACTIVE
                 team.package_expiry = get_expiration()
-                team.save()
-                
+                team.save()                
+
                 SubscriptionItem.objects.create(    
                     team=team,
                     customer_id = team.stripe_customer_id,
@@ -544,6 +546,7 @@ def paypal_payment_order(request):
             email=response.result.payer.email_address,
             country = request.user.country,
             payment_method=str(gateway_type),
+            category = Purchase.PROPOSAL,
             salary_paid=round(float(response.result.purchase_units[0].amount.value)),
             paypal_order_key=response.result.id,
             unique_reference=PayPalClient.paypal_unique_reference(),
@@ -618,6 +621,7 @@ def razorpay_application_intent(request):
         client=request.user,
         full_name=f'{request.user.first_name} {request.user.last_name}',
         payment_method=str(gateway_type),
+        category = Purchase.PROPOSAL,
         salary_paid=grand_total,
         unique_reference=unique_reference,
         status = Purchase.FAILED
@@ -705,6 +709,7 @@ def razorpay_webhook(request):
                     sales_category=SalesReporting.PROPOSAL, 
                     sales_price=int(proposal["salary"]),
                     staff_hired=proposal["member_qty"],
+                    client_fee_charged = round(shared_gateway_fee),
                     freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
                     total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
                     discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),

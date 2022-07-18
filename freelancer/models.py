@@ -113,7 +113,7 @@ class Freelancer(models.Model):
 class FreelancerAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='fundtransferuser', on_delete=models.PROTECT,)
     reference = models.UUIDField(unique=True, verbose_name="Reference Number", editable=False, default=uuid.uuid4,)
-    # pending_balance = models.PositiveIntegerField(_("Pending Balance"), default=0,)
+    pending_balance = models.PositiveIntegerField(_("Pending Balance"), default=0,)
     available_balance = models.PositiveIntegerField(_("Account Balance"), default=0, help_text=_("Min of $20 and Max of $500 per transaction"),)
     created_at = models.DateTimeField(auto_now=True,)
     modified_on = models.DateTimeField(auto_now=True,)

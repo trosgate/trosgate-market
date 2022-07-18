@@ -18,13 +18,22 @@ class Purchase(models.Model):
         (SUCCESS, _('Success')),
         (FAILED, _('Failed'))
     )    
+    PROPOSAL = 'proposal'
+    PROJECT = 'project'
+    CONTRACT = 'contract'
+    PURCHASE_CATEGORY = (
+        (PROPOSAL, _('Proposal')),
+        (PROJECT, _('Project')),
+        (CONTRACT, _('Contract'))
+    )    
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orderclient")
     full_name = models.CharField(_("Full Name"), max_length=100)
     email = models.EmailField(_("Email"), max_length=254, blank=True)
     phone = models.CharField(_("Phone Number"), max_length=100, null=True, blank=True)
     country = models.CharField(_("Country"), max_length=150, blank=True)
     salary_paid = models.PositiveIntegerField(_("Salary Paid"))
-    payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)   
+    payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
+    category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
     unique_reference = models.CharField(_("Unique Reference"), max_length=100, blank=True)
     paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, blank=True)
@@ -41,7 +50,7 @@ class Purchase(models.Model):
         ordering = ("-created_at",)
 
     def __str__(self):
-        return str(self.client.short_name)
+        return f'{self.payment_method} purchase made by {self.client.get_full_name()}'
 
 
 class ApplicationSale(models.Model):

@@ -18,6 +18,7 @@ urlpatterns = [
     path('notification/', include('notification.urls', namespace='notification')),
     path('application/', include('applications.urls', namespace='applications')),
     path('transaction/', include('transactions.urls', namespace='transactions')),
+    path('payments/', include('payments.urls', namespace='payments')),
     path('contract/', include('contract.urls', namespace='contract')),
     path('project/quiz/', include('quiz.urls', namespace='quiz')),
     path('team/analytics/', include('analytics.urls', namespace='analytics')),

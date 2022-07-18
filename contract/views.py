@@ -208,8 +208,6 @@ def final_contract_checkout(request, contract_id, contract_slug):
 def flutter_payment_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
 
-    print('contract_id:', contract_id)
-
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
 
@@ -235,6 +233,7 @@ def flutter_payment_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            category = Purchase.CONTRACT,
             salary_paid=grand_total,
             unique_reference=unique_reference,           
         )           
@@ -323,13 +322,10 @@ def get_flutterwave_verification(unique_reference, flutterwave_order_key):
     ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
 
 
-
 @login_required
 def stripe_contract_intent(request):
 
     contract_id = request.session["contractchosen"]["contract_id"]
-
-    print('contract_id:', contract_id)
 
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
@@ -375,6 +371,7 @@ def stripe_contract_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            category = Purchase.CONTRACT,
             salary_paid=grand_total,
             unique_reference=stripe_reference,           
         )           
@@ -436,8 +433,6 @@ def stripe_contract_intent(request):
 def paypal_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
 
-    print('contract_id:', contract_id)
-
     chosen_contract = BaseContract(request)
     contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
     discount_value = chosen_contract.get_discount_value(contract)
@@ -459,6 +454,7 @@ def paypal_contract_intent(request):
             email=response.result.payer.email_address,
             country = request.user.country,
             payment_method=str(gateway_type),
+            category = Purchase.CONTRACT,
             salary_paid=round(float(response.result.purchase_units[0].amount.value)),
             paypal_order_key=response.result.id,
             unique_reference=PayPalClient.paypal_unique_reference(),
@@ -525,8 +521,6 @@ def paypal_contract_intent(request):
 def razorpay_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
 
-    print('contract_id:', contract_id)
-
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
 
@@ -545,6 +539,7 @@ def razorpay_contract_intent(request):
         client=request.user,
         full_name=f'{request.user.first_name} {request.user.last_name}',
         payment_method=str(gateway_type),
+        category = Purchase.CONTRACT,
         salary_paid=grand_total,
         unique_reference=unique_reference,
     )
@@ -568,7 +563,6 @@ def razorpay_contract_intent(request):
     return response
 
 
-
 @login_required
 @user_is_client
 def razorpay_webhook(request):
@@ -580,10 +574,10 @@ def razorpay_webhook(request):
         razorpay_payment_id = str(request.POST.get('paymentid'))
         razorpay_signature = str(request.POST.get('signature'))
 
-        print('contract_id:', contract_id)
-        print('razorpay_order_id:', razorpay_order_key)
-        print('razorpay_payment_id:',razorpay_payment_id)
-        print('razorpay_signature:',razorpay_signature)
+        # print('contract_id:', contract_id)
+        # print('razorpay_order_id:', razorpay_order_key)
+        # print('razorpay_payment_id:',razorpay_payment_id)
+        # print('razorpay_signature:',razorpay_signature)
         data ={
             'razorpay_order_id': razorpay_order_key,
             'razorpay_payment_id': razorpay_payment_id,

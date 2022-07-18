@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'applications',
     'future',
     'resolution',
+    'payments',
 
     # Third party apps
     'django_htmx',

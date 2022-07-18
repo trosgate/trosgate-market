@@ -18,7 +18,7 @@ from django.utils import timezone
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 import time
 from datetime import timedelta
-# razorpay_plan = razorpay_api.razorpay_subscription_price_id()
+
 
 @login_required
 def razorpay_subscription_checkout_session(request):
@@ -30,8 +30,8 @@ def razorpay_subscription_checkout_session(request):
     # time_now = timezone.now() + timedelta(minutes=2)
     # start_at = int((time.mktime(time_now.timetuple())))
 
-    expiry = get_expiration()
-    expire_by = int((time.mktime(expiry.timetuple())))
+    # expiry = get_expiration()
+    # expire_by = int((time.mktime(expiry.timetuple())))
     try:
         package = Package.objects.get(is_default=False, type='Team')
         amount = int(package.price * 100)
@@ -41,6 +41,8 @@ def razorpay_subscription_checkout_session(request):
         'customer_notify': 1,
         'total_count': 1,
         'quantity': 1,
+        # start_at:
+        # expire_by:
         'notes': {'key1': f'Subscription by {team.title}'}
         }) 
                 
@@ -59,7 +61,6 @@ def razorpay_subscription_checkout_session(request):
         return JsonResponse(context)
     except Exception as e:
         return JsonResponse({'error': str(e)})
-
 
 
 @login_required
