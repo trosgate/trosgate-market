@@ -21,7 +21,6 @@ urlpatterns = [
     path('api/checkout/', views.final_application_checkout, name='final_application_checkout'),
 
     path('stripe/checkout/api/', views.stripe_application_intent, name='stripe_application_intent'),
-    path('stripe_webhook/', views.stripe_webhook, name='stripe_webhook'),
     # Urls for Paypal gateway
     path('paypal/checkout/api/', views.paypal_application_intent, name='paypal_payment_order'),
     path('success/', views.payment_success, name='hiring_payment_success'),

@@ -82,6 +82,15 @@
 						</div>
 					</div>
                     {% endfor %}
+                    {% comment %} {% for category in categories %}
+					<div class="wt-categoryslidercontent item">
+						<figure><img src="{{category.icon.url}}" alt="image description"></figure>
+						<div class="wt-cattitle">
+							<h3><a href="{{category.category_absolute_url}}">{{category.name}}</a></h3>
+							<span>Items: {{category.proposal.count}}</span>
+						</div>
+					</div>
+                    {% endfor %} {% endcomment %}
 				</div>
 			</div>			
 			<!--Main Start-->
@@ -208,7 +217,7 @@
 							<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
 								<div class="wt-proposalsr wt-box-shadow">
 									<div class="wt-proposalsrcontent">
-									<a href="{% url 'proposals:proposal_list' %}"> 
+									<a href="{% url 'freelancer:freelancer_profile' user.user.short_name %}"> 
 										<figure><img src="{% if user.profile_photo %} {{user.profile_photo.url }}{% endif %}" style="height:60px; width:60px" alt="image"></figure>
 									</a>
 									<h4>{{user.user.get_full_name}}</h4>

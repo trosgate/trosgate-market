@@ -39,6 +39,9 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_a
 from general_settings.models import Mailer
 from general_settings.currency import get_base_currency_symbol
 from .fund_exception import InvitationException
+from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from freelancer.models import FreelancerAccount
+
 
 def autoLogout(request):
     logout(request)
@@ -237,6 +240,7 @@ def account_activate(request, uidb64, token):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_dashboard(request):
     '''
     function for getting freelancer properties

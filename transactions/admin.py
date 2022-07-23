@@ -1,10 +1,10 @@
 from django.contrib import admin
-from . models import Purchase, ApplicationSale, ProposalSale, ContractSale, SalesReporting, SubscriptionItem
+from . models import Purchase, ApplicationSale, ProposalSale, ContractSale, SubscriptionItem
 
 
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
-    list_display = ['client', 'category', 'payment_method','salary_paid', 'created_at', 'status']
+    list_display = ['client', 'category', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
     list_filter = ['status']
     readonly_fields = ['client', 'payment_method','salary_paid','created_at'] # 'status',
     fieldsets = (
@@ -74,22 +74,6 @@ class ContractSaleAdmin(admin.ModelAdmin):
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 
-class SalesReportingAdmin(admin.ModelAdmin):
-    model = SalesReporting
-    list_display = ['team', 'sales_category','created_at', 'sales_price', 'staff_hired', 'total_sales_price', 'client_fee_charged','total_freelancer_fee_charged', 'total_discount_offered', 'total_earning','status_value']
-    list_filter = ['sales_category']
-    readonly_fields = [
-        'team', 'sales_category','purchase','created_at', 'staff_hired', 'total_sales_price', 
-        'client_fee_charged','freelancer_fee_charged', 'total_discount_offered', 
-        'total_earning','status_value','earning','created_at','updated_at','status_value'
-    ]
-    fieldsets = (
-        ('Classification', {'fields': ('team', 'purchase','sales_category',)}),
-        ('Revenue', {'fields': ('total_sales_price', 'client_fee_charged', 'total_freelancer_fee_charged', 'total_discount_offered',)}),
-        ('Earning/Profit', {'fields': ('staff_hired','earning',)}),
-        ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
-    )
-
 
 class SubscriptionItemAdmin(admin.ModelAdmin):
     model = SubscriptionItem
@@ -105,5 +89,4 @@ admin.site.register(Purchase, PurchaseAdmin)
 admin.site.register(ApplicationSale, ApplicationSaleAdmin)
 admin.site.register(ProposalSale, ProposalSaleAdmin)
 admin.site.register(ContractSale, ContractSaleAdmin)
-admin.site.register(SalesReporting, SalesReportingAdmin)
 admin.site.register(SubscriptionItem, SubscriptionItemAdmin)

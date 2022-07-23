@@ -20,7 +20,7 @@ from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
-from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SalesReporting, SubscriptionItem
+from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
 from . forms import PurchaseForm
 from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
@@ -33,7 +33,8 @@ from contract.models import InternalContract
 from django.utils import timezone
 from datetime import timedelta
 from teams.utilities import get_expiration
-
+from django.db import transaction as db_transaction
+from freelancer.models import FreelancerAccount
 
 @login_required
 def proposal_single_summary(request, short_name, proposal_slug):
@@ -208,16 +209,11 @@ def flutter_payment_intent(request):
     total_gateway_fee = hiringbox.get_fee_payable()
     gateway_type = str(hiringbox.get_gateway())
     grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-    number_of_applicants = hiringbox.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
-
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
     base_currency = get_base_currency_code()
 
     flutterwaveClient = FlutterwaveClientConfig()
     unique_reference = flutterwaveClient.flutterwave_unique_reference()
-
 
     if Purchase.objects.filter(unique_reference=unique_reference).exists():
         pass
@@ -228,6 +224,7 @@ def flutter_payment_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            client_fee = int(total_gateway_fee),
             category = Purchase.PROPOSAL,
             salary_paid=grand_total,
             unique_reference=unique_reference,           
@@ -257,28 +254,6 @@ def flutter_payment_intent(request):
                     get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"])                     
             )
 
-        for proposal in hiringbox:
-            SalesReporting.objects.create(
-                client=request.user,
-                team=proposal["proposal"].team, 
-                purchase=purchase,  
-                sales_category=SalesReporting.PROPOSAL, 
-                sales_price=int(proposal["salary"]),  
-                staff_hired=proposal["member_qty"],
-                client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-            )
         auth_token = flutterwaveClient.flutterwave_secret_key()
         headers = {'Authorization': 'Bearer ' + auth_token}
         data = {
@@ -370,8 +345,6 @@ def stripe_payment_order(request):
     total_gateway_fee = hiringbox.get_fee_payable()
     gateway_type = hiringbox.get_gateway()
     grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-    number_of_applicants = hiringbox.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
 
     stripe_obj = StripeClientConfig()
@@ -407,8 +380,9 @@ def stripe_payment_order(request):
             full_name=request.user.get_full_name,
             email=request.user.email,
             country=str(request.user.country),
-            payment_method=gateway_type,
+            client_fee = int(total_gateway_fee), 
             category = Purchase.PROPOSAL,
+            payment_method=gateway_type,
             salary_paid=grand_total,
             unique_reference=stripe_reference,           
         )           
@@ -437,37 +411,41 @@ def stripe_payment_order(request):
                     get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
             )
 
-        for proposal in hiringbox:
-            SalesReporting.objects.create(
-                client=request.user,
-                team=proposal["proposal"].team, 
-                purchase=purchase,  
-                sales_category=SalesReporting.PROPOSAL, 
-                sales_price=int(proposal["salary"]), 
-                staff_hired=proposal["member_qty"],
-                client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-            )
         hiringbox.clean_box()
         return JsonResponse({'session': session,})
             
-    hiringbox.clean_box()
     return JsonResponse({'failed':'Bad Signature',})
     
 
-def stripe_specific_payment_confirmation(data):
-    Purchase.objects.filter(stripe_order_key=data).update(status=Purchase.SUCCESS)
+@db_transaction.atomic()
+def stripe_specific_payment_confirmation(stripe_order_key):
+    purchase_obj = Purchase.objects.select_for_update().get(stripe_order_key=stripe_order_key)
+    purchase_obj.status = Purchase.SUCCESS
+    purchase_obj.save()
+
+    if purchase_obj.category == Purchase.PROPOSAL:
+        proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+        for item in proposal_items:
+            founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+            founder_account.pending_balance += sum([item.total_earning])
+            print('balance:::', founder_account.pending_balance)
+            founder_account.save()
+
+    if purchase_obj.category == Purchase.PROJECT:
+        proposal_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+        for item in proposal_items:
+            founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+            founder_account.pending_balance += sum([item.total_earnings])
+            print('balance:::', founder_account.pending_balance)
+            founder_account.save()
+
+    if purchase_obj.category == Purchase.CONTRACT:
+        proposal_items = ContractSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+        for item in proposal_items:
+            founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+            founder_account.pending_balance += sum([item.total_earning])
+            print('balance:::', founder_account.pending_balance)
+            founder_account.save()
 
 
 @csrf_exempt
@@ -491,16 +469,24 @@ def stripe_webhook(request):
         session = event['data']['object']
         if session.payment_status == 'paid':
             try:
+                stripe_specific_payment_confirmation(session.payment_intent)
+            except Exception as e:
+                print('%s' % (str(e)))
+
+            try:                            
                 package = Package.objects.get(is_default=False, type='Team')
-                stripe_specific_payment_confirmation(session.payment_intent)            
                 team = Team.objects.get(pk=session.get('client_reference_id'))
                 team.stripe_customer_id = session.get('customer')
                 team.stripe_subscription_id = session.get('subscription')
                 team.package = package
                 team.package_status = Team.ACTIVE
                 team.package_expiry = get_expiration()
-                team.save()                
+                team.save()   
 
+            except Exception as e:
+                print('%s' % (str(e)))
+
+            try:
                 SubscriptionItem.objects.create(    
                     team=team,
                     customer_id = team.stripe_customer_id,
@@ -513,8 +499,8 @@ def stripe_webhook(request):
                     status = True,
                 )
                            
-            except:
-                print('Payment unsuccessful')
+            except Exception as e:
+                print('%s' % (str(e)))
         else:
             print('Payment unsuccessful')  
 
@@ -528,83 +514,84 @@ def paypal_payment_order(request):
     total_gateway_fee = hiringbox.get_fee_payable()
     gateway_type = hiringbox.get_gateway()
     grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-
-    number_of_applicants = hiringbox.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
+    purchase = ''
 
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
     data = body["orderID"]
+    print(body)
 
     if data:
         paypal_request_order = OrdersGetRequest(data)
         response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
-
-        purchase = Purchase.objects.create(
-            client=request.user,
-            full_name=response.result.purchase_units[0].shipping.name.full_name,
-            email=response.result.payer.email_address,
-            country = request.user.country,
-            payment_method=str(gateway_type),
-            category = Purchase.PROPOSAL,
-            salary_paid=round(float(response.result.purchase_units[0].amount.value)),
-            paypal_order_key=response.result.id,
-            unique_reference=PayPalClient.paypal_unique_reference(),
-            status = Purchase.SUCCESS
-        )
-
-        for proposal in hiringbox:
-            ProposalSale.objects.create(
-                team=proposal["proposal"].team, 
-                purchase=purchase,  
-                proposal=proposal["proposal"], 
-                sales_price=int(proposal["salary"]), 
-                staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-
-            )
-
-        for proposal in hiringbox:
-            SalesReporting.objects.create(
+        # with db_transaction.atomic():
+        try:
+            purchase = Purchase.objects.create(
                 client=request.user,
-                team=proposal["proposal"].team, 
-                purchase=purchase,  
-                sales_category=SalesReporting.PROPOSAL, 
-                sales_price=int(proposal["salary"]), 
-                staff_hired=proposal["member_qty"],
-                client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"])             
+                full_name=response.result.purchase_units[0].shipping.name.full_name,
+                email=response.result.payer.email_address,
+                country = request.user.country,
+                payment_method=str(gateway_type),
+                client_fee = int(total_gateway_fee),
+                category = Purchase.PROPOSAL,
+                salary_paid=round(float(response.result.purchase_units[0].amount.value)),
+                paypal_order_key=response.result.id,
+                unique_reference=PayPalClient.paypal_unique_reference(),
             )
+        except Exception as e:
+            print('%s' % (str(e)))
+        
+        try:    
+            for proposal in hiringbox:
+                ProposalSale.objects.create(
+                    team=proposal["proposal"].team, 
+                    purchase=purchase,  
+                    proposal=proposal["proposal"], 
+                    sales_price=int(proposal["salary"]), 
+                    staff_hired=proposal["member_qty"],
+                    earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+                    total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
+                    discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
+                    total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+                    disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
+                    total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+                    earning=int(get_earning_calculator(
+                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
+                    total_earning=int(get_earning_calculator(
+                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
+                )
+
+        except Exception as e:
+            print('%s' % (str(e)))
+
+        with db_transaction.atomic():
+            purchase_obj = Purchase.objects.select_for_update().get(pk=purchase.pk)
+            purchase_obj.status = Purchase.SUCCESS
+            purchase_obj.save()
+
+            proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+            for item in proposal_items:
+                founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+                founder_account.pending_balance += sum([item.total_earning])
+                founder_account.save()
+
+        # try:
+        #     credit_team_founder_pending_balance(purchase.pk)
+        # except Exception as e:
+        #     print('%s' % (str(e)))
+        # try:
+            # Mail should be sent here notifying user that payment was made
+        # except Exception as e:
+        #     print('%s' % (str(e)))
+        hiringbox.clean_box()
+        return JsonResponse({'Perfect':'All was successful',})
     else:
         purchase.status = Purchase.FAILED
         purchase.save()
         return JsonResponse({'failed':'Bad Signature, Razorpay will refund your money if you are already debited',})
             
-    hiringbox.clean_box()
-    return JsonResponse({'Perfect':'All was successful',})
-
 
 @login_required
 @user_is_client
@@ -613,7 +600,10 @@ def razorpay_application_intent(request):
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
     gateway_type = hiringbox.get_gateway()
     base_currency_code = get_base_currency_code()
-    
+    total_gateway_fee = hiringbox.get_fee_payable()
+    discount_value = hiringbox.get_discount_value()
+    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
+
     razorpay_api = RazorpayClientConfig()
     unique_reference = razorpay_api.razorpay_unique_reference()
 
@@ -621,11 +611,33 @@ def razorpay_application_intent(request):
         client=request.user,
         full_name=f'{request.user.first_name} {request.user.last_name}',
         payment_method=str(gateway_type),
+        client_fee = int(total_gateway_fee),
         category = Purchase.PROPOSAL,
         salary_paid=grand_total,
         unique_reference=unique_reference,
         status = Purchase.FAILED
     )
+
+    for proposal in hiringbox:
+        ProposalSale.objects.create(
+            team=proposal["proposal"].team, 
+            purchase=purchase,  
+            proposal=proposal["proposal"], 
+            sales_price=int(proposal["salary"]),
+            staff_hired=proposal["member_qty"],
+            earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+            total_earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
+            discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
+            total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+            disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
+            total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+            earning=int(get_earning_calculator(
+                (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
+            total_earning=int(get_earning_calculator(
+                (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
+        )
 
     notes = {'Total Price': 'The total amount may change with discount'}
     currency = base_currency_code
@@ -648,15 +660,6 @@ def razorpay_application_intent(request):
 @user_is_client
 def razorpay_webhook(request):
     hiringbox = HiringBox(request)      
-    discount_value = hiringbox.get_discount_value()
-    total_gateway_fee = hiringbox.get_fee_payable()
-    total_after_discount_only = hiringbox.get_total_price_after_discount_only()
-    print('total_after_discount_only :', total_after_discount_only)
-    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-    grand_total_after_expense = hiringbox.get_total_price_after_discount_and_fee()
-    number_of_applicants = hiringbox.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
-    
     razorpay_client = RazorpayClientConfig().get_razorpay_client()
     if request.POST.get('action') == 'razorpay-proposal':   
         razorpay_order_key = request.POST.get('orderid')
@@ -668,70 +671,32 @@ def razorpay_webhook(request):
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature
         }
+        with db_transaction.atomic():
+            purchase_obj = Purchase.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)
+            purchase_obj.razorpay_payment_id = razorpay_payment_id
+            purchase_obj.razorpay_signature = razorpay_signature
 
-        purchase = Purchase.objects.get(razorpay_order_key=razorpay_order_key)
-        purchase.razorpay_payment_id = razorpay_payment_id
-        purchase.razorpay_signature = razorpay_signature
-        purchase.save()
+            signature = razorpay_client.utility.verify_payment_signature(data)
 
-        signature = razorpay_client.utility.verify_payment_signature(data)
+            if signature == True:
+                purchase_obj.status = Purchase.SUCCESS
+                purchase_obj.save()                   
 
-        if signature == True:
-            purchase.status = Purchase.SUCCESS
-            purchase.save()
-            
-            for proposal in hiringbox:
-                ProposalSale.objects.create(
-                    team=proposal["proposal"].team, 
-                    purchase=purchase,  
-                    proposal=proposal["proposal"], 
-                    sales_price=int(proposal["salary"]),
-                    staff_hired=proposal["member_qty"],
-                    earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                    total_earning_fee_charged=int(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                    discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                    total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                    total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                    total_earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-                )
+                proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+                for item in proposal_items:
+                    founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+                    founder_account.pending_balance += sum([item.total_earning])
+                    founder_account.save()
 
-            for proposal in hiringbox:
-                SalesReporting.objects.create(
-                    client=request.user,
-                    team=proposal["proposal"].team, 
-                    purchase=purchase,  
-                    sales_category=SalesReporting.PROPOSAL, 
-                    sales_price=int(proposal["salary"]),
-                    staff_hired=proposal["member_qty"],
-                    client_fee_charged = round(shared_gateway_fee),
-                    freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    total_freelancer_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                    discount_offered=round(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                    total_discount_offered=(get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value) * proposal["member_qty"]),
-                    disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                    total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                    total_earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"])
-                )
-        else:
-            purchase.status = Purchase.FAILED
-            purchase.save()
-            return JsonResponse({'failed':'Bad Signature, Razorpay will refund your money if you are already debited',})
-            
-    hiringbox.clean_box()
-    return JsonResponse({'Perfect':'All was successful',})
+                hiringbox.clean_box()
+                return JsonResponse({'Perfect':'All was successful',})
                 
-
+            else:
+                purchase_obj.status = Purchase.FAILED
+                purchase_obj.save()
+                return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+                
+                
 @login_required
 def payment_success(request):
     # hiringbox = HiringBox(request)

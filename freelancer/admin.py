@@ -38,7 +38,7 @@ class FreelancerAdmin(admin.ModelAdmin):
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
     list_display = ['user', 'created_at','reference', 'pending_balance', 'available_balance']
-    list_editable = ['available_balance']
+    list_editable = ['pending_balance','available_balance']
     list_display_links = None
 
     def has_add_permission(self, request):

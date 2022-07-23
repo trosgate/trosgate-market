@@ -26,17 +26,16 @@
 								<h5>{{proposal.title}}</h5>
 								<p class="text-justify text-truncate para mb-0" >{{proposal.preview}}<br><br></p>
 								<div class="alert alert-info" role="alert">
-									<span style="color: green; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Alert: You can hire more staff from<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"> Hiring More Staff table</a></span>
+									<span style="color: green; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Alert:  1 of {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} Chosen. {% if proposal.team.members.count > 1 %} You can hire more staff<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"> from Here</a> {% endif %}</span>
 								</div>
-									<div class="form-group">
-										<a href="javascript:void(0);" class="btn btn-outline-primary btn-sm mt-2"> 1 of {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</a>
+									{% comment %} <div class="form-group"> {% endcomment %}
 
-										<select id="select" class="form-control" style="width:auto;">
+										<select id="select" class="form-control" style="width:auto;" hidden>
 											<option selected disabled hidden> {{member_qty}} </option>
-												<option value=1 selected> 1 </option>
-											</select>                                                                                                                    
-											<button type="button" id="add-box" value="{{proposal.id}}" class="btn btn-info btn-sm mt-2"> 1 staff chosen </button>
-										</div>
+											<option value=1 selected> 1 </option>
+										</select>                                                                                                                  
+										<button type="button" id="add-box" hidden value="{{proposal.id}}" class="btn btn-info btn-sm mt-2"> 1 of {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} Chosen</button>
+										{% comment %} </div> {% endcomment %}
 									</div>
 									<div class="align-items-center align-content-center col-md-3 border-left mt-1">
 										<div class="d-flex flex-row align-items-center">

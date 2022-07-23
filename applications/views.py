@@ -27,7 +27,7 @@ from . application import ApplicationAddon
 from general_settings.models import PaymentGateway, Currency
 from general_settings.forms import CurrencyForm
 from django.views.decorators.csrf import csrf_exempt
-from transactions.models import Purchase, ApplicationSale, SalesReporting
+from transactions.models import Purchase, ApplicationSale, ProposalSale, ContractSale
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.http import require_http_methods
@@ -37,7 +37,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.fees_and_charges import get_application_fee_calculator
-
+from django.db import transaction as db_transaction
+from freelancer.models import FreelancerAccount
 
 
 @login_required
@@ -64,11 +65,9 @@ def apply_for_project(request, project_slug):
             application.applied_by = request.user
             application.save()
 
-            messages.info(
-                request, 'Your application was received successfully!')
+            messages.info(request, 'Your application was created successfully!')
             # utility function called for notification
-            create_notification(request, project.created_by,
-                                'application', slug=project.slug)
+            create_notification(request, project.created_by, 'application', slug=project.slug)
 
             return redirect(reverse("applications:freelancer_application"))
 
@@ -266,8 +265,6 @@ def stripe_application_intent(request):
     total_gateway_fee = applicant_box.get_fee_payable()
     grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
     grand_total = applicant_box.get_total_price_after_discount_and_fee()
-    number_of_applicants = applicant_box.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
 
     stripe_obj = StripeClientConfig()
     stripe_reference = stripe_obj.stripe_unique_reference()
@@ -288,7 +285,7 @@ def stripe_application_intent(request):
             },
         ],
         mode='payment',
-        success_url='http://' + str(get_current_site(request))+'/application/success/',
+        success_url='http://' + str(get_current_site(request)) + '/transaction/congrats/',
         cancel_url='http://' + str(get_current_site(request))+'/dashboard/'
     )
     gateway_type = str(applicant_box.get_gateway())
@@ -302,6 +299,7 @@ def stripe_application_intent(request):
             full_name=request.user.get_full_name,
             email=request.user.email,
             country=str(request.user.country),
+            client_fee = int(total_gateway_fee),
             category = Purchase.PROJECT,
             payment_method=gateway_type,
             salary_paid=grand_total,
@@ -332,57 +330,8 @@ def stripe_application_intent(request):
                     get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))             
             )
 
-        for applicant in applicant_box:
-            SalesReporting.objects.create(
-                client=request.user,
-                team=applicant["application"].team,
-                purchase=purchase,
-                sales_category=SalesReporting.PROJECT,
-                sales_price=int(applicant["budget"]),
-                staff_hired=int(1),
-                client_fee_charged=int(shared_gateway_fee),
-                freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]- get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))  
-            )
-
         return JsonResponse({'session': session, 'order': payment_intent})
 
-
-def stripe_specific_payment_confirmation(data):
-    Purchase.objects.filter(stripe_order_key=data).update(status = Purchase.SUCCESS)
-
-
-@csrf_exempt
-def stripe_webhook(request):
-    payload = request.body
-    event = None
-
-    try:
-        event = stripe.Event.construct_from(
-            json.loads(payload), stripe.api_key
-        )
-    except ValueError as e:
-        print(e)
-        return HttpResponse(status=400)
-
-    # Handle the event
-    if event.type == 'payment_intent.succeeded':
-        stripe_specific_payment_confirmation(event.data.object.client_secret)
-
-    else:
-        print('Unhandled event type {}'.format(event.type))
-
-    return HttpResponse(status=200)
 
 
 @login_required
@@ -394,8 +343,6 @@ def paypal_application_intent(request):
     gateway_type = applicant_box.get_gateway()
     grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
 
-    number_of_applicants = applicant_box.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
     data = body["orderID"]
@@ -404,68 +351,64 @@ def paypal_application_intent(request):
     if data:
         paypal_request_order = OrdersGetRequest(data)
         response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
-    
-        purchase = Purchase.objects.create(
-            client=request.user,
-            full_name=response.result.purchase_units[0].shipping.name.full_name,
-            email=response.result.payer.email_address,
-            country=request.user.country,
-            payment_method=str(gateway_type),
-            salary_paid=round(float(response.result.purchase_units[0].amount.value)),
-            paypal_order_key=response.result.id,
-            unique_reference=PayPalClient.paypal_unique_reference(),
-            status=Purchase.SUCCESS
-        )
-        for applicant in applicant_box:
-            ApplicationSale.objects.create(
-                team=applicant["application"].team,
-                purchase=purchase,
-                project=applicant["application"].project,
-                sales_price=int(applicant["budget"]),
-                staff_hired=int(1),
-                earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
-                total_earnings=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))            
-            )
-
-        for applicant in applicant_box:
-            SalesReporting.objects.create(
+        try:
+            purchase = Purchase.objects.create(
                 client=request.user,
-                team=applicant["application"].team,
-                purchase=purchase,
-                sales_category=SalesReporting.PROJECT,
-                sales_price=int(applicant["budget"]),
-                staff_hired=int(1),
-                client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]- get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))          
+                full_name=response.result.purchase_units[0].shipping.name.full_name,
+                email=response.result.payer.email_address,
+                country=request.user.country,
+                client_fee = int(total_gateway_fee), 
+                category = Purchase.PROJECT,
+                payment_method=str(gateway_type),
+                salary_paid=round(float(response.result.purchase_units[0].amount.value)),
+                paypal_order_key=response.result.id,
+                unique_reference=PayPalClient.paypal_unique_reference(),
+                status=Purchase.SUCCESS,
             )
+        except Exception as e:
+            print('%s' % (str(e)))
+        try:
+            for applicant in applicant_box:
+                ApplicationSale.objects.create(
+                    team=applicant["application"].team,
+                    purchase=purchase,
+                    project=applicant["application"].project,
+                    sales_price=int(applicant["budget"]),
+                    staff_hired=int(1),
+                    earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    earning=int(get_earning_calculator(
+                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
+                    total_earnings=int(get_earning_calculator(
+                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))            
+                )
+
+        except Exception as e:
+            print('%s' % (str(e)))
+
+        with db_transaction.atomic():
+            purchase_obj = Purchase.objects.select_for_update().get(pk=purchase.pk)
+            purchase_obj.status = Purchase.SUCCESS
+            purchase_obj.save()
+
+            application_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+            for item in application_items:
+                founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+                founder_account.pending_balance += sum([item.total_earnings])
+                founder_account.save()
+
+        applicant_box.clean_box()
+        return JsonResponse({'Perfect': 'All was successful', })
     else:
         purchase.status = Purchase.FAILED
         purchase.save()
-        return JsonResponse({'failed': 'Bad Signature, Razorpay will refund your money if you are already debited', })
-
-    applicant_box.clean_box()
-    return JsonResponse({'Perfect': 'All was successful', })
+        return JsonResponse({'failed': 'Transaction failed, Razorpay will refund your money if you are already debited', })
 
 
 @login_required
@@ -476,8 +419,6 @@ def flutter_payment_intent(request):
     total_gateway_fee = applicant_box.get_fee_payable()
     grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
     grand_total = applicant_box.get_total_price_after_discount_and_fee()
-    number_of_applicants = applicant_box.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
     base_currency = get_base_currency_code()
 
     flutterwaveClient = FlutterwaveClientConfig()
@@ -493,6 +434,7 @@ def flutter_payment_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            client_fee = int(total_gateway_fee),
             category = Purchase.PROJECT,
             salary_paid=grand_total,
             unique_reference=tx_ref,           
@@ -518,33 +460,6 @@ def flutter_payment_intent(request):
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                     get_application_fee_calculator(applicant["budget"]))), 
                 total_earnings=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"])))             
-            )
-
-        for applicant in applicant_box:
-            SalesReporting.objects.create(
-                client=request.user,
-                team=applicant["application"].team,
-                purchase=purchase,
-                sales_category=SalesReporting.PROJECT,
-                sales_price=int(applicant["budget"]),
-                staff_hired=int(1),
-                client_fee_charged=round(shared_gateway_fee),
-                freelancer_fee_charged=round(
-                    get_application_fee_calculator(applicant["budget"])),
-                total_freelancer_fee_charged=round(
-                    get_application_fee_calculator(applicant["budget"]) * int(1)),
-                discount_offered=get_discount_calculator(
-                    applicant["budget"], grand_total_before_expense, discount_value),
-                total_discount_offered=get_discount_calculator(
-                    applicant["budget"], grand_total_before_expense, discount_value),
-                disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"]))), 
-                total_earning=int(get_earning_calculator(
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                     get_application_fee_calculator(applicant["budget"])))             
             )
@@ -580,7 +495,13 @@ def flutter_payment_intent(request):
         return JsonResponse({'redirectToCheckout': redirectToCheckout, 'safe':False})
 
 
+def get_flutterwave_verification(unique_reference, flutterwave_order_key):
+    Purchase.objects.filter(
+        unique_reference=unique_reference, 
+        status=Purchase.FAILED,        
+    ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
 
+ 
 @login_required
 @user_is_client
 @require_http_methods(['GET', 'POST'])
@@ -612,8 +533,11 @@ def razorpay_application_intent(request):
     grand_total = applicant_box.get_total_price_after_discount_and_fee()
     gateway_type = applicant_box.get_gateway()
     base_currency_code = get_base_currency_code()
-
+    discount_value = applicant_box.get_discount_value()
+    total_gateway_fee = applicant_box.get_fee_payable()
+    grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
     razorpay_api = RazorpayClientConfig()
+    total_gateway_fee = applicant_box.get_fee_payable()
     unique_reference = razorpay_api.razorpay_unique_reference()
 
     purchase = Purchase.objects.create(
@@ -621,10 +545,32 @@ def razorpay_application_intent(request):
         full_name=f'{request.user.first_name} {request.user.last_name}',
         payment_method=str(gateway_type),
         category = Purchase.PROJECT,
+        client_fee = int(total_gateway_fee),
         salary_paid=grand_total,
         unique_reference=unique_reference,
         status=Purchase.FAILED
     )
+
+    for applicant in applicant_box:
+        ApplicationSale.objects.create(
+            team=applicant["application"].team,
+            purchase=purchase,
+            project=applicant["application"].project,
+            sales_price=int(applicant["budget"]),
+            staff_hired=int(1),
+            discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+            total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+            earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+            total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+            disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+            total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
+            total_earnings=int(get_earning_calculator(
+                (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))               
+        )
 
     notes = {'Total Price': 'The total amount may change with discount'}
     currency = base_currency_code
@@ -644,24 +590,14 @@ def razorpay_application_intent(request):
     return response
 
 
-def get_flutterwave_verification(unique_reference, flutterwave_order_key):
-    Purchase.objects.filter(
-        unique_reference=unique_reference, 
-        status=Purchase.FAILED,        
-    ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
-
- 
 @login_required
 @user_is_client
 def razorpay_webhook(request):
     applicant_box = ApplicationAddon(request)
-    discount_value = applicant_box.get_discount_value()
-    total_gateway_fee = applicant_box.get_fee_payable()
-    grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
-    number_of_applicants = applicant_box.__len__()
-    shared_gateway_fee = total_gateway_fee/number_of_applicants
-
     razorpay_client = RazorpayClientConfig().get_razorpay_client()
+    application_items=''
+    purchase_obj=''
+    founder_account=''
     if request.POST.get('action') == 'razorpay-application':
         razorpay_order_key = str(request.POST.get('orderid'))
         razorpay_payment_id = str(request.POST.get('paymentid'))
@@ -673,67 +609,35 @@ def razorpay_webhook(request):
             'razorpay_signature': razorpay_signature
         }
 
-        purchase = Purchase.objects.get(razorpay_order_key=razorpay_order_key)
-        purchase.razorpay_payment_id = razorpay_payment_id
-        purchase.razorpay_signature = razorpay_signature
-        purchase.save()
+        with db_transaction.atomic():
+            purchase_obj = Purchase.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)
+            purchase_obj.razorpay_payment_id = razorpay_payment_id
+            purchase_obj.razorpay_signature = razorpay_signature
 
-        signature = razorpay_client.utility.verify_payment_signature(data)
-        print('signature::::', signature)
-        if signature == True:  # must return True for below code to run
-            purchase.status = Purchase.SUCCESS
-            purchase.save()
+            signature = razorpay_client.utility.verify_payment_signature(data)
 
-            for applicant in applicant_box:
-                ApplicationSale.objects.create(
-                    team=applicant["application"].team,
-                    purchase=purchase,
-                    project=applicant["application"].project,
-                    sales_price=int(applicant["budget"]),
-                    staff_hired=int(1),
-                    discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                    total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                    earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                    total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    earning=int(get_earning_calculator(
-                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
-                    total_earnings=int(get_earning_calculator(
-                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))               
-                )
+            if signature == True:
+                purchase_obj.status = Purchase.SUCCESS
+                purchase_obj.save()                   
 
-            for applicant in applicant_box:
-                SalesReporting.objects.create(
-                    client=request.user,
-                    team=applicant["application"].team,
-                    purchase=purchase,
-                    sales_category=SalesReporting.PROJECT,
-                    sales_price=int(applicant["budget"]),
-                    staff_hired=int(1),
-                    client_fee_charged=round(shared_gateway_fee),
-                    freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    total_freelancer_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                    total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                    disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                    total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    earning=int(get_earning_calculator(
-                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"]- get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
-                    total_earning=int(get_earning_calculator(
-                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))
-                )
-        else:
-            purchase.status = Purchase.FAILED
-            purchase.save()
-            return JsonResponse({'failed': 'Bad Signature, Razorpay will refund your money if you are already debited', })
+                application_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+                for item in application_items:
+                    founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+                    founder_account.pending_balance += sum([item.total_earnings])
+                    founder_account.save()
 
-    applicant_box.clean_box()
-    return JsonResponse({'Perfect': 'All was successful', })
+                applicant_box.clean_box()
+                return JsonResponse({'Perfect':'All was successful',})
+                
+            else:
+                purchase_obj.status = Purchase.FAILED
+                purchase_obj.save()
+                return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+    else:            
+        purchase_obj.status = Purchase.FAILED
+        purchase_obj.save()
+        return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+                
 
 
 @login_required

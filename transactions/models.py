@@ -1,14 +1,16 @@
+import uuid
+import secrets
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
-import uuid
-import secrets
 from django.utils.safestring import mark_safe
 from django.urls import reverse
+from freelancer.models import Freelancer
 from proposals.models import Proposal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from general_settings.currency import get_base_currency_symbol
+from payments import signals
 
 
 class Purchase(models.Model):
@@ -32,6 +34,7 @@ class Purchase(models.Model):
     phone = models.CharField(_("Phone Number"), max_length=100, null=True, blank=True)
     country = models.CharField(_("Country"), max_length=150, blank=True)
     salary_paid = models.PositiveIntegerField(_("Salary Paid"))
+    client_fee = models.PositiveIntegerField(_("Client Fee"))
     payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
     category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
@@ -114,6 +117,32 @@ class ProposalSale(models.Model):
     def __str__(self):
         return str(self.proposal)
 
+
+    # @classmethod
+    # def credit_pending_balance(cls, pk:int):
+    #     print('initial run')
+    #     item_purchased = cls.objects.select_for_update().get(pk=pk, purchase__status='success')
+    #     print('item_purchased', item_purchased)
+
+    #     return item_purchased
+
+
+    # def mark_paid_in_bulk(paid_ids: list[int]) -> None:
+    #     with transaction.atomic():
+    #         for pk in paid_ids:
+    #             ProposalSale.credit_pending_balance(pk)
+    #             print('executed')
+
+    # for item in proposal_items:
+    #     print(item.team.created_by)
+    # for item in proposal_items:
+    #     founder_account = item.team.created_by.fundtransferuser
+    #     founder_account.pending_balance += item.total_earning
+    #     print('balance:', founder_account.pending_balance)
+
+    #     founder_account.save()
+    # print('payment made')
+
     def earning_fee(self):
         return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
 
@@ -177,46 +206,6 @@ class ContractSale(models.Model):
 
     def earnings(self):
         return f'{get_base_currency_symbol()} {self.total_earning}'
-
-    def status_value(self):
-        return self.purchase.get_status_display()
-
-
-class SalesReporting(models.Model):
-    #
-    # Item Type
-    PROJECT = 'project'
-    CONTRACT = 'contract'
-    PROPOSAL = 'proposal'
-    PRODUCT_TYPE = (
-        (PROJECT, _('Project')),
-        (CONTRACT, _('Contract')),
-        (PROPOSAL, _('Proposal'))
-    )
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='earningteam', on_delete=models.CASCADE)
-    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchased Client"), related_name="totalpurchase", on_delete=models.CASCADE)
-    sales_category = models.CharField(_("Sales Category"), max_length=50, blank=True)
-    sales_price = models.PositiveIntegerField(_("Total Sales"))
-    total_sales_price = models.PositiveIntegerField(_("Total Sales"), blank=True, null=True)
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), blank=True, null=True)
-    staff_hired = models.PositiveIntegerField(_("Total Staff Hired"), default=1)
-    client_fee_charged = models.PositiveIntegerField(_("Client Fee"))
-    freelancer_fee_charged = models.PositiveIntegerField(_("Freelancer Fee"))
-    total_freelancer_fee_charged = models.PositiveIntegerField(_("Total Freelancer Fee"), blank=True, null=True)
-    discount_offered = models.PositiveIntegerField(_("Discount Offered"))
-    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), blank=True, null=True)
-    earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
-
-    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Client"), related_name='created_by', on_delete=models.CASCADE)
-
-    class Meta:
-        ordering = ("-created_at",)
-
-    def __str__(self):
-        return str(self.purchase.client.short_name)
 
     def status_value(self):
         return self.purchase.get_status_display()

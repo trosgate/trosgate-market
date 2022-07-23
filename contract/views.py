@@ -17,7 +17,7 @@ from client.models import Client
 from django.http import HttpResponse, JsonResponse
 from .contract import BaseContract
 from django.views.decorators.csrf import csrf_exempt
-from transactions.models import Purchase, ContractSale, SalesReporting
+from transactions.models import Purchase, ContractSale
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
@@ -261,29 +261,6 @@ def flutter_payment_intent(request):
         
         )
 
-        SalesReporting.objects.create(
-            client=request.user,
-            team=contract.team, 
-            purchase=purchase,  
-            sales_category=SalesReporting.CONTRACT, 
-            sales_price=contract.grand_total,  
-            staff_hired=int(1),
-            client_fee_charged=round(total_gateway_fee),
-            freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
-            total_freelancer_fee_charged=round(get_contract_fee_calculator(contract.grand_total)),                   
-            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total))), 
-            total_earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total)))        
-        
-        )
-        
     auth_token = flutterwaveClient.flutterwave_secret_key()
     headers = {'Authorization': 'Bearer ' + auth_token}
     data = {
@@ -324,12 +301,9 @@ def get_flutterwave_verification(unique_reference, flutterwave_order_key):
 
 @login_required
 def stripe_contract_intent(request):
-
     contract_id = request.session["contractchosen"]["contract_id"]
-
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
-
     contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
     
     discount_value = chosen_contract.get_discount_value(contract)
@@ -371,6 +345,7 @@ def stripe_contract_intent(request):
             email=request.user.email,
             country=str(request.user.country),
             payment_method=gateway_type,
+            client_fee = int(total_gateway_fee),
             category = Purchase.CONTRACT,
             salary_paid=grand_total,
             unique_reference=stripe_reference,           
@@ -400,29 +375,6 @@ def stripe_contract_intent(request):
         
         )
 
-        SalesReporting.objects.create(
-            client=request.user,
-            team=contract.team, 
-            purchase=purchase,  
-            sales_category=SalesReporting.CONTRACT, 
-            sales_price=contract.grand_total, 
-            staff_hired=int(1),
-            client_fee_charged=round(total_gateway_fee),
-            freelancer_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            total_freelancer_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),            
-            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-            total_earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-       
-        )
-        
         chosen_contract.clean_box()
         return JsonResponse({'session': session,})
             
@@ -432,7 +384,6 @@ def stripe_contract_intent(request):
 @login_required
 def paypal_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
-
     chosen_contract = BaseContract(request)
     contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
     discount_value = chosen_contract.get_discount_value(contract)
@@ -454,6 +405,7 @@ def paypal_contract_intent(request):
             email=response.result.payer.email_address,
             country = request.user.country,
             payment_method=str(gateway_type),
+            client_fee = int(total_gateway_fee),
             category = Purchase.CONTRACT,
             salary_paid=round(float(response.result.purchase_units[0].amount.value)),
             paypal_order_key=response.result.id,
@@ -484,53 +436,30 @@ def paypal_contract_intent(request):
                 get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
         
         )
+        chosen_contract.clean_box()
+        return JsonResponse({'Perfect':'All was successful',})
 
-        SalesReporting.objects.create(
-            client=request.user,
-            team=contract.team, 
-            purchase=purchase,  
-            sales_category=SalesReporting.CONTRACT, 
-            sales_price=contract.grand_total,  
-            staff_hired=int(1),
-            client_fee_charged=round(total_gateway_fee),
-            freelancer_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            total_freelancer_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                     
-            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-            total_earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-        
-        )
     else:
         purchase.status = Purchase.FAILED
         purchase.save()
-        return JsonResponse({'failed':'Bad Signature, Razorpay will refund your money if you are already debited',})
-            
-    chosen_contract.clean_box()
-    return JsonResponse({'Perfect':'All was successful',})
-
+        return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+                
 
 @login_required
 @user_is_client
 def razorpay_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
-
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
-
-    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    total_gateway_fee = chosen_contract.get_fee_payable()
+    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)   
     
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
-
     gateway_type = chosen_contract.get_gateway()
-    print(gateway_type)
     base_currency_code = get_base_currency_code()
+    discount_value = chosen_contract.get_discount_value(contract)
+    total_gateway_fee = chosen_contract.get_fee_payable()
+    grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)       
     
     razorpay_api = RazorpayClientConfig()
     unique_reference = razorpay_api.razorpay_unique_reference()
@@ -540,11 +469,34 @@ def razorpay_contract_intent(request):
         full_name=f'{request.user.first_name} {request.user.last_name}',
         payment_method=str(gateway_type),
         category = Purchase.CONTRACT,
+        client_fee = int(total_gateway_fee),
         salary_paid=grand_total,
         unique_reference=unique_reference,
     )
     purchase.status = Purchase.FAILED
     purchase.save()
+
+    ContractSale.objects.create(
+        team=contract.team, 
+        purchase=purchase,  
+        contract=contract, 
+        sales_price=contract.grand_total, 
+        staff_hired=int(1),
+        earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+        total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                 
+
+        discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+        total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+        disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+        total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+        earning=int(get_earning_calculator(
+            (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
+        total_earning=int(get_earning_calculator(
+            (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
+    
+    )
 
     notes = {'Total Price': 'The total amount may change with discount'}
     currency = base_currency_code
@@ -585,10 +537,6 @@ def razorpay_webhook(request):
         }    
                  
         contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
-        discount_value = chosen_contract.get_discount_value(contract)
-        total_gateway_fee = chosen_contract.get_fee_payable()
-        grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)       
-
         razorpay_client = RazorpayClientConfig().get_razorpay_client()
         purchase = Purchase.objects.get(razorpay_order_key=razorpay_order_key)
 
@@ -597,7 +545,6 @@ def razorpay_webhook(request):
         purchase.save()
 
         signature = razorpay_client.utility.verify_payment_signature(data)
-        print('signature::::',signature)
         if signature == True: #must return True for below code to run
             contract.status=InternalContract.PAID
             contract.save()
@@ -605,57 +552,14 @@ def razorpay_webhook(request):
             purchase.status = Purchase.SUCCESS
             purchase.save()
 
-            ContractSale.objects.create(
-                team=contract.team, 
-                purchase=purchase,  
-                contract=contract, 
-                sales_price=contract.grand_total, 
-                staff_hired=int(1),
-                earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-                total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                 
-  
-                discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                    get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                    get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-            
-            )
+            chosen_contract.clean_box()
+            return JsonResponse({'Perfect':'All was successful',})
 
-            SalesReporting.objects.create(
-                client=request.user,
-                team=contract.team, 
-                purchase=purchase,  
-                sales_category=SalesReporting.CONTRACT, 
-                sales_price=contract.grand_total,  
-                staff_hired=int(1),
-                client_fee_charged=round(total_gateway_fee),
-                freelancer_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-                total_freelancer_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                                      
-                discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                    get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                    get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-            )
         else:
             purchase.status = Purchase.FAILED
             purchase.save()
-            return JsonResponse({'failed':'Bad Signature, Razorpay will refund your money if you are already debited',})
-            
-    chosen_contract.clean_box()
-    return JsonResponse({'Perfect':'All was successful',})
-            
+            return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+                       
 
 @login_required
 @user_is_client

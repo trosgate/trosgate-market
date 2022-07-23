@@ -17,8 +17,7 @@ from transactions.models import (
     ApplicationSale, 
     Purchase, 
     ProposalSale, 
-    ContractSale, 
-    SalesReporting
+    ContractSale
 )
 from . models import (
     ProjectResolution,

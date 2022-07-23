@@ -125,6 +125,7 @@ def proposal_filter(request):
     search_count = len(proposals)
     totalcount = f'<div id="proposalTotal" class="alert alert-info text-center" role="alert" style="color:black;">{search_count} of {all_proposals} search results found</div>'
     returned_proposal = render_to_string('proposals/ajax/proposal_search.html', {'proposals':proposals, 'base_currency':base_currency})
+    
     if len(proposals) > 0: 
         return JsonResponse({'proposals': returned_proposal, 'base_currency':base_currency, 'totalcount':totalcount})
     else:
