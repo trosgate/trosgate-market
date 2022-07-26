@@ -31,7 +31,7 @@ class PackageAdmin(admin.ModelAdmin):
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['title','created_by', 'created_at', 'package_status', 'status',]
+    list_display = ['title','created_by', 'created_at', 'package_status', 'team_balance', 'status',]
     list_display_links = ['title', 'created_by']
     search_fields = ['title',]
     prepopulated_fields = {'slug': ('title',)}
@@ -45,7 +45,7 @@ class TeamAdmin(admin.ModelAdmin):
     ]
 
     fieldsets = (
-        ('Introduction', {'fields': ('title', 'slug',)}),
+        ('Introduction', {'fields': ('title', 'slug', 'team_balance',)}),
         ('Background Details', {'fields': ('notice',)}),
         ('Team Manager', {'fields': ('created_by',)}),
         ('Team Member(s)', {'fields': ('members',)}),

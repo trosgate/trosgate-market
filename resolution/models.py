@@ -6,10 +6,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator, FileExt
 from django.template.defaultfilters import truncatechars
 from django.utils.safestring import mark_safe
 from account.fund_exception import ReviewException
-
-# from django.utils import timezone
-
-# self.last_updated = timezone.localtime(timezone.now())
+from teams.models import Team
+from freelancer.models import FreelancerAccount
 
 
 def application_file_directory(instance, filename):
@@ -34,14 +32,19 @@ class ProjectResolution(models.Model):
     THREE_WEEK = "three_weeks"
     ONE_MONTH = "one_month"
 
+    ONGOING = 'ongoing'
+    COMPLETED = 'completed'
+    STATUS_CHOICES = (
+        (ONGOING, _("Ongoing")),
+        (COMPLETED, _("Completed")),
+    ) 
+
     #Resolution parameters
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='approvedteam', on_delete=models.CASCADE)
     application = models.ForeignKey("transactions.ApplicationSale", verbose_name=_("Application Accepted"), related_name="projectapplicantsaction", on_delete=models.CASCADE)
-    project = models.ForeignKey("projects.Project", verbose_name=_("Project Offered"), related_name="resolutionproject", on_delete=models.CASCADE)
     start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
     end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
-    
-    completed = models.BooleanField(_("Completed"), choices=((False, 'Ongoing'), (True, 'Completed')), default=False)
+    status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=ONGOING)
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
         
     class Meta:
@@ -49,9 +52,44 @@ class ProjectResolution(models.Model):
         verbose_name = _("Application Approved")
         verbose_name_plural = _("Application Approved")
 
-
     def __str__(self):
-        return f'{self.team.title} vrs. {self.project.created_by.get_full_name()}'
+        return f'{self.team.title}'
+
+
+    @classmethod
+    def review_and_approve(cls, resolution_pk, team, title:str, message:str, rating:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution_pk)
+            applicant_team = Team.objects.select_for_update().get(pk=team.id)
+            team_manager = FreelancerAccount.objects.select_for_update().get(user=team.created_by)
+
+            if title is None:
+                raise ReviewException(_("Title is required"))
+            if message is None:
+                raise ReviewException(_("Message is required"))
+            if rating is None:
+                raise ReviewException(_("rating is required"))
+
+            review = ApplicationReview.create(
+                resolution=resolution, 
+                title=title, 
+                message=message, 
+                rating=rating, 
+            )
+
+            team_manager.pending_balance -= int(resolution.application.total_earnings)
+            team_manager.save(update_fields=['pending_balance'])
+
+            team_manager.available_balance += int(resolution.application.total_earnings)
+            team_manager.save(update_fields=['available_balance'])
+
+            applicant_team.team_balance += int(resolution.application.total_earnings)
+            applicant_team.save(update_fields=['team_balance'])
+
+            resolution.status = 'completed'
+            resolution.save(update_fields=['status'])          
+
+            return resolution, applicant_team, team_manager, review
 
 
 
@@ -78,16 +116,25 @@ class ApplicationReview(models.Model):
     status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')))
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
 
-
     class Meta:
         ordering = ("-created_at",)
-        verbose_name = _("Project Review")
-        verbose_name_plural = _("Project Review")
-
+        verbose_name = _("Application Review")
+        verbose_name_plural = _("Application Review")
 
     def __str__(self):
         return self.title
 
+    @classmethod
+    def create(cls, resolution, title, message, rating):
+        
+        if title is None:
+            raise ReviewException(_("Title is required"))
+        if message is None:
+            raise ReviewException(_("Message is required"))
+        if rating is None:
+            raise ReviewException(_("rating is required"))   
+
+        return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
 
 
 
@@ -111,12 +158,18 @@ class ProposalResolution(models.Model):
     THREE_WEEK = "three_weeks"
     ONE_MONTH = "one_month"
 
+    ONGOING = 'ongoing'
+    COMPLETED = 'completed'
+    STATUS_CHOICES = (
+        (ONGOING, _("Ongoing")),
+        (COMPLETED, _("Completed")),
+    ) 
     #Resolution parameters
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='approvedproposalteam', on_delete=models.CASCADE)
     proposal_sale = models.ForeignKey("transactions.ProposalSale", verbose_name=_("Proposal Sold"), related_name="proposalaction", on_delete=models.CASCADE)
     start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
     end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)   
-    completed = models.BooleanField(_("Completed"), choices=((False, 'Ongoing'), (True, 'Completed')), default=False)
+    status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=ONGOING)    
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
         
     class Meta:
@@ -124,9 +177,44 @@ class ProposalResolution(models.Model):
         verbose_name = _("Proposal Approved")
         verbose_name_plural = _("Proposal Approved")
 
-
     def __str__(self):
         return f'{self.team.title} vrs. {self.proposal_sale.proposal.created_by.get_full_name()}'
+
+
+    @classmethod
+    def review_and_approve(cls, resolution_pk, team, title:str, message:str, rating:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution_pk)
+            proposal_team = Team.objects.select_for_update().get(pk=team.id)
+            team_manager = FreelancerAccount.objects.select_for_update().get(user=team.created_by)
+
+            if title is None:
+                raise ReviewException(_("Title is required"))
+            if message is None:
+                raise ReviewException(_("Message is required"))
+            if rating is None:
+                raise ReviewException(_("rating is required"))
+
+            review = ProposalReview.create(
+                resolution=resolution, 
+                title=title, 
+                message=message, 
+                rating=rating, 
+            )
+
+            team_manager.pending_balance -= int(resolution.proposal_sale.total_earning)
+            team_manager.save(update_fields=['pending_balance'])
+
+            team_manager.available_balance += int(resolution.proposal_sale.total_earning)
+            team_manager.save(update_fields=['available_balance'])
+
+            proposal_team.team_balance += int(resolution.proposal_sale.total_earning)
+            proposal_team.save(update_fields=['team_balance'])
+
+            resolution.status = 'completed'
+            resolution.save(update_fields=['status'])          
+
+            return resolution, proposal_team, team_manager, review
 
 
 class ProposalCompletionFiles(models.Model):
@@ -161,25 +249,18 @@ class ProposalReview(models.Model):
     def __str__(self):
         return self.title
 
+    @classmethod
+    def create(cls, resolution, title, message, rating):
+        
+        if title is None:
+            raise ReviewException(_("Title is required"))
+        if message is None:
+            raise ReviewException(_("Message is required"))
+        if rating is None:
+            raise ReviewException(_("rating is required"))   
 
-    # @classmethod
-    # def create(cls, resolution, title, message:str, rating:int):
+        return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
 
-    #     with db_transaction.atomic(): #nowait=True
-    #         if resolution is None:
-    #             raise ReviewException(_("Bad request.Please contact Admin"))
-    #         if title is None:
-    #             raise ReviewException(_("Title is required"))
-    #         if message is None:
-    #             raise ReviewException(_("message is required"))
-    #         if rating is None:
-    #             raise ReviewException(_("message is required"))               
-
-    #         review = cls.objects.select_for_update(nowait=True).get(resolution=resolution)
-
-    #         review.save(update_fields=['resolution','title','message','rating'])
-
-    #     return review
 
 
 

@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from account.models import Country, Customer
 from general_settings . models import (
     WebsiteSetting, Category, Department, Size, PaymentsControl,
-    Skill, DiscountSystem, PaymentGateway, HiringFee, Currency
+    Skill, DiscountSystem, PaymentGateway, HiringFee, Currency, Payday
 )
 from teams . models import Package, Team
 from proposals . models import Proposal
@@ -51,6 +51,9 @@ class Command(BaseCommand):
 
         if not PaymentGateway.objects.count():
             call_command("loaddata", "db_payment_gateways.json")
+
+        if not Payday.objects.count():
+            call_command("loaddata", "db_payday.json")
 
         if not Currency.objects.count():
             call_command("loaddata", "db_currencies.json")

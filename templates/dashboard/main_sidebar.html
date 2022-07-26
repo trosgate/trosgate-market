@@ -123,12 +123,14 @@
 						<li class="menu-item-has-children wt-active">
 							<a href="javascript:void(0);">
 								<i class="ti-dashboard"></i>
-								<span>Account Insights</span>
+								<span>Fund Manager</span>
 							</a>
 							<ul class="sub-menu">
-								<li class="wt-active"><hr><a href="dashboard-insights.html">Insights</a></li>
-								<li><hr><a href="{% url 'freelancer:transfer_or_withdraw' %}">Salary Insight</a></li>
-								<li><hr><a href="{% url 'analytics:time_tracker' %}">Time Tracker</a></li>
+								{% if active_team.created_by == request.user %}
+								<li class="wt-active"><hr><a href="{% url 'freelancer:transfer_or_withdraw' %}">New Action</a></li>
+								{% endif %}
+								<li><hr><a href="{% url 'payments:transfer_transactions' %}">Transfer</a></li>
+								<li><hr><a href="{% url 'payments:withdrawal_transactions' %}">Withdawals</a></li>
 							</ul>
 						</li>																		
 																						
@@ -160,6 +162,7 @@
 							<ul class="sub-menu">
 								<li><hr><a href="{% url 'teams:assign_to_me' %}">To Me</a></li>
 								<li><hr><a href="{% url 'teams:assign_to_members' %}">To Members</a></li>
+								<li><hr><a href="{% url 'analytics:time_tracker' %}">Performance</a></li>
 							</ul>
 						</li>												
 						<li class="menu-item-has-children">

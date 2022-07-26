@@ -118,11 +118,6 @@ class Project(models.Model):
     TWO_WEEK = "two_weeks"
     THREE_WEEK = "three_weeks"
     ONE_MONTH = "one_month"
-    TWO_MONTH = "two_months"
-    THREE_MONTH = "three_months"
-    FOUR_MONTH = "four_months"
-    FIVE_MONTH = "five_months"
-    SIX_MONTH = "six_months"
     PROJECT_COMPLETION = (
         (ONE_DAY, _("01 Day")),
         (TWO_DAYS, _("02 Days")),

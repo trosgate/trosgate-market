@@ -4,7 +4,7 @@
 {% include 'dashboard/main_sidebar.html' %}
 
 			<!--Main Start-->
-			<main id="wt-main" class="wt-main wt-haslayout">
+			<main class="wt-main wt-haslayout">
 				<div class="wt-haslayout wt-innerbannerholder">
 					<div class="container">
 						<div class="row justify-content-md-center">
@@ -210,8 +210,12 @@
 										
 										<div class="wt-rightarea text-center">
 											<div class="wt-hireduserstatus">
-												<i class="fa fa-dollar"></i>
+												<i class="fa fa-dollar" style='color:green;'></i>
+												{% if active_team.created_by == request.user %}
+												<span>{{currency}}{{proposal_sold.total_earning}}</span>
+												{% elif request.user == proposal_sold.purchase.client %}
 												<span>{{currency}}{{proposal_sold.total_sales_price}}</span>
+												{% endif %}
 											</div>
 											{% if request.user == proposal_sold.purchase.client %}
 											<div class="wt-hireduserstatus">
@@ -219,21 +223,21 @@
 												<span><button type='button' class='btn btn-success btn-sm' data-toggle="modal" data-target="#projectreviewmodalbox">Approve</button></span>
 											</div>														
 											<div class="wt-hireduserstatus">
-												<i class="ti-na" style='color:red'></i>
+												<i class="ti-na" style='color:green;'></i>
 												<span><button type='button' class='btn btn-danger btn-sm' data-toggle="modal" data-target="#projectcancelmodalbox">Cancel</button></span>
 											</div>														
 											{% endif %}														
 											<div class="wt-hireduserstatus">
-												<i class="far fa-envelope"></i>
+												<i class="far fa-envelope" style='color:green;'></i>
 												<span>Cover Letter</span>
 											</div>														
 											<div class="wt-hireduserstatus">
-												<i class="fa fa-paperclip"><a href=""></a></i>
+												<i class="fa fa-paperclip" style='color:green;'><a href=""></a></i>
 												<span>0 Files</span>
 											</div>														
 											<div class="wt-hireduserstatus">
-												<i class="far fa-envelope"></i>
-												<span>Status</span>
+												<i class="fa fa-list-alt" style='color:green;'></i>
+												<span>{{resolution.get_status_display}}</span>
 											</div>														
 										</div>
 									</div>
@@ -254,7 +258,8 @@
 									<span>Proposal Review </span>
 								</div>
 								<div id="refreshProposal" class="table-responsive"><button class="btn btn-success btn-sm mb-4 text-white float-left"><i class="fas fa-sync fa-spin"></i>Refresh</button>
-								{% for review in client_review %}
+
+									{% for review in client_review %}
 								<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
 									<figure class="wt-userlistingimg">
 										<img src="{% if review.resolution.team.created_by.freelancer.profile_photo %} {{review.resolution.team.created_by.freelancer.profile_photo.url }} {% endif %}" alt="image description">

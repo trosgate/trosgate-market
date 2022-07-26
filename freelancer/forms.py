@@ -134,17 +134,20 @@ class WithdrawalForm(forms.ModelForm):
 
     class Meta:
         model = FreelancerAction
-        fields = ['withdraw_amount','narration']
-        required = ['withdraw_amount', 'narration']
+        fields = ['gateway', 'withdraw_amount', 'narration']
+        required = ['gateway', 'withdraw_amount', 'narration']
 
     def __init__(self, *args, **kwargs):
         super(WithdrawalForm, self).__init__(*args, **kwargs)
+
+        self.fields['gateway'].widget.attrs.update(
+            {'class': 'form-control col-12 float-left', 'placeholder': ''})
 
         self.fields['withdraw_amount'].widget.attrs.update(
             {'class': 'form-control col-12 float-left', 'placeholder': ''})
 
         self.fields['narration'].widget.attrs.update(
             {'class': 'form-control col-12 float-left', 'placeholder': ''})
-
+        
         for field in self.Meta.required:
             self.fields[field].required = True

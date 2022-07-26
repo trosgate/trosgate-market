@@ -1,0 +1,9 @@
+[
+    {
+        "model": "general_settings.payday",
+        "pk": 1,
+        "fields": {
+            "payday_converter": "three_days"
+        }
+    }
+]

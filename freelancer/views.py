@@ -11,7 +11,6 @@ from django.utils.text import slugify
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from teams.controller import max_member_per_team
-from contract.forms import InternalContractForm
 from django.db.models import F
 from teams.controller import monthly_offer_contracts
 from account.fund_exception import FundException
@@ -19,7 +18,7 @@ import json
 from general_settings.fund_control import get_min_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
 from future.utilities import get_transfer_feature
 from account.models import Country
-from general_settings.models import Category, Skill
+from general_settings.models import Category, PaymentGateway, Skill
 from teams.models import Team
 from account.models import Customer
 from proposals.models import Proposal
@@ -179,11 +178,9 @@ def update_freelancer(request, user_id):
 @login_required
 @user_is_freelancer
 def transfer_or_withdraw(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, created_by=request.user)
     team_staff = request.user.team_member.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
 
-    manager_transfers = FreelancerAction.objects.filter(team=team, manager=request.user)
-    staff_transfers = FreelancerAction.objects.filter(team=team, team_staff=request.user)
     transferform = FundTransferForm(team_staff)
     withdrawalform = WithdrawalForm(request.POST)
 
@@ -198,8 +195,6 @@ def transfer_or_withdraw(request):
         'team': team,
         'transferform': transferform,
         'withdrawalform': withdrawalform,
-        'manager_transfers': manager_transfers,
-        'staff_transfers': staff_transfers,
         'min_balance_remaining': min_balance_remaining,
         'max_transfer_amount': max_transfer_amount,
         'min_transfer_amount': min_transfer_amount,
@@ -255,13 +250,16 @@ def withdrawal_debit(request):
     if request.POST.get('action') == 'make-withdrawal':
         withdraw_amount = int(request.POST.get('wamount'))
         narration = str(request.POST.get('narration'))
+        gateway_id = int(request.POST.get('gateway'))
 
         try:
+            gateway = PaymentGateway.objects.get(pk=gateway_id)
             FreelancerAccount.withdrawal(
                 team_owner=team.created_by,
                 team_staff=team.created_by,
                 action_choice=FreelancerAction.WITHDRAWAL,
                 team=team,
+                gateway=gateway,
                 withdraw_amount=withdraw_amount,
                 narration=narration,
                 transfer_status=True
@@ -273,3 +271,4 @@ def withdrawal_debit(request):
             message = message = f'<span id="debit-message" class="alert alert-danger" style="color:red; text-align:right;">{mes}</span>'
 
         return JsonResponse({'message': message})
+

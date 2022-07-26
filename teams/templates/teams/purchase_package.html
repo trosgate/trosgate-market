@@ -158,7 +158,7 @@
       
           let stripe = Stripe('{{stripe_public_key}}');
       
-          fetch('/team/api/stripe_subscription_checkout_session/', {
+          fetch('/team/stripe_subscription_checkout_session/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

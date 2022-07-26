@@ -7,3 +7,4 @@ class ReviewException(Exception):
 
 class InvitationException(Exception):
     pass
+

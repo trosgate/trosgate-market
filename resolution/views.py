@@ -27,15 +27,15 @@ from . models import (
     ApplicationReview,
     ProposalReview
 )
-
+from teams.models import Team
 
 
 @login_required
-def application_resolution(request, application_id, project_slug):
+def application_manager(request, application_id, project_slug):
     resolution = ''
     duration_end_time = ''
     application = get_object_or_404(ApplicationSale, pk=application_id, project__slug=project_slug)
-    client_review = ApplicationReview.objects.all()
+    client_review = ApplicationReview.objects.filter(resolution__application=application)
 
     completion_form = ProjectCompletionForm(request.POST, request.FILES)
     if request.user.user_type == Customer.FREELANCER:
@@ -46,6 +46,7 @@ def application_resolution(request, application_id, project_slug):
         if project_resolution.count() > 0:
             resolution = project_resolution.first()
             duration_end_time = resolution.end_time
+            
 
         if resolution and completion_form.is_valid():
             completed_file = completion_form.save(commit=False)
@@ -81,13 +82,18 @@ def applicant_start_work(request):
         applicationsale_id = int(request.POST.get('applicationid'))
 
         application = get_object_or_404(ApplicationSale, pk=applicationsale_id, team__created_by=request.user, purchase__status = Purchase.SUCCESS)
-        project = get_object_or_404(Project, pk=application.project.id)
-        if ProjectResolution.objects.filter(application=application, project=project, team=application.team).exists():
+        if ProjectResolution.objects.filter(application=application, team=application.team).exists():
             print('already started')
             pass
         else:
-            ProjectResolution.objects.create(application=application, project=project, team=application.team, start_time=datetime.now())
-            print('work started')
+            # try:
+            ProjectResolution.objects.create(
+                application=application, 
+                team=application.team, 
+                start_time=datetime.now()
+            )
+            # except Exception as e:
+            #     print(str(e))            
         response = JsonResponse({'message': 'work started'})
         return response
 
@@ -104,53 +110,57 @@ def applicant_review(request):
         message = str(request.POST.get('message'))
 
         application = get_object_or_404(ApplicationSale, pk=application_id, purchase__client = request.user, purchase__status = Purchase.SUCCESS)
-        project = get_object_or_404(Project, pk=application.project.id)
-        resolution = get_object_or_404(ProjectResolution, application=application, project=project, team=application.team)
+        resolution = get_object_or_404(ProjectResolution, application=application, team=application.team)
 
         reviews = ApplicationReview.objects.filter(resolution=resolution, status=True)
         if reviews.count() > 0:
             review = reviews.first()
-            review.application = resolution
+            review.resolution = resolution
             review.title = title
             review.message = message
             review.rating = rating
             review.status = True
             review.save()
-            success_or_error_message = 'Your review updated successfully'
+            success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review modified Successfully</span>'
         else:
             try:
-                ApplicationReview.objects.create(resolution=resolution, title=title, message=message, rating=rating, status=True)
-                success_or_error_message = 'Review received Successfully'
+                ProjectResolution.review_and_approve(
+                    resolution_pk=resolution.pk, 
+                    team=application.team, 
+                    title=title, 
+                    message=message, 
+                    rating=rating
+                )
+                success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review received Successfully</span>'
             except Exception as e:
                 error_messages = str(e)
-                success_or_error_message = f'Ooops! {error_messages}'
+                success_or_error_message = f'<span id="reviewerror-message" style="color:red;"> {error_messages}</span>'
 
         response = JsonResponse({'success_or_error_message': success_or_error_message})
         return response
 
 
 @login_required
-def proposal_resolution(request, proposal_id, proposal_slug):
+def proposal_manager(request, proposalsale_id, proposal_slug):
     resolution = ''
     duration_end_time = ''
-    proposal_sold = get_object_or_404(ProposalSale, pk=proposal_id, proposal__slug=proposal_slug)
+    proposal_sold = get_object_or_404(ProposalSale, pk=proposalsale_id, proposal__slug=proposal_slug)
     client_review = ProposalReview.objects.filter(resolution__proposal_sale=proposal_sold)
-
     completion_form = ProposalCompletionForm(request.POST, request.FILES)
+    
     if request.user.user_type == Customer.FREELANCER:
         if request.user != proposal_sold.team.created_by:
-            return redirect('transactions:application_transaction')
+            return redirect('transactions:proposal_transaction') 
 
-        proposal_resolution = ProposalResolution.objects.filter(proposal_sale__pk=proposal_sold.id, proposal_sale__team__created_by = request.user, proposal_sale__team__pk=request.user.freelancer.active_team_id)
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+        proposal_resolution = ProposalResolution.objects.filter(
+            proposal_sale__pk=proposal_sold.id, 
+            proposal_sale__team = team, 
+            team=team
+        )
         if proposal_resolution.count() > 0:
             resolution = proposal_resolution.first()
             duration_end_time = resolution.end_time
-
-        # if resolution and completion_form.is_valid():
-        #     completed_file = completion_form.save(commit=False)
-        #     completed_file.proposal_sale = resolution
-        #     completed_file.save()
-
 
     elif request.user.user_type == Customer.CLIENT:
         if request.user != proposal_sold.purchase.client:
@@ -159,7 +169,7 @@ def proposal_resolution(request, proposal_id, proposal_slug):
         proposal_resolution = ProposalResolution.objects.filter(proposal_sale=proposal_sold, proposal_sale__purchase__client = request.user)
         if proposal_resolution.count() > 0:
             resolution = proposal_resolution.first()
-            duration_end_time = resolution.end_time            
+            duration_end_time = resolution.end_time  
 
     context = {
         "proposal_sold": proposal_sold,
@@ -168,9 +178,52 @@ def proposal_resolution(request, proposal_id, proposal_slug):
         "duration_end_time": duration_end_time,
         "resolution": resolution,
         "currency": get_base_currency_code,
-
     }
     return render(request, "resolution/proposal_resolution.html", context)
+
+
+# @login_required
+# def proposal_resolution(request, proposal_id, proposal_slug):
+#     resolution = ''
+#     duration_end_time = ''
+#     proposal_sold = get_object_or_404(ProposalSale, pk=proposal_id, proposal__slug=proposal_slug, purchase__status = Purchase.SUCCESS)
+#     client_review = ProposalReview.objects.filter(resolution__proposal_sale=proposal_sold)
+
+#     completion_form = ProposalCompletionForm(request.POST, request.FILES)
+#     if request.user.user_type == Customer.FREELANCER:
+#         if request.user != proposal_sold.team.created_by:
+#             return redirect('transactions:application_transaction')
+
+#         proposal_resolution = ProposalResolution.objects.filter(proposal_sale__pk=proposal_sold.id, proposal_sale__team__created_by = request.user, proposal_sale__team__pk=request.user.freelancer.active_team_id)
+#         if proposal_resolution.count() > 0:
+#             resolution = proposal_resolution.first()
+#             duration_end_time = resolution.end_time
+
+#         # if resolution and completion_form.is_valid():
+#         #     completed_file = completion_form.save(commit=False)
+#         #     completed_file.proposal_sale = resolution
+#         #     completed_file.save()
+
+
+#     elif request.user.user_type == Customer.CLIENT:
+#         if request.user != proposal_sold.purchase.client:
+#             return redirect('transactions:proposal_transaction')        
+        
+#         proposal_resolution = ProposalResolution.objects.filter(proposal_sale=proposal_sold, proposal_sale__purchase__client = request.user)
+#         if proposal_resolution.count() > 0:
+#             resolution = proposal_resolution.first()
+#             duration_end_time = resolution.end_time            
+
+#     context = {
+#         "proposal_sold": proposal_sold,
+#         "client_review": client_review,
+#         "completion_form": completion_form,
+#         "duration_end_time": duration_end_time,
+#         "resolution": resolution,
+#         "currency": get_base_currency_code,
+
+#     }
+#     return render(request, "resolution/proposal_resolution.html", context)
 
 
 @login_required
@@ -179,13 +232,20 @@ def proposal_start_work(request):
     if request.POST.get('action') == 'start-work':
         proposalsale_id = int(request.POST.get('proposalSoldId'))
 
-        proposal_sold = get_object_or_404(ProposalSale, pk=proposalsale_id, team__created_by=request.user, purchase__status = Purchase.SUCCESS)
-        if ProposalResolution.objects.filter(proposal_sale=proposal_sold, team=proposal_sold.team).exists():
+        proposal_sale = get_object_or_404(ProposalSale, pk=proposalsale_id, team__created_by=request.user, purchase__status = Purchase.SUCCESS)
+        if ProposalResolution.objects.filter(proposal_sale=proposal_sale, team=proposal_sale.team).exists():
             print('already started')
             pass
         else:
-            ProposalResolution.objects.create(proposal_sale=proposal_sold, team=proposal_sold.team, start_time=timezone.now())
-            print('work started')
+            try:
+                ProposalResolution.objects.create(
+                    proposal_sale=proposal_sale, 
+                    team=proposal_sale.team, 
+                    start_time=timezone.now()
+                )
+                print('work started')
+            except Exception as e:
+                print(str(e))
         response = JsonResponse({'message': 'work started'})
         return response
 
@@ -216,7 +276,13 @@ def proposal_review(request):
             success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review modified Successfully</span>'
         else:
             try:
-                ProposalReview.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
+                ProposalResolution.review_and_approve(
+                    resolution_pk=resolution.pk, 
+                    team=proposal_sale.team, 
+                    title=title, 
+                    message=message, 
+                    rating=rating
+                )
                 success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review received Successfully</span>'
             except Exception as e:
                 error_messages = str(e)
@@ -225,39 +291,3 @@ def proposal_review(request):
         response = JsonResponse({'success_or_error_message': success_or_error_message})
         return response
 
-
-# login_required
-# @user_is_client
-# def applicant_review(request):
-#     success_or_error_message = ''
-#     error_messages = ''
-#     if request.POST.get('action') == 'project-review':
-#         application_id = int(request.POST.get('applicationid'))
-#         rating = int(request.POST.get('rating'))
-#         title = str(request.POST.get('title'))
-#         message = str(request.POST.get('message'))
-
-#         application = get_object_or_404(ApplicationSale, pk=application_id, purchase__client = request.user, purchase__status = Purchase.SUCCESS)
-#         project = get_object_or_404(Project, pk=application.project.id)
-#         resolution = get_object_or_404(ProjectResolution, application=application, project=project, team=application.team)
-
-#         reviews = ApplicationReview.objects.filter(resolution=resolution, status=True)
-#         if reviews.count() > 0:
-#             review = reviews.first()
-#             review.application = resolution
-#             review.title = title
-#             review.message = message
-#             review.rating = rating
-#             review.status = True
-#             review.save()
-#             success_or_error_message = 'Your review updated successfully'
-#         else:
-#             try:
-#                 ApplicationReview.create(resolution=resolution, title=title, message=message, rating=rating, status=True)
-#                 success_or_error_message = 'Review received Successfully'
-#             except ReviewException as e:
-#                 error_messages = str(e)
-#                 success_or_error_message = f'Ooops! {error_messages}'
-
-#         response = JsonResponse({'success_or_error_message': success_or_error_message})
-#         return response

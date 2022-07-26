@@ -1,0 +1,235 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<main class="wt-main wt-haslayout">
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                    <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>Transfers</h2></div>
+                    <ol class="wt-breadcrumb">
+                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                        <li class="wt-active">Transfers </li>
+                    </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if active_team.created_by == request.user %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>Transfer History</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                            Info: Any credit transfer or withdrawal will impact a debited to your account. 
+                                        </span>
+                                    </div>
+                                </div>									 
+                                <div class="table-responsive">
+                                <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Receiver</th>
+                                        <th>Action Type</th>
+                                        <th>Position</th>
+                                        <th>Transfered On</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for manager_transfer in manager_transfers %}
+                                    <tr>
+                                        <td>{{forloop.counter}} </td>
+                                        <td>{{manager_transfer.team_staff.get_full_name}}</td>
+                                        <td>{{manager_transfer.get_action_choice_display}}</td>
+                                        <td>{{manager_transfer.get_position_display}}</td>
+                                        <td>{{manager_transfer.created_at}}</td>
+                                        <td>{{manager_transfer.debit_amount}}</td>
+                                        <td>{{manager_transfer.get_transfer_status_display}}</td>
+                                    </tr> 
+                                {% endfor %}					
+                                    </tbody>
+                                </table>
+                                {% if not manager_transfers %}
+                                <hr>
+                                <p class='text-center'><strong>{% if request.user == active_team.created_by %} You have not transfered money yet, but you can change that {% else %}You have not received transfer yet.{% endif %}</strong></p>
+                                {% endif %}											
+                                </div> 
+                            </div>
+                        </div>								
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}    
+        
+    {% if active_team.created_by != request.user %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>Transfer History</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                            Info: We shall make payment to your selected account within the timeframe
+                                        </span>
+                                    </div>
+                                </div>									 
+                                    <div class="table-responsive">
+                                    <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Type</th>                                                
+                                            <th>Worked As</th>
+                                            <th>Received on </th>
+                                            <th>Transfer($)</th>
+                                            <th>Transfer Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for staff_transfer in staff_transfers %}
+                                        <tr>
+                                            <td>{{forloop.counter}} </td>
+                                            <td>{{staff_transfer.team_staff.get_full_name}}</td>
+                                            <td>{{staff_transfer.get_action_choice_display}}</td>
+                                            <td>{{staff_transfer.get_position_display}}</td>
+                                            <td>{{staff_transfer.created_at}}</td>
+                                            <td>{{staff_transfer.debit_amount}}</td>
+                                            <td>{{staff_transfer.get_transfer_status_display}}</td>
+                                        </tr> 
+                                    {% endfor %}					
+                                        </tbody>
+                                    </table>
+                                    {% if not staff_transfers %}
+                                    <hr>
+                                    <p class='text-center'><strong>You have not received transfer from your team founder</strong></p>
+                                    {% endif %}											
+                                </div> 
+                            </div>
+                        </div>								
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    
+
+    {% endblock content %}
+    {% block scripts %}
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    
+    <script>
+        //TRANSFER OF FUND BUTTON CONFIRMATION  
+        $(document).ready(function(){
+
+            $('#transfer-nextstep').hide()
+            $('#transfer-confirm').click(function(){
+                $('#transfer-nextstep').slideToggle(200)       
+            });
+            $('#transfer-nextstep').click(function(){
+                $('#transfer-nextstep').hide()       
+            });            
+        });
+    </script>
+
+    <script>
+        //TRANSFER OF FUND             
+        $(document).on('click', '#transfer-button', function (e) {
+        e.preventDefault();
+
+        let staff = $('[name="team_staff"]').val();
+        let position = $('[name="position"]').val();
+        let amount = $('[name="debit_amount"]').val();
+        let displayMessage = document.getElementById('transfer-message');
+        let displayError = document.getElementById('transfer-error');
+
+        if(staff =='' || position == ''|| amount ==''){
+            swal("Alert!", "All fields are required", "error");
+            return false;
+        }
+        else{
+            $.ajax({
+                type: 'POST',
+                url: '{% url "freelancer:transfer_debit" %}',
+                data: {
+                    teamstafftype: $('#id_team_staff option:selected').val(),
+                    position: $('#id_position option:selected').val(),
+                    tamount: $('#id_debit_amount').val(),
+                    csrfmiddlewaretoken: "{{csrf_token}}",
+                    action: 'make-transfer'
+                },
+                success: function (json) {
+                    $('#id_team_staff').val('');
+                    $('#id_position').val('');
+                    $('#id_debit_amount').val('');                   
+                    document.getElementById('transfer-message').innerHTML = json.message            
+                },
+                error: function (error) {
+                    document.getElementById('transfer-message').innerHTML = error.message
+                }
+            });
+        }
+    })
+    </script>
+
+    <script>
+        //WITHDRAWAL OF FUND             
+        $(document).on('click', '#withdrawal-button', function (e) {
+        e.preventDefault();
+
+        let amount = $('[name="withdraw_amount"]').val();
+        let narration = $('[name="narration"]').val();
+        let gateway = $('[name="gateway"]').val();
+
+        if(amount =='' || narration == ''||gateway=='')
+        {
+            swal("Alert!", "All fields are required", "error");
+            return false;
+        }
+        else{
+            $.ajax({
+                type: 'POST',
+                url: '{% url "freelancer:withdrawal_debit" %}',
+                data: {
+                    wamount: $('#id_withdraw_amount').val(),
+                    narration: $('#id_narration').val(),
+                    gateway: $('#id_gateway').val(),
+                    csrfmiddlewaretoken: "{{csrf_token}}",
+                    action: 'make-withdrawal'
+                },
+                success: function (json) {
+                    document.getElementById('withdrawal-message').innerHTML = json.message
+                    $('#id_withdraw_amount').val('');
+                    $('#id_narration').val('');
+                },
+                error: function (error) {
+                    document.getElementById('withdrawal-message').innerHTML = error.message
+                }            
+            });
+        }
+    })
+    </script>
+
+    {% endblock scripts %}

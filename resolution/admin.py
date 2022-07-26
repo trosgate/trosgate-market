@@ -26,7 +26,7 @@ class ApplicationReviewAdmin(admin.ModelAdmin):
 
 class ProposalResolutionAdmin(admin.ModelAdmin):
     model = ProposalResolution
-    list_display = ['team', 'proposal_sale', 'start_time', 'end_time']    
+    list_display = ['team','start_time', 'end_time', 'status']    
 
 
 class ProposalCompletionFilesAdmin(admin.ModelAdmin):

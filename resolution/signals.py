@@ -1,7 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import ProjectResolution, ProposalResolution
-
 from proposals.utilities import (
     one_day, two_days, three_days, four_days, 
     five_days, six_days, one_week, two_weeks,
@@ -14,31 +13,30 @@ from proposals.utilities import (
 @receiver(post_save, sender=ProjectResolution)
 def create_endtime_of_project(sender, instance, created, **kwargs):
 
-    if created and instance.project.completion_time == instance.ONE_DAY:
+    if created and instance.application.project.completion_time == instance.ONE_DAY:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = one_day())
-    if created and instance.project.completion_time == instance.TWO_DAYS:
+    if created and instance.application.project.completion_time == instance.TWO_DAYS:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = two_days())
-    if created and instance.project.completion_time == instance.THREE_DAYS:
+    if created and instance.application.project.completion_time == instance.THREE_DAYS:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = three_days())
-    if created and instance.project.completion_time == instance.FOUR_DAYS:
+    if created and instance.application.project.completion_time == instance.FOUR_DAYS:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = four_days())
-    if created and instance.project.completion_time == instance.FIVE_DAYS:
+    if created and instance.application.project.completion_time == instance.FIVE_DAYS:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = five_days())
-    if created and instance.project.completion_time == instance.SIX_DAYS:
+    if created and instance.application.project.completion_time == instance.SIX_DAYS:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = six_days())
-    if created and instance.project.completion_time == instance.ONE_WEEK:
+    if created and instance.application.project.completion_time == instance.ONE_WEEK:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = one_week())
-    if created and instance.project.completion_time == instance.TWO_WEEK:
+    if created and instance.application.project.completion_time == instance.TWO_WEEK:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = two_weeks())
-    if created and instance.project.completion_time == instance.THREE_WEEK:
+    if created and instance.application.project.completion_time == instance.THREE_WEEK:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = three_weeks())
-    if created and instance.project.completion_time == instance.ONE_MONTH:
+    if created and instance.application.project.completion_time == instance.ONE_MONTH:
         ProjectResolution.objects.filter(pk=instance.id).update(end_time = one_month())
 
 
 @receiver(post_save, sender=ProposalResolution)
 def create_endtime_of_proposal(sender, instance, created, **kwargs):
-
     if created and instance.proposal_sale.proposal.dura_converter == instance.ONE_DAY:
         ProposalResolution.objects.filter(pk=instance.id).update(end_time = one_day())
     if created and instance.proposal_sale.proposal.dura_converter == instance.TWO_DAYS:

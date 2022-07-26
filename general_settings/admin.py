@@ -2,7 +2,7 @@ import sys
 from django.contrib import admin
 from . models import (
     Category, Department, Skill, Size, CommunicationLanguage, ProposalGuides,
-    WebsiteSetting, PaymentGateway, PaymentAPIs, AutoLogoutSystem, DiscountSystem,
+    WebsiteSetting, PaymentGateway, PaymentAPIs, Payday, AutoLogoutSystem, DiscountSystem,
     EmailConfig, TestEmail, SubscriptionGateway, HiringFee, Currency, ExachangeRateAPI,
     PaymentsControl, Mailer, DepositControl
 )
@@ -111,6 +111,33 @@ class PaymentGatewayAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_GATEWAYS:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
+class PaydayAdmin(admin.ModelAdmin):
+    model = Payday
+    list_display = ['preview','payday_converter']
+    list_editable = ['payday_converter']
+    # list_display_links: None
+    readonly_fields = ['preview']
+    fieldsets = (
+        ('Preview', {'fields': ('preview',)}),
+        ('Payday Duration', {'fields': ('payday_converter',)}),
+    )
+    
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_OBJECTS:
             return False
         return super().has_add_permission(request)
 
@@ -389,6 +416,7 @@ admin.site.register(PaymentsControl, PaymentControlAdmin)
 admin.site.register(Department)
 admin.site.register(Size)
 admin.site.register(Skill)
+admin.site.register(Payday, PaydayAdmin)
 admin.site.register(TestEmail, TestEmailAdmin)
 admin.site.register(Mailer, MailerAdmin)
 admin.site.register(DiscountSystem, DiscountSystemAdmin)

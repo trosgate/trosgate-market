@@ -37,7 +37,9 @@
 							<th>Sales ({{base_currency}}) </th>
 							<th>Fees </th>
 							<th>Est. Earning</th>
+							{% if active_team.created_by == request.user %}
 							<th>Manager</th>
+							{% endif %}
 						</tr>
 					</thead>
 					
@@ -53,7 +55,9 @@
 							<td>{{proposal.total_sales_price}} ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td> 
 							<td>{{proposal.total_earning_fee_charged}}</td>
 							<td>{{proposal.total_earning}}</td>
-							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm">Manage</button></a></td>
+							{% if active_team.created_by == request.user %}
+							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+							{% endif %}
 						</tr>
 						{% comment %} {% url 'proposals:proposal_resolution' %} {% endcomment %}
 						{% endfor %}

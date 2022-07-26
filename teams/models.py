@@ -90,6 +90,7 @@ class Team(models.Model):
     package_status = models.CharField(_("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     slug = models.SlugField(_("Slug"), max_length=100, editable=True)
+    team_balance = models.PositiveIntegerField(_("Team Balance"), default=0, help_text=_("Team Transaction Balance"),)
     # payment method to be used by User to activate plan
     stripe_customer_id = models.CharField(_("Stripe Customer ID"), max_length=255, blank=True, null=True)
     stripe_subscription_id = models.CharField(_("Stripe Subscription ID"), max_length=255, blank=True, null=True)

@@ -12,8 +12,15 @@ app_name = 'teams'
 
 urlpatterns = [
 
-    # Urls for team table
+
     path('', views.team, name='team'),
+
+    # payment subscription urls
+    path('packages/', views.packages, name='packages'),
+    path('package/<slug:type>/', views.purchase_package, name='purchase_package'),
+    path('packages/success/', views.package_success, name='package_success'),
+    path('packages/paypal/create/', views.paypal_package_order, name='paypal_package_order'),
+    # Urls for team table
     path('message/', views.teamchat, name='teamchat'),
     path('chat/', views.teamchatroom, name='teamchatroom'),
     path('accept/', views.accept_team_invitation, name='accept_invite'),
@@ -40,14 +47,8 @@ urlpatterns = [
     path('delete/<slug:proposal_slug>/<int:assign_id>/<int:tracking_id>/',
          views.delete_proposal_tracking, name='delete_proposal_tracking'),
 
-    # payment subscription urls
-    path('packages/', views.packages, name='packages'),
-    path('package/<slug:type>/', views.purchase_package, name='purchase_package'),
-    path('packages/success/', views.package_success, name='package_success'),
-    path('packages/paypal/create/', views.paypal_package_order, name='paypal_package_order'),
-
     # payment api with stripe urls
-    path('api/stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
+    path('stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
     path('razorpay_subscription_checkout_session/', razorpay_subscription_checkout_session, name='razorpay_subscription_checkout_session'),
     path('razorpay_subscription_webhook/', razorpay_subscription_webhook, name='razorpay_subscription_webhook'),
 

@@ -13,7 +13,7 @@ from account.models import Customer
 from account.fund_exception import FundException
 from teams.models import Team
 from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
-
+from payments.models import PaymentRequest
 
 class ActiveFreelancer(models.Manager):
     def get_queryset(self):
@@ -123,15 +123,17 @@ class FreelancerAccount(models.Model):
         verbose_name_plural = 'Freelancer Account'
 
     def __str__(self):
-        return self.user.short_name
+        return f'{self.user.first_name} {self.user.last_name}'
  
 
     @classmethod
-    def transfer(cls, team_owner, team_staff, team, action_choice, transfer_status, debit_amount, position):
+    def transfer(cls, team_owner, team_staff, team, action_choice, transfer_status, debit_amount, position, gateway=None):
 
         with transaction.atomic():
             team_manager = cls.objects.select_for_update().get(user=team_owner)
             team_member_staff = cls.objects.select_for_update().get(user=team_staff)
+            owner_active_team = Team.objects.select_for_update().get(pk=team.id)
+            staff_team = Team.objects.select_for_update().filter(created_by=team_staff).first()
 
             if not team_staff:
                 raise FundException(_("Staff is required"))
@@ -145,20 +147,23 @@ class FreelancerAccount(models.Model):
             if not team_owner:
                 raise FundException(_('You must be team Owner to transfer'))
 
-            if int(debit_amount) > int(get_max_transfer()):
-                raise FundException(_('Transfer Exceeds Limit'))
-
-            if int(debit_amount) < int(get_min_transfer()):
-                raise FundException(_('You cannot Transfer below Minimum'))
-
             if not (int(get_min_transfer()) <= int(debit_amount) <= int(get_max_transfer())):
-                raise FundException(_('Transfer amount is out of range'))
+                raise FundException(_(f'Transfer amount is out of range {get_min_transfer()} to {get_max_transfer()}'))
 
             if int(team_manager.available_balance) - int(debit_amount) < int(get_min_balance()):
-                raise FundException(_('You cannot keep balance after transaction below minimum'))
+                raise FundException(_(f'You cannot keep balance after transaction below {get_min_balance()}'))
 
             if int(team_member_staff.available_balance) + int(debit_amount) > int(get_max_receiver_balance()):
-                raise FundException(_('Unsuccessful. Please Prompt Receiver to withdraw existing funds first'))
+                raise FundException(_(f'{team_staff} cannot receive funds beyond threshold. Please Prompt receiver to withdraw existing funds first'))
+
+            if int(owner_active_team.team_balance) - int(debit_amount) < int(get_min_balance()):
+                raise FundException(_(f'Team balance after transfer cannot fall below {get_min_balance()}'))
+            
+            if int(debit_amount) > int(owner_active_team.team_balance):
+                raise FundException(_(f'Insufficient Team balance: transfer({debit_amount}) bigger than Team Balance({owner_active_team.team_balance})'))
+            
+            if team_owner != owner_active_team.created_by:
+                raise FundException(_('You must be Team founder to initiate transfer'))
 
             if team_owner == team_staff:
                 raise FundException(_('You cannot transfer fund to yourself'))
@@ -166,26 +171,36 @@ class FreelancerAccount(models.Model):
             team_manager.available_balance -= int(debit_amount)
             team_manager.save(update_fields=['available_balance'])
 
+            owner_active_team.team_balance -= int(debit_amount)
+            owner_active_team.save(update_fields=['team_balance'])
+
+            staff_team.team_balance += int(debit_amount)
+            staff_team.save(update_fields=['team_balance'])
+
             team_member_staff.available_balance += int(debit_amount)
             team_member_staff.save(update_fields=['available_balance'])
 
-            account_action = FreelancerAction.objects.create(
-                account=team_manager, manager=team_manager.user, team_staff=team_member_staff.user, team=team, 
+            account_action = FreelancerAction.create(
+                account=team_manager, manager=team_manager.user, team_staff=team_member_staff.user, gateway=gateway, team=owner_active_team, 
                 action_choice=action_choice, position=position, debit_amount=debit_amount, transfer_status=transfer_status
             )
 
         return account_action
 
     @classmethod
-    def withdrawal(cls, team_owner, team, team_staff, transfer_status, action_choice, withdraw_amount, narration):
+    def withdrawal(cls, team_owner, team, team_staff, gateway, transfer_status, action_choice, withdraw_amount, narration):
         with transaction.atomic():
             freelancer_account = cls.objects.select_for_update().get(user=team_owner)
+            owner_active_team = Team.objects.select_for_update().get(pk=team.id)
 
             if not narration:
                 raise FundException(_("narration is required"))
 
             if not withdraw_amount:
                 raise FundException(_("Withdraw amount is required"))
+
+            if gateway is None:
+                raise FundException(_("Payment Account is required"))
 
             if team.created_by != team_owner:
                 raise FundException(_('You must be team Owner to transfer'))
@@ -200,7 +215,7 @@ class FreelancerAccount(models.Model):
                 raise FundException(_('You cannot withdraw below Minimum'))
 
             if int(freelancer_account.available_balance) - int(withdraw_amount) < int(get_min_balance()):
-                raise FundException(_('You cannot keep balance below Minimum'))
+                raise FundException(_(f'You cannot keep balance after withdrawal below {get_min_balance()}'))
 
             if int(withdraw_amount) == 0:
                 raise FundException(_('You cannot set zero Amount'))
@@ -208,21 +223,40 @@ class FreelancerAccount(models.Model):
             if not (int(get_min_withdrawal()) <= int(withdraw_amount) <= int(get_max_withdrawal())):
                 raise FundException(_('Withdraw amount is out of range'))
 
+            if int(owner_active_team.team_balance) - int(withdraw_amount) < int(get_min_balance()):
+                raise FundException(_(f'Team balance after witdrawal cannot fall below {get_min_balance()}'))
+            
+            if int(withdraw_amount) > int(owner_active_team.team_balance):
+                raise FundException(_(f'Insufficient Team balance: Withdrawal Amount ({withdraw_amount}) bigger than Team Balance({owner_active_team.team_balance})'))
+
+            if team_owner != owner_active_team.created_by:
+                raise FundException(_('You must be Team founder to initiate transfer'))
+
             freelancer_account.available_balance -= int(withdraw_amount)
             freelancer_account.save(update_fields=['available_balance'])
+
+            owner_active_team.team_balance -= int(withdraw_amount)
+            owner_active_team.save(update_fields=['team_balance'])
 
             account_action = FreelancerAction.create(
                 account=freelancer_account,
                 manager=freelancer_account.user,
-                team=team,
+                team=owner_active_team,
                 action_choice=action_choice,
                 narration=narration,
+                gateway=gateway,
                 withdraw_amount=withdraw_amount,
                 team_staff=freelancer_account.user,
                 transfer_status=transfer_status
             )
 
-        return account_action
+            payment_request = PaymentRequest.create(
+                user=team_owner,
+                gateway=str(gateway.name), 
+                team=owner_active_team, 
+                amount=withdraw_amount
+                )
+        return account_action, payment_request
 
 
 class FreelancerAction(models.Model):
@@ -256,11 +290,12 @@ class FreelancerAction(models.Model):
     )
 
     account = models.ForeignKey(FreelancerAccount, verbose_name=_("Account"), related_name="fundmanageraccount", on_delete=models.PROTECT)
+    gateway = models.ForeignKey('general_settings.PaymentGateway', verbose_name=_("Payment Account"), related_name="paymentaccount", blank=True, null=True, on_delete=models.SET_NULL)
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Manager"), related_name="fundtransferor", on_delete=models.PROTECT)
     team_staff = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Staff"), related_name='fundtransferee', blank=True, null=True, on_delete=models.SET_NULL)
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='fundtransferteam', on_delete=models.PROTECT)
     position = models.CharField(_("Worked As"), max_length=50,choices=POSITIONS, default=CO_CEO, blank=True, null=True)
-    action_choice = models.CharField(_("Worked As"), max_length=50, choices=ACTION_CHOICES, default=NONE, blank=True, null=True)
+    action_choice = models.CharField(_("Action Type"), max_length=50, choices=ACTION_CHOICES, default=NONE, blank=True, null=True)
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
     transfer_status = models.BooleanField(_("Status"), choices=((False, 'Failed'), (True, 'Successful')), default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -277,7 +312,7 @@ class FreelancerAction(models.Model):
         return f'{self.team.title} - {self.position}'
 
     @classmethod
-    def create(cls, account, manager, team, action_choice, transfer_status, debit_amount=None, withdraw_amount=None, team_staff=None, narration=None, position=None):  # 'delta_amount',
+    def create(cls, account, manager, team, action_choice, transfer_status, gateway=None, debit_amount=None, withdraw_amount=None, team_staff=None, narration=None, position=None):  
 
         if (action_choice == cls.TRANSFER and team_staff is None):
             raise FundException(_("Staff is required"))
@@ -285,15 +320,36 @@ class FreelancerAction(models.Model):
         if (action_choice == cls.TRANSFER and position is None):
             raise FundException(_("position is required"))
 
+        if (action_choice == cls.TRANSFER and gateway is None):
+            gateway = None
+        
         if (action_choice == cls.TRANSFER and debit_amount is None):
             raise FundException(_("Transfer Amount is required"))
 
         if (action_choice == cls.WITHDRAWAL and narration is None):
             raise FundException(_("narration is required"))
 
+        if (action_choice == cls.WITHDRAWAL and gateway is None):
+            raise FundException(_("Payment Account is required"))
+
         if (action_choice == cls.WITHDRAWAL and withdraw_amount is None):
             raise FundException(_("Withdraw amount is required"))
 
-        action = cls.objects.create(account=account, manager=manager, team=team, action_choice=action_choice, transfer_status=transfer_status,
+        if (action_choice == cls.WITHDRAWAL):
+            debit_amount= int(0)
+
+        if (action_choice == cls.WITHDRAWAL):
+            team_staff = None
+
+        if (action_choice == cls.WITHDRAWAL):
+            position = ''
+
+        if (action_choice == cls.TRANSFER):
+            withdraw_amount= int(0)
+
+        if (action_choice == cls.TRANSFER):
+            narration= ''
+
+        action = cls.objects.create(account=account, manager=manager, team=team, gateway=gateway, action_choice=action_choice, transfer_status=transfer_status,
                                     debit_amount=debit_amount, withdraw_amount=withdraw_amount, team_staff=team_staff, position=position, narration=narration)
         return action

@@ -264,6 +264,7 @@ class Department(models.Model):
         return f'{self.name}'
 
 
+
 class Size(models.Model):
     size = models.CharField(_("Business Size"), max_length=100, help_text=_(
         "Business Size field is Required"), unique=True, blank=True)
@@ -493,6 +494,40 @@ class DepositControl(models.Model):
 
     def __str__(self):
         return self.preview
+
+        
+class Payday(models.Model):
+    ONE_DAY = "one_day"
+    TWO_DAYS = "two_days"
+    THREE_DAYS = "three_days"
+    FOUR_DAYS = "four_days"
+    FIVE_DAYS = "five_days"
+    SIX_DAYS = "six_days"
+    ONE_WEEK = "one_week"
+    TWO_WEEK = "two_weeks"
+    THREE_WEEK = "three_weeks"
+    ONE_MONTH = "one_month"
+    PAYDAY_DURATION = (
+        (ONE_DAY, _("01 Day")),
+        (TWO_DAYS, _("02 Days")),
+        (THREE_DAYS, _("03 Days")),
+        (FOUR_DAYS, _("04 Days")),
+        (FIVE_DAYS, _("05 Days")),
+        (SIX_DAYS, _("06 Days")),
+        (ONE_WEEK, _("01 Week")),
+        (TWO_WEEK, _("02 Weeks")),
+        (THREE_WEEK, _("03 Weeks")),
+        (ONE_MONTH, _("01 Month")),
+    )  
+    preview = models.CharField(_("Preview"), max_length=100, default = 'Payday Timelines that users should expect money', help_text=_('"01 Week" means 7 Days, "02 Weeks" means 14 Days, "03 Weeks" means 21 Days, "01 Month" means 28-30 Days'))
+    payday_converter = models.CharField(_("Duration"), max_length=20, choices=PAYDAY_DURATION, default = ONE_DAY)
+
+    class Meta:
+        verbose_name = 'Payday'
+        verbose_name_plural = 'Payday'
+
+    def __str__(self):
+        return f'{self.preview}'
 
 
 class Mailer(models.Model):

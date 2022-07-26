@@ -59,10 +59,17 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
 
 class FreelancerActionAdmin(admin.ModelAdmin):
     model = FreelancerAction    
-    list_display = ['account','team', 'manager', 'action_choice','team_staff','position', 'transfer_status', 'debit_amount', 'withdraw_amount']
-    list_display_links = None
+    list_display = ['account','team', 'manager', 'action_choice', 'debit_amount', 'withdraw_amount']
+    list_display_links = ['account']
     search_fields = ['team__title', 'position']
     list_filter = ['team']
+    readonly_fields = ['account','team', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
+
+    fieldsets = (
+        ('Background', {'fields': ('account','team', 'manager','action_choice','created_at', 'transfer_status',)}),
+        ('Other Transfer Info', {'fields': ('team_staff', 'debit_amount',)}),
+        ('Other Withdrawal Info', {'fields': ('gateway', 'withdraw_amount', 'narration',)}),
+    )    
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:

@@ -18,10 +18,10 @@ from django.utils import timezone
 
 @login_required
 def stripe_subscription_checkout_session(request):
-    data = json.loads(request.body)
-    team_id = data['team_id']
+    # data = json.loads(request.body)
+    # team_id = data['team_id']
     
-    team = Team.objects.filter(pk=team_id, created_by=request.user, status=Team.ACTIVE)
+    team = Team.objects.filter(pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
     if not team:
         error_message = messages.error(request, 'Bad request. Let the team owner subscribe')
         return HttpResponse({'error_message': error_message})
@@ -33,7 +33,7 @@ def stripe_subscription_checkout_session(request):
     price_id = stripe_obj.stripe_subscription_price_id()
     try:
         checkout_session = stripe.checkout.Session.create(
-            client_reference_id=team_id,
+            client_reference_id=request.user.freelancer.active_team_id,
             success_url='%s%s?session_id={CHECKOUT_SESSION_ID}' % (site_url, reverse('teams:package_success')),
             cancel_url='%s%s' % (site_url, reverse('teams:packages')),
             payment_method_types=['card'],

@@ -9,10 +9,10 @@
             <div class="row justify-content-md-center">
                 <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
                     <div class="wt-innerbannercontent">
-                    <div class="wt-title"><h2>Shareholder Rights</h2></div>
+                    <div class="wt-title"><h2>T & W Hub</h2></div>
                     <ol class="wt-breadcrumb">
                         <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-                        <li class="wt-active">Salaries </li>
+                        <li class="wt-active">Transfer or Withdrawal </li>
                     </ol>
                     </div>
                 </div>
@@ -22,17 +22,13 @@
     <div class="wt-proposalholder">
         <div class="row justify-content-md-center">
             <div class="wt-hireduserstatus">
-                <h4>Salary Structure for {{ team.title }} Staff</h4>
-                {% if team.created_by == request.user %}
-                <em>As a Project Manager, you have exclusive right to transfer fund to fellow team member.</em>
-                <div class="alert alert-warning" role="alert">
-                    <span style="color: red; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-                        Alert: Transaction limit for Transfer ({{base_currency}}{{min_transfer_amount}} - {{base_currency}}{{max_transfer_amount}})   
-                        and withdrawal  ({{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}}) only.   
-                        <a href=""> Read More</a>
-                    </span>
-                </div>
-                {% endif %}
+                <nav>
+                    <div class="nav nav-pills nav-justified">
+                        <a class="nav-item nav-link text-white btn btn-secondary mt-2"> &nbsp; &nbsp; Book Bal: {{base_currency}}&nbsp;{{request.user.fundtransferuser.pending_balance}}</a>
+                        <a class="nav-item nav-link text-white btn btn-primary mt-2">&nbsp; &nbsp; Team Bal: {{base_currency}}&nbsp;{{active_team.team_balance}}</a>
+                        <a class="nav-item nav-link text-white btn btn-success mt-2">&nbsp; &nbsp; Avail. Bal: {{base_currency}}&nbsp;{{request.user.fundtransferuser.available_balance}}</a>
+                    </div>
+                </nav>
             </div>											
         </div>
     </div>
@@ -46,29 +42,38 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <div class="text-center" role="alert">
-                                            <span style="color: green; font-weight: bold;"> 
-                                                <p>Account Balance: {{base_currency}}{{request.user.fundtransferuser.available_balance}}</p><br>
-                                            </span>
-                                        </div>
+                                        
+                                        <br>
+                                        <br>
                                         <nav>
                                             <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
                                                 <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">{% if future_release.transfer %} Transfer {%else %} Transfer Feature coming soon <i class="fas fa-spinner fa-spin"></i> {% endif %}</a>
                                                 <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Withdrawal</a>
                                             </div>
                                         </nav>
+                                        <br>
+                                        <br>
                                         
                                         <div class="tab-content" id="nav-tabContent">
                                             
                                             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                                                 {% if future_release.transfer %}
                                                 <div class="row">
+                                                    {% if active_team.package_status == 'default' or active_team.package.type == 'Basic' %}
+                                                    <div class="wt-updatall">
+                                                        <span>Upgrade Team to make transfer </span>
+                                                        <a href="{% url 'teams:packages' %}" class="wt-btn">
+                                                            <div class="btn btn-inline-danger text-white">Subscribe Now</div>
+                                                        </a>
+                                                    </div>
+                                                    {% else %}
                                                     <form method="post" action=".">  
                                                         
                                                         <span id="transfer-message" style="color:green; text-align:right;"></span>
                                                         <br>
+                                                        <br>
                                                         <h4> Transfer Withdrawal Right</h4>
-                                                        
+                                                        <br>
                                                         <div class="form-group">
                                                             {{transferform.team_staff.label}}
                                                             {{transferform.team_staff}}
@@ -101,8 +106,10 @@
                                                             <li><span><i class="fa fa-check"></i>#4: The remaining balance after each withdrawal must not fall below the minimum</span></li>
                                                             <li><span><i class="fa fa-check"></i>#5: Addition of your transfer must not result into exceeded balance of receiver. We will prompt you in that case</span></li>
                                                         </ul>
-                                                    </form>  
+                                                    </form>
+                                                    {% endif %} 
                                                 </div>
+
                                                 {% else %}
                                                 <div class="wt-dashboardboxcontent wt-offersidebar wt-dashboardbox-margin">
                                                     <figure><img src="{% static 'images/save-img-01.jpg'%}" alt="img description"></figure>
@@ -132,6 +139,11 @@
                                                         <h3> Make Withdrawal </h3>
                                                         
                                                         <div class="form-group">
+                                                            {{withdrawalform.gateway.label}}
+                                                            {{withdrawalform.gateway}}
+                                                        </div>
+
+                                                        <div class="form-group">
                                                             {{withdrawalform.withdraw_amount.label}}
                                                             {{withdrawalform.withdraw_amount}}
                                                         </div>
@@ -160,116 +172,8 @@
                         </div>
                     </div>								
             </section>
-
-            <section class="wt-haslayout wt-dbsectionspace">
-                <div class="row justify-content-md-center">				
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
-                        <div class="wt-dashboardbox">
-                            <div class="wt-dashboardboxcontent wt-rcvproposala">
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-                                    <h3>Action History</h3>
-                                    <div class="wt-freelancerholder wt-rcvproposalholder">												
-                                        <div class="wt-tabscontenttitle">
-                                            <div class="alert alert-warning" role="alert">
-                                                <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-                                                    Info: Any credit transfer or withdrawal will impact a debited to your account. 
-                                                </span>
-                                            </div>
-                                        </div>									 
-                                            <div class="table-responsive">
-                                            <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Sender/Receiver</th>
-                                                    <th>Action Type</th>
-                                                    <th>Position/Narration</th>
-                                                    <th>Transfered On</th>
-                                                    <th>Debited Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for manager_transfer in manager_transfers %}
-                                                <tr>
-                                                    <td>{{forloop.counter}} </td>
-                                                    <td>{% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.manager.get_full_name}} {% else %} {{manager_transfer.team_staff.get_full_name}}{% endif %}</td>
-                                                    <td>{{manager_transfer.get_action_choice_display}}</td>
-                                                    <td>{% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.narration|truncatechars:60}} {% else %} {{manager_transfer.get_position_display}}{% endif %}</td>
-                                                    <td>{{manager_transfer.created_at}}</td>
-                                                    <td>$ {% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.withdraw_amount}} {% else %} {{manager_transfer.debit_amount}}{% endif %}</td>
-                                                </tr> 
-                                            {% endfor %}					
-                                                </tbody>
-                                            </table>
-                                            {% if not manager_transfers %}
-                                            <p><strong>{% if request.user == active_team.created_by %} You have not created profit rights to your members.{% else %}You have not been alloted right to share in profit. Please contact your Team Manager.{% endif %}</strong></p>
-                                            {% endif %}											
-                                            </div> 
-                                        </div>
-                                    </div>								
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                {% endif %}
-
-                {% if team.created_by != request.user %}
-                <section class="wt-haslayout wt-dbsectionspace">
-                    <div class="row justify-content-md-center">				
-                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
-                            <div class="wt-dashboardbox">
-                                <div class="wt-dashboardboxcontent wt-rcvproposala">
-                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-                                        <h3>Transfer History</h3>
-                                        <div class="wt-freelancerholder wt-rcvproposalholder">												
-                                            <div class="wt-tabscontenttitle">
-                                                <div class="alert alert-warning" role="alert">
-                                                    <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-                                                        Info: Any credit transfer will be debited to your account. Ensure to withdraw within your balance 
-                                                    </span>
-                                                </div>
-                                            </div>									 
-                                                <div class="table-responsive">
-                                                <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Name</th>
-                                                        <th>Type</th>                                                
-                                                        <th>Worked As</th>
-                                                        <th>Received on </th>
-                                                        <th>Transfer($)</th>
-                                                        <th>Transfer Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for staff_transfer in staff_transfers %}
-                                                    <tr>
-                                                        <td>{{forloop.counter}} </td>
-                                                        <td>{{staff_transfer.team_staff.get_full_name}}</td>
-                                                        <td>{{staff_transfer.get_action_choice_display}}</td>
-                                                        <td>{{staff_transfer.get_position_display}}</td>
-                                                        <td>{{staff_transfer.created_at}}</td>
-                                                        <td>{{staff_transfer.debit_amount}}</td>
-                                                        <td>{{staff_transfer.get_transfer_status_display}}</td>
-                                                    </tr> 
-                                                {% endfor %}					
-                                                    </tbody>
-                                                </table>
-                                                {% if not staff_transfers %}
-                                                <p><strong>You have not received transfer from your team founder</strong></p>
-                                                {% endif %}											
-                                            </div> 
-                                        </div>
-                                    </div>								
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                {% endif %}
-
+            {% endif %}
+            
             <div class="wt-proposalholder">
                 <div class="row justify-content-md-center">
                     <div class="wt-sectionhead wt-textcenter">
@@ -344,8 +248,9 @@
 
         let amount = $('[name="withdraw_amount"]').val();
         let narration = $('[name="narration"]').val();
+        let gateway = $('[name="gateway"]').val();
 
-        if(amount =='' || narration == '')
+        if(amount =='' || narration == ''||gateway=='')
         {
             swal("Alert!", "All fields are required", "error");
             return false;
@@ -357,6 +262,7 @@
                 data: {
                     wamount: $('#id_withdraw_amount').val(),
                     narration: $('#id_narration').val(),
+                    gateway: $('#id_gateway').val(),
                     csrfmiddlewaretoken: "{{csrf_token}}",
                     action: 'make-withdrawal'
                 },

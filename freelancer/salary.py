@@ -2,7 +2,7 @@ from general_settings.models import PaymentAPI
 from django.shortcuts import get_object_or_404
 from proposals.models import Proposal
 from freelancer.models import Freelancer, FundTransfer
-from orders.models import Order, OrderItem
+
 
 
 class Algorithm():
