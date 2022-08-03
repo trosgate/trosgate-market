@@ -88,8 +88,7 @@ class CustomerAdmin(BaseUserAdmin,):
 
 class CountryAdmin(admin.ModelAdmin):
     model = Country
-    list_display = ['flag_tag', 'name',
-                    'country_code', 'ordering', 'supported']
+    list_display = ['flag_tag', 'name', 'country_code', 'ordering', 'supported']
     readonly_fields = ['flag_tag']
     list_display_links = ['flag_tag', 'name']
     list_editable = ['ordering', 'supported']

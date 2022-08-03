@@ -94,7 +94,7 @@ def client_listing(request):
 @user_is_client
 def deposit_fee_structure(request):
     client = get_object_or_404(Client, user=request.user, user__is_active=True)
-    gateways = PaymentGateway.objects.filter(status=True)
+    gateways = PaymentGateway.objects.filter(status=True).exclude(name='Account Balance')
     base_currency = get_base_currency_code()
     context = {
         'client': client,
@@ -199,7 +199,7 @@ def stripe_deposit(request):
                 'price_data': {
                     'currency': 'usd',
                     'product_data': {
-                        'name': 'Deposit for purchase of services',
+                        'name': narration,
                     },
                     'unit_amount': total_amount,
                 },

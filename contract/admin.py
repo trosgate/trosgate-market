@@ -40,7 +40,7 @@ class InternalContractAdmin(admin.ModelAdmin):
         ('Service Description #3', {'fields': ('line_three','line_three_quantity', 'line_three_unit_price', 'line_three_total_price',)}),
         ('Service Description #4', {'fields': ('line_four','line_four_quantity', 'line_four_unit_price', 'line_four_total_price',)}),
         ('Service Description #5', {'fields': ('line_five','line_five_quantity', 'line_five_unit_price', 'line_five_total_price',)}),
-        ('Notes/Description', {'fields': ('notes', 'date_created','last_updated', 'payment_gateway','grand_total',)}),
+        ('Notes/Description', {'fields': ('notes', 'date_created','last_updated','grand_total',)}),
        
     )    
     radio_fields = {'contract_duration': admin.HORIZONTAL}

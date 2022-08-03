@@ -45,7 +45,7 @@
                                             <th>Payee</th>
                                             <th>Account type</th>
                                             <th>Requested On</th>
-                                            <th>Payday</th>
+                                            <th>Payment Due</th>
                                             <th>Status</th>
                                             <th>Amount</th>
                                         </tr>
@@ -59,7 +59,7 @@
                                             <td>{{withdrawals.gateway}}</td>
                                             <td>{{withdrawals.created_at}}</td>
                                             <td>{{withdrawals.payday}}</td>
-                                            <td>{{withdrawals.get_status_choice_display}}</td>
+                                            <td {% if withdrawals.status_choice == 'pending' %} style='color:red;' {% elif withdrawals.status_choice == 'paid' %} style='color:green;' {% endif %}>{{withdrawals.get_status_choice_display}}</td>
                                             <td>{{withdrawals.amount}}</td>
                                         </tr> 
                                     {% endfor %}					

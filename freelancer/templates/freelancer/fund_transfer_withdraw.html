@@ -48,7 +48,7 @@
                                         <nav>
                                             <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
                                                 <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">{% if future_release.transfer %} Transfer {%else %} Transfer Feature coming soon <i class="fas fa-spinner fa-spin"></i> {% endif %}</a>
-                                                <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Withdrawal</a>
+                                                <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Withdraw</a>
                                             </div>
                                         </nav>
                                         <br>
@@ -212,7 +212,7 @@
         let displayMessage = document.getElementById('transfer-message');
         let displayError = document.getElementById('transfer-error');
 
-        if(staff =='' || position == ''|| amount ==''){
+        if(position == ''|| amount ==''){
             swal("Alert!", "All fields are required", "error");
             return false;
         }

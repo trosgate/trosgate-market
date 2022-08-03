@@ -79,8 +79,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_("Active Status"), default=False)
     is_staff = models.BooleanField(_("Staff Status"), default=False)
     is_admin = models.BooleanField(_("Admin Status"), default=False)
-    user_type = models.CharField(
-        _("User Type"), choices=USER_TYPE, max_length=30)
+    user_type = models.CharField(_("User Type"), choices=USER_TYPE, max_length=30)
 
     class Meta:
         ordering = ("-date_joined",)

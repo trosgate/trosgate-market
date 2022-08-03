@@ -12,8 +12,16 @@ from teams.utilities import create_random_code
 from account.models import Customer
 from account.fund_exception import FundException
 from teams.models import Team
-from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
-from payments.models import PaymentRequest
+from general_settings.fund_control import (
+    get_min_balance, get_max_receiver_balance, 
+    get_min_transfer, get_max_transfer, get_min_withdrawal, 
+    get_max_withdrawal, get_min_deposit, 
+    get_max_deposit, get_max_depositor_balance,
+)
+from payments.models import PaymentRequest, AdminCredit
+from general_settings.storage_backend import activate_storage_type, DynamicStorageField
+
+
 
 class ActiveFreelancer(models.Manager):
     def get_queryset(self):
@@ -21,6 +29,7 @@ class ActiveFreelancer(models.Manager):
 
 
 class Freelancer(models.Model):
+    STORAGE = activate_storage_type()
     MALE = 'male'
     FEMALE = 'female'
     GENDER = (
@@ -64,6 +73,7 @@ class Freelancer(models.Model):
     image_three = models.ImageField(_("Image 3"), upload_to='freelancer/awards/',default='freelancer/awards/banner.png', null=True, blank=True,)
     slug = models.SlugField(_("Slug"), max_length=30, null=True, blank=True,)
     active_team_id = models.PositiveIntegerField(_("Active Team ID"), default=0)
+    objects = models.Manager()
     active = ActiveFreelancer()
 
     class Meta:
@@ -125,26 +135,73 @@ class FreelancerAccount(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
  
+ 
+    @classmethod
+    def admin_credit(cls, account, user, amount, comment, created_at):
+        with transaction.atomic():
+            account = cls.objects.select_for_update().get(pk=account.id)
+            super_admin_user = Customer.objects.select_for_update().get(pk=user.id)
+            owner_active_team = Team.objects.select_for_update().filter(created_by=account.user, status=Team.ACTIVE).first()
+
+            if amount  == '':
+                raise FundException(_("Amount is required"))
+
+            if comment == '':
+                raise FundException(_('Error! comment is required'))
+
+            if len(comment) > 500:
+                raise FundException(_('Error! comment must be less or equal to 500 characters'))
+            
+            if super_admin_user.is_admin == False:
+                raise FundException(_("Only Admin User can add credit"))
+
+            if not (account.user in owner_active_team.members.all()):
+                raise FundException(_("Receiver is no longer a member of his Team. Add first as member"))
+
+            if int(account.available_balance) + int(amount) > int(get_max_depositor_balance()):
+                raise FundException(_(f'Adding {amount} will breach the company receiver max({get_max_depositor_balance()}) balance Policy. Please review'))
+            
+            if not (int(get_min_deposit()) <= int(amount) <= int(get_max_deposit())):
+                raise FundException(_(f'Adding {amount} will breach the company Min({get_min_deposit()}) and Max({get_max_deposit()}) deposit policy. Please review'))
+
+            if account.user != owner_active_team.created_by:
+                raise FundException(_('Receiver and his Team are not same, so cannot receive credit'))
+
+            account.available_balance += int(amount)
+            account.save(update_fields=['available_balance'])
+
+            owner_active_team.team_balance += int(amount)
+            owner_active_team.save(update_fields=['team_balance'])
+
+            admin_action = AdminCredit.create(
+                sender=super_admin_user,
+                receiver=account.user,
+                team=owner_active_team,
+                comment=comment,
+                amount=amount,
+                created_at = created_at
+            )
+        return account, super_admin_user, owner_active_team, admin_action
+
 
     @classmethod
     def transfer(cls, team_owner, team_staff, team, action_choice, transfer_status, debit_amount, position, gateway=None):
-
         with transaction.atomic():
             team_manager = cls.objects.select_for_update().get(user=team_owner)
             team_member_staff = cls.objects.select_for_update().get(user=team_staff)
             owner_active_team = Team.objects.select_for_update().get(pk=team.id)
             staff_team = Team.objects.select_for_update().filter(created_by=team_staff).first()
 
-            if not team_staff:
+            if team_staff is None:
                 raise FundException(_("Staff is required"))
                 
-            if not debit_amount:
+            if debit_amount  == '':
                 raise FundException(_("Amount is required"))
 
-            if not position:
+            if position  == '':
                 raise FundException(_("Position is required"))
 
-            if not team_owner:
+            if team_owner == '':
                 raise FundException(_('You must be team Owner to transfer'))
 
             if not (int(get_min_transfer()) <= int(debit_amount) <= int(get_max_transfer())):
@@ -187,16 +244,20 @@ class FreelancerAccount(models.Model):
 
         return account_action
 
+
     @classmethod
     def withdrawal(cls, team_owner, team, team_staff, gateway, transfer_status, action_choice, withdraw_amount, narration):
         with transaction.atomic():
             freelancer_account = cls.objects.select_for_update().get(user=team_owner)
             owner_active_team = Team.objects.select_for_update().get(pk=team.id)
 
-            if not narration:
+            if narration == '':
                 raise FundException(_("narration is required"))
 
-            if not withdraw_amount:
+            if len(narration) > 100:
+                raise FundException(_("narration exceeds max characters"))
+
+            if withdraw_amount is None:
                 raise FundException(_("Withdraw amount is required"))
 
             if gateway is None:

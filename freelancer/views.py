@@ -213,7 +213,7 @@ def transfer_debit(request):
     mes = ''
     if request.POST.get('action') == 'make-transfer' and get_transfer_feature():
         team_staff_id = int(request.POST.get('teamstafftype'))
-        position = str(request.POST.get('position'))
+        position = str(request.POST.get('position', ''))
         debit_amount = int(request.POST.get('tamount'))
         staff = Customer.objects.get(id=team_staff_id)
 

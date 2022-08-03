@@ -116,7 +116,7 @@ def contract_fee_selection(request):
     if request.POST.get('action') == 'capture-contract':
         contract_id = int(request.POST.get('contractid'))
         gateway_type = int(request.POST.get('gatewaytype'))
-        contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status =InternalContract.PENDING, created_by=request.user)
+        contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=InternalContract.ACCEPTED, status =InternalContract.PENDING, created_by=request.user)
 
         chosen_contract.capture(contract=contract)
 
@@ -125,7 +125,7 @@ def contract_fee_selection(request):
             session.modified = True
 
         discount = chosen_contract.get_discount_value(contract)
-        print(discount)
+        
         gateway = PaymentGateway.objects.get(id=gateway_type)
 
         if "contractgateway" not in request.session:

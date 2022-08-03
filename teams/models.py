@@ -17,6 +17,10 @@ from uuid import uuid4
 from account.fund_exception import InvitationException
 import secrets
 from account.models import Customer
+from account.fund_exception import FundException
+from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
+# from freelancer.models import FreelancerAccount
+
 
 def code_generator():
         generated_code = secrets.token_urlsafe(6)[:6]
@@ -273,7 +277,7 @@ class Invitation(models.Model):
         if team.created_by != sender:
             raise InvitationException(_("This action requires upgraded team founder"))
 
-        external_invite = cls.objects.create(team=team, sender=sender, type=type, email=email)
+        external_invite = cls.objects.create(team=team, sender=sender, email=email, type=type)
         return external_invite
 
 

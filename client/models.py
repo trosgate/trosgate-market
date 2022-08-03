@@ -9,9 +9,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
 from account.fund_exception import FundException
 from general_settings.fund_control import get_max_deposit, get_min_deposit, get_max_depositor_balance, get_min_depositor_balance
+from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 
 
 class Client(models.Model):
+    STORAGE = activate_storage_type()
     MALE = 'male'
     FEMALE = 'female'
     GENDER = (
@@ -90,6 +92,7 @@ class ClientAccount(models.Model):
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
+
 
     @classmethod
     def level_one_deposit_check(cls, user, deposit_amount, narration, reference, deposit_fee):

@@ -5,12 +5,38 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from account.models import Customer
 from general_settings.backends import get_from_email
-
+from general_settings.models import WebsiteSetting
 
 #
 # Utility function for sending envites to team
 
+
+def website():
+    try:
+        return WebsiteSetting.objects.get(id=1)
+    except:
+         return None
+
+def send_credit_to_team(account, team):
+    # Blueprint for sending mail to receiver of new credit given by admin
+    from_email = get_from_email()
+    acceptation_url = settings.WEBSITE_URL
+    subject = 'You have received a Credit'
+    text_content = f'Invitation to {team.title}.'
+    html_content = render_to_string('notification/new_credit_email.html', {
+        'account': account,
+        'mywebsite': website(),
+        'team': team,
+        'acceptation_url': acceptation_url,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [account.user.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
 def send_new_test_mail(to_email):
+    # Blueprint for sending test mail
     from_email = get_from_email()
     subject = 'This is a test Email'
     message = 'This is a test Email to confirm that my email setup is fine'
@@ -20,7 +46,6 @@ def send_new_test_mail(to_email):
     send_mail(subject, message, from_email, recipient_list)
 
 __all__ = ['send_new_test_mail']
-
 
 
 def send_new_team_email(to_email, team):

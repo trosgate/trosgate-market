@@ -1,12 +1,10 @@
-from django.core.exceptions import ValidationError
 from .models import Contractor, Contract, InternalContract
 from teams.models import Team
 from django.utils.translation import gettext_lazy as _
 from django import forms
 from proposals.models import Proposal
-from freelancer.models import Freelancer
 
-from account.models import Customer
+
 # a class to output datepicker on template
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -36,7 +34,7 @@ class InternalContractForm(forms.ModelForm):
 
     def __init__(self, team, *args, **kwargs):
         super(InternalContractForm, self).__init__(*args, **kwargs)        
-        self.fields['proposal'].queryset = Proposal.objects.filter(team=team, status = Proposal.ACTIVE)
+        self.fields['proposal'].queryset = Proposal.active.filter(team=team)
        
         # 'Basic Info'
         self.fields['proposal'].widget.attrs.update(

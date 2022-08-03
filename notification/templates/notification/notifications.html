@@ -29,16 +29,7 @@
                         <div class="wt-proposalsr wt-box-shadow">
                             <div class="wt-proposalsrcontent">
                                 <figure><img src="{% static 'images/thumbnail/img-19.png'%}" alt="image"></figure>
-                            {% comment %} {% if notification.notification_type == 'message' %}
-                            <div class="wt-title">
-                                <h3>Direct Hire</h3>
-                                <a href="{% url 'notification:notifications' %}?goto=application_detail&notification={{ notification.id }}&extra_id={{ notification.extra_id }}"> 
-                                    <span>Hire directly from proposals</span>
-                                </a>
-                                <strong>{{ notification.sender.short_name }}</strong> sent you a message<br>
-                                <small>{{ notification.created_at|timesince }} ago</small>
-                            </div>
-                            </div>  {% endcomment %}
+                            
                             {% if notification.notification_type == 'application' %}
                             <div class="wt-title">
                                 <h3>Direct Hire</h3>

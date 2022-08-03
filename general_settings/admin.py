@@ -3,12 +3,37 @@ from django.contrib import admin
 from . models import (
     Category, Department, Skill, Size, CommunicationLanguage, ProposalGuides,
     WebsiteSetting, PaymentGateway, PaymentAPIs, Payday, AutoLogoutSystem, DiscountSystem,
-    EmailConfig, TestEmail, SubscriptionGateway, HiringFee, Currency, ExachangeRateAPI,
+    TestEmail, SubscriptionGateway, HiringFee, Currency, StorageBuckets, ExachangeRateAPI,
     PaymentsControl, Mailer, DepositControl
 )
 
 MAX_OBJECTS = 1
 MAX_GATEWAYS = 4
+
+
+class StorageBucketsAdmin(admin.ModelAdmin):
+    model = StorageBuckets
+    list_display = ['description', 'storage_type',]
+    exclude = ['description']
+    radio_fields = {'storage_type': admin.HORIZONTAL}
+    fieldsets = (
+        ('Storage Type', {'fields': ('storage_type',)}),
+        ('Extra Amazon S3 Bucket Settings', {'fields': ('bucket_name','access_key','secret_key',)}),
+    )
+    
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_OBJECTS:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions        
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -416,6 +441,7 @@ admin.site.register(PaymentsControl, PaymentControlAdmin)
 admin.site.register(Department)
 admin.site.register(Size)
 admin.site.register(Skill)
+admin.site.register(StorageBuckets, StorageBucketsAdmin)
 admin.site.register(Payday, PaydayAdmin)
 admin.site.register(TestEmail, TestEmailAdmin)
 admin.site.register(Mailer, MailerAdmin)

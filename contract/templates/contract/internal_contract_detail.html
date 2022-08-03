@@ -161,7 +161,7 @@
                             {% endif %}	
                             {% endif %}	
                             {% if request.user == contract.created_by %}
-                            {% if contract.team_reaction == True %}
+                            {% if contract.team_reaction == accepted %}
                             {% if contract.status == 'unpaid' %}
                             </div>
                                 </div>
@@ -177,7 +177,7 @@
                             {% endif %}
                             {% endif %}
                             {% if request.user == contract.created_by %}
-                            {% if not contract.team_reaction == True %}
+                            {% if not contract.team_reaction == accepted %}
                                 <div class="row justify-content-md-center">
                                     <div class="col-xs-12">
                                         <div class="alert alert-info" role="alert">

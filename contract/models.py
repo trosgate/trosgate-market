@@ -24,7 +24,6 @@ from proposals.utilities import (
 )
 
 
-
 class InternalContract(models.Model):
     """
     This is the Internal contract Model
@@ -69,18 +68,26 @@ class InternalContract(models.Model):
     STATUS = (
         (PENDING, _('Unpaid')),
         (PAID, _('Paid')),
+    )  
+    #states 
+    AWAITING = 'awaiting'
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+    STATE = (
+        (AWAITING, _('Awaiting')),
+        (ACCEPTED, _('Accepted')),
+        (REJECTED, _('Rejected')),
     )   
   
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="internalcontractteam", on_delete=models.CASCADE)
     proposal = models.ForeignKey('proposals.Proposal', verbose_name=_("Proposal"), related_name="internalcontractproposal", on_delete=models.CASCADE)
-    payment_gateway = models.ForeignKey('general_settings.PaymentGateway', verbose_name=_("Payment Type"), related_name="internalcontractgateway", null=True, blank=True, on_delete=models.SET_NULL)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), null=True, blank=True, related_name="internalcontractauthor", on_delete=models.SET_NULL)
     date_created = models.DateTimeField(_('Created On'),blank=True, null=True, default=timezone.now)
     last_updated = models.DateTimeField(blank=True, null=True, default=timezone.now)
     contract_duration = models.CharField(_('Duration'), choices=CONTRACT_DURATION, default=ONE_DAY, max_length=20)
     duration = models.DateTimeField(_("Completion In"), blank=True, help_text=_("deadline for contract"))
-    status = models.CharField(_('Status'), choices=STATUS, default=PENDING, max_length=100)
-    team_reaction = models.BooleanField(_("Reaction"), choices = ((False,'Rejected'), (True, 'Accepted')), null=True, blank=True)
+    status = models.CharField(_('Status'), choices=STATUS, default=PENDING, max_length=30)
+    team_reaction = models.CharField(_('State'), choices=STATE, default=AWAITING, max_length=30)
     notes = models.TextField(null=True, blank=True, max_length=500)
 
     reference = models.CharField(_('Reference'), unique=True, null=True, blank=True, max_length=100)

@@ -1,0 +1,10 @@
+[
+    {
+        "model": "general_settings.storagebuckets",
+        "pk": 1,
+        "fields": {
+            "description": "Local Storage and Amazon S3 Configuration",
+            "storage_type": true
+        }
+    }
+]

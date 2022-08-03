@@ -77,47 +77,41 @@ class WebsiteSetting(models.Model):
             return self.site_name
 
 
-class EmailConfig(models.Model):
-    TLS = "tls"
-    SSL = "ssl"
-    CERTIFICATE = (
-        (TLS, _("TLS")),
-        (SSL, _("SSL")),
-    )
-    YES = "Yes"
-    NO = "No"
-    FAIL_SILENTLY = (
-        (YES, _("Yes")),
-        (NO, _("No")),
-    )
-   # Email API
-    email_hosting_server = encrypt(models.CharField(_("Email Hosting Server"), max_length=255,
-                                   default="smtp.gmail.com", help_text=_("E.x: smtp.gmail.com"), null=True, blank=True))
-    email_hosting_server_password = encrypt(models.CharField(
-        _("Email Hosting Password"), max_length=255, default='ngnrfcsozfrxbgfx', null=True, blank=True))
-    email_hosting_server_port = encrypt(models.CharField(_("Email Hosting Port"), max_length=10, default=587, help_text=_(
-        'Usually 587 but confirm from your hosting company'), null=True, blank=True))
-    email_hosting_certificate = encrypt(models.CharField(_("Email Hosting Certificate"), max_length=255, choices=CERTIFICATE, default=TLS, help_text=_(
-        'If your hosting support both, then we highly recommend the use of TLS')))
-    email_hosting_server_email = encrypt(models.CharField(
-        _("Site Email"), max_length=100, default='example@gmail.com', null=True, blank=True))
-    email_fail_silently = encrypt(models.CharField(_("Email Fail Silently"),  max_length=10,
-                                  default=YES, choices=FAIL_SILENTLY, help_text=_('ds dsfds'), null=True, blank=True))
-
-    # Twilio SMS API
-    twilio_account_sid = encrypt(models.CharField(
-        _("Twilio Account SID"), max_length=255, null=True, blank=True, default='Dvtksh883c9c3e9d9913a715557dddff99'))
-    twilio_auth_token = encrypt(models.CharField(_("Twilio Account Auth Token"),
-                                max_length=255, null=True, blank=True, default='abd4d45dd57dd79gldjrb1df2e2a6cd5'))
-    twilio_phone_number = encrypt(models.CharField(
-        _("Twilio Sending Phone Number"), max_length=255, null=True, blank=True, default='+18001110005'))
-
-    def __str__(self):
-        return f'Email: {self.email_hosting_server_email}'
+class StorageBuckets(models.Model):
+    description = models.CharField(_("Storages"), max_length=100, default='Local Storage and Amazon S3 Configuration',)
+    bucket_name = encrypt(models.CharField(_("Bucket Name"), max_length=100, null=True, blank=True,))
+    access_key = encrypt(models.CharField(_("S3 Access Key"), max_length=100, null=True, blank=True,))
+    secret_key = encrypt(models.CharField(_("S3 Secret Key"), max_length=100, null=True, blank=True,))
+    storage_type = models.BooleanField(_("Storage Type"), choices=((True, 'Local Storage'), (False, 'Amazon S3 Bucket')), default=True)
 
     class Meta:
-        verbose_name = 'Email Settings'
-        verbose_name_plural = 'Email Settings'
+        verbose_name = 'File and Image Storage'
+        verbose_name_plural = 'File and Image Storage'
+
+    def __str__(self):
+        return str(self.description)
+
+    def clean(self):       
+        if  self.storage_type == False and not (self.bucket_name is not None and self.access_key is not None and self.secret_key is not None):
+            raise ValidationError(_("All extra Amazon S3 setting fields below are required to activate S3 Bucket."))
+
+
+# class EmailConfig(models.Model):
+
+#     # Twilio SMS API
+#     twilio_account_sid = encrypt(models.CharField(
+#         _("Twilio Account SID"), max_length=255, null=True, blank=True, default='Dvtksh883c9c3e9d9913a715557dddff99'))
+#     twilio_auth_token = encrypt(models.CharField(_("Twilio Account Auth Token"),
+#                                 max_length=255, null=True, blank=True, default='abd4d45dd57dd79gldjrb1df2e2a6cd5'))
+#     twilio_phone_number = encrypt(models.CharField(
+#         _("Twilio Sending Phone Number"), max_length=255, null=True, blank=True, default='+18001110005'))
+
+#     def __str__(self):
+#         return f'Email: {self.email_hosting_server_email}'
+
+#     class Meta:
+#         verbose_name = 'Email Settings'
+#         verbose_name_plural = 'Email Settings'
 
 
 class TestEmail(models.Model):
@@ -438,9 +432,17 @@ class CurrencyConverter(models.Model):
 
 class ExachangeRateAPI(models.Model):
     preview = models.CharField(
-        _("Preamble"), max_length=100, default="Exchange rate API", blank=True, null=True)
-    exchange_rates_api_key = encrypt(models.CharField(_("API Key"), max_length=255, help_text=_(
-        'grab your key from https://exchangerate-api.com/'), blank=True, null=True))
+        _("Preamble"), 
+        max_length=100, 
+        default="Exchange rate API", 
+        blank=True, 
+        null=True)
+    exchange_rates_api_key = encrypt(models.CharField(
+        _("API Key"), 
+        max_length=255, 
+        help_text=_('grab your key from https://exchangerate-api.com/'), 
+        blank=True, 
+        null=True))
 
     class Meta:
         verbose_name = _("Exchange Rates API")
@@ -477,15 +479,29 @@ class PaymentsControl(models.Model):
 
 class DepositControl(models.Model):
     preview = models.CharField(
-        _("Deposit Settings"), max_length=50, default="All about Deposit configuration")
-    min_balance = models.PositiveIntegerField(_("Minimum Balance"), default=0, help_text=_(
-        "User with this minimum balance qualifies to make deposit (restricted to base Zero currency point"), validators=[MinValueValidator(0)])
-    max_balance = models.PositiveIntegerField(_("Maximum Balance"), default=2000, help_text=_(
-        "User with this Maximum balance has reached the max limit for further deposit(restricted to 500000 currency points)"), validators=[MaxValueValidator(50000)])
-    min_deposit = models.PositiveIntegerField(_("Minimum Deposit Amount"), default=20, help_text=_(
-        "Minimum mount client can deposit - (restricted to 20 minimum currency points)"), validators=[MinValueValidator(20)])
-    max_deposit = models.PositiveIntegerField(_("Maximum Deposit Amount"), default=500, help_text=_(
-        "Maximum amount client can deposit"), validators=[MaxValueValidator(50000)])
+        _("Deposit Settings"), 
+        max_length=50, 
+        default="All about Deposit configuration")
+    min_balance = models.PositiveIntegerField(
+        _("Minimum Balance"), 
+        default=0, 
+        help_text=_("User with this minimum balance qualifies to make deposit (restricted to base Zero currency point"), 
+        validators=[MinValueValidator(0)])
+    max_balance = models.PositiveIntegerField(
+        _("Maximum Balance"), 
+        default=2000, 
+        help_text=_("User with this Maximum balance has reached the max limit for further deposit(restricted to 50000 currency points)"), 
+        validators=[MaxValueValidator(50000)])
+    min_deposit = models.PositiveIntegerField(
+        _("Minimum Deposit Amount"), 
+        default=20, 
+        help_text=_("Minimum mount client can deposit - (restricted to 20 minimum currency points)"), 
+        validators=[MinValueValidator(20)])
+    max_deposit = models.PositiveIntegerField(
+        _("Maximum Deposit Amount"), 
+        default=500, 
+        help_text=_("Maximum amount client can deposit"), 
+        validators=[MaxValueValidator(50000)])
 
     class Meta:
 
@@ -523,8 +539,8 @@ class Payday(models.Model):
     payday_converter = models.CharField(_("Duration"), max_length=20, choices=PAYDAY_DURATION, default = ONE_DAY)
 
     class Meta:
-        verbose_name = 'Payday'
-        verbose_name_plural = 'Payday'
+        verbose_name = 'Payday Setting'
+        verbose_name_plural = 'Payday Setting'
 
     def __str__(self):
         return f'{self.preview}'
@@ -532,24 +548,61 @@ class Payday(models.Model):
 
 class Mailer(models.Model):
    # Email API
-    email_hosting_server = encrypt(models.CharField(_("Email Hosting Server"), max_length=255,
-                                   default="smtp.gmail.com", help_text=_("E.x: smtp.gmail.com"), null=True, blank=True))
+    email_hosting_server = encrypt(models.CharField(
+        _("Email Hosting Server"), 
+        max_length=255,
+        default="smtp.gmail.com", 
+        help_text=_("E.x: smtp.gmail.com"), 
+        null=True, 
+        blank=True))
     email_hosting_server_password = encrypt(models.CharField(
-        _("Email Server Password"), max_length=255, default='ngnrfcsozfrxbgfx', null=True, blank=True))
-    email_hosting_username = encrypt(models.CharField(_("Email Server Username"), max_length=255, help_text=_(
-        'This is the email hosting username created'), null=True, blank=True))
-    from_email = encrypt(models.CharField(_("From Email"), max_length=255, help_text=_(
-        'This email will be the site-wide sender email'), null=True, blank=True))
-    email_use_tls = encrypt(models.BooleanField(_("Use TLS"), choices=((False, 'No'), (True, 'Yes')), default=True, help_text=_(
-        'If your hosting support both SSL and TLS, we recommend the use of TLS'), null=True, blank=True))
-    email_use_ssl = encrypt(models.BooleanField(_("Use SSL"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_(
-        'If SSL is set to "Yes", TLS should be "No", and vise-versa'), null=True, blank=True))
-    email_fail_silently = encrypt(models.BooleanField(_("Email Fail Silently"), choices=((False, 'Show Error'), (True, 'Hide Error')), default=True, help_text=_(
-        'if you want users to see errors with your misconfiguration, set to "Show Error". We recommend that you Hide Error'), null=True, blank=True))
-    email_hosting_server_port = models.PositiveSmallIntegerField(_("Email Server Port"), default=587, help_text=_(
-        'Usually 587 but confirm from your hosting company'), null=True, blank=True)
-    email_timeout = models.PositiveSmallIntegerField(_("Email Timeout"), default=60, help_text=_(
-        'the timeout time for email'), null=True, blank=True)
+        _("Email Server Password"), 
+        max_length=255, 
+        default='ngnrfcsozfrxbgfx', null=True, blank=True))
+    email_hosting_username = encrypt(models.CharField(
+        _("Email Server Username"), 
+        max_length=255, 
+        help_text=_('This is the email hosting username created'), 
+        null=True, 
+        blank=True))
+    from_email = encrypt(models.CharField(
+        _("From Email"), 
+        max_length=255, help_text=_('This email will be the site-wide sender email'), 
+        null=True, 
+        blank=True))
+    email_use_tls = encrypt(models.BooleanField(
+        _("Use TLS"), 
+        choices=((False, 'No'), (True, 'Yes')), 
+        default=True, 
+        help_text=_('If your hosting support both SSL and TLS, we recommend the use of TLS'), 
+        null=True, 
+        blank=True))
+    email_use_ssl = encrypt(models.BooleanField(
+        _("Use SSL"), 
+        choices=((False, 'No'), (True, 'Yes')), 
+        default=False, 
+        help_text=_('If SSL is set to "Yes", TLS should be "No", and vise-versa'), 
+        null=True, 
+        blank=True))
+    email_fail_silently = encrypt(models.BooleanField(
+        _("Email Fail Silently"), 
+        choices=((False, 'Show Error'), (True, 'Hide Error')), 
+        default=True, 
+        help_text=_('if you want users to see errors with your misconfiguration, set to "Show Error". We recommend that you Hide Error'), 
+        null=True, 
+        blank=True))
+    email_hosting_server_port = models.PositiveSmallIntegerField(
+        _("Email Server Port"), 
+        default=587, 
+        help_text=_('Usually 587 but confirm from your hosting company'), 
+        null=True, 
+        blank=True)
+    email_timeout = models.PositiveSmallIntegerField(
+        _("Email Timeout"), 
+        default=60, 
+        help_text=_('the timeout time for email'), 
+        null=True,
+        blank=True)
 
     def __str__(self):
         return f'{self.from_email}'

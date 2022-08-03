@@ -1,0 +1,139 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+		<main class="wt-main wt-haslayout">
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Payment Modes</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Modes </li>
+							</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-hireduserstatus">
+						<h4>Invitation to "{{ teams.title }}"</h4>
+						<em>There are two options available to invite users. (1) Internal Users & (2) External Freelancers</em>
+					</div>											
+				</div>
+			</div>
+
+			<section class="wt-haslayout wt-dbsectionspace">
+				<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+									<div class="wt-freelancerholder wt-rcvproposalholder">												
+										<div class="wt-sectiontitle">
+											<span>Payment Modes</span>
+										</div>
+										<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
+
+										<form method="POST", autocomplete='off'> {% csrf_token %}
+											<div class="form-group ">
+												{{paymentForm.paypal.label}}
+												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
+												{{paymentForm.paypal}}<br>
+												{{paymentForm.paypal.help_text}}
+												</div> 
+											<div class="form-group ">
+												{{paymentForm.stripe.label}}
+												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
+												{{paymentForm.stripe}}<br>
+												{{paymentForm.stripe.help_text}}
+												</div> 
+											<div class="form-group ">
+												{{paymentForm.flutterwave.label}}
+												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
+												{{paymentForm.flutterwave}}<br>
+												{{paymentForm.flutterwave.help_text}}
+												</div> 
+											<div class="form-group ">
+												{{paymentForm.razorpay.label}}
+												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
+												{{paymentForm.razorpay}}<br>
+												{{paymentForm.razorpay.help_text}}
+												</div> 
+											
+											<div class="form-group wt-btnarea">
+												<button id="updatePaymentAccount" type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Save Changes </button>
+											</div>											
+										</form> 
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Information!</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: These accounts are only accessible to you and our account department in charge of payments</span></li>
+											<li><span><i class="fa fa-check"></i>#2: No staff of {{website.site_name|capfirst}} will ever contact you for any account info</span></li>
+											<li><span><i class="fa fa-check"></i>#3: You are not obliged to provide all account. Give what you wish to receive to</span></li>
+										</ul>											                  														
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{website.site_name}}</span>
+					</div>
+				</div>
+			</div>
+
+		</main>
+		<!--Main End-->	
+				
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+	//UPDATE PAYMENT ACCOUNT             
+	$(document).on('click', '#updatePaymentAccount', function (e) {
+	e.preventDefault();
+
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'payments:update_payment_account' %}",
+			data: {
+				paypalAccount: $('#id_paypal').val(),
+				stripeAccount: $('#id_stripe').val(),
+				flutterwaveAccount: $('#id_flutterwave').val(),
+				razorpayAccount: $('#id_razorpay').val(),
+				csrfmiddlewaretoken: "{{csrf_token}}",
+				action: 'payment-account'
+			},
+			success: function (json) {
+				console.log(json)
+				if (json.message){
+					document.getElementById('paymentAccount-message').innerHTML = json.result
+					$('#paymentAccount-message').addClass('alert alert-success');
+					
+				}
+				else if (json.errors){
+					document.getElementById('paymentAccount-message').innerHTML = json.errors
+					$('#paymentAccount-message').addClass('alert alert-danger');
+				} 
+				
+			},
+			error: function (error) {}            
+		});
+	});
+</script>
+
+{% endblock scripts %}

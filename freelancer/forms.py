@@ -1,15 +1,16 @@
 from django.core.exceptions import ValidationError
-from .models import Freelancer, FreelancerAction
+from .models import Freelancer, FreelancerAction, FreelancerAccount
 from general_settings.models import Department, Size
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.forms import ModelForm
 from django import forms
 from datetime import datetime
 from account.models import Customer
-from django.conf import settings
-
-# a class to output datepicker on template
-
+from account.fund_exception import FundException
+from notification.mailer import send_credit_to_team
+from general_settings.fund_control import get_min_deposit, get_max_deposit
+from teams.models import Team
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -23,8 +24,7 @@ class FreelancerForm(forms.ModelForm):
     profile_photo = forms.ImageField(widget=forms.FileInput,)
     banner_photo = forms.ImageField(widget=forms.FileInput,)
     department = forms.ModelChoiceField(queryset=Department.objects.all(), widget=forms.RadioSelect)
-    business_size = forms.ModelChoiceField(
-        queryset=Size.objects.all(), widget=forms.RadioSelect)
+    business_size = forms.ModelChoiceField(queryset=Size.objects.all(), widget=forms.RadioSelect)
     image_one = forms.ImageField(widget=forms.FileInput, required=False)
     image_two = forms.ImageField(widget=forms.FileInput, required=False)
     image_three = forms.ImageField(widget=forms.FileInput, required=False)
@@ -108,7 +108,7 @@ class FreelancerForm(forms.ModelForm):
 
 class FundTransferForm(forms.ModelForm):
 
-    team_staff = forms.ModelChoiceField(queryset=FreelancerAction.objects.all(), empty_label='Select Receiver')
+    team_staff = forms.ModelChoiceField(queryset=Freelancer.active.all(), empty_label='Select Receiver')
 
     class Meta:
         model = FreelancerAction
@@ -151,3 +151,175 @@ class WithdrawalForm(forms.ModelForm):
         
         for field in self.Meta.required:
             self.fields[field].required = True
+
+
+class BaseAccountForm(forms.Form):
+    comment = forms.CharField(required=False, widget=forms.Textarea,)
+    send_email = forms.BooleanField(required=False,)
+
+    def form_action(self, account, user):
+        
+        if account == '':
+            raise FundException(_("Bad request. Try again later"))
+
+        if user == '':
+            raise FundException(_("Bad request. Try again later"))
+
+    def save(self, account, user):
+        try:
+            action = self.form_action(account, user)
+        except Exception as e:
+            error_message = str(e)
+            self.add_error(None, error_message)           
+            raise
+        
+        active_team = ''
+        if self.cleaned_data.get('send_email', False):
+            team = Team.objects.filter(created_by=account.user, status=Team.ACTIVE)
+            if len(team) > 0:
+                active_team = team.first()
+            try:
+                send_credit_to_team(account, active_team)
+            except Exception as e:
+                error_message = str(e)
+                print(error_message)
+
+        return account, action
+
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+class AdminCreditForm(BaseAccountForm):
+    amount = forms.IntegerField(
+        min_value=get_min_deposit(), 
+        max_value=get_max_deposit(),
+        required=True,
+        help_text = 'How much to give out as credit'
+    )
+    field_order = ('amount', 'comment', 'send_email',)
+
+    def form_action(self, account, user):
+        return FreelancerAccount.admin_credit(
+            account=account,
+            user=user,
+            amount = self.cleaned_data['amount'],
+            comment = self.cleaned_data['comment'],
+            created_at = timezone.now()
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

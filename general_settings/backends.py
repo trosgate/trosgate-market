@@ -30,13 +30,13 @@ def get_email_use_tls_certificate():
     try:
         return Mailer.objects.get(id=1).email_use_tls 
     except:
-        return None
+        return False
 
 def get_email_use_ssl_certificate():
     try:
         return Mailer.objects.get(id=1).email_use_ssl 
     except:
-        return None
+        return False
 
 def get_from_email():
     try:
@@ -48,7 +48,7 @@ def get_email_fail_silently():
     try:
         return Mailer.objects.get(id=1).email_fail_silently 
     except:
-        return None
+        return True
 
 def get_email_timeout():
     try:
@@ -79,29 +79,6 @@ class MailerBackend(EmailBackend):
 
 __all__ = ['MailerBackend']
 
-
-
-
-# from django.core import mail
-# from general_settings.utilities import (
-#     get_email_hosting_server,
-#     get_email_hosting_server_password,
-#     get_email_hosting_server_port,
-#     get_email_use_tls_certificate,
-#     get_email_use_ssl_certificate,
-#     get_email_hosting_server_email,
-#     get_email_fail_silently
-# )
-
-# connection = mail.get_connection(
-#     email_hosting_server= get_email_hosting_server(), 
-#     email_hosting_server_password= get_email_hosting_server_password(), 
-#     email_hosting_server_port= get_email_hosting_server_port(),
-#     email_use_tls= get_email_use_tls_certificate(),
-#     email_use_ssl= get_email_use_ssl_certificate(),
-#     email_hosting_server_email= get_email_hosting_server_email(),
-#     email_fail_silently= get_email_fail_silently(),
-# )
 
 
 
