@@ -4,6 +4,10 @@ from django.utils.translation import gettext_lazy as _
 from .payday import get_payday_deadline
 from django_cryptography.fields import encrypt
 from account.fund_exception import FundException
+from notification.mailer import send_marked_paid_in_bulk_email, send_withdrawal_marked_failed_email
+from account.models import Customer
+from teams.models import Team
+
 
 
 class PaymentAccount(models.Model):
@@ -46,21 +50,16 @@ class PaymentAccount(models.Model):
 
 
 class PaymentRequest(models.Model):
-    # Status Choices
-    PENDING = 'pending'
-    PAID = 'paid'
-    STATUS_CHOICES = (
-        (PENDING, _("Pending")),
-        (PAID, _("Paid")),
-    )    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='paymentrequest', on_delete=models.PROTECT,)
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='paymentrequesterteam', on_delete=models.PROTECT)
     amount = models.PositiveIntegerField(_("Amount"), default=0,)
-    status_choice = models.CharField(_("Action Type"), max_length=50, choices=STATUS_CHOICES, default=PENDING)
+    status = models.BooleanField(_("Action Type"), choices=((False, 'Pending'), (True, 'Paid')), default=False)
     gateway = models.CharField(_("Payment Account"), max_length=50)
-    payday = models.DateTimeField(_("PayDay By"), null=True, blank=True)
-    created_at = models.DateTimeField(_("Started On"), auto_now_add=True,)
+    message = models.TextField(_("Payment Error Message"), max_length=500, null=True, blank=True)
+    payday = models.DateTimeField(_("Payment Due"), null=True, blank=True)
+    created_at = models.DateTimeField(_("Requested On"), auto_now_add=True,)
     modified_on = models.DateTimeField(auto_now=True,)
+    reference = models.CharField(_("Ref Number"), max_length=15, blank=True, help_text=_("This is a unique number assigned for audit purposes"),)
 
     def save(self, *args, **kwargs):
         if self.payday is None:
@@ -75,13 +74,57 @@ class PaymentRequest(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
-
     @classmethod
     def create(cls, user, team, amount, gateway):
-        return cls.objects.create(user=user, team=team, amount=amount, gateway=gateway)
+        payout =  cls.objects.create(user=user, team=team, amount=amount, gateway=gateway)
+        stan = f'{payout.pk}'.zfill(8)
+        payout.reference = f'REQ-{stan}'
+        payout.save()
+        return payout        
+    
+    
+    @classmethod
+    def mark_paid(cls, pk:int):
+        with db_transaction.atomic():
+            payout = cls.objects.select_for_update().get(pk=pk)
+            if payout.status != False:
+                raise Exception(_("The request must be in Pending state before you can mark as paid"))
+            payout.status = True
+            payout.save()
+
+            db_transaction.on_commit(lambda: send_marked_paid_in_bulk_email(payout))
+
+        return payout
 
 
-class AdminCredit(models.Model): 
+    @classmethod
+    def payment_declined(cls, pk:int, message:str):
+        with db_transaction.atomic():
+            payout = cls.objects.select_for_update().get(pk=pk)
+            if payout.status != False:
+                raise Exception(_("The request must be in Pending state before you can mark as paid"))
+            if message == '':
+                raise Exception(_("message is required"))
+
+            message_count = len(message)
+            if len(message) > 500:
+                raise Exception(_(f"message exceeds 500 words required. You entered {message_count} words"))
+            
+            payout.message = message
+            payout.save()
+
+            send_withdrawal_marked_failed_email(payout)
+
+        return payout
+
+
+class AdminCredit(models.Model):
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    STATUS_CHOICES = (
+        (INITIATED, _('Initiated')),
+        (APPROVED, _('Approved')),
+    )     
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='admincreditor', on_delete=models.PROTECT,)
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='creditreceiver', on_delete=models.PROTECT,)
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='admincreditteam', on_delete=models.PROTECT)
@@ -89,11 +132,12 @@ class AdminCredit(models.Model):
     comment = models.TextField(_("Credit Comment"), max_length=200)
     reference = models.CharField(_("STAN"), max_length=200, blank=True, help_text=_("STAN means System Audit Trail Number"),)
     created_at = models.DateTimeField(_("Started On"), auto_now_add=True,)
+    status = models.CharField(_("Status"), choices=STATUS_CHOICES, default=INITIATED, max_length=20)
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Admin Credit'
-        verbose_name_plural = 'Admin Credits'
+        verbose_name = 'Credit Memo'
+        verbose_name_plural = 'Credit Memos'
 
     def __str__(self):
         return f'{self.sender.first_name} {self.sender.last_name}'
@@ -105,21 +149,34 @@ class AdminCredit(models.Model):
         credit.reference = f'STAN-{stan}'
         credit.save()
         return credit
+ 
+    @classmethod
+    def approve_credit_memo(cls, pk, user):
+        with db_transaction.atomic():
+            credit_account = cls.objects.select_for_update().get(pk=pk)
+            super_admin_user = Customer.objects.select_for_update().get(pk=credit_account.receiver.id)
+            owner_active_team = Team.objects.select_for_update().filter(created_by=credit_account.team.created_by, status=Team.ACTIVE).first()
+            account = Customer.objects.select_for_update().get(pk=credit_account.team.created_by.id).fundtransferuser #I am accessing from customer to avoid circular import
+            
+            if credit_account.status != 'initiated':
+                raise FundException(_("account must be in initiated state to approve"))
 
-    # @classmethod
-    # def confirm_and_mark_paid(cls, pk:int):
-    #     with db_transaction.atomic():
-    #         payout = cls.objects.select_for_update().get(pk=pk)
-    #         if payout.status != 'pending':
-    #             raise FundException(_("Only pending transaction can be marked"))
-    #         payout.status = 'paid'
-    #         payout.save()
-    #     return payout
+            if user.is_superuser == False:
+                raise FundException(_("All approvals must be performed by the SuperAdmin Only"))
 
+            if super_admin_user != user:
+                raise FundException(_("This is not your assigned task"))
 
+            credit_account.status = 'approved'
+            credit_account.save(update_fields=['status'])
 
+            account.available_balance += int(credit_account.amount)
+            account.save(update_fields=['available_balance'])
 
+            owner_active_team.team_balance += int(credit_account.amount)
+            owner_active_team.save(update_fields=['team_balance'])
 
+        return account, super_admin_user, owner_active_team
 
 
 

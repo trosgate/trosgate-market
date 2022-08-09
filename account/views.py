@@ -19,7 +19,6 @@ from projects.models import Project
 from . utilities import new_user_registration, send_verification_sms
 from future.utilities import get_sms_feature, get_more_team_per_user_feature
 from notification.mailer import send_new_team_email
-from teams.controller import max_proposals_allowable_per_team
 from quiz.models import Quizes
 from contract . models import InternalContract
 from datetime import timedelta
@@ -85,7 +84,8 @@ def loginView(request):
 
         # Admin is exempted from two step verification via sms
         # Otherwise if there is server error in sms sending, admin is also lock out 
-        if user is not None and user.user_type == Customer.ADMIN and user.is_active == True:
+        # To still make it secure, user must be STAFF and must be ACTIVE before login 
+        if user is not None and user.user_type == Customer.ADMIN and user.is_active and user.is_staff == True:
              
             login(request, user)
 
@@ -94,7 +94,7 @@ def loginView(request):
             return redirect('/admin')
 
         # Checks for freelancer and redirect to 2FA or otherwise
-        if user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and get_sms_feature():
+        if user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and user.is_staff == True and get_sms_feature():
 
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
@@ -232,7 +232,6 @@ def account_activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-
         return redirect('account:login')
 
     else:
@@ -260,7 +259,6 @@ def user_dashboard(request):
         teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
 
-        # print('get_gateway_environment:', PayPalClientConfig().subscription_access_token())
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)
             try:
@@ -302,12 +300,11 @@ def user_dashboard(request):
             'quizz': quizz,
             'contracts': contracts,
             'belong_to_more_than_one_team': belong_to_more_than_one_team,
-            'max_proposals_per_team': max_proposals_allowable_per_team(request),
             'teams': teams,
         }
         return render(request, 'account/user/freelancer_dashboard.html', context)
 
-    if request.user.user_type == Customer.CLIENT and request.user.is_active == True:
+    elif request.user.user_type == Customer.CLIENT and request.user.is_active == True:
         client_profile = Client.objects.get(user=request.user)
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
@@ -323,7 +320,7 @@ def user_dashboard(request):
         }
         return render(request, 'account/user/client_dashboard.html', context)
     
-    if request.user.user_type == Customer.ADMIN and request.user.is_active == True:
+    elif request.user.user_type == Customer.ADMIN and request.user.is_staff == True:
         messages.info(request, f'Welcome back {request.user.short_name}')
 
-        return redirect('/admin')
+        return redirect('/admin/')

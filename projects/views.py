@@ -13,14 +13,12 @@ from account.models import Customer
 from teams.models import Team
 from applications.models import Application
 from django.http import JsonResponse
-from teams.controller import monthly_projects_applicable_per_team
 from django.conf import settings
 from django.contrib import messages
 import requests
 import base64
 import json
 from django.http import HttpResponseRedirect, HttpResponse
-from teams.controller import monthly_projects_applicable_per_team
 from notification.utilities import create_notification
 
 
@@ -54,15 +52,14 @@ def project_single(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug)
     profile_view = get_object_or_404(Client, user=project.created_by, user__is_active=True)
     applications = Application.objects.filter(project = project)
-    application_limit = monthly_projects_applicable_per_team(request)
+    # application_limit = monthly_projects_applicable_per_team(request)
 
     context = {
         "projectdetail": project,
         'project':project,  
         'profile_view':profile_view,  
-        'application_limit':application_limit,  
+        # 'application_limit':application_limit,  
         'applications':applications,  
-        # 'monthly_projects_applicable_per_team':monthly_projects_applicable_per_team(request),  
   
     }
     return render(request, 'projects/project_detail.html', context)

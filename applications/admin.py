@@ -3,8 +3,9 @@ from .models import (Application)
 
 
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ['team', 'budget','project', 'message_slice', 'status']
+    list_display = ['team', 'budget','project', 'created_at', 'message_slice', 'status']
     list_filter = ['team']
+    readonly_fields = ('created_at',)
     search_fields = ['message']
     list_editable = ['status']
     radio_fields = {'status': admin.HORIZONTAL}       

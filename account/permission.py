@@ -24,3 +24,4 @@ def user_is_client(function):
             raise PermissionDenied
 
     return wrap
+

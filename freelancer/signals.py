@@ -24,17 +24,6 @@ def create_freelancer_profile(sender, instance, created, **kwargs):
         freelancer_payment_account.save()
 
 
-@receiver(post_save, sender=Customer)
-def create_new_admin_type(sender, instance, created, **kwargs):
-    '''
-    Create a freelancer profile ..
-    For user who signup as freelancer
-    '''
-    if created and not (instance.user_type == Customer.FREELANCER  or instance.user_type == Customer.CLIENT):
-        Customer.objects.filter(id=instance.id).update(user_type = Customer.ADMIN)
-
-
-
 
 
 

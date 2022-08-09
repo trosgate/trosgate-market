@@ -9,10 +9,10 @@
 				<div class="row justify-content-md-center">
 					<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 						<div class="wt-innerbannercontent">
-						<div class="wt-title"><h2>Create Proposal</h2></div>
+						<div class="wt-title"><h2>Application</h2></div>
 						<ol class="wt-breadcrumb">
 							<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-							<li class="wt-active">Post Proposal</li>
+							<li class="wt-active">Apply for project</li>
 						</ol>
 						</div>
 					</div>
@@ -21,7 +21,7 @@
 		</div>
 		<!--Inner Home End-->
 			<!--Main Start-->
-		<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+		<main class="wt-main wt-haslayout wt-innerbgcolor">
 				<div class="wt-haslayout wt-main-section"> 
 					<div class="container">
 						<div class="row justify-content-md-center">
@@ -40,7 +40,7 @@
 										</div>
 									</div>
 								</div>
-					
+							{% if can_apply_for_project %}
 							<form method="POST" enctype="multipart/form-data"> {% csrf_token %}
 								<div class="wt-proposalholder"> 
 									<div class="wt-proposalamount-holder">
@@ -65,6 +65,19 @@
 							</div>
 						</div>
 					</form>
+					{% else %}
+					<div class="wt-btnarea text-center alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+							{% if active_team.package.type == 'Basic' and active_team.created_by == request.user %} 
+							Maximum application threshold reached but you can change that. <a href="{% url 'teams:packages' %}"> Please upgrade </a>
+							{% elif active_team.package.type == 'Basic' and active_team.created_by != request.user %} 
+							Please prompt your team founder to upgrade
+							{% elif active_team.package.type == 'Team' %}
+							Maximum application limit reached for this Team
+							{% endif %}
+						</span>
+					</div>	
+					{% endif %}
 				</div>
 			<!-- User Listing End-->
 		</main>

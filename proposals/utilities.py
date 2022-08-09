@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-from django.utils.timezone import localtime
+
 
 
 # Duration conversion parameters for the proposal, projects and contracts

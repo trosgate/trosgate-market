@@ -10,7 +10,7 @@ from teams.models import Team, Invitation
 from django.utils.text import slugify
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from teams.controller import max_member_per_team
+# from teams.controller import max_member_per_team
 from django.db.models import F
 from teams.controller import monthly_offer_contracts
 from account.fund_exception import FundException

@@ -64,9 +64,11 @@
 												<a href="{% url 'freelancer:freelancer_listing' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite Freelancer</button></a>
 											</div>
 										{% else %}
-											<div class="form-group wt-btnarea">
-												<a href="{% url 'teams:packages' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Upgrade Plan</button></a>
-											</div>
+										<div class="wt-btnarea alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-6">
+											<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+												Maximum membership reached and can no longer invite. 
+											</span>
+										</div>	
 										{% endif %}											
 									</div>
 								</div>
@@ -97,9 +99,11 @@
 												<button id="emailInvitation" type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite member </button>
 											</div>											
 											{% else %}
-											<div class="form-group wt-btnarea">
-												<a href="{% url 'teams:packages' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Upgrade Plan</button></a>
-											</div>
+											<div class="wt-btnarea alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-6">
+												<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                                    Maximum membership reached and can no longer invite. 
+                                                </span>
+											</div>	
 											{% endif %}
 										</form> 
 										<ul class="wt-projectliststyle">

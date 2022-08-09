@@ -21,6 +21,9 @@ class ProposalAdmin(admin.ModelAdmin):
     )
 
     def Go_Public_on_home(self, request, queryset):
+        # # query = queryset
+        # # for query in queryset:
+        # print('queryset Pk:', queryset, 'queryset title:', queryset)
         queryset.update(published = True)
 
     def Go_Private_on_home(self, request, queryset):

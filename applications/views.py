@@ -16,12 +16,10 @@ from account.permission import user_is_freelancer, user_is_client
 from account.models import Customer
 from teams.models import Team
 from django.http import JsonResponse
-from teams.controller import monthly_projects_applicable_per_team
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from datetime import datetime, timezone, timedelta
-from teams.controller import monthly_projects_applicable_per_team
 from notification.utilities import create_notification
 from . application import ApplicationAddon
 from general_settings.models import PaymentGateway, Currency
@@ -39,6 +37,7 @@ from general_settings.discount import get_discount_calculator, get_earning_calcu
 from general_settings.fees_and_charges import get_application_fee_calculator
 from django.db import transaction as db_transaction
 from freelancer.models import FreelancerAccount
+from teams.controller import PackageController
 
 
 @login_required
@@ -47,9 +46,9 @@ from freelancer.models import FreelancerAccount
 def apply_for_project(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
-
+    can_apply_for_project = PackageController(team).monthly_projects_applicable_per_team()
     applied = Application.objects.filter(team=team, project=project)
-
+    
     if applied:
         messages.error(request, 'Your team already applied for this job!')
 
@@ -77,6 +76,7 @@ def apply_for_project(request, project_slug):
     context = {
         'applyform': applyform,
         'project': project,
+        'can_apply_for_project': can_apply_for_project,
     }
     return render(request, 'applications/application.html', context)
 

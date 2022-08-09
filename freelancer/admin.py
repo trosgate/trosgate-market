@@ -45,33 +45,32 @@ class FreelancerAdmin(admin.ModelAdmin):
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
     list_display = ['user', 'created_at', 'pending_balance', 'available_balance', 'admin_action']
-    # list_editable = ['pending_balance', 'available_balance']
     readonly_fields = ['user', 'created_at', 'pending_balance', 'available_balance', 'admin_action']
     list_select_related = ('user',)
     
     def get_urls(self):
         urls = super().get_urls()
         pattern = [
-            path('<int:account_id>/credit/', self.admin_site.admin_view(self.add_credit), name='account-credit'),
+            path('<int:account_id>/credit/', self.admin_site.admin_view(self.initiate_memo), name='account-credit'),
         ]
         return pattern + urls
 
 
     def admin_action(self, obj):
         return format_html(
-            '<a class="button" href="{}"> Credit Account</a>',
+            '<a class="button" href="{}"> Initiate Memo</a>',
             reverse('admin:account-credit', args=[obj.pk]),
         )
     
     admin_action.allow_tags = True
     admin_action.short_description = 'Admin Action'
 
-    def add_credit(self, request, account_id, *args, **kwargs):
+    def initiate_memo(self, request, account_id, *args, **kwargs):
         return self.process_action(
             request=request,
             account_id=account_id,
             action_form=AdminCreditForm,
-            action_title='About to give credit. Action is irreversible so be sure',
+            action_title='Warning!: If you encounter error like "[Errno 11001] getaddrinfo failed", it means email was not sent to SuperAdmin due to low network from you. But it is possible that memo was initiated so verify first before re-attempting',
         )
 
     def process_action(self, request, account_id, action_form, action_title):
@@ -89,11 +88,9 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
                 except Exception as e:
                     error_message = str(e)
                     print(error_message)
-                    # raise FundException(error_message)           
-                    # raise
                     pass
                 else:
-                    self.message_user(request, 'Success')
+                    self.message_user(request, 'Successfully initiated memo')
                     url = reverse('admin:freelancer_freelanceraccount_change', args=[account.pk], current_app=self.admin_site.name)
                     return HttpResponseRedirect(url)
 
@@ -129,7 +126,8 @@ class FreelancerActionAdmin(admin.ModelAdmin):
     search_fields = ['team__title', 'position']
     list_filter = ['team']
     readonly_fields = ['account','team', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
-
+    list_per_page = 20
+    
     fieldsets = (
         ('Background', {'fields': ('account','team', 'manager','action_choice','created_at', 'transfer_status',)}),
         ('Other Transfer Info', {'fields': ('team_staff', 'debit_amount',)}),

@@ -117,32 +117,6 @@ class ProposalSale(models.Model):
     def __str__(self):
         return str(self.proposal)
 
-
-    # @classmethod
-    # def credit_pending_balance(cls, pk:int):
-    #     print('initial run')
-    #     item_purchased = cls.objects.select_for_update().get(pk=pk, purchase__status='success')
-    #     print('item_purchased', item_purchased)
-
-    #     return item_purchased
-
-
-    # def mark_paid_in_bulk(paid_ids: list[int]) -> None:
-    #     with transaction.atomic():
-    #         for pk in paid_ids:
-    #             ProposalSale.credit_pending_balance(pk)
-    #             print('executed')
-
-    # for item in proposal_items:
-    #     print(item.team.created_by)
-    # for item in proposal_items:
-    #     founder_account = item.team.created_by.fundtransferuser
-    #     founder_account.pending_balance += item.total_earning
-    #     print('balance:', founder_account.pending_balance)
-
-    #     founder_account.save()
-    # print('payment made')
-
     def earning_fee(self):
         return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
 

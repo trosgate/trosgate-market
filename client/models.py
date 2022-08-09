@@ -80,7 +80,6 @@ class Client(models.Model):
 
 class ClientAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='clientfunduser', on_delete=models.PROTECT,)
-    reference = models.UUIDField(unique=True, verbose_name="Reference Number", editable=False, default=uuid.uuid4,)
     debug_balance = models.PositiveIntegerField(_("Pending Balance"), default=0)
     available_balance = models.PositiveIntegerField(_("Account Balance"), default=0)
     created_at = models.DateTimeField(auto_now_add=True)

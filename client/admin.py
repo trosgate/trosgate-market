@@ -4,7 +4,7 @@ from . models import Client, ClientAccount, ClientAction
 
 MAX_OBJECTS = 1
 
-
+@admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     model = Client
     list_display = ['user', 'gender','budget_per_hourly_rate', 'tagline', 'image_tag']
@@ -29,9 +29,10 @@ class ClientAdmin(admin.ModelAdmin):
         return False
 
 
+@admin.register(ClientAccount)
 class ClientAccountAdmin(admin.ModelAdmin):
     model = ClientAccount
-    list_display = ['user', 'created_at', 'modified_on', 'reference', 'debug_balance', 'available_balance']
+    list_display = ['user', 'created_at', 'modified_on', 'debug_balance', 'available_balance']
     list_editable = ['available_balance']
     list_display_links = None
 
@@ -49,6 +50,7 @@ class ClientAccountAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(ClientAction)
 class ClientActionAdmin(admin.ModelAdmin):
     model = ClientAction
     list_display = ['account', 'created_at', 'modified_on', 'deposit_amount', 'status']
@@ -67,11 +69,4 @@ class ClientActionAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
-
-
-
-
-admin.site.register(Client, ClientAdmin)
-admin.site.register(ClientAccount, ClientAccountAdmin)
-admin.site.register(ClientAction, ClientActionAdmin)
 

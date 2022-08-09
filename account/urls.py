@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('', views.homepage, name='homepage'),
     path("account/login/", views.loginView, name = "login"),
+    path('dashboard/', views.user_dashboard, name='dashboard'), 
     path("account/two-factor-auth/", views.two_factor_auth, name = "two_factor_auth"),    
     path("logout/", auth_views.LogoutView.as_view(next_page="account:homepage"), name="logout"),
     path("autologout/", views.autoLogout, name="autologout"),
@@ -45,7 +46,7 @@ urlpatterns = [
         template_name="account/user/reset_status.html"),
         name="password_reset_complete",
     ),
-    path('dashboard/', views.user_dashboard, name='dashboard'),     
+        
 ]
 
 htmx_urlpatterns = [

@@ -9,12 +9,10 @@ from django.utils.translation import gettext_lazy as _
 import sys
 
 
-class CustomerCreationForm(forms.ModelForm):
+MAX_OBJECTS = 0
 
-    # ADMIN = 'admin'
-    # USER_TYPE = (
-    #     (ADMIN, _('Admin')),
-    # )    
+class CustomerCreationForm(forms.ModelForm):
+ 
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
     # user_type = forms.ChoiceField(required=True, choices=USER_TYPE, label="Select Type")
@@ -41,10 +39,11 @@ class CustomerCreationForm(forms.ModelForm):
 
 class CustomerChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
+  
 
     class Meta:
         model = Customer
-        fields = ['email', 'short_name', 'country', 'password', 'is_active', 'is_admin']
+        fields = ['email', 'short_name', 'country', 'password', 'is_active', 'is_superuser']
 
     def clean_password(self):
         return self.initial['password']
@@ -55,14 +54,14 @@ class CustomerAdmin(BaseUserAdmin,):
     form = CustomerChangeForm
     add_form = CustomerCreationForm
 
-    list_display = ['email', 'short_name', 'country','user_type', 'is_active', 'is_staff', 'is_admin']
+    list_display = ['short_name', 'country','user_type', 'is_active', 'is_staff', 'is_assistant', 'is_superuser']
     readonly_fields = ['date_joined', 'user_type', 'last_login']  # , 'is_active'
-    list_display_links = ['email','short_name']
-    list_filter = ['user_type', 'is_admin', 'is_staff']
+    list_display_links = ['short_name']
+    list_filter = ['user_type', 'is_superuser', 'is_assistant',]
     fieldsets = (
         ('Personal Information', {'fields': ('email', 'short_name', 'first_name', 'last_name', 'phone', 'country', 'password',)}),
-        ('User Type', {'fields': ('user_type',)}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_admin',)}),
+        ('All User Permissions', {'fields': ('user_type','is_active','is_staff',)}),
+        ('Company Roles', {'fields': ('is_assistant', 'is_superuser',)}),
         ('Activity Log', {'fields': ('date_joined', 'last_login',)}),
     )
     add_fieldsets = (
@@ -75,15 +74,79 @@ class CustomerAdmin(BaseUserAdmin,):
     ordering = ('email',)
     filter_horizontal = ()
     list_per_page = 10
+    is_superuser = False
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+        
     def get_actions(self, request):
         actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
 
-    def has_delete_permission(self, request, obj=None):
-        return True
+    def has_add_permission(self, request):
+        if not request.user.is_superuser:
+            return False
+        return super().has_add_permission(request)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        if not is_superuser:            
+            disabled_fields |= {
+                'short_name',
+                'email',
+                'country',                 
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'is_assistant',
+            }
+
+        if (not is_superuser and obj is not None and obj == request.user):
+            disabled_fields |= {
+                'short_name',
+                'email',
+                'is_active',
+                'is_superuser',
+                'is_staff',
+                'is_assistant',
+            }        
+
+        if (not is_superuser and obj is not None and obj != request.user):
+            disabled_fields |= {
+                'short_name',
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+                'country', 
+                'password',
+                'is_active',
+                'is_superuser',
+                'is_staff',
+                'is_assistant',               
+            }
+
+        if (obj is not None and obj.user_type == Customer.FREELANCER or obj.user_type == Customer.CLIENT):
+            disabled_fields |= {                
+                'is_superuser',
+                'is_staff',
+                'is_marketer',
+                'is_hr', 
+                'is_pro', 
+                'is_accountant'
+            }
+
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
 
 class CountryAdmin(admin.ModelAdmin):

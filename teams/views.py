@@ -25,15 +25,14 @@ from applications.models import Application
 from account.models import Customer
 from datetime import datetime
 from django.utils import timezone
-from teams.controller import max_member_per_team
-from django.views.decorators.http import require_http_methods
+from .controller import PackageController
+# from django.views.decorators.http import require_http_methods
 from freelancer.models import Freelancer
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from transactions.models import Purchase, SubscriptionItem
 from general_settings.models import PaymentAPIs
 from django.conf import settings
-from . controller import monthly_projects_applicable_per_team
 from account.fund_exception import InvitationException
 from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token
 
@@ -158,9 +157,9 @@ def invitation(request):
     invited = team.invitations.filter(status=Invitation.INVITED)
     accepted = team.invitations.filter(status=Invitation.ACCEPTED)
     code = Invitation.objects.values('code')[0]
-    max_team_members = max_member_per_team(team)
-
-    monthly_projects_applicable_per_team(request)
+    max_team_members = PackageController(team).max_member_per_team()
+    
+    print('max_team_members:', max_team_members)
 
     inviteform = InvitationForm()
 

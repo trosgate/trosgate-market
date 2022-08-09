@@ -16,6 +16,7 @@ from django.views.decorators.cache import cache_control #prevent back button on 
 from account.models import Country
 from django.template.loader import render_to_string
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+from teams.controller import PackageController
 
 
 #this will appear in search results
@@ -140,9 +141,11 @@ def proposal_step_one(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
     session = request.session
     proposal = ''
+    can_create_new_proposal = PackageController(team).max_proposals_allowable_per_team()
+    
     if "proposalstepone" not in session:
-        proposalformone = ProposalStepOneForm(request.POST)
-
+        proposalformone = ProposalStepOneForm(request.POST or None)
+        
         if proposalformone.is_valid():
             proposal = proposalformone.save(commit=False)
             proposal.created_by = request.user
@@ -173,6 +176,7 @@ def proposal_step_one(request):
 
     context = {
         'proposalformone': proposalformone,
+        'can_create_new_proposal': can_create_new_proposal,
     }
     return render(request, 'proposals/proposal_step_one.html', context)
 

@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models, transaction as db_transaction
 from django.db.models import F, Q
 import uuid
 from django.urls import reverse
@@ -20,8 +20,7 @@ from general_settings.fund_control import (
 )
 from payments.models import PaymentRequest, AdminCredit
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
-
-
+from notification.mailer import initiate_credit_memo_email
 
 class ActiveFreelancer(models.Manager):
     def get_queryset(self):
@@ -137,10 +136,10 @@ class FreelancerAccount(models.Model):
  
  
     @classmethod
-    def admin_credit(cls, account, user, amount, comment, created_at):
-        with transaction.atomic():
+    def initiate_credit_memo(cls, account, user, amount, comment, created_at):
+        with db_transaction.atomic():
             account = cls.objects.select_for_update().get(pk=account.id)
-            super_admin_user = Customer.objects.select_for_update().get(pk=user.id)
+            super_admin_user = Customer.objects.select_for_update().get(is_superuser=True)
             owner_active_team = Team.objects.select_for_update().filter(created_by=account.user, status=Team.ACTIVE).first()
 
             if amount  == '':
@@ -152,8 +151,8 @@ class FreelancerAccount(models.Model):
             if len(comment) > 500:
                 raise FundException(_('Error! comment must be less or equal to 500 characters'))
             
-            if super_admin_user.is_admin == False:
-                raise FundException(_("Only Admin User can add credit"))
+            if user.is_assistant == False:
+                raise FundException(_("Only Assistant can initiate memo. Be sure to add yourself as assistant under user manager"))
 
             if not (account.user in owner_active_team.members.all()):
                 raise FundException(_("Receiver is no longer a member of his Team. Add first as member"))
@@ -167,26 +166,25 @@ class FreelancerAccount(models.Model):
             if account.user != owner_active_team.created_by:
                 raise FundException(_('Receiver and his Team are not same, so cannot receive credit'))
 
-            account.available_balance += int(amount)
-            account.save(update_fields=['available_balance'])
-
-            owner_active_team.team_balance += int(amount)
-            owner_active_team.save(update_fields=['team_balance'])
-
-            admin_action = AdminCredit.create(
-                sender=super_admin_user,
-                receiver=account.user,
+            credit_memo = AdminCredit.create(
+                sender=user,
+                receiver=super_admin_user,
                 team=owner_active_team,
                 comment=comment,
                 amount=amount,
                 created_at = created_at
             )
-        return account, super_admin_user, owner_active_team, admin_action
+            # try:
+            db_transaction.on_commit(lambda: initiate_credit_memo_email(credit_memo))
+            # except Exception as e:
+            #     raise (_(str(e)))
+                
+        return account, super_admin_user, owner_active_team, credit_memo
 
 
     @classmethod
     def transfer(cls, team_owner, team_staff, team, action_choice, transfer_status, debit_amount, position, gateway=None):
-        with transaction.atomic():
+        with db_transaction.atomic():
             team_manager = cls.objects.select_for_update().get(user=team_owner)
             team_member_staff = cls.objects.select_for_update().get(user=team_staff)
             owner_active_team = Team.objects.select_for_update().get(pk=team.id)
@@ -247,7 +245,7 @@ class FreelancerAccount(models.Model):
 
     @classmethod
     def withdrawal(cls, team_owner, team, team_staff, gateway, transfer_status, action_choice, withdraw_amount, narration):
-        with transaction.atomic():
+        with db_transaction.atomic():
             freelancer_account = cls.objects.select_for_update().get(user=team_owner)
             owner_active_team = Team.objects.select_for_update().get(pk=team.id)
 

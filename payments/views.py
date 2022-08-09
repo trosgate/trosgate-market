@@ -15,8 +15,7 @@ from django.http import JsonResponse
 def payment_modes(request, username):
     account = get_object_or_404(PaymentAccount, user__short_name=username, user=request.user)
     paymentForm = PaymentAccountForm(instance=account)
-    
-    
+       
     context = {
         'paymentForm': paymentForm,
     }

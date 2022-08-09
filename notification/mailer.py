@@ -10,29 +10,11 @@ from general_settings.models import WebsiteSetting
 #
 # Utility function for sending envites to team
 
-
 def website():
     try:
         return WebsiteSetting.objects.get(id=1)
     except:
          return None
-
-def send_credit_to_team(account, team):
-    # Blueprint for sending mail to receiver of new credit given by admin
-    from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
-    subject = 'You have received a Credit'
-    text_content = f'Invitation to {team.title}.'
-    html_content = render_to_string('notification/new_credit_email.html', {
-        'account': account,
-        'mywebsite': website(),
-        'team': team,
-        'acceptation_url': acceptation_url,
-    })
-
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [account.user.email])
-    msg.attach_alternative(html_content, 'text/html')
-    msg.send()
 
 
 def send_new_test_mail(to_email):
@@ -48,6 +30,80 @@ def send_new_test_mail(to_email):
 __all__ = ['send_new_test_mail']
 
 
+def send_marked_paid_in_bulk_email(payout):
+    # Blueprint for sending mail when payment is marked by admin
+    from_email = get_from_email()
+    acceptation_url = settings.WEBSITE_URL
+    subject = f'Your withdrawal Ref {payout.reference} was Approved'
+    preview = f'Payout Ref {payout.reference} was Approved'
+    text_content = f'Invitation to {payout.team.title}.'
+    html_content = render_to_string('notification/withdrawal_marked_as_paid.html', {
+        'subject': subject,
+        'preview': preview,
+        'payout': payout,
+        'mywebsite': website(),
+        'acceptation_url': acceptation_url,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [payout.team.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def send_withdrawal_marked_failed_email(payout):
+    # Blueprint for sending mail when payment error occured
+    from_email = get_from_email()
+    acceptation_url = settings.WEBSITE_URL
+    subject = f'Your withdrawal Ref {payout.reference} Failed'
+    preview = f'Payout Ref {payout.reference} was not processed'
+    text_content = f'Your withdrawal with Ref: {payout.reference} Failed.'
+    html_content = render_to_string('notification/withdrawal_request_declined.html', {
+        'payout': payout,
+        'preview': preview,
+        'mywebsite': website(),
+        'acceptation_url': acceptation_url,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [payout.team.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def initiate_credit_memo_email(credit_memo):
+    # Blueprint for sending mail to superuser
+    from_email = get_from_email()
+    subject = 'Freelancer Credit Memo Initiated'
+    text_content = f'New memo initiated for freelancer credit.'
+    html_content = render_to_string('notification/initiate_credit_memo_email.html', {
+        'subject': subject,
+        'account': credit_memo,
+        'mywebsite': website(),
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [credit_memo.sender.email,credit_memo.receiver.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+def send_credit_to_team(account):
+    # Blueprint for sending mail to receiver of new credit given by admin
+    from_email = get_from_email()
+    subject = 'You have received a Credit'
+    text_content = f'Invitation to {account.team.title}.'
+    html_content = render_to_string('notification/new_credit_email.html', {
+        'account': account,
+        'mywebsite': website(),
+        'team': account.team,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [account.team.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+# To be continued
+# To be continued
+# To be continued
+# To be continued
+# To be continued
 def send_new_team_email(to_email, team):
     from_email = get_from_email()
     acceptation_url = settings.WEBSITE_URL

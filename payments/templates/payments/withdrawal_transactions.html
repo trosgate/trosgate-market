@@ -59,7 +59,7 @@
                                             <td>{{withdrawals.gateway}}</td>
                                             <td>{{withdrawals.created_at}}</td>
                                             <td>{{withdrawals.payday}}</td>
-                                            <td {% if withdrawals.status_choice == 'pending' %} style='color:red;' {% elif withdrawals.status_choice == 'paid' %} style='color:green;' {% endif %}>{{withdrawals.get_status_choice_display}}</td>
+                                            <td {% if withdrawals.status == False %} style='color:red;' {% elif withdrawals.status == True %} style='color:green;' {% endif %}>{{withdrawals.get_status_display}}</td>
                                             <td>{{withdrawals.amount}}</td>
                                         </tr> 
                                     {% endfor %}					

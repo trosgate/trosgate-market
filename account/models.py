@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 from . utilities import auth_code
 from django_cryptography.fields import encrypt
-
+from django.core.exceptions import ValidationError
 
 
 class Country(models.Model):
@@ -74,13 +74,18 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_("Date Joined"), auto_now_add=True)
     last_login = models.DateTimeField(_("Last Login"), auto_now=True)
     phone = models.CharField(_("Phone"), max_length=20, blank=True, null=True)
-    country = models.ForeignKey(Country, verbose_name=_(
-        "Country"), null=True, blank=True, related_name="countries", on_delete=models.SET_NULL)
-    is_active = models.BooleanField(_("Active Status"), default=False)
-    is_staff = models.BooleanField(_("Staff Status"), default=False)
-    is_admin = models.BooleanField(_("Admin Status"), default=False)
+    country = models.ForeignKey(Country, 
+        verbose_name=_("Country"), 
+        null=True, blank=True, 
+        related_name="countries", 
+        on_delete=models.SET_NULL
+    )
+    is_active = models.BooleanField(_("Activate User"), default=False, help_text="Important: This controls login access for Staffs, Freelancer and CLient")
+    is_staff = models.BooleanField(_("Activate Staff"), default=False, help_text="Important: Addition to 'Activate/Deactivate User Login', this controls login access for SuperAdmin and Staffs only")
+    is_superuser = models.BooleanField(_("CEO/SuperAdmin"), default=False)
+    is_assistant = models.BooleanField(_("Virtual Assistant"), default=False)
     user_type = models.CharField(_("User Type"), choices=USER_TYPE, max_length=30)
-
+    
     class Meta:
         ordering = ("-date_joined",)
         verbose_name = "User Manager"
@@ -114,6 +119,29 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
+
+    def clean(self):
+        if self.is_superuser == True and self.is_staff == False:
+            raise ValidationError(
+                {'is_staff': _('Superuser must have "Activate Staff" set to Active')})
+        
+        if self.is_assistant == True and self.is_staff == False:
+            raise ValidationError(
+                {'is_staff': _('Assistant must have "Activate Staff" set to Active')})
+        
+        if Customer.objects.filter(is_superuser=True).count() > 1 and self.is_superuser == True:
+            raise ValidationError(
+                {'is_superuser': _('SuperAdmin role is too strong to share. Maybe add them as Virtual Assistants or exchange credentials at your own risk')})
+
+        if self.user_type == 'freelancer' and self.is_assistant == True:
+            raise ValidationError(
+                {'is_assistant': _('Freelancer cannot be a Staff or Assistant at same time. You can let them join with a different email')})
+        
+        if self.user_type == 'client' and self.is_assistant == True:
+            raise ValidationError(
+                {'is_assistant': _('Client cannot be a Staff or Assistant at same time. You can let them join with a different email')})
+           
+        return super().clean()
 
 
 class TwoFactorAuth(models.Model):

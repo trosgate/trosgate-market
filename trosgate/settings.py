@@ -223,7 +223,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # MEDIA_ROOT = os.path.join(ENV_PATH, 'media')
 
 LOGIN_URL = "account:login"
-# LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = "account:dashboard"
 
 #Custom Email Backend for this software
@@ -241,7 +240,7 @@ EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'myvoistudio@gmail.com'
-# EMAIL_HOST_PASSWORD = 'nsndvgrisaxrdyei'
+# EMAIL_HOST_PASSWORD = 'kadjbfgubatoipur'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 # DEFAULT_EMAIL_FROM = 'Trosgate <myvoistudio@gmail.com>'

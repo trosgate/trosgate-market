@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from .models import Freelancer, FreelancerAction, FreelancerAccount
-from general_settings.models import Department, Size
+from general_settings.models import Department, Size, PaymentGateway
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.forms import ModelForm
@@ -108,7 +108,7 @@ class FreelancerForm(forms.ModelForm):
 
 class FundTransferForm(forms.ModelForm):
 
-    team_staff = forms.ModelChoiceField(queryset=Freelancer.active.all(), empty_label='Select Receiver')
+    team_staff = forms.ModelChoiceField(queryset=Freelancer.objects.all(), empty_label='Select Receiver')
 
     class Meta:
         model = FreelancerAction
@@ -131,7 +131,6 @@ class FundTransferForm(forms.ModelForm):
 
 
 class WithdrawalForm(forms.ModelForm):
-
     class Meta:
         model = FreelancerAction
         fields = ['gateway', 'withdraw_amount', 'narration']
@@ -139,6 +138,7 @@ class WithdrawalForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(WithdrawalForm, self).__init__(*args, **kwargs)
+        self.fields['gateway'].queryset = PaymentGateway.objects.filter(status=True).exclude(name="Account Balance")
 
         self.fields['gateway'].widget.attrs.update(
             {'class': 'form-control col-12 float-left', 'placeholder': ''})
@@ -154,8 +154,11 @@ class WithdrawalForm(forms.ModelForm):
 
 
 class BaseAccountForm(forms.Form):
-    comment = forms.CharField(required=False, widget=forms.Textarea,)
-    send_email = forms.BooleanField(required=False,)
+    comment = forms.CharField(
+        required=False, 
+        widget=forms.Textarea(attrs={'cols': 100, 'rows': 10}), 
+        help_text="This message will be seen by superadmin first, and eventually seen by the account holder informing him/her about credit",
+    )
 
     def form_action(self, account, user):
         
@@ -172,40 +175,40 @@ class BaseAccountForm(forms.Form):
             error_message = str(e)
             self.add_error(None, error_message)           
             raise
-        
-        active_team = ''
-        if self.cleaned_data.get('send_email', False):
-            team = Team.objects.filter(created_by=account.user, status=Team.ACTIVE)
-            if len(team) > 0:
-                active_team = team.first()
-            try:
-                send_credit_to_team(account, active_team)
-            except Exception as e:
-                error_message = str(e)
-                print(error_message)
 
+        # try:
+        #     send_credit_to_team(account)
+        # except Exception as e:
+        #     error_message = str(e)
+        #     print(error_message)
+                    
         return account, action
 
-# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 class AdminCreditForm(BaseAccountForm):
     amount = forms.IntegerField(
         min_value=get_min_deposit(), 
         max_value=get_max_deposit(),
         required=True,
-        help_text = 'How much to give out as credit'
+        help_text = 'How much to give out as credit',
     )
     field_order = ('amount', 'comment', 'send_email',)
 
     def form_action(self, account, user):
-        return FreelancerAccount.admin_credit(
+        
+        if account == '':
+            raise FundException(_("Bad request. Try again later"))
+
+        if user == '':
+            raise FundException(_("Bad request. Try again later"))
+
+        return FreelancerAccount.initiate_credit_memo(
             account=account,
             user=user,
             amount = self.cleaned_data['amount'],
             comment = self.cleaned_data['comment'],
             created_at = timezone.now()
         )
-
-
 
 
 
