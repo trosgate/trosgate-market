@@ -12,7 +12,6 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 # from teams.controller import max_member_per_team
 from django.db.models import F
-from teams.controller import monthly_offer_contracts
 from account.fund_exception import FundException
 import json
 from general_settings.fund_control import get_min_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
@@ -28,6 +27,7 @@ from .utilities import (
     one_month, two_months, three_months, four_months, five_months, six_months,
     one_year, two_years, three_years, four_years, five_years    
 )
+from teams.controller import PackageController
 
 
 # this will appear in search results
@@ -128,18 +128,14 @@ def freelancer_search(request):
     else:
         searched_freelancer = f'<div class="alert alert-warning text-center" role="alert" style="color:red;"> Hmm! nothing to show for this search</div>'
         return JsonResponse({'freelancer_list': searched_freelancer, 'base_currency':base_currency, 'totalcount':totalcount})
-    # else:
-    #     searched_freelancer = render_to_string('freelancer/ajax/freelancer_search.html', {'freelancer_list':freelancers, 'base_currency':base_currency})
-    #     return JsonResponse({'freelancer_list': searched_freelancer, 'base_currency':base_currency, 'totalcount':totalcount})
 
 
 @login_required
 def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
-    monthly_contracts_limiter = monthly_offer_contracts(team)
-    print(team)
-    print(monthly_contracts_limiter)
+    monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
+
     context = {
         'freelancer': freelancer,
         'team': team,

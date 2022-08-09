@@ -1,9 +1,7 @@
-from django.shortcuts import get_object_or_404
 from twisted.internet.protocol import Protocol
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
-from account.models import Customer
 from general_settings.backends import get_from_email
 from general_settings.models import WebsiteSetting
 

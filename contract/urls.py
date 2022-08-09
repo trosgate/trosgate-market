@@ -21,10 +21,10 @@ urlpatterns = [
     path('internal/', views.internal_contract_list, name='internal_contract_list'),
     path('accept_or_reject_contract', views.accept_or_reject_contract, name='accept_or_reject_contract'),
     path('contract_fee_selection/', views.contract_fee_selection, name='contract_fee_selection'),
-    path('new/offer-to/<slug:short_name>/', views.create_internal_contract, name='create_internal_contract'),
-    path('id/<int:contract_id>/<slug:contract_slug>/', views.internal_contract_detail, name='internal_contract_detail'),
-    path('id/<int:contract_id>/<slug:contract_slug>/fees-structure/', views.internal_contract_fee_structure, name='internal_contract_fee_structure'),
-    path('id/<int:contract_id>/<slug:contract_slug>/checkout/', views.final_contract_checkout, name='final_contract_checkout'),
+    path('offer/<slug:short_name>/', views.create_internal_contract, name='create_internal_contract'),
+    path('detail/<int:contract_id>/<slug:contract_slug>/', views.internal_contract_detail, name='internal_contract_detail'),
+    path('fees/<int:contract_id>/<slug:contract_slug>/fees-structure/', views.internal_contract_fee_structure, name='internal_contract_fee_structure'),
+    path('complete/<int:contract_id>/<slug:contract_slug>/checkout/', views.final_contract_checkout, name='final_contract_checkout'),
     
     # Urls for internal contracts chats   
     path('discord/<int:contract_id>/<slug:contract_slug>/', views.contract_chat, name='contract_discord'),

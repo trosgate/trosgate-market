@@ -26,7 +26,7 @@ from general_settings.fees_and_charges import get_contract_fee_calculator
 from general_settings.models import PaymentGateway, Currency
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
-
+from teams.controller import PackageController
 
 
 # <...........................................................Internal Contract Section..........................................................>
@@ -37,7 +37,9 @@ from django.contrib.sites.shortcuts import get_current_site
 def create_internal_contract(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
-
+    monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
+     
+    print('monthly_contracts_limiter:', monthly_contracts_limiter)
     if request.method == 'POST':
         intcontractform = InternalContractForm(team, request.POST)
 
@@ -56,6 +58,7 @@ def create_internal_contract(request, short_name):
         'freelancer': freelancer,
         'team': team,
         'intcontractform': intcontractform,
+        'monthly_contracts_limiter': monthly_contracts_limiter,
     }
     return render(request, 'contract/add_internal_contract.html', context)
 

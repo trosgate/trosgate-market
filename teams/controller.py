@@ -9,6 +9,8 @@ from datetime import timedelta
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from applications.models import Application
+from contract.models import InternalContract
+
 
 # max_proposals_allowable_per_team
 # monthly_projects_applicable_per_team
@@ -26,11 +28,9 @@ class PackageController():
         self.team = team
 
     def max_member_per_team(self):
-        # Must return a Bool:True. If True, the team has chances to invite
         max_member_in_a_team = self.team.package.max_member_per_team > self.team.members.count()
         return max_member_in_a_team
-
-    # this function is complete now but yet to add template limit
+  
     def max_proposals_allowable_per_team(self):
         team_proposal_limit = self.team.package.max_proposals_allowable_per_team  
         team_proposals_count = self.team.proposalteam.count()
@@ -45,34 +45,16 @@ class PackageController():
 
         return team_project_limit > monthly_applications_count
 
-        # print('team_project_limit:', team_project_limit, ':', self.team.title)
-        # print('monthly_applications_count:', monthly_applications_count)
+    def monthly_offer_contracts(self):
+        team_contracts_limit = self.team.package.monthly_offer_contracts_per_team
+        monthly_team_contracts_count = InternalContract.objects.filter(
+            team=self.team, 
+            date_created__gt=timezone.now() - relativedelta(months=1)
+        ).count()          
 
-def monthly_offer_contracts(team):
-    team_contracts_limit = team.package.monthly_offer_contracts_per_team
-    monthly_team_contracts_count = team.internalcontractteam.filter(
-        date_created__gt=timezone.now() - relativedelta(month=1)
-        ).count()
-
-    offer_contracts_per_team = team_contracts_limit > monthly_team_contracts_count
-    return offer_contracts_per_team
+        return team_contracts_limit > monthly_team_contracts_count
 
 
-
-
-
-
-# def max_member_per_team(team):
-#     invites_per_team = team.package.max_member_per_team > team.members.count()
-#     return invites_per_team
-
-
-# def max_proposals_allowable_per_team(request):
-#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-#     team_proposal_limit = team.package.max_proposals_allowable_per_team  
-#     team_proposals_count = team.proposalteam.count()
-#     max_proposal_per_team = team_proposal_limit > team_proposals_count
-#     return max_proposal_per_team
 
 
 
