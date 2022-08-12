@@ -96,22 +96,7 @@
 								<li><hr><a href="{% url 'projects:archived_project_view' %}">Archived Jobs</a></li>
 							</ul>
 						</li>
-						<li class="menu-item-has-children">
-							<a href="{% url 'contract:external_contract_list' %}">
-								<i class="ti-package"></i>
-								<span>My Contracts</span>
-							</a>
-						</li>						
-						<li class="menu-item-has-children">
-							<a href="javascript:void(0);">
-								<i class="ti-package"></i>
-								<span>Project Types</span>
-							</a>
-							<ul class="sub-menu">
-								<li><hr><a href="{% url 'projects:active_project' %}">Fixed Jobs</a></li>
-								<li><hr><a href="{% url 'projects:active_project' %}">Hourly Jobs</a></li>
-							</ul>
-						</li>						
+											
 						{% endif %}
 						{% if request.user.freelancer %}						
 						<li>
@@ -146,14 +131,12 @@
 								<span>Aptitude Test</span>
 							</a>
 						</li>
-						{% if max_proposals_per_team %}																																 
 						<li class="menu-item-has-children">
 							<a href="{% url 'proposals:proposal_step_one' %}">
 								<i class="ti-bookmark-alt"></i>
 								<span>Create Proposal</span>
 							</a>
 						</li>
-						{% endif %}
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-bookmark-alt"></i>
@@ -182,18 +165,20 @@
 								<span>Applications</span>
 							</a>
 						</li>
+						{% endif %}	
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-package"></i>
 								<span>My Contracts</span>
 							</a>
 							<ul class="sub-menu">
-								<li><hr><a href="{% url 'contract:contract_client' %}">External Contractors</a></li>
+								{% if request.user.freelancer %}
+								<li><hr><a href="{% url 'contract:contract_client' %}">Contractors</a></li>
+								{% endif %}
 								<li><hr><a href="{% url 'contract:internal_contract_list' %}">Internal Contracts</a></li>
 								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
 							</ul>
 						</li>							
-						{% endif %}	
 												
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">

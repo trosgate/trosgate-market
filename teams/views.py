@@ -158,8 +158,6 @@ def invitation(request):
     accepted = team.invitations.filter(status=Invitation.ACCEPTED)
     code = Invitation.objects.values('code')[0]
     max_team_members = PackageController(team).max_member_per_team()
-    
-    print('max_team_members:', max_team_members)
 
     inviteform = InvitationForm()
 

@@ -49,7 +49,7 @@
                                         
                                         <div class="form-group col-md-6">
                                             <span><i class="fa fa-group"> Client Name: {{contract.created_by.get_full_name}}</i></span><br><br>
-                                            <span><i class="fa fa-dollar-sign"> Contract Status: {{contract.get_status_display}}</i></span><br><br>
+                                            <span><i class="fa fa-arrow-up">  Contract Status: </i><i style='color:blue'>{{contract.get_reaction_display}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Duration: {{contract.get_contract_duration_display}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Reference: {{contract.reference}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Time Created: {{contract.date_created}}</i></span><br><br>
@@ -137,10 +137,9 @@
                                 </div>
                                 {% endif %}
                             </div>
-                                
                             </div>
-                            {% if active_team.members %}
                             {% if request.user == contract.team.created_by %}
+                            {% if contract.reaction == 'awaiting' %}
                                 <div class="container">
                                     <div class="row justify-content-md-center">
                                         <div class="text-center">
@@ -149,20 +148,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% else %}
-                                <div class="container">
-                                    <div class="row justify-content-md-center">
-                                        <div class="text-center">
-                                            <button type="button" class="btn btn-outline-success" disabled=true><i class="fa fa-check"> Accept</i></button>
-                                            <button type="button" class="btn btn-outline-danger" disabled=true><i class="fa fa-ban"> Reject</i></button>
-                                        </div>
-                                    </div>
-                                </div>
                             {% endif %}	
                             {% endif %}	
                             {% if request.user == contract.created_by %}
-                            {% if contract.team_reaction == accepted %}
-                            {% if contract.status == 'unpaid' %}
+                            {% if contract.reaction == 'accepted' %}
                             </div>
                                 </div>
                                     </div>
@@ -173,11 +162,7 @@
                                     </div>
                                 </div>
                             </div>
-                            {% endif %}
-                            {% endif %}
-                            {% endif %}
-                            {% if request.user == contract.created_by %}
-                            {% if not contract.team_reaction == accepted %}
+                            {% elif contract.reaction == 'awaiting' %}
                                 <div class="row justify-content-md-center">
                                     <div class="col-xs-12">
                                         <div class="alert alert-info" role="alert">
@@ -205,13 +190,19 @@
                     csrfmiddlewaretoken: "{{csrf_token}}",
                     action: 'accept'
                 },
+                beforeSend:function(){
+                    $("#accept-contract").attr("disabled", true);
+                    $("#reject-contract").attr("disabled", true);
+                },
                 success: function (json) {
                     if(json.status == 'accepted'){
-                        
                         alert('Thank you for acceptance. We shall inform the client to proceed with payment')
+                        window.location.href = ""
                     }
                 },
-                error: function (xhr, errmsg, err) {}
+                error: function (xhr, errmsg, err) {
+                    $("#accept-contract").attr("disabled", false);
+                }
               });
             })
           </script>
@@ -226,13 +217,19 @@
                     csrfmiddlewaretoken: "{{csrf_token}}",
                     action: 'reject'
                 },
+                beforeSend:function(){
+                    $("#accept-contract").attr("disabled", true);
+                    $("#reject-contract").attr("disabled", true);
+                },
                 success: function (json) {
                     if(json.status == 'rejected'){
-
                         alert('We are sorry you had a bad offer. Other doors will open soon')
+                        window.location.href = ""
                     }
                 },
-                error: function (xhr, errmsg, err) {}
+                error: function (xhr, errmsg, err) {
+                    $("#reject-contract").attr("disabled", false);
+                }
               });
             })
           </script>

@@ -186,12 +186,6 @@
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> Take tests and stand a chance at wining bigger projects</span>
 								</div>
-								<form action="" method="post">
-									<div class="input-group">
-										<input type="text" class="form-control" name="" id="">
-										<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-									</div>
-								</form>
 							</div>
 						</div>
 					</div>
@@ -213,8 +207,8 @@
 						{% for quiz in quizz %}
 						<tr>
 							<td>{{forloop.counter}} </td>
-							<td>{% if quiz.title %} {{quiz.title}} {% else %} - {% endif %}</td>
-							<td>{% if quiz.skills %}<div class="wt-widgettag">{% for quizz in quiz.skills.all %}<a href="javascript:void(0);">{{quizz}}</a>{% endfor %} {% else %} - {% endif %}</td>
+							<td class='text-left'>{% if quiz.title %} {{quiz.title}} {% else %} - {% endif %}</td>
+							<td>{% if quiz.skills %}<span class="wt-widgettag">{% for quizz in quiz.skills.all %}<a href="javascript:void(0);">{{quizz}}</a>{% endfor %} {% else %} - {% endif %}</span></td>
 							<td>{% if quiz.duration %} {{quiz.duration }} {% else %} - {%endif%}</td>
 							<td>
 								<a href="{{quiz.get_quiz_detail_absolute_url}}" class="btn btn-info btn-sm"><i class="fa fa-window-restore"> Take Quiz</i></a>
@@ -233,6 +227,7 @@
 		{% endif %}	
 				
 		<!--Company listing starts-->
+		
 		<div class="wt-proposalholder">
 			<div class="container">
 				<div class="row justify-content-md-center">
@@ -243,12 +238,14 @@
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> Verified Open Jobs</span>
 								</div>
+								{% if open_projects|length > 5 %}
 								<form action="" method="post">
 									<div class="input-group">
 										<input type="text" class="form-control" name="" id="">
 										<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
 									</div>
 								</form>
+								{% endif %}
 							</div>
 						</div>
 					</div>
@@ -275,7 +272,7 @@
 						<td>{{forloop.counter}}</td> 
 						<td>{% if project.created_by.clients.brand_name %}{{project.created_by.clients.brand_name}} {% else %}{{project.created_by.get_full_name}}{% endif %}</td>
 						<td><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} &nbsp; &nbsp; {{project.created_by.country.name|truncatechars:40}}</span></td>
-						<td><a class="text-info" href="{% url 'projects:project_detail' project.slug %}">{{project.title}}</a></td>
+						<td class='text-left'><a class="text-info" href="{% url 'projects:project_detail' project.slug %}">{{project.title}}</a></td>
 						<td><class="wt-hireduserstatus">${{ project.amount }}</td>
 						<td><class="wt-hireduserstatus">{{ project.applications.count }}</td>
 						<td><a class="btn btn-outline-success btn-sm" href="{% url 'applications:application_detail' project.slug %}">View</a> </td>
@@ -298,6 +295,8 @@
 		</div>
 
 		<!--Company listing starts-->
+								
+		{% if contracts|length > 0 %}
 		<div class="wt-proposalholder">
 			<div class="container">
 				<div class="row justify-content-md-center">
@@ -308,12 +307,6 @@
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> All Your Internal contracts Received</span>
 								</div>
-								<form action="" method="post">
-									<div class="input-group">
-										<input type="text" class="form-control" name="" id="">
-										<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-									</div>
-								</form>
 							</div>
 						</div>
 					</div>
@@ -329,7 +322,7 @@
 							<th>Created By</th>
 							<th>Proposal Associated</th>
 							<th>Target In </th>
-							<th>Reaction</th>
+							<th>Status</th>
 							<th>Total Budget($)</th>
 							<th>Message</th>
 							<th>Actions</th>
@@ -341,10 +334,10 @@
 						<tr>
 							<td>{{forloop.counter}} </td>
 							<td>{{contract.created_by.get_full_name}}</td>
-							<td>{{contract.proposal.title}}</td>
+							<td class='text-left'>{{contract.proposal.title}}</td>
 							<td>{{contract.date_created|date:"M-d-Y"}}</td>
 							<td>{{contract.get_contract_duration_display}}</td>
-							<td>{{contract.get_team_reaction_display}}</td>
+							<td>{{contract.get_reaction_display}}</td>
 							<td>{{contract.grand_total}}</td>
 							<td>
 								<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="far fa-envelope"> Discord</i></a>
@@ -357,7 +350,7 @@
 					</tbody>
 				</table>
 					{% if not contracts %}
-					<div class="alert alert-info justify-content-md-center" role="alert">
+					<div class="alert alert-info justify-content-md-center text-center" role="alert">
 						<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
 					</div>
 					{% endif %}
@@ -368,6 +361,7 @@
 			</div>
 			{% endif %}
 		</div>
+		{% endif %}
 
 <!--Company listing starts-->
 <div class="wt-proposalholder">
@@ -380,12 +374,6 @@
 						<div class="alert alert-info" role="alert">
 							<span style="color: green; font-weight: bold;"> All Your Proposals created by this team</span>
 						</div>
-						<form action="" method="post">
-							<div class="input-group">
-								<input type="text" class="form-control" name="" id="">
-								<a type="button" href="" class="wt-searchbtn" style="height:50px;"><i class="lnr lnr-magnifier"></i></a>
-							</div>
-						</form>
 					</div>
 				</div>
 			</div>
@@ -412,7 +400,7 @@
 				<tr>
 					<td>{{forloop.counter}} </td>
 					<td>{% if proposal.thumbnail %}<img src="{{proposal.thumbnail.url}}" alt="img description" width="50">{% endif %}</td>
-					<td><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}">{{proposal.title|truncatechars:100}}</a></td>
+					<td class='text-left'><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}">{{proposal.title|truncatechars:100}}</a></td>
 					<td>{{proposal.created_by.get_full_name}}</td>
 					<td>{{proposal.created_at|date:"M-d-Y"}}</td>
 					<td>{{proposal.salary}}</td>

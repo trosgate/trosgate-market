@@ -23,11 +23,11 @@ from general_settings.gateways import PayPalClientConfig, StripeClientConfig, Fl
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.fees_and_charges import get_contract_fee_calculator
-from general_settings.models import PaymentGateway, Currency
+from general_settings.models import PaymentGateway
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from teams.controller import PackageController
-
+from notification.mailer import send_contract_accepted_email, send_contract_rejected_email
 
 # <...........................................................Internal Contract Section..........................................................>
 
@@ -39,7 +39,6 @@ def create_internal_contract(request, short_name):
     team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
     monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
      
-    print('monthly_contracts_limiter:', monthly_contracts_limiter)
     if request.method == 'POST':
         intcontractform = InternalContractForm(team, request.POST)
 
@@ -79,7 +78,7 @@ def internal_contract_list(request):
 @login_required
 def internal_contract_detail(request, contract_id, contract_slug):
     if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
         contract = get_object_or_404(InternalContract, team=team, pk=contract_id, slug=contract_slug)
 
     elif request.user.user_type == Customer.CLIENT:
@@ -91,19 +90,38 @@ def internal_contract_detail(request, contract_id, contract_slug):
     return render(request, 'contract/internal_contract_detail.html', context)
 
 
+
+@login_required
+@user_is_freelancer
+def accept_or_reject_contract(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+    contract_id = int(request.POST.get('contractid'))
+    contract = get_object_or_404(InternalContract, team=team, id=contract_id)
+    
+    if request.POST.get('action') == 'accept':
+        InternalContract.capture(contract.id, contract.ACCEPTED)
+        response = JsonResponse({'status': 'accepted'})
+        return response
+
+    elif request.POST.get('action') == 'reject':
+        InternalContract.capture(contract.id, contract.REJECTED)
+        response = JsonResponse({'status': 'rejected'})
+        return response
+
+
 @login_required
 @user_is_client
 def internal_contract_fee_structure(request, contract_id, contract_slug):
     base_contract = BaseContract(request)
-    gateways = PaymentGateway.objects.filter(status=True)
-    contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
+    contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, reaction=InternalContract.ACCEPTED, created_by=request.user)
     discount = base_contract.get_discount_value(contract)
     multiplier = base_contract.get_discount_multiplier(contract)
     start_discount = base_contract.get_start_discount_value()
 
     context = {
         "contract": contract,
-        "gateways": gateways,
+        "payment_gateways": payment_gateways,
         "discount": discount,
         "multiplier": multiplier,
         "start_discount": start_discount,
@@ -119,7 +137,7 @@ def contract_fee_selection(request):
     if request.POST.get('action') == 'capture-contract':
         contract_id = int(request.POST.get('contractid'))
         gateway_type = int(request.POST.get('gatewaytype'))
-        contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=InternalContract.ACCEPTED, status =InternalContract.PENDING, created_by=request.user)
+        contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
 
         chosen_contract.capture(contract=contract)
 
@@ -151,10 +169,10 @@ def contract_fee_selection(request):
 @user_is_client
 def final_contract_checkout(request, contract_id, contract_slug):
     chosen_contract = BaseContract(request)
-    contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, reaction=InternalContract.ACCEPTED, created_by=request.user)
 
     if "contractchosen" not in request.session:
-        messages.error(request, "Bad request. Please select the payment method again")
+        messages.error(request, "Bad request. We could not fetch the selected contract. Try again")
         return redirect("contract:internal_contract_fee_structure", contract_id=contract.id, contract_slug=contract.slug)
 
     if "contractgateway" not in request.session:
@@ -774,23 +792,3 @@ def contract_chatroom(request,  contract_id):
     else:
         return render(request, 'contract/contract_chat.html', {'chats': chats})
 
-
-@login_required
-@user_is_freelancer
-def accept_or_reject_contract(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,
-                             created_by=request.user, status=Team.ACTIVE)
-    contract_id = int(request.POST.get('contractid'))
-    contract = get_object_or_404(InternalContract, team=team, id=contract_id)
-
-    if request.POST.get('action') == 'accept':
-        contract.team_reaction = True
-        contract.save()
-        response = JsonResponse({'status': 'accepted'})
-        return response
-
-    elif request.POST.get('action') == 'reject':
-        contract.team_reaction = False
-        contract.save()
-        response = JsonResponse({'status': 'rejected'})
-        return response

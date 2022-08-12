@@ -135,11 +135,22 @@ def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
     monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
-
+    
+    max_team_members = ''
+    my_team = ''
+    if request.user.user_type == Customer.FREELANCER:
+        try:
+            my_team = Team.objects.get(pk=request.user.freelancer.active_team_id)
+        except Exception as e:
+            return False
+        max_team_members = PackageController(my_team).max_member_per_team()
+    
+    print('max_team_members:', max_team_members)
     context = {
         'freelancer': freelancer,
         'team': team,
         'monthly_contracts_limiter': monthly_contracts_limiter,
+        'max_team_members': max_team_members,
     }
     return render(request, 'freelancer/freelancer_profile_detail.html', context)
 

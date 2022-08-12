@@ -92,7 +92,18 @@
                                                 <span>{{proposalformfour.thumbnail.label}}</span>
                                                 <span><h5>{{ proposalformfour.thumbnail }}</h5></span>
                                                 <span style="color:red;" role="alert">{{ proposalformfour.thumbnail.errors}}</span>
-                                            </div>												
+                                            </div>
+                                        
+                                            {% comment %} <div>
+                                                <img id="image" src="{{proposal.thumbnail.url}}" style='display: block;max-width: 100%;'>
+                                            </div>
+
+                                            {% if proposal.thumbnail %}  {% endcomment %}
+                                            <div id="image-box">
+                                                <span>{{proposal.thumbnail.label}}</span>
+                                                <img id="image" src="{{proposal.thumbnail.url}}" style='display: block;max-width: 100%;'>
+                                            </div>
+                                            {% comment %} {% endif %}												  {% endcomment %}
                                         </div>												
                                     </div>
                                 </div>
@@ -115,7 +126,9 @@
             </main>
         {% endblock content %}
 
-
+        {% block scripts %}
+        <script src="{% static 'js/proposal-cropper.js' %}"></script>
+        {% endblock scripts %}
 
 
 

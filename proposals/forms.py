@@ -86,7 +86,7 @@ class ProposalStepThreeForm(forms.ModelForm):
 
 
 class ProposalStepFourForm(forms.ModelForm):
-
+    thumbnail = forms.ImageField(widget=forms.FileInput,)
     class Meta:
         model = Proposal
         fields = ['salary', 'service_level','revision', 'dura_converter', 'thumbnail']

@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from .payday import get_payday_deadline
 from django_cryptography.fields import encrypt
 from account.fund_exception import FundException
-from notification.mailer import send_marked_paid_in_bulk_email, send_withdrawal_marked_failed_email
+from notification.mailer import send_credit_to_team, send_marked_paid_in_bulk_email, send_withdrawal_marked_failed_email
 from account.models import Customer
 from teams.models import Team
 
@@ -98,12 +98,12 @@ class PaymentRequest(models.Model):
 
 
     @classmethod
-    def payment_declined(cls, pk:int, message:str):
+    def payment_declined(cls, pk:int, message):
         with db_transaction.atomic():
             payout = cls.objects.select_for_update().get(pk=pk)
             if payout.status != False:
                 raise Exception(_("The request must be in Pending state before you can mark as paid"))
-            if message == '':
+            if message is None:
                 raise Exception(_("message is required"))
 
             message_count = len(message)
@@ -111,9 +111,9 @@ class PaymentRequest(models.Model):
                 raise Exception(_(f"message exceeds 500 words required. You entered {message_count} words"))
             
             payout.message = message
-            payout.save()
+            payout.save(update_fields=['message'])
 
-            send_withdrawal_marked_failed_email(payout)
+            db_transaction.on_commit(lambda: send_withdrawal_marked_failed_email(payout))
 
         return payout
 
@@ -175,6 +175,8 @@ class AdminCredit(models.Model):
 
             owner_active_team.team_balance += int(credit_account.amount)
             owner_active_team.save(update_fields=['team_balance'])
+
+            db_transaction.on_commit(lambda: send_credit_to_team(credit_account))
 
         return account, super_admin_user, owner_active_team
 

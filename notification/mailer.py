@@ -48,6 +48,41 @@ def send_marked_paid_in_bulk_email(payout):
     msg.send()
 
 
+def send_contract_accepted_email(contract):
+    # Blueprint for sending mail when payment is marked by admin
+    from_email = get_from_email()
+    subject = f'Your offered Contract was Accepted'
+    preview = f'Contract Ref {contract.reference} was Approved'
+    text_content = f'Contract Ref {contract.reference} was Approved'
+    html_content = render_to_string('notification/contract_accepted_email.html', {
+        'subject': subject,
+        'preview': preview,
+        'contract': contract,
+        'mywebsite': website(),
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [contract.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+def send_contract_rejected_email(contract):
+    # Blueprint for sending mail when payment is marked by admin
+    from_email = get_from_email()
+    subject = f'Your offered Contract was Rejected'
+    preview = f'Contract Ref {contract.reference} was Rejected'
+    text_content = f'Contract Ref {contract.reference} was Rejected'
+    html_content = render_to_string('notification/contract_rejected_email.html', {
+        'subject': subject,
+        'preview': preview,
+        'contract': contract,
+        'mywebsite': website(),
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [contract.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
 def send_withdrawal_marked_failed_email(payout):
     # Blueprint for sending mail when payment error occured
     from_email = get_from_email()

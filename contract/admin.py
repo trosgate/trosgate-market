@@ -28,13 +28,13 @@ class ContractAdmin(admin.ModelAdmin):
 
 
 class InternalContractAdmin(admin.ModelAdmin):
-    list_display = ['team', 'proposal', 'date_created', 'grand_total', 'team_reaction', 'status']
+    list_display = ['team', 'proposal', 'grand_total', 'reaction']
     list_display_links = ['team',]
     readonly_fields = ['last_updated','created_by', 'date_created']
-    list_editable = ['team_reaction', 'status']
+    list_editable = ['reaction']
     exclude = ('created_by', 'reference',)
     fieldsets = (
-        ('Basic Info', {'fields': ('team', 'created_by', 'proposal', 'contract_duration','status','slug',)}),
+        ('Basic Info', {'fields': ('team', 'created_by', 'proposal', 'contract_duration','reaction','slug',)}),
         ('Service Description #1', {'fields': ('line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',)}),
         ('Service Description #2', {'fields': ('line_two','line_two_quantity', 'line_two_unit_price', 'line_two_total_price',)}),
         ('Service Description #3', {'fields': ('line_three','line_three_quantity', 'line_three_unit_price', 'line_three_total_price',)}),

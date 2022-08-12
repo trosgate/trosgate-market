@@ -12,10 +12,7 @@ from applications.models import Application
 from contract.models import InternalContract
 
 
-# max_proposals_allowable_per_team
-# monthly_projects_applicable_per_team
-# monthly_offer_contracts_per_team
-# daily_Handshake_mails_to_clients
+
 def one_month():
     return (timezone.now() + relativedelta(months = 1))
 

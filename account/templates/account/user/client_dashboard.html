@@ -205,7 +205,7 @@
 						{% endif %}
 				</div>
 			</div>
-
+			{% if closed_projects|length > 0 %}
 			<div class="wt-proposalholder">
 				<div class="container">
 					<div class="row justify-content-md-center">
@@ -251,8 +251,9 @@
 						<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
 					</div>
 					{% endif %}
-					</div>
 				</div>
+			</div>
+			{% endif %}
 
 				<!--Company listing starts-->
 				<div class="wt-proposalholder">
@@ -278,10 +279,9 @@
 									<th>#</th>
 									<th>Contract #</th>
 									<th>Awarded Team</th>
-									<th>Proposal Associated</th>
 									<th>Created On</th>
+									<th>Budget($)</th>
 									<th>Reaction</th>
-									<th>Total Budget($)</th>
 									<th>Message</th>
 									<th>Actions</th>
 								</tr>
@@ -293,10 +293,9 @@
 									<td>{{forloop.counter}} </td>
 									<td>{{contract.reference}}</td>
 									<td>{{contract.team.title}}</td>
-									<td>{{contract.proposal.title}}</td>
 									<td>{{contract.date_created|date:"M-d-Y"}}</td>
-									<td>{{contract.get_team_reaction_display}}</td>
 									<td>{{contract.grand_total}}</td>
+									<td>{{contract.get_reaction_display}}</td>
 									<td>
 										<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-info btn-sm"><i class="fa fa-folder-open"> Chat Team</i></a>
 									</td>

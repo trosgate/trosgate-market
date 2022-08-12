@@ -8,3 +8,6 @@ class ReviewException(Exception):
 class InvitationException(Exception):
     pass
 
+class ContractException(Exception):
+    pass
+

@@ -253,7 +253,7 @@ def user_dashboard(request):
         user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
         freelancer_profile = Freelancer.active.get(user__id=request.user.id)
         open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gt=timezone.now())[:10]
-        contracts = user_active_team.internalcontractteam.filter(team_reaction=InternalContract.AWAITING)[:10]
+        contracts = user_active_team.internalcontractteam.filter(reaction=InternalContract.AWAITING)[:10]
         proposals = user_active_team.proposalteam.all()[:12]
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
@@ -309,7 +309,7 @@ def user_dashboard(request):
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
-        contracts = InternalContract.objects.filter(team_reaction=InternalContract.ACCEPTED, status=InternalContract.PENDING, created_by=request.user)[:10]
+        contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction=InternalContract.PAID)[:10]
 
         context = {
             'open_projects': open_projects,

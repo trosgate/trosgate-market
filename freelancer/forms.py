@@ -138,7 +138,7 @@ class WithdrawalForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(WithdrawalForm, self).__init__(*args, **kwargs)
-        self.fields['gateway'].queryset = PaymentGateway.objects.filter(status=True).exclude(name="Account Balance")
+        self.fields['gateway'].queryset = PaymentGateway.objects.filter(status=True).exclude(name="Balance")
 
         self.fields['gateway'].widget.attrs.update(
             {'class': 'form-control col-12 float-left', 'placeholder': ''})
@@ -175,12 +175,6 @@ class BaseAccountForm(forms.Form):
             error_message = str(e)
             self.add_error(None, error_message)           
             raise
-
-        # try:
-        #     send_credit_to_team(account)
-        # except Exception as e:
-        #     error_message = str(e)
-        #     print(error_message)
                     
         return account, action
 

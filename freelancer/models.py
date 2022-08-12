@@ -174,11 +174,9 @@ class FreelancerAccount(models.Model):
                 amount=amount,
                 created_at = created_at
             )
-            # try:
+
             db_transaction.on_commit(lambda: initiate_credit_memo_email(credit_memo))
-            # except Exception as e:
-            #     raise (_(str(e)))
-                
+ 
         return account, super_admin_user, owner_active_team, credit_memo
 
 

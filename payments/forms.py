@@ -45,11 +45,11 @@ class BaseMemoForm(forms.Form):
             self.add_error(None, error_message)           
             raise
         
-        try:
-            send_credit_to_team(account)
-        except Exception as e:
-            error_message = str(e)
-            print(error_message)
+        # try:
+        #     send_credit_to_team(account)
+        # except Exception as e:
+        #     error_message = str(e)
+        #     print(error_message)
             
         return account, action
 
@@ -64,7 +64,7 @@ class AdminApproveForm(BaseMemoForm):
 
 
 class PaymentChallengeForm(forms.Form):
-    message = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols': 100, 'rows': 10}),help_text='We will take care of Salutation and the details like amount, team, username. Go straight to the point and describe error and what to do. Ex, Payment company declined payment, Account details provided are invalid etc')
+    message = forms.CharField(widget=forms.Textarea(attrs={'cols': 100, 'rows': 10}), help_text='We will take care of Salutation and the details like amount, team, username. Go straight to the point and describe error and what to do. Ex, Payment company declined payment, Account details provided are invalid etc', required=True)
     send_email = forms.BooleanField(required=True,)
 
     def form_action(self, payout, message):
@@ -83,13 +83,6 @@ class PaymentChallengeForm(forms.Form):
             self.add_error(None, error_message)           
             raise
         
-        if self.cleaned_data.get('send_email', False):
-            try:
-                send_withdrawal_marked_failed_email(payout)
-            except Exception as e:
-                error_message = str(e)
-                print(error_message)
-
         return action
 
     field_order = ('message', 'send_email',)
@@ -97,7 +90,7 @@ class PaymentChallengeForm(forms.Form):
     def form_action(self, payout, message):
         return PaymentRequest.payment_declined(
             pk=payout,
-            message = message,
+            message = self.cleaned_data['message'],
         )
 
 

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction as db_transaction
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +22,8 @@ from proposals.utilities import (
     five_months,
     six_months
 )
+from account.fund_exception import ContractException
+from notification.mailer import send_contract_accepted_email, send_contract_rejected_email
 
 
 class InternalContract(models.Model):
@@ -62,21 +64,16 @@ class InternalContract(models.Model):
         (SIX_MONTH, _("06 Months")),
     )   
     #
-    # Invoice States
-    PENDING = 'unpaid'
-    PAID = 'paid'
-    STATUS = (
-        (PENDING, _('Unpaid')),
-        (PAID, _('Paid')),
-    )  
     #states 
     AWAITING = 'awaiting'
     ACCEPTED = 'accepted'
     REJECTED = 'rejected'
+    PAID = 'paid'
     STATE = (
         (AWAITING, _('Awaiting')),
         (ACCEPTED, _('Accepted')),
         (REJECTED, _('Rejected')),
+        (PAID, _('Paid')),
     )   
   
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="internalcontractteam", on_delete=models.CASCADE)
@@ -86,8 +83,7 @@ class InternalContract(models.Model):
     last_updated = models.DateTimeField(blank=True, null=True, default=timezone.now)
     contract_duration = models.CharField(_('Duration'), choices=CONTRACT_DURATION, default=ONE_DAY, max_length=20)
     duration = models.DateTimeField(_("Completion In"), blank=True, help_text=_("deadline for contract"))
-    status = models.CharField(_('Status'), choices=STATUS, default=PENDING, max_length=30)
-    team_reaction = models.CharField(_('State'), choices=STATE, default=AWAITING, max_length=30)
+    reaction = models.CharField(_('State'), choices=STATE, default=AWAITING, max_length=30)
     notes = models.TextField(null=True, blank=True, max_length=500)
 
     reference = models.CharField(_('Reference'), unique=True, null=True, blank=True, max_length=100)
@@ -178,6 +174,25 @@ class InternalContract(models.Model):
         super(InternalContract, self).save(*args, **kwargs)        
 
 
+    @classmethod
+    def capture(cls, pk:int, reaction):
+        with db_transaction.atomic():
+            contract = cls.objects.select_for_update().get(pk=pk)
+            if contract.reaction != 'awaiting':
+                raise ContractException('Contract must be in awaiting state to accept or reject')
+            
+            contract.reaction = reaction
+            contract.save(update_fields=['reaction'])
+
+            if contract.reaction == 'accepted':
+                db_transaction.on_commit(lambda: send_contract_accepted_email(contract))
+            
+            if contract.reaction == 'rejected':
+                db_transaction.on_commit(lambda: send_contract_rejected_email(contract))
+ 
+        return contract
+        
+
 class Contractor(models.Model):
     """
     This is the external client to be invited
@@ -191,7 +206,7 @@ class Contractor(models.Model):
     tax_Number = models.CharField(null=True, blank=True, max_length=100)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="contractors", on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="contractors", on_delete=models.CASCADE)
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="contractors", on_delete=models.CASCADE)    
 
     def __str__(self):
@@ -203,7 +218,7 @@ class Contractor(models.Model):
         verbose_name_plural = _("External Contractor")
 
     def save(self, *args, **kwargs):
-        if self.reference is None:
+        if self.reference == '':
             self.reference = str(uuid4()).split('-')[4]       
         super(Contractor, self).save(*args, **kwargs)
 
@@ -255,8 +270,8 @@ class Contract(models.Model):
     )  
     #
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="contractsteam", on_delete=models.CASCADE)
-    client = models.ForeignKey(Contractor, verbose_name=_("External Client"), related_name="contractsclient", blank=True, on_delete=models.PROTECT)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), blank=True, related_name="contractsauthor", on_delete=models.PROTECT)
+    client = models.ForeignKey(Contractor, verbose_name=_("External Client"), related_name="contractsclient", blank=True, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), blank=True, related_name="contractsauthor", on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     contract_duration = models.CharField(_('Completion Time'), choices=CONTRACT_DURATION, default=ONE_DAY, max_length=20)

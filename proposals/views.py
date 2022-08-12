@@ -412,7 +412,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
     proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
-    proposalformfour = ProposalStepFourForm(request.POST, request.FILES, instance=proposal)
+    proposalformfour = ProposalStepFourForm(request.POST or None, request.FILES or None, instance=proposal)
 
     if proposalformfour.is_valid():
         proposalformfour.save()
@@ -493,12 +493,11 @@ def reactivate_archive_proposal(request, short_name, proposal_slug):
     return redirect('proposals:archive_proposal_page')
 
 
-@login_required
-@user_is_freelancer
-def modify_proposal_page(request, proposal_slug):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    Proposal.objects.filter(team=team, slug=proposal_slug).update(status = Proposal.MODIFY)
-
+# @login_required
+# @user_is_freelancer
+# def modify_proposal_page(request, proposal_slug):
+#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+#     Proposal.objects.filter(team=team, slug=proposal_slug).update(status = Proposal.MODIFY)
 
 
 @login_required

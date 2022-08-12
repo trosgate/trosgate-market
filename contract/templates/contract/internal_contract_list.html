@@ -1,45 +1,60 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% block content%}
+{% block content %}
 {% include 'dashboard/main_sidebar.html' %}
 
-			<!--Main Start-->
-			<main id="wt-main" class="wt-main wt-haslayout">
-			{% if request.user.freelancer %}
+<main class="wt-main wt-haslayout">
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                    <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>Contracts</h2></div>
+                    <ol class="wt-breadcrumb">
+                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                        <li class="wt-active">My Contracts </li>
+                    </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-			{% endif %}
-            <section class="wt-haslayout wt-dbsectionspace">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            All your Internal Contracts
-                        </div>								
-						<div class="wt-insightsitem wt-dashboardbox">
-                        	<div class="card-body">
+    {% if request.user.freelancer %}
 
-                            {% comment %} <div class="row"> {% endcomment %}
-                            <div class="col-lg-12">
-
-                            {% if intcontracts|length > 0 %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>My Contracts</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                            Info: You will see all your contracts and their status here. 
+                                        </span>
+                                    </div>
+                                </div>
                             <div class="table-responsive">
-                                <table class="table table-striped table-sm">
-                                    <thead>
+                                <table class="table">
+                                <thead>
                                     <tr>
-
                                         <th>#</th>
                                         <th>Contract #</th>
                                         <th>Created By</th>
-                                        <th>Proposal Associated</th>
+                                        <th>Proposal</th>
                                         <th>Created On</th>
-                                        <th>Completion In </th>
-                                        <th>Reaction</th>
-                                        <th>Total Budget($)</th>
+                                        <th>Completion</th>
+                                        <th>Budget($)</th>
+                                        <th>Status</th>
+                                        {% if active_team.created_by == request.user %}
                                         <th>Actions</th>
-
+                                        {% endif %}
                                     </tr>
-                                    </thead>
-                                    <tbody>
+                                </thead>
+                                <tbody>
 
                                     {% for contract in intcontracts %}
                                     <tr>
@@ -49,38 +64,112 @@
                                     <td>{{contract.proposal.title}}</td>
                                     <td>{{contract.date_created|date:"M-d-Y"}}</td>
                                     <td>{{contract.get_contract_duration_display}}</td>
-                                    <td>{{contract.get_team_reaction_display}}</td>
                                     <td>{{contract.grand_total}}</td>
-                                    <td>
-										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success"><i class="fa fa-info"> Preview</i></a>
-										{% if request.user.freelancer %}
-										<a href="javascript:void(0);" class="btn btn-info"><i class="fa fa-folder-open"> Send Client Email</i></a>
-										{% endif %}
-									</td> 
-                                    </tr>
-                                    {% endfor %}
+                                    <td {% if contract.reaction == 'awaiting' %} style='color:purple' 
+                                        {% elif contract.reaction == 'accepted' %} style='color:blue'
+                                        {% elif contract.reaction == 'rejected' %} style='color:red'
+                                        {% elif contract.reaction == 'paid' %} style='color:green'
+                                        {% endif %}>
+                                        
+                                        {{contract.get_reaction_display}}
+                                    </td>
 
+                                    {% if contract.team.created_by == request.user %}
+                                    <td>
+										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+									</td> 
+                                    {% endif %}
+                                    </tr>
+                                    {% endfor %}					
                                     </tbody>
                                 </table>
+                                {% if not intcontracts %}
+                                <hr>
+                                <p class='text-center'><strong>{% if request.user == active_team.created_by %} You have not transfered money yet, but you can change that {% else %}You have not received transfer yet.{% endif %}</strong></p>
+                                {% endif %}											
+                                </div> 
                             </div>
-                            {% endif %}
-							{% if not intcontracts %}
-							<p> Ooops! No contract has been connected to you Yet<p>
-							{% endif %}
-				        </div>				
+                        </div>								
                     </div>
-                </div>										
-            </section>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}  
+  
 
-			<div class="wt-proposalholder">
-				<div class="row justify-content-md-center">
-					<div class="wt-sectionhead wt-textcenter">
-						<span>I am Client</span>
-					</div>
-				</div>
-			</div>
-    			{% comment %} {% include 'dashboard/main_footer.html' %} {% endcomment %}
-			</main>
+    {% if request.user.clients %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>My Contracts</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                            Info: You will see all your contracts and their status here. 
+                                        </span>
+                                    </div>
+                                </div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Contract #</th>
+                                        <th>Team</th>
+                                        <th>Receiver</th>
+                                        <th>Created On</th>
+                                        <th>Completion</th>
+                                        <th>Budget($)</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for contract in intcontracts %}
+                                    <tr>
+                                    <td>{{forloop.counter}} </td>
+                                    <td>{{contract.reference}}</td>
+                                    <td>{{contract.team.title}}</td>
+                                    <td>{{contract.team.created_by.get_short_name}}</td>
+                                    <td>{{contract.date_created|date:"M-d-Y"}}</td>
+                                    <td>{{contract.get_contract_duration_display}}</td>
+                                    <td>{{contract.grand_total}}</td>
+                                    <td {% if contract.reaction == 'awaiting' %} style='color:purple' 
+                                        {% elif contract.reaction == 'accepted' %} style='color:blue'
+                                        {% elif contract.reaction == 'rejected' %} style='color:red'
+                                        {% elif contract.reaction == 'paid' %} style='color:green'
+                                        {% endif %}>
+                                        
+                                        {{contract.get_reaction_display}}
+                                    </td>
+                                    {% if contract.created_by == request.user %}
+                                    <td>
+										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+									</td> 
+                                    {% endif %}
+                                    </tr>
+                                    {% endfor %}					
+                                    </tbody>
+                                </table>
+                                {% if not intcontracts %}
+                                <hr>
+                                <p class='text-center'><strong>{% if request.user == intcontracts.created_by %} You have not transfered money yet, but you can change that {% else %}You have not received transfer yet.{% endif %}</strong></p>
+                                {% endif %}											
+                                </div> 
+                            </div>
+                        </div>								
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}    
 
 {% endblock %}
 

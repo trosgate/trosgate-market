@@ -35,10 +35,12 @@
 													<span>5.0/5 <a class="javascript:void(0);">(860 Feedback)</a> <br>Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
 
 													{% if active_team.created_by == request.user %}
+													{% if max_team_members %}
 													<div id="invitation-message"></div>
 													<div class="form-group wt-btnarea">
 														<button id="userInvitation" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"> Invite to Team</i></button>
 													</div>
+													{% endif %}
 													{% endif %}
 												</div>
 												
