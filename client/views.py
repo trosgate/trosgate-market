@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
 from .forms import ClientForm, AnnouncementForm
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from account.models import Customer
 from .models import Client, ClientAccount, ClientAction
@@ -20,6 +19,8 @@ from general_settings.models import PaymentGateway
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+from general_settings.fund_control import get_min_depositor_balance, get_max_depositor_balance, get_min_deposit, get_max_deposit
+
 import stripe
 import json
 from django.contrib.sites.shortcuts import get_current_site
@@ -33,7 +34,7 @@ def client_profile(request, short_name):
     projects = Project.objects.filter(created_by=client.user, status=Project.ACTIVE)
 
     if request.method == 'POST':
-        announcementform = AnnouncementForm(request.POST, instance=client)
+        announcementform = AnnouncementForm(request.POST or None, instance=client)
         if announcementform.is_valid():
             profile = announcementform.save(commit=False)
             profile.user = request.user
@@ -94,8 +95,9 @@ def client_listing(request):
 @user_is_client
 def deposit_fee_structure(request):
     client = get_object_or_404(Client, user=request.user, user__is_active=True)
-    gateways = PaymentGateway.objects.filter(status=True).exclude(name='Account Balance')
+    gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
     base_currency = get_base_currency_code()
+
     context = {
         'client': client,
         'gateways': gateways,
@@ -157,7 +159,13 @@ def final_deposit(request):
     if selected_gateway.name =="Razorpay":
         razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
 
-    base_currency = get_base_currency_code()
+    # base_currency = get_base_currency_code()
+    min_depositor_balance = get_min_depositor_balance()
+    max_depositor_balance = get_max_depositor_balance()
+    min_deposit = get_min_deposit()
+    max_deposit = get_max_deposit()
+    base_currency = get_base_currency_symbol()
+    base_currency_code = get_base_currency_code()
 
     context = {
         "client": client,
@@ -165,9 +173,14 @@ def final_deposit(request):
         "stripe_public_key": stripe_public_key,
         "flutterwave_public_key": flutterwave_public_key,
         "razorpay_public_key": razorpay_public_key,
+        "base_currency_code": base_currency_code,
         "base_currency": base_currency,
         "paypal_public_key": paypal_public_key,
-        "selected_gateway": selected_gateway,        
+        "selected_gateway": selected_gateway,
+        'min_depositor_balance': min_depositor_balance,
+        'max_depositor_balance': max_depositor_balance,
+        'min_deposit': min_deposit,
+        'max_deposit': max_deposit,                
     }
 
     return render(request, 'client/deposit_step_final.html', context)
@@ -178,8 +191,6 @@ def final_deposit(request):
 def stripe_deposit(request):
     message = ''
     mes = ''
-    account = ''
-    action = ''
     data = json.loads(request.body)
     gateway_id = request.session["depositgateway"]["gateway_id"]
     selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
@@ -192,6 +203,20 @@ def stripe_deposit(request):
     # stripe_obj = StripeClientConfig()
     # stripe_reference = stripe_obj.stripe_unique_reference()
     # stripe.api_key = stripe_obj.stripe_secret_key()
+
+    try:
+        ClientAccount.level_one_deposit_check(
+            user=request.user, 
+            deposit_amount=deposit_amount, 
+            narration=narration, 
+            reference = payment_intent
+        )
+        message = 'The deposit was successful'
+
+    except FundException as e:
+        mes = str(e)
+        message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
+            
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items = [
@@ -215,11 +240,31 @@ def stripe_deposit(request):
     payment_intent = session.payment_intent
     print('payment_intent', payment_intent)
 
+    return JsonResponse({'session':session, 'order':payment_intent, 'message':message})
+
+
+
+@login_required
+def paypal_deposit_order(request):
+    message = ''
+    mes = ''
+    data = json.loads(request.body)
+    gateway_id = request.session["depositgateway"]["gateway_id"]
+    selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
+
+    deposit_amount = data['stripeAmount']
+    narration = data['stripeNarration']
+    deposit_fee = selected_gateway.processing_fee
+    total_amount = int((deposit_amount + deposit_fee) * 100)
+    
+    # stripe_obj = StripeClientConfig()
+    # stripe_reference = stripe_obj.stripe_unique_reference()
+    # stripe.api_key = stripe_obj.stripe_secret_key()
+
     try:
         ClientAccount.level_one_deposit_check(
-            depositor=request.user, 
+            user=request.user, 
             deposit_amount=deposit_amount, 
-            deposit_fee = deposit_fee, 
             narration=narration, 
             reference = payment_intent
         )
@@ -228,8 +273,32 @@ def stripe_deposit(request):
     except FundException as e:
         mes = str(e)
         message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
+            
+
+    PayPalClient = PayPalClientConfig()
+    body = json.loads(request.body)
+    data = body["orderID"]
+    print(body)
+
+    if data:
+        paypal_request_order = OrdersGetRequest(data)
+        response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
         
-    return JsonResponse({'session':session, 'order':payment_intent, 'message':message})
+    
+        with db_transaction.atomic():
+            purchase_obj = Purchase.objects.select_for_update().get(pk=purchase.pk)
+            purchase_obj.status = Purchase.SUCCESS
+            purchase_obj.save()
+
+            proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+            for item in proposal_items:
+                founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+                founder_account.pending_balance += sum([item.total_earning])
+                founder_account.save()
+
+        hiringbox.clean_box()
+        return JsonResponse({'Perfect':'All was successful',})
+
 
 
 # level_two_deposit_check

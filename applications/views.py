@@ -172,7 +172,7 @@ def application_fee_structure(request):
         messages.error(request, "Please add atleast one applicant to proceed")
         return redirect("applications:application_multiple_summary")
 
-    payment_gateways = PaymentGateway.objects.filter(status=True)
+    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
     context = {
         'applicant_box': applicant_box,
         'base_currency': base_currency,

@@ -40,11 +40,56 @@ from general_settings.currency import get_base_currency_symbol
 from .fund_exception import InvitationException
 from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
 from freelancer.models import FreelancerAccount
+from applications.application import ApplicationAddon
+from contract.contract import BaseContract
+from transactions.hiringbox import HiringBox
+import copy
+
+
+
+def Logout(request):
+    '''
+    This is manual method for user to logout.
+    Custom session data stored in bucket need to persist.
+    Rather than creating a cache, i create a deep copy since django calls flush() during logout
+    User can now login to see data in bucket.
+    All other session data not copied can be deleted.
+    '''
+    proposal_box = copy.deepcopy(HiringBox(request).hiring_box)
+    application = copy.deepcopy(ApplicationAddon(request).applicant_box)
+    contract = copy.deepcopy(BaseContract(request).contract_box)
+    logout(request)
+
+    request.user = None
+    session = request.session
+    session[settings.HIRINGBOX_SESSION_ID] = proposal_box
+    session[settings.APPLICATION_SESSION_ID] = application
+    session[settings.CONTRACT_SESSION_ID] = contract
+    session.modified = True
+
+    return redirect('account:homepage')
 
 
 def autoLogout(request):
+    '''
+    This is automatic method for user logout.
+    Custom session data stored in bucket need to persist.
+    Rather than creating a cache, i create a deep copy since django calls flush() during logout.
+    User can now login to see session specific data related to bucket.
+    All other session data not copied can be deleted.
+    '''    
+    proposal_box = copy.deepcopy(HiringBox(request).hiring_box)
+    application = copy.deepcopy(ApplicationAddon(request).applicant_box)
+    contract = copy.deepcopy(BaseContract(request).contract_box)
     logout(request)
+
     request.user = None
+    session = request.session
+    session[settings.HIRINGBOX_SESSION_ID] = proposal_box
+    session[settings.APPLICATION_SESSION_ID] = application
+    session[settings.CONTRACT_SESSION_ID] = contract
+    session.modified = True
+
     return redirect('account:homepage')
 
 

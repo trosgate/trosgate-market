@@ -28,6 +28,29 @@ def send_new_test_mail(to_email):
 __all__ = ['send_new_test_mail']
 
 
+#Yet to test this.....................................
+def credit_pending_balance_email(account, paid_amount, purchase):
+    # Blueprint for sending mail when checkout is complete
+    from_email = get_from_email()
+    acceptation_url = settings.WEBSITE_URL
+    subject = f'Congrats. Your proposal was purchased'
+    preview = f'Proposal paid for {paid_amount}'
+    text_content = f'A New Checkout was paid_amount.'
+    html_content = render_to_string('notification/credit_pending_balance_for_sales.html', {
+        'subject': subject,
+        'preview': preview,
+        'account': account,
+        'purchase': purchase,
+        'paid_amount': paid_amount,
+        'mywebsite': website(),
+        'acceptation_url': acceptation_url,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [account.user.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
 def send_marked_paid_in_bulk_email(payout):
     # Blueprint for sending mail when payment is marked by admin
     from_email = get_from_email()
@@ -64,6 +87,7 @@ def send_contract_accepted_email(contract):
     msg = EmailMultiAlternatives(subject, text_content, from_email, [contract.created_by.email])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
+
 
 def send_contract_rejected_email(contract):
     # Blueprint for sending mail when payment is marked by admin

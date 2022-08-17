@@ -4,31 +4,32 @@
 {% include 'dashboard/main_header.html' %}
 <body class="wt-login">
 {% include 'dashboard/main_navbar.html' %}
-        <!-- Alert message Start -->
-        {% if messages %}
-            {% for message in messages %}        
-            <div class="row justify-content-md-center">        
-                <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                    <div class="wt-jobalerts">
-                        <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
-                            <span> {{ message}} </span>
-                            <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
-                        </div>
+
+    <!-- Alert message Start -->
+    {% if messages %}
+        {% for message in messages %}        
+        <div class="row justify-content-md-center">        
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <div class="wt-jobalerts">
+                    <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                        <span> {{ message}} </span>
+                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        {% endif %}  
+        </div>
+        {% endfor %}
+    {% endif %}  
 
 
     {% block content %}
 
     {% endblock content %}
+    {% include 'dashboard/main_scripts.html' %}
     {% include "account/modals/generic_logout_popup.html" %}
     {% include "account/modals/auto_logout_config.html" %}
     {% include "account/modals/warning_auto_logout_popup.html" %}
     
-    {% include 'dashboard/main_scripts.html' %}
     {% block scripts %}
     {% endblock scripts %}
 </body>

@@ -1,14 +1,14 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
 {% block content%}
-<link rel="stylesheet" href="{% static 'css/bootstrap-5.min.css'%}">
 
-        <div class="wt-dashboardbox">
-            <div class="wt-proposalsr">
-                <div class="container"><br><br><br>
-                    <div class="wt-managejobcontent">
-                        <div class="col-12">
-                            <h3>
+        <div class="wt-haslayout wt-innerbannerholder">
+            <div class="container">
+                <div class="row justify-content-md-center">
+                    <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                        <div class="wt-innerbannercontent">
+                        <div class="wt-title">
+                            <h2>
                                 {% if gateway_type.name == "PayPal" %}
                                 PayPal
                                 {% elif gateway_type.name == "Flutterwave" %} 
@@ -18,131 +18,107 @@
                                 {% elif gateway_type.name == "Razorpay" %}
                                 Razorpay
                                 {%endif%} 
-                                Checkout</h3>
-                            </div>
-                        <div class="col-12">
-                            <div class="wt-updatall">
-								<span>
-                                    {% if chosen_contract.get_discount_value > 0 %}
-                                    You just won yourself a ({{chosen_contract.get_discount_multiplier}}%) discount on your total amount 
-                                    {% else %}
-                                    Get a huge discount for every contract hire above ${{chosen_contract.get_start_discount_value}} 
-                                    {% endif %}. 
-                                    The total includes previously saved Applications
-                                </span>
-							</div>	
-                        </div>
-                    </div>
-                    <div class="container">
-                        
-                        <div class="row g-3">
-                            <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
-                                {% comment %} <div class="row">
-                                    <form method="POST">
-                                        {{ currency}}
-                                        <br>
-                                        <div class="p-2 bd-highlight">
-                                            <span id="feedback-converter" style="color:green; text-align:right;">.</span>
-                                        </div>
-                                        <button type="button" id="convert-currency" role="status" class="btn btn-primary w-100 fw-bold spinner-border">Convert</button>                            
-                                    </form>
-                                </div> {% endcomment %}
-                                <div class="d-flex bd-highlight ms-0">
-                                    <div class="p-2 flex-grow-1 bd-highlight">Total Salary:</div>
-                                    <div class="p-2 bd-highlight"><span class="fw-bold h5">$</span><span
-                                    class="fw-bold h5">{{contract.grand_total}}</span></div>
-                                </div>
-                                <div class="d-flex bd-highlight">
-                                    <div class="p-2 flex-grow-1 bd-highlight">Processing Fees:</div>
-                                    <div class="p-2 bd-highlight"><span class="fw-bold h5">$</span><span
-                                    class="fw-bold h5">{{chosen_contract.get_fee_payable}}</span></div>
-                                </div>
-                                <div class="d-flex bd-highlight">
-                                    <div class="p-2 flex-grow-1 bd-highlight">Total Payable:</div>
-                                    <div class="p-2 bd-highlight"><span class="fw-bold h5">$</span><span id="totalSalary" 
-                                        class="fw-bold h5">{{grand_total}}</span></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-7 col-lg-8">
-                                {% if gateway_type.name == "PayPal" %}
-                                <!-- Paypal Div button starts -->
-                                <div id="paypal-button-container"></div>
-                                <!-- Paypal Div button ends -->
-
-                                {% elif gateway_type.name == "Flutterwave" %}
-                                <!-- Flutterwave section button starts -->
-                                <div class="container">
-                                    <div class="row">
-                                    {% comment %} <form method="POST"> 
-                                        <button type="button" id="flutterwave-payment" class="btn btn-primary w-100 fw-bold">Pay Now</button> 
-                                        
-                                    </form> {% endcomment %}
-                                    <br class="my-5">
-                                    <button onclick='flutterwavePay(event)' class="btn btn-primary w-100 fw-bold" >
-                                    Pay with flutterwave
-                                    </button>
-                                    </div>
-                                    </div>
-                                </div>
-                                </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Flutterwave section button ends -->
-                <!-- Stripe section button starts -->
-                {% elif gateway_type.name == "Stripe" %}
-                    <div class="container">
-                        <div class="row">
-                        <div id="stripepayment-form" class="col-12 col-lg-6 mx-auto">
-                            <!-- Error messages in this element -->
-                            <div id="stripecard-errors" class="a" role="alert">.</div>
-                            {% comment %} <form method = 'POST'>{{csrf_token}} {% endcomment %}
-                            <div class="row g-4">
-                                <div class="col-12">
-                                <label for="stripecCustomer" class="form-label">Customer Name</label>
-                                <input name="stripecCustomer" type="text" class="form-control" id="stripecCustomer" value="{{request.user.get_full_name}}" > readonly
-                                <div class="invalid-feedback">
-                                    Valid first name is required.
-                                </div>
-                                </div>
-                                <div class="col-12">
-                                <label for="stripecEmail" class="form-label">Email <span class="text-muted"></span></label>
-                                <input name="stripecEmail" type="email" class="form-control" id="stripecEmail" value="{{request.user.email}}" readonly>
-                                <div class="invalid-feedback">
-                                    Please enter a valid email address for shipping updates.
-                                </div>
-                                </div>
-                                <div class="col-12">
-                                    <label for="stripecCountry" class="form-label">Country</label>
-                                    <input name="stripecCountry" type="text" class="form-control" id="stripecCountry" value="{{request.user.country}}" readonly>
-                                    <div class="invalid-feedback">
-                                        Country field required.
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            <br class="my-5">
-                            <button 
-                            onclick='stripePay(event)' 
-                            id="stripesubmit" class="btn btn-primary w-100 fw-bold" >
-                            Pay with Stripe
-                            </button>
-                            {% comment %} </form> {% endcomment %}
+                                Checkout
+                            </h2>
                         </div>
                         </div>
                     </div>
-                    </div>
-                </div>
-                {% elif gateway_type.name == "Razorpay" %}
-                    <button id="rzp-button1" class="btn btn-primary w-100 fw-bold">Pay with Razorpay</button>
-                <!-- Stripe section button ends -->
-                {% endif %}                 
                 </div>
             </div>
-         </div>
+        </div>
+
+        <div class="wt-dashboardbox">
+            <div class="wt-proposalsr">
+                
+                <br>
+                <br>
+                <br>
+                <div class="container">
+                    <div class='row'>
+                        <div class='col-md-7'>
+                            <div class='card' style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                                <div class='card-body'>
+                                    <h3>Checkout Summary({{base_currency_symbol}})</h3>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Total</th>
+                                                <th>Fees</th>
+                                                <th>Payable</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{contract.grand_total}} </td>
+                                                <td>{{chosen_contract.get_fee_payable}}</td>
+                                                <td>{{grand_total}}</td>
+                                            </tr> 
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                <div class='col-md-12 mt-2'>
+                                    {% if gateway_type.name == "PayPal" %}
+                                    <div id="paypal-button-container"></div>
+                                    {% elif gateway_type.name == "Flutterwave" %}
+                                    <button onclick='flutterwavePay(event)' class="btn btn-success w-100 fw-bold" >
+                                        Pay with flutterwave
+                                    </button>
+                                    {% elif gateway_type.name == "Stripe" %}
+                                    <button 
+                                    onclick='stripePay(event)' id="stripesubmit" class="btn btn-success w-100 fw-bold" >
+                                    Pay with Stripe
+                                    </button>
+                                    {% elif gateway_type.name == "Razorpay" %}
+                                    <button id="rzp-button1" class="btn btn-success w-100 fw-bold">Pay with Razorpay</button>
+                                    {% endif %} 
+                                </div>
+                                <div class='card-body'>
+                                    <div class='col-md-12 mt-6'>
+                                        <h3>Currency Converter</h3>
+                                        {{ currency}}
+                                    </div>
+                                    <div class="p-2 bd-highlight">
+                                        <span id="feedback-converter" style="color:green; text-align:right;">.</span>
+                                    </div>
+                                    <div class='col-md-12 mt-4'>
+                                        <button class="btn btn-primary w-100 fw-bold" >Converter</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <br>                        
+                        </div>
+
+                        <div class='col-md-5'>
+                            <div class='card' style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                                <div class='row'>
+                                    <div class='card-body'>
+                                    
+                                    <div class="wt-dashboardboxcontent wt-offersidebar wt-dashboardbox-margin">
+                                        <figure><img src="{% static 'images/save-img-01.jpg'%}" alt="img description"></figure>
+                                        <div class="wt-offercontent">
+                                            <ul class="wt-projectliststyle">
+                                                
+                                                <li><span><i class="fa fa-check"></i>#1: For Customers with billing currencies different from {{base_currency}}, we present you a way to check your conversion rate and amount</span></li>
+                                                <li><span><i class="fa fa-check"></i>#2: Our conversion does not replace any conversion rate offered by our payment parties.</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} </div>
+        </div>
+        </div> {% endcomment %}
+            
         <div class="wt-proposalholder mt-6">
             <div class="row justify-content-md-center">
                 <div class="wt-sectionhead wt-textcenter">
@@ -181,7 +157,7 @@
                     style: {
                         layout: 'vertical',
                         color:  'gold',
-                        shape:  'pill',
+                        shape:  'rect',
                         label:  'checkout'
                     },
                 createOrder: function(data, actions) {

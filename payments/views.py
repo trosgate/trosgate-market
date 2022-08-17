@@ -8,6 +8,7 @@ from teams.models import Team, Invitation
 from .models import PaymentAccount, PaymentRequest
 from .forms import PaymentAccountForm
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 @login_required
@@ -57,8 +58,32 @@ def update_payment_account(request):
 @user_is_freelancer
 def transfer_transactions(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
-    manager_transfers = FreelancerAction.objects.filter(team=team, manager=request.user, action_choice=FreelancerAction.TRANSFER)
-    staff_transfers = FreelancerAction.objects.filter(team=team, team_staff=request.user, action_choice=FreelancerAction.TRANSFER)
+    manager = FreelancerAction.objects.filter(team=team, manager=request.user, action_choice=FreelancerAction.TRANSFER)
+    staff = FreelancerAction.objects.filter(team=team, team_staff=request.user, action_choice=FreelancerAction.TRANSFER)
+
+    manager_transfers = ''
+    staff_transfers = ''
+
+    if manager:
+        page = request.GET.get('page', 1)
+        paginator = Paginator(manager, 10)
+        try:
+            manager_transfers = paginator.page(page)
+        except PageNotAnInteger:
+            manager_transfers = paginator.page(1)
+        except EmptyPage:
+            manager_transfers = paginator.page(paginator.num_pages)
+
+    if staff:
+        page = request.GET.get('page', 1)
+        paginator = Paginator(staff, 10)
+
+        try:
+            staff_transfers = paginator.page(page)
+        except PageNotAnInteger:
+            staff_transfers = paginator.page(1)
+        except EmptyPage:
+            staff_transfers = paginator.page(paginator.num_pages)
 
     context = {
         'manager_transfers': manager_transfers,

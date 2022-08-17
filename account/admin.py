@@ -95,6 +95,11 @@ class CustomerAdmin(BaseUserAdmin,):
         is_superuser = request.user.is_superuser
         disabled_fields = set() 
 
+        if is_superuser:            
+            disabled_fields |= {
+                'is_superuser',
+            }
+
         if not is_superuser:            
             disabled_fields |= {
                 'short_name',
@@ -135,10 +140,7 @@ class CustomerAdmin(BaseUserAdmin,):
             disabled_fields |= {                
                 'is_superuser',
                 'is_staff',
-                'is_marketer',
-                'is_hr', 
-                'is_pro', 
-                'is_accountant'
+                'is_assistant',
             }
 
 

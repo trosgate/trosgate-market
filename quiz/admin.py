@@ -22,7 +22,7 @@ class QuestionAdmin(admin.ModelAdmin):
     search_fields = ['question']
     list_per_page = 20    
     exclude = ['reference','slug']
-    # readonly_fields = ['created_by', 'answers', 'marks']
+    readonly_fields = ['question', 'created_by', 'answers', 'marks']
 
 class ParticipantAdmin(admin.ModelAdmin):
     model = Participant

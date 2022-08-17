@@ -1,6 +1,6 @@
 import uuid
 import secrets
-from django.db import models, transaction
+from django.db import models, transaction as db_transaction
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils.safestring import mark_safe
@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from general_settings.currency import get_base_currency_symbol
 from payments import signals
+from freelancer.models import FreelancerAccount
 
 
 class Purchase(models.Model):
@@ -20,6 +21,7 @@ class Purchase(models.Model):
         (SUCCESS, _('Success')),
         (FAILED, _('Failed'))
     )    
+
     PROPOSAL = 'proposal'
     PROJECT = 'project'
     CONTRACT = 'contract'
@@ -54,6 +56,34 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f'{self.payment_method} purchase made by {self.client.get_full_name()}'
+
+
+    @classmethod
+    def stripe_order_confirmation(cls, stripe_order_key):
+        with db_transaction.atomic():
+            purchase = cls.objects.select_for_update().get(stripe_order_key=stripe_order_key)
+            if purchase.status != Purchase.FAILED:
+                raise Exception(_("This purchase already succeeded and cannot be processed"))
+            purchase.status = Purchase.SUCCESS
+            purchase.save()
+
+            proposal_items = ProposalSale.objects.filter(purchase=purchase)
+            application_items = ApplicationSale.objects.filter(purchase=purchase, purchase__status='success')
+            contract_items = ContractSale.objects.filter(purchase=purchase, purchase__status='success')
+
+            if purchase.category == Purchase.PROPOSAL:
+                for item in proposal_items:
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
+            
+            if purchase.category == Purchase.PROJECT:
+                for item in application_items:
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
+            
+            # if purchase.category == Purchase.CONTRACT:
+            #     for item in contract_items:
+            #         FreelancerAccount.credit_pending_balance(user=item.team.created_by, purchase=purchase)            
+
+        return purchase
 
 
 class ApplicationSale(models.Model):

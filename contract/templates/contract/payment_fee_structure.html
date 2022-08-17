@@ -1,15 +1,13 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% block content%}
 
+{% block content %}
+{% include "account/partials/feebanner.html" %}
 
         <div class="wt-dashboardbox">
             <div class="wt-proposalsr">
                 <div class="container"><br><br><br>
                     <div class="wt-managejobcontent">
-                        <div class="col-12">
-                            <h3>Fee Structure</h3>
-                        </div>
                         <span>
                           {% if discount > 0 %}
                            You just won yourself a ({{multiplier}}%) discount on your total amount 
@@ -22,7 +20,6 @@
                     
                     <div class="container">
                         <div class="row g-3">
-
                             <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
                               <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">Team:</div>
@@ -39,7 +36,7 @@
                               <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">Processing Fees (F):</div>
                                 <div class="p-2 bd-highlight"><span class="fw-bold h5">$</span><span id="totalFees"
-                                    class="fw-bold h5">{{chosen_contract.get_fee_payable}}</span></div>
+                                    class="fw-bold h5 float-right">{{chosen_contract.get_fee_payable}}</span></div>
                               </div>
 
                               <div class="d-flex bd-highlight">

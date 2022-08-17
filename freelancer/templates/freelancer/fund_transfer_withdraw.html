@@ -231,10 +231,12 @@
                     $('#id_team_staff').val('');
                     $('#id_position').val('');
                     $('#id_debit_amount').val('');                   
-                    document.getElementById('transfer-message').innerHTML = json.message            
+                    document.getElementById('transfer-message').innerHTML = json.message
+           
                 },
                 error: function (error) {
                     document.getElementById('transfer-message').innerHTML = error.message
+                    //$("#transfer-message").delay(1000).fadeOut(800);
                 }
             });
         }

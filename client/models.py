@@ -94,9 +94,18 @@ class ClientAccount(models.Model):
 
 
     @classmethod
-    def level_one_deposit_check(cls, user, deposit_amount, narration, reference, deposit_fee):
+    def level_one_deposit_check(cls, user, deposit_amount, narration):
         with transaction.atomic():
             client_account = cls.objects.select_for_update().get(user=user)
+
+            if client_account.user.first_name == '':
+                raise FundException(_("First name must be specified on your profile"))
+
+            if client_account.user.last_name == '':
+                raise FundException(_("Last name must be specified on your profile"))
+
+            if narration == '':
+                raise FundException(_("Narration is required"))
 
             if not deposit_amount:
                 raise FundException(_("Deposit amount is required"))
@@ -113,11 +122,7 @@ class ClientAccount(models.Model):
             client_account.available_balance += int(0)
             client_account.save(update_fields=['available_balance'])
 
-            account_action = ClientAction.create(
-                account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, reference=reference, status=False
-            )
-
-        return client_account, account_action
+        return client_account
 
 
     @classmethod
@@ -131,8 +136,11 @@ class ClientAccount(models.Model):
             client_account.available_balance += int(deposit_amount)
             client_account.save(update_fields=['available_balance'])
 
-            account_action = cls.objects.select_for_update().get(account=client_account, transaction_id=transaction_id, reference=reference, status=False)
+            # account_action = cls.objects.select_for_update().get(account=client_account, transaction_id=transaction_id, reference=reference, status=False)
 
+            account_action = ClientAction.create(
+                account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, status=False
+            )
             account_action.available_balance += int(deposit_amount)
             account_action.status = True
             account_action.save(update_fields=['available_balance', 'status'])

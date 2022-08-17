@@ -129,9 +129,9 @@ class Customer(AbstractBaseUser, PermissionsMixin):
             raise ValidationError(
                 {'is_staff': _('Assistant must have "Activate Staff" set to Active')})
         
-        if Customer.objects.filter(is_superuser=True).count() > 1 and self.is_superuser == True:
+        if Customer.objects.filter(is_superuser=True).exists() and self.is_superuser == True:
             raise ValidationError(
-                {'is_superuser': _('SuperAdmin role is too strong to share. Maybe add them as Virtual Assistants or exchange credentials at your own risk')})
+                {'is_superuser': _('SuperAdmin role already exist. Maybe add them as Virtual Assistants or exchange credentials at your own risk')})
 
         if self.user_type == 'freelancer' and self.is_assistant == True:
             raise ValidationError(

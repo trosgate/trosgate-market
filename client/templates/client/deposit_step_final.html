@@ -49,37 +49,39 @@
                                             
                                             <div class="row">
                                                 <h3> Deposit Method - {{selected_gateway}} </h3>
-                                                    
+                                                
                                                 <div class="form-group">
-                                                    <label for="depositAmount" class="form-label">Deposit Amount </label>
-                                                    <input name="depositAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositAmount">
+                                                    <label for="paypaldepositAmount" class="form-label">Deposit Amount </label>
+                                                    <input name="paypaldepositAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositAmount">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="depositNarration" class="form-label">Narration <span class="text-muted"></span></label>
-                                                    <input name="depositNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositNarration" value="">
-                                                </div>
+                                                    <label for="depositdepositNarration" class="form-label">Narration <span class="text-muted"></span></label>
+                                                    <input name="depositdepositNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="depositNarration" value="">
+                                                </div> 
                                                 <div id = 'paypal-deposit-confirm' class="wt-updatall">
                                                     <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
                                                     <a href="javascript:void(0);" class="wt-btn">
                                                         <div id="deposit-confirmation" class="btn btn-inline-danger text-white">I Confirm</div>
                                                     </a>
-                                                </div>
+                                                </div> 
+                                                {% comment %} <div id="paypal-button-container"></div> {% endcomment %}
                                                 <div id = 'paypal-deposit-nextstep' class="wt-updatall">
                                                     <span>Step 2: I understand that after successful deposit, its Irreversible</span>
-                                                    <button id='paypal-deposit-button' type="submit" class="wt-btn"> Yes, Make Deposit </button>
-                                                </div>											
+                                                    <button onclick='hiringPayPalButton(event)' class="wt-btn"> Yes, Make Deposit </button>
+                                                </div>	
+                                                
                                                 <ul class="wt-projectliststyle">
                                                     <div class="wt-title">
                                                         <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
                                                     </div>	
-                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
-                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
-                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#1: Deposit amount must range between <em> {{base_currency}}{{min_deposit}} - {{base_currency}}{{max_deposit}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making deposit, we expect your total balance less than or equal to {{base_currency}}{{max_depositor_balance}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: Your deposit can be used for <em style='color:green'>One-Click-Checkout</em></span></li>
                                                 </ul>
                                             </div>
-                                            {% endif %}
-                                            {% if selected_gateway.name == "Flutterwave" %}  
-                                            <br> 
+                                        {% endif %}
+                                        {% if selected_gateway.name == "Flutterwave" %}  
+                                        <br> 
                                             <div id="flutterwave-error-message" class="a" role="alert">.</div>
                                             <div id="flutterwave-success-message" class="a" role="alert">.</div>
                                             
@@ -108,14 +110,14 @@
                                                     <div class="wt-title">
                                                         <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
                                                     </div>	
-                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
-                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
-                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#1: Deposit amount must range between <em> {{base_currency}}{{min_deposit}} - {{base_currency}}{{max_deposit}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making deposit, we expect your total balance less than or equal to {{base_currency}}{{max_depositor_balance}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: Your deposit can be used for <em style='color:green'>One-Click-Checkout</em></span></li>
                                                 </ul>
                                             </div>
-                                            {% endif %}
-                                            {% if selected_gateway.name == "Stripe" %}
-                                            <br>  
+                                        {% endif %}
+                                        {% if selected_gateway.name == "Stripe" %}
+                                        <br>  
                                             <div id="stripe-error-message" class="text-center" role="alert">.</div>
                                             <div id="stripe-success-message" class="a" role="alert">.</div>
                                             
@@ -147,15 +149,15 @@
                                                     <div class="wt-title">
                                                         <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
                                                     </div>	
-                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
-                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
-                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#1: Deposit amount must range between <em> {{base_currency}}{{min_deposit}} - {{base_currency}}{{max_deposit}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making deposit, we expect your total balance less than or equal to {{base_currency}}{{max_depositor_balance}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: Your deposit can be used for <em style='color:green'>One-Click-Checkout</em></span></li>
                                                 </ul>
          
                                             </div>
-                                            {% endif %} 
-                                            {% if selected_gateway.name == "Razorpay" %} 
-                                            <br> 
+                                        {% endif %} 
+                                        {% if selected_gateway.name == "Razorpay" %} 
+                                        <br> 
                                             <div id="razorpay-error-message" class="a" role="alert">.</div>
                                             <div id="razorpay-success-message" class="a" role="alert">.</div>
                                             
@@ -183,12 +185,12 @@
                                                     <div class="wt-title">
                                                         <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
                                                     </div>	
-                                                    <li><span><i class="fa fa-check"></i>#1: Amount must range from <em> {{base_currency}}{{min_withdrawal_amount}} - {{base_currency}}{{max_withdrawal_amount}} </em></span></li>
-                                                    <li><span><i class="fa fa-check"></i>#2: While making withdrawal, we expect you to keep a minimum of {{base_currency}}{{min_balance_remaining}}</span></li>
-                                                    <li><span><i class="fa fa-check"></i>#3: The remaining balance after each withdrawal must not fall below the minimum</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#1: Deposit amount must range between <em> {{base_currency}}{{min_deposit}} - {{base_currency}}{{max_deposit}} </em></span></li>
+                                                    <li><span><i class="fa fa-check"></i>#2: While making deposit, we expect your total balance less than or equal to {{base_currency}}{{max_depositor_balance}}</span></li>
+                                                    <li><span><i class="fa fa-check"></i>#3: Your deposit can be used for <em style='color:green'>One-Click-Checkout</em></span></li>
                                                 </ul>
                                             </div> 
-                                            {% endif %} 
+                                        {% endif %} 
                                         </div>                                            
                                     </div>
                                 </div>
@@ -210,6 +212,7 @@
 
     {% block scripts %}
 
+
     {% if selected_gateway.name == "PayPal" %}
     <script>
         //PAYPAL DEPOSIT BUTTON CONFIRMATION  
@@ -225,10 +228,96 @@
         });
     </script>        
     <script 
-        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}"data-sdk-integration-source="button-factory">
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency_code}}"data-sdk-integration-source="button-factory">
     </script>
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        let csrftoken = getCookie('csrftoken');
 
-    {% elif selected_gateway.name == "Stripe" %}
+        function hiringPayPalButton(event) {
+            event.preventDefault();
+            
+            let paypalAmount = $('[name="paypaldepositAmount"]').val();
+            let paypalNarration = $('[name="depositdepositNarration"]').val();
+    
+            let displayError = document.getElementById('paypal-error-message')
+            let displaySuccess = document.getElementById('paypal-success-message')            
+
+            if (paypalAmount == '' || paypalNarration == '') {
+                displayError.textContent = 'Ooops! All fields are required';
+                $('#paypal-error-message').addClass('alert alert-danger');
+                
+                console.log('Nothing to display');
+                return false;
+            }
+            else {
+                console.log('All looks good');
+                displayError.textContent = '';
+                $('#stripe-error-message').removeClass('alert alert-danger');
+    
+                let data = {
+                    'paypalAmount': paypalAmount,
+                    'paypalNarration': paypalNarration,
+                }
+                
+                paypal.Buttons({
+                    style: {
+                        layout: 'vertical', //or horizontal
+                        color: 'gold',
+                        shape: 'pill', //or rect
+                        label: 'paypal',
+                    },
+
+                    createOrder: function (data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: paypalAmount
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: function (data) {
+                        let url = "" //{% url 'transactions:paypal_payment_order' %}
+                        return fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'content-type': 'application/json',
+                                'X-CSRFToken': csrftoken,
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID,
+                                paypalAmount: paypalAmount,
+                                paypalNarration: paypalNarration,
+                            })
+                        }).then(function () {
+                            swal("Perfect!", 'All looked good', "success").then((value) =>{
+                                window.location.href = "{% url 'transactions:hiring_payment_success' %}"
+                            });              
+                            
+                        })
+                    },
+                }).render('#paypal-button-container');
+            }
+        }
+        hiringPayPalButton();
+    </script>
+    {% endif %} 
+    
+    {% if selected_gateway.name == "Stripe" %}
     <script>
         //STRIPE DEPOSIT BUTTON CONFIRMATION  
         $(document).ready(function(){
@@ -296,7 +385,8 @@
           }
         }
     </script>
-    {% elif selected_gateway.name == "Flutterwave" %}
+    {% endif %} 
+    {% if selected_gateway.name == "Flutterwave" %}
     <script>
         //FLUTTERWAVE DEPOSIT BUTTON CONFIRMATION  
         $(document).ready(function(){
@@ -312,8 +402,9 @@
     </script>    
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <script src="{% static 'js/deposits/flutterwave-checkout.js' %}"></script>
-
-    {% elif selected_gateway.name == "Razorpay" %}
+    
+    {% endif %} 
+    {% if selected_gateway.name == "Razorpay" %}
     <script>
         //RAZORPAY DEPOSIT BUTTON CONFIRMATION  
         $(document).ready(function(){

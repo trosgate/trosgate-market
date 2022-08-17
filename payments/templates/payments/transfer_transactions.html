@@ -5,19 +5,7 @@
 
 <main class="wt-main wt-haslayout">
     <div class="wt-haslayout wt-innerbannerholder">
-        <div class="container">
-            <div class="row justify-content-md-center">
-                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-                    <div class="wt-innerbannercontent">
-                    <div class="wt-title"><h2>Transfers</h2></div>
-                    <ol class="wt-breadcrumb">
-                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-                        <li class="wt-active">Transfers </li>
-                    </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "account/partials/transfer.html" %}
     </div>
 
     {% if active_team.created_by == request.user %}
@@ -69,6 +57,40 @@
                                 {% endif %}											
                                 </div> 
                             </div>
+                        
+                            {% if manager_transfers.has_other_pages %}
+                            <nav class="wt-pagination">
+                                <ul>
+                                    {% if manager_transfers.has_previous %}
+                                        <li class="wt-prevpage"><a href="?page={{ manager_transfers.previous_page_number }}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                    {% else %}
+                                        <li class="wt-prevpage"><i class="lnr lnr-chevron-left"></i></li>
+                                    {% endif %}
+
+                                    {% if manager_transfers.number|add:'-1' > 1 %}
+                                        <li class="page-item disabled"><a class="page-link">&hellip;</a></li>
+                                    {% endif %}
+
+                                    {% for pg in manager_transfers.paginator.page_range %}
+                                        {% if manager_transfers.number == pg %}
+                                        <li><a style="color: red;" href="#">{{ pg }}</a></li>
+                                        {% elif pg > manager_transfers.number|add:'-2' and pg < manager_transfers.number|add:'2' %}
+                                        <li><a href="?page={{pg}}">{{ pg }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                        
+                                    {% if manager_transfers.paginator.num_pages > manager_transfers.number|add:'1' %}
+                                        <li><a href="#">&hellip;</a></li>
+                                    {% endif %}
+
+                                    {% if manager_transfers.has_next %}
+                                    <li class="wt-nextpage"><a href="?page={{ manager_transfers.next_page_number }}"><i class="lnr lnr-chevron-right"></i></a></li>
+                                    {% else %}
+                                    <li class="wt-nextpage"><i class="lnr lnr-chevron-right"></i></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}	
                         </div>								
                     </div>
                 </div>
@@ -98,7 +120,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Name</th>
+                                            <th>Sender</th>
                                             <th>Type</th>                                                
                                             <th>Worked As</th>
                                             <th>Received on </th>
@@ -110,7 +132,7 @@
                                     {% for staff_transfer in staff_transfers %}
                                         <tr>
                                             <td>{{forloop.counter}} </td>
-                                            <td>{{staff_transfer.team_staff.get_full_name}}</td>
+                                            <td>{{staff_transfer.manager.get_full_name}}</td>
                                             <td>{{staff_transfer.get_action_choice_display}}</td>
                                             <td>{{staff_transfer.get_position_display}}</td>
                                             <td>{{staff_transfer.created_at}}</td>
@@ -126,6 +148,39 @@
                                     {% endif %}											
                                 </div> 
                             </div>
+                            {% if staff_transfers.has_other_pages %}
+                            <nav class="wt-pagination">
+                                <ul>
+                                    {% if staff_transfers.has_previous %}
+                                        <li class="wt-prevpage"><a href="?page={{ staff_transfers.previous_page_number }}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                    {% else %}
+                                        <li class="wt-prevpage"><i class="lnr lnr-chevron-left"></i></li>
+                                    {% endif %}
+
+                                    {% if staff_transfers.number|add:'-1' > 1 %}
+                                        <li class="page-item disabled"><a class="page-link">&hellip;</a></li>
+                                    {% endif %}
+
+                                    {% for pg in staff_transfers.paginator.page_range %}
+                                        {% if staff_transfers.number == pg %}
+                                        <li><a style="color: red;" href="#">{{ pg }}</a></li>
+                                        {% elif pg > staff_transfers.number|add:'-2' and pg < staff_transfers.number|add:'2' %}
+                                        <li><a href="?page={{pg}}">{{ pg }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                        
+                                    {% if staff_transfers.paginator.num_pages > staff_transfers.number|add:'1' %}
+                                        <li><a href="#">&hellip;</a></li>
+                                    {% endif %}
+
+                                    {% if staff_transfers.has_next %}
+                                    <li class="wt-nextpage"><a href="?page={{ staff_transfers.next_page_number }}"><i class="lnr lnr-chevron-right"></i></a></li>
+                                    {% else %}
+                                    <li class="wt-nextpage"><i class="lnr lnr-chevron-right"></i></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}	
                         </div>								
                     </div>
                 </div>

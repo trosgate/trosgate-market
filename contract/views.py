@@ -90,7 +90,6 @@ def internal_contract_detail(request, contract_id, contract_slug):
     return render(request, 'contract/internal_contract_detail.html', context)
 
 
-
 @login_required
 @user_is_freelancer
 def accept_or_reject_contract(request):
@@ -201,6 +200,7 @@ def final_contract_checkout(request, contract_id, contract_slug):
 
     currency = CurrencyForm()
     base_currency = get_base_currency_code()
+    base_currency_symbol = get_base_currency_symbol()
 
     context = {
         'contract': contract,
@@ -214,6 +214,7 @@ def final_contract_checkout(request, contract_id, contract_slug):
         "razorpay_public_key": razorpay_public_key,
         "currency": currency,
         "base_currency": base_currency,
+        "base_currency_symbol": base_currency_symbol,
         "discount": discount,
         "multiplier": multiplier,
         "start_discount": start_discount,
@@ -321,11 +322,12 @@ def get_flutterwave_verification(unique_reference, flutterwave_order_key):
 
 
 @login_required
+@user_is_client
 def stripe_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
-    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
     
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()
@@ -403,10 +405,11 @@ def stripe_contract_intent(request):
 
 
 @login_required
+@user_is_client
 def paypal_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
     chosen_contract = BaseContract(request)
-    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()
     gateway_type = chosen_contract.get_gateway()
@@ -473,7 +476,7 @@ def razorpay_contract_intent(request):
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
     total_gateway_fee = chosen_contract.get_fee_payable()
-    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)   
+    contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)   
     
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
     gateway_type = chosen_contract.get_gateway()
@@ -487,12 +490,14 @@ def razorpay_contract_intent(request):
 
     purchase = Purchase.objects.create(
         client=request.user,
-        full_name=f'{request.user.first_name} {request.user.last_name}',
-        payment_method=str(gateway_type),
-        category = Purchase.CONTRACT,
+        full_name=request.user.get_full_name,
+        email=request.user.email,
+        country=str(request.user.country),
+        payment_method=gateway_type,
         client_fee = int(total_gateway_fee),
+        category = Purchase.CONTRACT,
         salary_paid=grand_total,
-        unique_reference=unique_reference,
+        unique_reference=unique_reference, 
     )
     purchase.status = Purchase.FAILED
     purchase.save()
@@ -557,7 +562,7 @@ def razorpay_webhook(request):
             'razorpay_signature': razorpay_signature
         }    
                  
-        contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+        contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
         razorpay_client = RazorpayClientConfig().get_razorpay_client()
         purchase = Purchase.objects.get(razorpay_order_key=razorpay_order_key)
 
@@ -635,13 +640,16 @@ def add_contractor(request):
 @login_required
 @user_is_freelancer
 def update_contractor(request, contractor_id):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[
-                             request.user], status=Team.ACTIVE)
+    team = get_object_or_404(
+        Team, 
+        pk=request.user.freelancer.active_team_id, 
+        members__in=[request.user], 
+        status=Team.ACTIVE
+    )
     contractor = get_object_or_404(Contractor, team=team, pk=contractor_id)
 
     if request.method == 'POST':
-        update_contractor = ChangeContractorForm(
-            request.POST, instance=contractor)
+        update_contractor = ChangeContractorForm(request.POST, instance=contractor)
 
         if update_contractor.is_valid():
             update_contractor.save()
@@ -662,8 +670,12 @@ def update_contractor(request, contractor_id):
 @login_required
 @user_is_freelancer
 def delete_contractor(request, contractor_id):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[
-                             request.user], status=Team.ACTIVE)
+    team = get_object_or_404(
+        Team, 
+        pk=request.user.freelancer.active_team_id, 
+        members__in=[request.user], 
+        status=Team.ACTIVE
+    )
     contractor = get_object_or_404(Contractor, team=team, pk=contractor_id)
     contractor.delete()
 
@@ -675,12 +687,16 @@ def delete_contractor(request, contractor_id):
 @login_required
 @user_is_freelancer
 def create_external_contract(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[
-                             request.user], status=Team.ACTIVE)
+    team = get_object_or_404(
+        Team, 
+        pk=request.user.freelancer.active_team_id, 
+        members__in=[request.user], 
+        status=Team.ACTIVE
+    )
 
     if request.method == 'POST':
-        contractform = ExternalContractForm(team, request.POST)
-        contractorform = ContractorForm(request.POST)
+        contractform = ExternalContractForm(team, request.POST or None)
+        contractorform = ContractorForm(request.POST or None)
 
         if contractform.is_valid():
             contract = contractform.save(commit=False)
@@ -698,8 +714,7 @@ def create_external_contract(request):
             contractor.team = team
             contractor.save()
 
-            messages.success(
-                request, f'The contractor "{contractor.name}" was added!')
+            messages.success(request, f'The contractor "{contractor.name}" was added!')
             return redirect('contract:create_external_contract')
 
     else:
@@ -716,8 +731,12 @@ def create_external_contract(request):
 @login_required
 def external_contract_list(request):
     if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[
-                                 request.user], status=Team.ACTIVE)
+        team = get_object_or_404(
+            Team, 
+            pk=request.user.freelancer.active_team_id, 
+            members__in=[request.user], 
+            status=Team.ACTIVE
+        )
         contracts = team.contractsteam.all()
 
     elif request.user.user_type == Customer.CLIENT:

@@ -20,7 +20,7 @@ from general_settings.fund_control import (
 )
 from payments.models import PaymentRequest, AdminCredit
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
-from notification.mailer import initiate_credit_memo_email
+from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email
 
 class ActiveFreelancer(models.Manager):
     def get_queryset(self):
@@ -133,8 +133,21 @@ class FreelancerAccount(models.Model):
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
+
+
+    @classmethod
+    def credit_pending_balance(cls, user, pending_balance, paid_amount, purchase):
+        with db_transaction.atomic():
+            account = cls.objects.select_for_update().get(user=user)
+            account.pending_balance += pending_balance
+            account.save(update_fields=['pending_balance'])           
+            account.save()
+
+            db_transaction.on_commit(lambda: credit_pending_balance_email(account, paid_amount, purchase))
+
+        return account
  
- 
+
     @classmethod
     def initiate_credit_memo(cls, account, user, amount, comment, created_at):
         with db_transaction.atomic():

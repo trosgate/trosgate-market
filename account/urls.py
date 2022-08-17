@@ -17,7 +17,7 @@ urlpatterns = [
     path("account/login/", views.loginView, name = "login"),
     path('dashboard/', views.user_dashboard, name='dashboard'), 
     path("account/two-factor-auth/", views.two_factor_auth, name = "two_factor_auth"),    
-    path("logout/", auth_views.LogoutView.as_view(next_page="account:homepage"), name="logout"),
+    path("logout/", views.Logout, name="logout"),
     path("autologout/", views.autoLogout, name="autologout"),
     path('account/register/', account_register, name='register'),
     path("activate/<slug:uidb64>/<slug:token>)/", account_activate, name="activate"),

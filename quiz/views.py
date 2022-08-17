@@ -14,6 +14,8 @@ from account.models import Customer
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text
 from datetime import datetime, timedelta
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .controller import QuizMaster
 
 
 @login_required
@@ -42,14 +44,37 @@ def create_quiz(request):
 
 @login_required
 def list_quiz(request):
+
     quiz_change_form = QuizChangeForm()
+    freelancer_quizz = ''
+    client_quizz = ''
+
     if request.user.user_type == Customer.FREELANCER:
         quizz = Quizes.objects.filter(is_published=True)
+        page = request.GET.get('page', 1)
+        paginator = Paginator(quizz, 10)
+        try:
+            freelancer_quizz = paginator.page(page)
+        except PageNotAnInteger:
+            freelancer_quizz = paginator.page(1)
+        except EmptyPage:
+            freelancer_quizz = paginator.page(paginator.num_pages)
+
     elif request.user.user_type == Customer.CLIENT:
         quizz = Quizes.objects.filter(created_by=request.user)
-    
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(quizz, 10)
+        try:
+            client_quizz = paginator.page(page)
+        except PageNotAnInteger:
+            client_quizz = paginator.page(1)
+        except EmptyPage:
+            client_quizz = paginator.page(paginator.num_pages)
+
     context = {
-	    'quizz':quizz,
+	    'freelancer_quizz':freelancer_quizz,
+	    'client_quizz':client_quizz,
 	    'quiz_change_form':quiz_change_form,
 	}
     return render(request, 'quiz/quizes_list.html', context)
@@ -155,7 +180,17 @@ def take_test(request, quiz_slug):
     print(time_duration)
     print(datetime.now())
     print(time_remaining)
-    
+
+    quiz_master = QuizMaster(request, quiz)
+    print('num_of_attempt_avail:', quiz_master.num_of_attempt_avail()), 
+    print('num_of_attempt_remaining:', quiz_master.num_of_attempt_remaining(request.user)),  
+    print('can_attempt_again:', quiz_master.can_attempt_again(request.user)),  
+    print('total_quiz_questions:', quiz_master.total_quiz_questions()),  
+    print('total_marks_for_quiz_questions:', quiz_master.total_marks_for_quiz_questions())
+    # print('total_correct_marks_per_quiz:', quiz_master.total_correct_marks_per_quiz(request.user))
+
+
+
     context = {
         'quiz': quiz,
         'time_remaining': time_remaining,
@@ -180,7 +215,7 @@ def select_answers(request, quiz_id):
             Attempt.objects.create(quiz=quiz, participant=participant, question=question, answer=answer)
             if answer.is_correct == True:
                 marks += question.marks
-                participant.score += marks
+                participant.score = marks
                 participant.save()
 
         messages.info(request, f'You have completed with a score of {marks}')

@@ -16,7 +16,7 @@ class QuizForm(forms.ModelForm):
 
     class Meta:
         model = Quizes
-        fields = ['title','skills', 'instruction', 'attempts', 'duration', 'is_published'] 
+        fields = ['title','skills', 'instruction', 'attempts', 'duration'] 
 
 
     def __init__(self, *args, **kwargs):
@@ -32,8 +32,6 @@ class QuizForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 1})
         self.fields['duration'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 10})
-        self.fields['is_published'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Select Status' })
 
 
 class QuestionForm(forms.ModelForm):

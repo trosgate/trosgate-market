@@ -7,7 +7,6 @@ from proposals.models import Proposal
 from account.models import Customer
 from datetime import timedelta
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 from applications.models import Application
 from contract.models import InternalContract
 
@@ -30,7 +29,7 @@ class PackageController():
   
     def max_proposals_allowable_per_team(self):
         team_proposal_limit = self.team.package.max_proposals_allowable_per_team  
-        team_proposals_count = self.team.proposalteam.count()
+        team_proposals_count = Proposal.objects.filter(team=self.team).count()
         return team_proposal_limit > team_proposals_count
 
     def monthly_projects_applicable_per_team(self):

@@ -28,6 +28,7 @@ from .utilities import (
     one_year, two_years, three_years, four_years, five_years    
 )
 from teams.controller import PackageController
+from django.core.paginator import Paginator
 
 
 # this will appear in search results

@@ -3,53 +3,124 @@
 {% block content%}
 {% include 'dashboard/main_sidebar.html' %}
 
-			<!--Main Start-->
-			<main id="wt-main" class="wt-main wt-haslayout">
 
-            {% if request.user.clients %}
-            <section class="wt-haslayout wt-dbsectionspace">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="alert alert-info" role="alert">
-                                <span style="color: green; font-weight: bold;">!Important: <br>(1) Only quizes with "Public" status shall be Published, <br>(2) Ensure you have a maximum of 5 questions else your quiz will not go public</span>
-                            </div>
-                        </div>
+<main class="wt-main wt-haslayout">
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="alert alert-info" role="alert">
+            <span style="color: green; font-weight: bold;">!Important: <br>(1) Only quizes with "Public" status shall be Published, <br>(2) Ensure you have a maximum of 5 questions else your quiz will not go public</span>
+        </div>
+    </div>
 
-                        <div class="card-body">
 
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h5 class="card-title">
-                                <div class="wt-btnarea">
-                                    <a href="{% url 'quiz:create_quiz' %}" class="wt-btn">Add New Quiz</a>
+    {% if request.user.freelancer %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>Freelancer Quizes</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                            Info: Any credit transfer or withdrawal will impact a debited to your account. 
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>										
-            </section>
-            {% comment %} {% endif %} {% endcomment %}
-                        
-            <section class="wt-haslayout wt-dbsectionspace">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                        <div class="wt-insightsitem wt-dashboardbox">
-                    <div class="card">
-                        <div class="card-header">
-                            List of Quizzes
-                        </div>
 
-                        <div class="card-body">
-
-                            <div class="row">
-                            <div class="col-lg-12">
-
-                            {% if quizz|length > 0 %}
                             <div class="table-responsive">
-                                <table class="table table-striped table-sm">
-                                    <thead>
+                                <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Number</th>
+                                        <th>Quiz Name</th>
+                                        <th>Skills Required</th>
+                                        <th>Duration(Min)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for quiz in freelancer_quizz %}
+                                    <tr>
+                                    <td>{{forloop.counter}} </td>
+                                    <td>{% if quiz.title %} {{quiz.title}} {% else %} - {% endif %}</td>
+                                    <td>{% if quiz.skills %}<div class="wt-widgettag">{% for quizz in quiz.skills.all %}<a href="javascript:void(0);">{{quizz}}</a>{% endfor %} {% else %} - {% endif %}</td>
+                                    <td>{% if quiz.duration %} {{quiz.duration }} {% else %} - {%endif%}</td>
+                                    <td>
+										<a href="{{quiz.get_quiz_detail_absolute_url}}" class="btn btn-info"><i class="fa fa-window-restore"> View Detail</i></a>
+									</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+							{% if not freelancer_quizz %}
+                            <hr>
+							<p class='text-center'> Ooops! No quiz created Yet<p>
+							{% endif %}
+				        </div>				
+                        
+                        {% if freelancer_quizz.has_other_pages %}
+                        <nav class="wt-pagination">
+                            <ul>
+                                {% if freelancer_quizz.has_previous %}
+                                    <li class="wt-prevpage"><a href="?page={{ freelancer_quizz.previous_page_number }}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                {% else %}
+                                    <li class="wt-prevpage"><i class="lnr lnr-chevron-left"></i></li>
+                                {% endif %}
+
+                                {% if freelancer_quizz.number|add:'-1' > 1 %}
+                                    <li class="page-item disabled"><a class="page-link">&hellip;</a></li>
+                                {% endif %}
+
+                                {% for pg in freelancer_quizz.paginator.page_range %}
+                                    {% if freelancer_quizz.number == pg %}
+                                    <li><a style="color: red;" href="#">{{ pg }}</a></li>
+                                    {% elif pg > freelancer_quizz.number|add:'-2' and pg < freelancer_quizz.number|add:'2' %}
+                                    <li><a href="?page={{pg}}">{{ pg }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                    
+                                {% if freelancer_quizz.paginator.num_pages > freelancer_quizz.number|add:'1' %}
+                                    <li><a href="#">&hellip;</a></li>
+                                {% endif %}
+
+                                {% if freelancer_quizz.has_next %}
+                                <li class="wt-nextpage"><a href="?page={{ freelancer_quizz.next_page_number }}"><i class="lnr lnr-chevron-right"></i></a></li>
+                                {% else %}
+                                <li class="wt-nextpage"><i class="lnr lnr-chevron-right"></i></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}	
+                        </div>								
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}      
+
+    {% if request.user.clients %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>Client Quizes</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-warning" role="alert">
+                                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                            Info: Any credit transfer or withdrawal will impact a debited to your account. 
+                                        </span>
+                                    </div>
+                                </div>
+
+                            <div class="table-responsive">
+                                <table class="table">
+                                <thead>
                                     <tr>
                                         <th>Number</th>
                                         <th>Quiz Name</th>
@@ -58,11 +129,10 @@
                                         <th>Participants</th>
                                         <th>Duration(Min)</th>
                                         <th>Action</th>
-
                                     </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for quiz in quizz %}
+                                </thead>
+                                <tbody>
+                                    {% for quiz in client_quizz %}
                                     <tr>
                                         <td>{{forloop.counter}} </td>
                                         <td>{% if quiz.title %} {{quiz.title}} {% else %} - {% endif %}</td>
@@ -75,93 +145,64 @@
                                         </td>
                                     </tr>
                                     {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% endif %}
-							{% if not quizz %}
-							<p> Ooops! No quiz created Yet<p>
+                                </tbody>
+                            </table>
+							{% if not client_quizz %}
+                            <hr>
+							<p class='text-center'> Ooops! No quiz created Yet<p>
 							{% endif %}
 				        </div>				
+                        
+                        {% if client_quizz.has_other_pages %}
+                        <nav class="wt-pagination">
+                            <ul>
+                                {% if client_quizz.has_previous %}
+                                    <li class="wt-prevpage"><a href="?page={{ client_quizz.previous_page_number }}"><i class="lnr lnr-chevron-left"></i></a></li>
+                                {% else %}
+                                    <li class="wt-prevpage"><i class="lnr lnr-chevron-left"></i></li>
+                                {% endif %}
+
+                                {% if client_quizz.number|add:'-1' > 1 %}
+                                    <li class="page-item disabled"><a class="page-link">&hellip;</a></li>
+                                {% endif %}
+
+                                {% for pg in client_quizz.paginator.page_range %}
+                                    {% if client_quizz.number == pg %}
+                                    <li><a style="color: red;" href="#">{{ pg }}</a></li>
+                                    {% elif pg > client_quizz.number|add:'-2' and pg < client_quizz.number|add:'2' %}
+                                    <li><a href="?page={{pg}}">{{ pg }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                    
+                                {% if client_quizz.paginator.num_pages > client_quizz.number|add:'1' %}
+                                    <li><a href="#">&hellip;</a></li>
+                                {% endif %}
+
+                                {% if client_quizz.has_next %}
+                                <li class="wt-nextpage"><a href="?page={{ client_quizz.next_page_number }}"><i class="lnr lnr-chevron-right"></i></a></li>
+                                {% else %}
+                                <li class="wt-nextpage"><i class="lnr lnr-chevron-right"></i></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}	
+                        </div>								
                     </div>
-                </div>										
-            </section>
-            {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}	
 
-            {% if request.user.freelancer %}
-            <section class="wt-haslayout wt-dbsectionspace">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="alert alert-info" role="alert">
-                                <span style="color: green; font-weight: bold;">!Alert: Usually Employers trust their long term projects with those who participate in their quizes</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>										
-            </section>
-          
-            <section class="wt-haslayout wt-dbsectionspace">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                        <div class="wt-insightsitem wt-dashboardbox">
-                    <div class="card">
-                        <div class="card-header">
-                            List of Quizzes
-                        </div>
-
-                        <div class="card-body">
-
-                            <div class="row">
-                            <div class="col-lg-12">
-
-                            {% if quizz|length > 0 %}
-                            <div class="table-responsive">
-                                <table class="table table-striped table-sm">
-                                    <thead>
-                                    <tr>
-
-                                        <th>Number</th>
-                                        <th>Quiz Name</th>
-                                        <th>Skills Required</th>
-                                        <th>Duration(Min)</th>
-                                        <th>Action</th>
-
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for quiz in quizz %}
-                                    <tr>
-                                    <td>{{forloop.counter}} </td>
-                                    <td>{% if quiz.title %} {{quiz.title}} {% else %} - {% endif %}</td>
-                                    <td>{% if quiz.skills %}<div class="wt-widgettag">{% for quizz in quiz.skills.all %}<a href="javascript:void(0);">{{quizz}}</a>{% endfor %} {% else %} - {% endif %}</td>
-                                    <td>{% if quiz.duration %} {{quiz.duration }} {% else %} - {%endif%}</td>
-                                    <td>
-										<a href="{{quiz.get_quiz_detail_absolute_url}}" class="btn btn-info"><i class="fa fa-window-restore"> View Detail</i></a>
-									</td>
-                                    </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% endif %}
-							{% if not quizz %}
-							<p> Ooops! quiz created Yet<p>
-							{% endif %}
-				        </div>				
-                    </div>
-                </div>										
-            </section>
-            {% endif %}
-			<div class="wt-proposalholder">
-				<div class="row justify-content-md-center">
-					<div class="wt-sectionhead wt-textcenter">
-						<span>I am ...........</span>
-					</div>
-				</div>
-			</div>
-			</main>
-
+    <div class="wt-proposalholder">
+        <div class="row justify-content-md-center">
+            <div class="wt-sectionhead wt-textcenter">
+                <span>{{website.name}}</span>
+            </div>
+        </div>
+    </div>
+</main>
 {% endblock %}
+
+{% comment %} {% endblock %} {% endcomment %}
 

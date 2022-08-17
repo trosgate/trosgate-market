@@ -112,7 +112,7 @@ def payment_option_with_fees(request):
         messages.error(request, "Please add atleast one proposal to proceed")
         return redirect("transactions:hiring_box_summary")
 
-    payment_gateways = PaymentGateway.objects.filter(status=True)
+    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
     base_currency = get_base_currency_symbol()    
     context ={
         'hiringbox': hiringbox,
@@ -170,7 +170,6 @@ def final_checkout(request):
     subtotal = hiringbox.get_total_price_before_fee_and_discount()
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
     base_currency = get_base_currency_code()
-    total_after_discount = hiringbox.get_total_price_after_discount_only()
 
     # Stripe payment api
     stripeClient = StripeClientConfig()
@@ -410,46 +409,46 @@ def stripe_payment_order(request):
                     (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
                     get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
             )
-
         hiringbox.clean_box()
         return JsonResponse({'session': session,})
             
     return JsonResponse({'failed':'Bad Signature',})
-    
 
-@db_transaction.atomic()
-def stripe_specific_payment_confirmation(stripe_order_key):
-    purchase_obj = Purchase.objects.select_for_update().get(stripe_order_key=stripe_order_key)
-    purchase_obj.status = Purchase.SUCCESS
-    purchase_obj.save()
 
-    if purchase_obj.category == Purchase.PROPOSAL:
-        proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-        for item in proposal_items:
-            founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-            founder_account.pending_balance += sum([item.total_earning])
-            print('balance:::', founder_account.pending_balance)
-            founder_account.save()
+# @db_transaction.atomic()
+# def stripe_specific_payment_confirmation(stripe_order_key):
+#     purchase_obj = Purchase.objects.select_for_update().get(stripe_order_key=stripe_order_key)
+#     purchase_obj.status = Purchase.SUCCESS
+#     purchase_obj.save()
 
-    if purchase_obj.category == Purchase.PROJECT:
-        proposal_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-        for item in proposal_items:
-            founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-            founder_account.pending_balance += sum([item.total_earnings])
-            print('balance:::', founder_account.pending_balance)
-            founder_account.save()
+#     if purchase_obj.category == Purchase.PROPOSAL:
+#         proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+#         for item in proposal_items:
+#             founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+#             founder_account.pending_balance += sum([item.total_earning])
+#             print('balance:::', founder_account.pending_balance)
+#             founder_account.save()
 
-    if purchase_obj.category == Purchase.CONTRACT:
-        proposal_items = ContractSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-        for item in proposal_items:
-            founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-            founder_account.pending_balance += sum([item.total_earning])
-            print('balance:::', founder_account.pending_balance)
-            founder_account.save()
+#     if purchase_obj.category == Purchase.PROJECT:
+#         application_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+#         for item in application_items:
+#             founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+#             founder_account.pending_balance += sum([item.total_earnings])
+#             print('balance:::', founder_account.pending_balance)
+#             founder_account.save()
+
+#     if purchase_obj.category == Purchase.CONTRACT:
+#         contract_items = ContractSale.objects.filter(purchase=purchase_obj, purchase__status='success')
+#         for item in contract_items:
+#             founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
+#             founder_account.pending_balance += sum([item.total_earning])
+#             print('balance:::', founder_account.pending_balance)
+#             founder_account.save()
 
 
 @csrf_exempt
 def stripe_webhook(request):
+    # hiringbox = HiringBox(request)
     payload = request.body
     stripe.api_key = StripeClientConfig().stripe_secret_key()
     webhook_key = StripeClientConfig().stripe_webhook_key()    
@@ -468,39 +467,41 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         if session.payment_status == 'paid':
-            try:
-                stripe_specific_payment_confirmation(session.payment_intent)
-            except Exception as e:
-                print('%s' % (str(e)))
+            if session.mode == 'payment':# else a subscription
+                try:
+                    Purchase.stripe_order_confirmation(session.payment_intent) # Yet to test this with internet                    
+                except Exception as e:
+                    print('%s' % (str(e)))
+                
+            else:
+                try:                            
+                    package = Package.objects.get(is_default=False, type='Team')
+                    team = Team.objects.get(pk=session.get('client_reference_id'))
+                    team.stripe_customer_id = session.get('customer')
+                    team.stripe_subscription_id = session.get('subscription')
+                    team.package = package
+                    team.package_status = Team.ACTIVE
+                    team.package_expiry = get_expiration()
+                    team.save()   
 
-            try:                            
-                package = Package.objects.get(is_default=False, type='Team')
-                team = Team.objects.get(pk=session.get('client_reference_id'))
-                team.stripe_customer_id = session.get('customer')
-                team.stripe_subscription_id = session.get('subscription')
-                team.package = package
-                team.package_status = Team.ACTIVE
-                team.package_expiry = get_expiration()
-                team.save()   
+                except Exception as e:
+                    print('%s' % (str(e)))
 
-            except Exception as e:
-                print('%s' % (str(e)))
-
-            try:
-                SubscriptionItem.objects.create(    
-                    team=team,
-                    customer_id = team.stripe_customer_id,
-                    subscription_id=team.stripe_subscription_id,
-                    payment_method='Stripe', 
-                    price=package.price, 
-                    created_at = timezone.now(),
-                    activation_time = timezone.now(),
-                    expired_time = get_expiration(),
-                    status = True,
-                )
-                           
-            except Exception as e:
-                print('%s' % (str(e)))
+                try:
+                    SubscriptionItem.objects.create(    
+                        team=team,
+                        customer_id = team.stripe_customer_id,
+                        subscription_id=team.stripe_subscription_id,
+                        payment_method='Stripe', 
+                        price=package.price, 
+                        created_at = timezone.now(),
+                        activation_time = timezone.now(),
+                        expired_time = get_expiration(),
+                        status = True,
+                    )
+                            
+                except Exception as e:
+                    print('%s' % (str(e)))
         else:
             print('Payment unsuccessful')  
 
