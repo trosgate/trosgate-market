@@ -329,7 +329,7 @@ def stripe_application_intent(request):
                     (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
                     get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))             
             )
-
+        applicant_box.clean_box()
         return JsonResponse({'session': session, 'order': payment_intent})
 
 
@@ -346,7 +346,6 @@ def paypal_application_intent(request):
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
     data = body["orderID"]
-    print(data)
 
     if data:
         paypal_request_order = OrdersGetRequest(data)
@@ -363,10 +362,12 @@ def paypal_application_intent(request):
                 salary_paid=round(float(response.result.purchase_units[0].amount.value)),
                 paypal_order_key=response.result.id,
                 unique_reference=PayPalClient.paypal_unique_reference(),
-                status=Purchase.SUCCESS,
+                status=Purchase.FAILED,
             )
+
         except Exception as e:
             print('%s' % (str(e)))
+            
         try:
             for applicant in applicant_box:
                 ApplicationSale.objects.create(
@@ -392,16 +393,10 @@ def paypal_application_intent(request):
         except Exception as e:
             print('%s' % (str(e)))
 
-        with db_transaction.atomic():
-            purchase_obj = Purchase.objects.select_for_update().get(pk=purchase.pk)
-            purchase_obj.status = Purchase.SUCCESS
-            purchase_obj.save()
-
-            application_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-            for item in application_items:
-                founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-                founder_account.pending_balance += sum([item.total_earnings])
-                founder_account.save()
+        try:
+            Purchase.paypal_order_confirmation(pk=purchase.pk)
+        except Exception as e:
+            print('%s' % (str(e)))        
 
         applicant_box.clean_box()
         return JsonResponse({'Perfect': 'All was successful', })
@@ -609,35 +604,20 @@ def razorpay_webhook(request):
             'razorpay_signature': razorpay_signature
         }
 
-        with db_transaction.atomic():
-            purchase_obj = Purchase.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)
-            purchase_obj.razorpay_payment_id = razorpay_payment_id
-            purchase_obj.razorpay_signature = razorpay_signature
 
-            signature = razorpay_client.utility.verify_payment_signature(data)
+        signature = razorpay_client.utility.verify_payment_signature(data)
 
-            if signature == True:
-                purchase_obj.status = Purchase.SUCCESS
-                purchase_obj.save()                   
-
-                application_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-                for item in application_items:
-                    founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-                    founder_account.pending_balance += sum([item.total_earnings])
-                    founder_account.save()
-
+        if signature == True:
+            try:
+                Purchase.razorpay_order_confirmation(razorpay_order_key, razorpay_payment_id, razorpay_signature)
                 applicant_box.clean_box()
                 return JsonResponse({'Perfect':'All was successful',})
-                
-            else:
-                purchase_obj.status = Purchase.FAILED
-                purchase_obj.save()
-                return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
-    else:            
-        purchase_obj.status = Purchase.FAILED
-        purchase_obj.save()
-        return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
-                
+            except Exception as e:
+                print('%s' % (str(e))) 
+
+        else:
+            return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+ 
 
 
 @login_required

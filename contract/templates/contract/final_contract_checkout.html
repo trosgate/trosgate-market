@@ -84,7 +84,7 @@
                                         <span id="feedback-converter" style="color:green; text-align:right;">.</span>
                                     </div>
                                     <div class='col-md-12 mt-4'>
-                                        <button class="btn btn-primary w-100 fw-bold" >Converter</button>
+                                        <button id="convert-currency" class="btn btn-primary w-100 fw-bold" >Converter</button>
                                     </div>
                                     </div>
                                 </div>
@@ -115,10 +115,7 @@
                 </div>
             </div>
         </div>
-        {% comment %} </div>
-        </div>
-        </div> {% endcomment %}
-            
+
         <div class="wt-proposalholder mt-6">
             <div class="row justify-content-md-center">
                 <div class="wt-sectionhead wt-textcenter">
@@ -129,228 +126,252 @@
 
     {% endblock %}        
     {% block scripts %}
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        
-        {% if gateway_type.name == "PayPal" %}
-        <script 
-            src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}"data-sdk-integration-source="button-factory">
-        </script>
-        <script>
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                    }
-                }
-                return cookieValue;
-            }
-            var csrftoken = getCookie('csrftoken');
 
-            function hiringPayPalButton(){
-                paypal.Buttons({
-                    style: {
-                        layout: 'vertical',
-                        color:  'gold',
-                        shape:  'rect',
-                        label:  'checkout'
-                    },
-                createOrder: function(data, actions) {
+    <script>
+        //Script to add proposal quantity in session             
+        $(document).on('click', '#convert-currency', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url "general_settings:converter" %}',
+            data: {
+                currencyid: $('#id_currency option:selected').val(),
+                targetamount: '{{grand_total}}',
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'currency'
+            },
+            success: function (json) {
+                document.getElementById('feedback-converter').innerHTML = json.message
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+        })
+    </script>
+
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    
+    {% if gateway_type.name == "PayPal" %}
+    <script 
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}"data-sdk-integration-source="button-factory">
+    </script>
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+                }
+            }
+            return cookieValue;
+        }
+        let csrftoken = getCookie('csrftoken');
+
+        function hiringPayPalButton(){
+            paypal.Buttons({
+                style: {
+                    layout: 'vertical', //or horizontal
+                    color: 'gold',
+                    shape: 'rect', //or pill
+                    label: 'paypal',
+                },
+                createOrder: function (data, actions) {
                     return actions.order.create({
                         purchase_units: [{
-                        amount: {
-                            value: '{{grand_total}}'
-                        }
+                            amount: {
+                                value: '{{grand_total}}'
+                            }
                         }]
                     });
-                },
-                onApprove: function (data) {
-                    var url = "{% url 'contract:paypal_contract_intent' %}"
-                    return fetch(url, {
-                        method: 'POST',
-                        headers: {
-                        'content-type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                        },
-                        body: JSON.stringify({
-                        orderID: data.orderID
+                },                
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function(){
+                        let url = "{% url 'contract:paypal_contract_intent' %}"
+                        return fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'content-type': 'application/json',
+                                'X-CSRFToken': csrftoken,
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID
+                            })
+                        }).then(function () {
+                            swal("Perfect!", 'All looked good', "success").then((value) =>{
+                                window.location.href = "{% url 'contract:contract_success' %}"
+                            });              
+                            
                         })
-                    }).then(function () {
-                        swal("Perfect!", 'All looked good', "success").then((value) =>{
-                            window.location.href = '/contract/congrats/'
-                        });  
-                    })
-                    },
-                }).render('#paypal-button-container');
-            }
-            hiringPayPalButton();                              
-        </script>
+                    })                    
+                    
+                },                
+            }).render('#paypal-button-container');
+        }
+        hiringPayPalButton();                              
+    </script>
 
-        {% elif gateway_type.name == "Stripe" %}
-        <script>
-            /// Make csrf token availble in JS files
-            var CSRF_TOKEN = '{{ csrf_token }}';
-        </script>
-        <script src="https://js.stripe.com/v3/"></script>
-        {% comment %} <script src="{% static 'js/payments/stripe-contract-checkout.js' %}" data-rel-js></script> {% endcomment %}
-        <script>
-            function stripePay(event) {
-                event.preventDefault();
-              
-                let stripecCustomer = document.getElementById("stripecCustomer").value;
-                let stripecEmail = document.getElementById("stripecEmail").value;
-                let stripecCountry = document.getElementById("stripecCountry").value;
-              
-                let displayError = document.getElementById('stripecard-errors')
-              
-                if (stripecCustomer == '' || stripecEmail == '' || stripecCountry == '') {
-                  displayError.textContent = 'Ooops! All fields are required';
-                  $('#stripecard-errors').addClass('alert alert-danger');
-              
-                  return false
-                }
-                else {
-                  displayError.textContent = '';
-                  $('#stripecard-errors').removeClass('alert alert-danger');
-                  console.log('error removed')
-              
-                  let data = {
-                    'stripeCustomer': stripecCustomer, //document.querySelector('input[name=stripeCustomer]').value,
-                    'stripeEmail': stripecEmail,// document.querySelector('input[name=stripeEmail]').value,
-                    'stripeCountry': stripecCountry,//document.querySelector('input[name=stripeCountry]').value,
-              
-                  }
-              
-                  let stripe = Stripe('{{stripe_public_key}}');
-                  //   /contract/stripe/{{contract.id}}/
-                  fetch('/contract/stripe_contract_intent/', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'X-CSRFToken': '{{csrf_token}}'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify(data)
-                  })
-                    .then(function (response) {
-                      return response.json()
-                    })
-                    .then(function (session) {
-                      return stripe.redirectToCheckout({ sessionId: session.session.id })
-                    })
-                    .then(function (result) {
-                      return console.log(result.error.message)
-                    })
-                    .catch(function (error) {
-                      return console.log(error)
-                    })
-                }
-              }
-              
-        </script>
-        {% elif gateway_type.name == "Flutterwave" %}
-        <script src="https://checkout.flutterwave.com/v3.js"></script>
-        {% comment %} <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script> {% endcomment %}
-        <script>
-            function flutterwavePay(event) {
+    {% elif gateway_type.name == "Stripe" %}
+    <script>
+        /// Make csrf token availble in JS files
+        var CSRF_TOKEN = '{{ csrf_token }}';
+    </script>
+    <script src="https://js.stripe.com/v3/"></script>
+    {% comment %} <script src="{% static 'js/payments/stripe-contract-checkout.js' %}" data-rel-js></script> {% endcomment %}
+    <script>
+        function stripePay(event) {
             event.preventDefault();
-          
-              let data = {
-                'amount': "{{hiring_box.get_total_price_after_discount_and_fee}}",
-                'name': "{{request.user.get_full_name}}",
-                'email': "{{request.user.email}}",
-                'consumerid': "{{request.user.id}}",
-          
-              }
-          
-              fetch('{% url "contract:flutter_payment_intent" %}', {
+
+            $("#stripesubmit").attr("disabled", true);
+            $("#convert-currency").attr("disabled", true);
+
+            let data = {
+                'stripepCustomer': '{{request.user.get_full_name}}', 
+                'stripepEmail': '{{request.user.email}}',
+                'stripepCountry': '{{request.user.country.name}}',
+            
+            }
+            
+            let stripe = Stripe('{{stripe_public_key}}');
+                //   /contract/stripe/{{contract.id}}/
+            fetch('/contract/stripe_contract_intent/', {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': '{{csrf_token}}'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{csrf_token}}'
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify(data)
-              })
+                })
                 .then(function (response) {
-                  return response.json()
+                    return response.json()
                 })
                 .then(function (session) {
-                    window.location.href = session.redirectToCheckout
+                    return stripe.redirectToCheckout({ sessionId: session.session.id })
                 })
                 .then(function (result) {
-                  return console.log(result)
+                    $("#stripesubmit").attr("disabled", false);
+                    $("#convert-currency").attr("disabled", false);
+                    return console.log(result.error.message)
                 })
                 .catch(function (error) {
-                  return console.log(error)
+                    $("#stripesubmit").attr("disabled", false);
+                    $("#convert-currency").attr("disabled", false);
+                    return console.log(error)
                 })
             }
-    
-        </script>                 
-        {% elif gateway_type.name == "Razorpay" %}
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>        
-        <script>
-            //Script to add proposal quantity in session             
-            $(document).on('click', '#rzp-button1', function (e) {
-            e.preventDefault();
-            $.ajax({
-                method: 'GET',
-                url: '{% url "contract:razorpay_contract_intent" %}',
-                success: function (response) {
-                    console.log(response)
-                    var options = {
-                        "key": "{{razorpay_public_key}}", 
-                        "amount": response.amount,
-                        "currency": response.currency,
-                        "name": "{{website.site_name}}",
-                        "description": "Hiring of Applicants",
-                        "image": "{{website.site_Logo.url}}",
-                        "order_id": response.razorpay_order_key, 
-                        "handler": function (responseOne) {
-                            $.ajax({
-                                type: "POST",
-                                url: '{% url "contract:razorpay_webhook" %}',
-                                data: {
-                                    contractid: {{contract.id}},
-                                    orderid: responseOne.razorpay_order_id,
-                                    paymentid: responseOne.razorpay_payment_id,
-                                    signature: responseOne.razorpay_signature,
-                                    csrfmiddlewaretoken: "{{csrf_token}}",
-                                    action: "razorpay-contract",
-                                },
-                                success: function (responseTwo) {
-                                    swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                        window.location.href = '/contract/congrats/'
-                                    });                        
-                                }
-                            });
-                        },
-    
-                        "prefill": {
-                            "name": "{{request.user.get_full_name}}",
-                            "email": "{{request.user.email}}",
-                            "contact": "{{request.user.phone}}"
-                        },
-                        "notes": {
-                            "address": "{{request.user.country}}"
-                        },
-                        "theme": {
-                            "color": "#3399cc"
-                        }
-                    };
-                    var rzp1 = new Razorpay(options);
-                    rzp1.open();                
-                },
-                error: function (xhr, errmsg, err) {}
-            });
+            
+    </script>
+    {% elif gateway_type.name == "Flutterwave" %}
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    {% comment %} <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script> {% endcomment %}
+    <script>
+        function flutterwavePay(event) {
+        event.preventDefault();
+        
+            let data = {
+            'amount': "{{hiring_box.get_total_price_after_discount_and_fee}}",
+            'name': "{{request.user.get_full_name}}",
+            'email': "{{request.user.email}}",
+            'consumerid': "{{request.user.id}}",
+        
+            }
+        
+            fetch('{% url "contract:flutter_payment_intent" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{csrf_token}}'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
             })
-        </script>    
-        {% endif %}
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (session) {
+                window.location.href = session.redirectToCheckout
+            })
+            .then(function (result) {
+                return console.log(result)
+            })
+            .catch(function (error) {
+                return console.log(error)
+            })
+        }
+
+    </script>                 
+    {% elif gateway_type.name == "Razorpay" %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>        
+    <script>
+        //Script to add proposal quantity in session             
+        $(document).on('click', '#rzp-button1', function (e) {
+        e.preventDefault();
+        $.ajax({
+            method: 'GET',
+            url: '{% url "contract:razorpay_contract_intent" %}',
+            beforeSend:function(){
+                $("#rzp-button1").attr("disabled", true);
+                $("#convert-currency").attr("disabled", true);
+            },
+            success: function (response) {
+                
+                var options = {
+                    "key": "{{razorpay_public_key}}", 
+                    "amount": response.amount,
+                    "currency": response.currency,
+                    "name": "{{website.site_name}}",
+                    "description": "Hiring of Applicants",
+                    "image": "{{website.site_Logo.url}}",
+                    "order_id": response.razorpay_order_key, 
+                    "handler": function (responseOne) {
+                        $.ajax({
+                            type: "POST",
+                            url: '{% url "contract:razorpay_webhook" %}',
+                            data: {
+                                orderid: responseOne.razorpay_order_id,
+                                paymentid: responseOne.razorpay_payment_id,
+                                signature: responseOne.razorpay_signature,
+                                csrfmiddlewaretoken: "{{csrf_token}}",
+                                action: "razorpay-contract",
+                            },
+                            success: function (responseTwo) {
+                                $("#rzp-button1").attr("disabled", true);
+                                $("#convert-currency").attr("disabled", true);
+                                swal("Perfect!", 'All looked good', "success").then((value) =>{
+                                    window.location.href = '/contract/congrats/'
+                                });                        
+                            }
+                        });
+                    },
+
+                    "prefill": {
+                        "name": "{{request.user.get_full_name}}",
+                        "email": "{{request.user.email}}",
+                        "contact": "{{request.user.phone}}"
+                    },
+                    "notes": {
+                        "address": "{{request.user.country}}"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();                
+            },
+            error: function (xhr, errmsg, err) {
+                $("#rzp-button1").attr("disabled", true);
+                $("#convert-currency").attr("disabled", true);
+            }
+        });
+        })
+    </script>    
+    {% endif %}
     {% endblock scripts %}        
 
 

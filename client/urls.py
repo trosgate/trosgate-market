@@ -13,6 +13,8 @@ urlpatterns = [
     path('deposit_fee_session/', views.deposit_fee_session, name='deposit_fee_session'),
     path('deposit-final/', views.final_deposit, name='final_deposit'),
     path('stripe-deposit/', views.client_listing, name='client_listing'),
+    path('deposit_checker/', views.deposit_checker, name='deposit_checker'),
+    path('razorpay_callback/', views.razorpay_callback, name='razorpay_callback'),
     path('congrats/', views.payment_success, name='payment_success'),
     
 ]

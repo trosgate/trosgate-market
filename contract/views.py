@@ -171,7 +171,7 @@ def final_contract_checkout(request, contract_id, contract_slug):
     contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, reaction=InternalContract.ACCEPTED, created_by=request.user)
 
     if "contractchosen" not in request.session:
-        messages.error(request, "Bad request. We could not fetch the selected contract. Try again")
+        messages.error(request, "Bad request. Please select payment option again")
         return redirect("contract:internal_contract_fee_structure", contract_id=contract.id, contract_slug=contract.slug)
 
     if "contractgateway" not in request.session:
@@ -407,8 +407,8 @@ def stripe_contract_intent(request):
 @login_required
 @user_is_client
 def paypal_contract_intent(request):
-    contract_id = request.session["contractchosen"]["contract_id"]
     chosen_contract = BaseContract(request)
+    contract_id = request.session["contractchosen"]["contract_id"]
     contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()
@@ -419,9 +419,11 @@ def paypal_contract_intent(request):
     body = json.loads(request.body)
     data = body["orderID"]
 
-    if data:
-        paypal_request_order = OrdersGetRequest(data)
-        response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
+    purchase = ''
+    paypal_request_order = OrdersGetRequest(data)
+    response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
+    
+    if response:
 
         purchase = Purchase.objects.create(
             client=request.user,
@@ -434,11 +436,8 @@ def paypal_contract_intent(request):
             salary_paid=round(float(response.result.purchase_units[0].amount.value)),
             paypal_order_key=response.result.id,
             unique_reference=PayPalClient.paypal_unique_reference(),
-            status = Purchase.SUCCESS
+            status = Purchase.FAILED
         )
-
-        contract.status=InternalContract.PAID
-        contract.save()
 
         ContractSale.objects.create(
             team=contract.team, 
@@ -460,6 +459,12 @@ def paypal_contract_intent(request):
                 get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
         
         )
+
+        try:
+            Purchase.paypal_order_confirmation(pk=purchase.pk)
+        except Exception as e:
+            print('%s' % (str(e)))  
+
         chosen_contract.clean_box()
         return JsonResponse({'Perfect':'All was successful',})
 
@@ -474,12 +479,12 @@ def paypal_contract_intent(request):
 def razorpay_contract_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
     chosen_contract = BaseContract(request)
-    gateway_type = str(chosen_contract.get_gateway())
-    total_gateway_fee = chosen_contract.get_fee_payable()
+    gateway_type = chosen_contract.get_gateway()
+    total_gateway_fee = int(chosen_contract.get_fee_payable())
     contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)   
     
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
-    gateway_type = chosen_contract.get_gateway()
+    gateway_type = str(chosen_contract.get_gateway())
     base_currency_code = get_base_currency_code()
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()
@@ -494,7 +499,7 @@ def razorpay_contract_intent(request):
         email=request.user.email,
         country=str(request.user.country),
         payment_method=gateway_type,
-        client_fee = int(total_gateway_fee),
+        client_fee = total_gateway_fee,
         category = Purchase.CONTRACT,
         salary_paid=grand_total,
         unique_reference=unique_reference, 
@@ -510,7 +515,6 @@ def razorpay_contract_intent(request):
         staff_hired=int(1),
         earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
         total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                 
-
         discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
         total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
         disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
@@ -533,7 +537,7 @@ def razorpay_contract_intent(request):
         notes = notes, 
         receipt = purchase.unique_reference
     ))
-    print('razorpay_order', razorpay_order['id'])
+
     purchase.razorpay_order_key = razorpay_order['id']
     purchase.save()
 
@@ -545,47 +549,30 @@ def razorpay_contract_intent(request):
 @user_is_client
 def razorpay_webhook(request):
     chosen_contract = BaseContract(request)
-    # contract_id = ''
+    razorpay_client = RazorpayClientConfig().get_razorpay_client()
     if request.POST.get('action') == 'razorpay-contract':   
-        contract_id = int(request.POST.get('contractid'))
         razorpay_order_key = str(request.POST.get('orderid'))
         razorpay_payment_id = str(request.POST.get('paymentid'))
         razorpay_signature = str(request.POST.get('signature'))
 
-        # print('contract_id:', contract_id)
-        # print('razorpay_order_id:', razorpay_order_key)
-        # print('razorpay_payment_id:',razorpay_payment_id)
-        # print('razorpay_signature:',razorpay_signature)
         data ={
             'razorpay_order_id': razorpay_order_key,
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature
         }    
-                 
-        contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
-        razorpay_client = RazorpayClientConfig().get_razorpay_client()
-        purchase = Purchase.objects.get(razorpay_order_key=razorpay_order_key)
-
-        purchase.razorpay_payment_id = razorpay_payment_id
-        purchase.razorpay_signature = razorpay_signature
-        purchase.save()
-
         signature = razorpay_client.utility.verify_payment_signature(data)
-        if signature == True: #must return True for below code to run
-            contract.status=InternalContract.PAID
-            contract.save()
 
-            purchase.status = Purchase.SUCCESS
-            purchase.save()
-
-            chosen_contract.clean_box()
-            return JsonResponse({'Perfect':'All was successful',})
+        if signature == True:
+            try:
+                Purchase.razorpay_order_confirmation(razorpay_order_key, razorpay_payment_id, razorpay_signature)
+                chosen_contract.clean_box()
+                return JsonResponse({'Perfect':'All was successful',})
+            except Exception as e:
+                print('%s' % (str(e))) 
 
         else:
-            purchase.status = Purchase.FAILED
-            purchase.save()
             return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
-                       
+   
 
 @login_required
 @user_is_client

@@ -94,7 +94,7 @@ class ClientAccount(models.Model):
 
 
     @classmethod
-    def level_one_deposit_check(cls, user, deposit_amount, narration):
+    def deposit_check(cls, user, deposit_amount, narration):
         with transaction.atomic():
             client_account = cls.objects.select_for_update().get(user=user)
 
@@ -107,8 +107,11 @@ class ClientAccount(models.Model):
             if narration == '':
                 raise FundException(_("Narration is required"))
 
-            if not deposit_amount:
+            if deposit_amount == '':
                 raise FundException(_("Deposit amount is required"))
+
+            if deposit_amount > get_max_deposit():
+                raise FundException(_("Invalid amount entered"))
 
             if not (int(get_min_deposit()) <= int(deposit_amount) <= int(get_max_deposit())):
                 raise FundException(_('Deposit amount is out of range'))

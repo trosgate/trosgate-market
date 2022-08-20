@@ -99,7 +99,7 @@
                                 <span id="feedback-converter" style="color:green; text-align:right;">.</span>
                             </div>
                             <div class='col-md-12 mt-4'>
-                                <button class="btn btn-primary w-100 fw-bold" >Converter</button>
+                                <button id='convert-currency' class="btn btn-primary w-100 fw-bold" >Converter</button>
                             </div>
                             </div>
                         </div>
@@ -145,26 +145,28 @@
     {% block scripts %}
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
+
     <script>
         //Script to add proposal quantity in session             
         $(document).on('click', '#convert-currency', function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: '{% url "general_settings:converter" %}',
-                data: {
-                    currencyid: $('#id_currency option:selected').val(),
-                    targetamount: '{{application_addon.get_total_price_after_discount_and_fee}}',
-                    csrfmiddlewaretoken: "{{csrf_token}}",
-                    action: 'currency'
-                },
-                success: function (json) {
-                    document.getElementById('feedback-converter').innerHTML = json.message
-                },
-                error: function (xhr, errmsg, err) {}
-            });
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url "general_settings:converter" %}',
+            data: {
+                currencyid: $('#id_currency option:selected').val(),
+                targetamount: '{{application_addon.get_total_price_after_discount_and_fee}}',
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'currency'
+            },
+            success: function (json) {
+                document.getElementById('feedback-converter').innerHTML = json.message
+            },
+            error: function (xhr, errmsg, err) {}
+        });
         })
     </script>
+
 
     {% if gateway_type.name == "PayPal" %}
     <script 
@@ -193,7 +195,7 @@
             style: {
                 layout: 'vertical',
                 color: 'gold',
-                shape: 'pill',
+                shape: 'rect', //pill
                 label: 'paypal',
             },
             createOrder: function (data, actions) {
@@ -205,7 +207,8 @@
                     }]
                 });
             },
-            onApprove: function (data) {
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function(){
                 var url = "{% url 'applications:paypal_payment_order' %}"
                 return fetch(url, {
                     method: 'POST',
@@ -221,12 +224,15 @@
                         window.location.href = '/application/congrats/'
                     });
                 })
+            })
             },
         }).render('#paypal-button-container');
     }
     hiringPayPalButton();
     </script>
     {% endif %}
+
+    
     {% if gateway_type.name == "Stripe" %}
     <script type="application/javascript" src="https://js.stripe.com/v3/"></script>
     {% comment %} <script src="{% static 'js/payments/stripe-application-checkout.js' %}"></script> {% endcomment %}
@@ -281,7 +287,6 @@
             'consumerid': "{{request.user.id}}",
       
           }
-      
           fetch('{% url "applications:flutter_payment_intent" %}', {
             method: 'POST',
             headers: {
@@ -319,6 +324,11 @@
         $.ajax({
             method: 'GET',
             url: '{% url "applications:razorpay_application_intent" %}',
+            
+            beforeSend:function(){
+                $("#rzp-button1").attr("disabled", true);
+                $("#convert-currency").attr("disabled", true);
+            },
             success: function (response) {
                 console.log(response)
                 var options = {
@@ -341,7 +351,8 @@
                                 action: "razorpay-application",
                             },
                             success: function (responseTwo) {
-                                console.log(responseTwo)
+                                $("#rzp-button1").attr("disabled", false);
+                                $("#convert-currency").attr("disabled", false);
                                 swal("Perfect!", 'All looked good', "success").then((value) =>{
                                     window.location.href = '/application/congrats/'
                                 });                        
@@ -364,7 +375,10 @@
                 var rzp1 = new Razorpay(options);
                 rzp1.open();                
             },
-            error: function (xhr, errmsg, err) {}
+            error: function (xhr, errmsg, err) {
+                $("#rzp-button1").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
+            }
         });
         })
     </script>

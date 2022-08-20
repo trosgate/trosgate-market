@@ -1,6 +1,6 @@
 
-client_id: 'AQYALADOflIRdjVHlkCLwuZ9Obj1ylOUuDF0y9mBlAu7IUIjV8YyKfbTqAPqPt3OSl7-hfPd4LWH7IQp'
-secret_id: 'EOhjdJJK0VETJ3xQwHD6dW96Zw9CITEKc-tbYrYw4iszRTyvBWmwCzdSDDxvVpBOUyyvXRm8yisaAVDP'
+client_id: 'ATHsQNeeu9f7QhxJxOJhiCyg7xlXraRb6EFKSGIVaDwo52k3N6JuZZ5LWYCL8h-r61_Z2gcZ1ImoSVDn'
+secret_id: 'EPUPK1xIXpWX3SuKqlQiMrXf5VDzR2DJXPjnpUQQPXPt9Vnol-xQHc4N3keY9hmtlZfeWVoDaQcGMH55'
 
 SUBSCRIPTION
 ...............
@@ -26,17 +26,17 @@ John
 Last name:
 Doe
 Email ID:
-sb-lndpj15241105@business.example.com
-System Generated Password: 952=u@QC
+sb-qk1kf18073840@business.example.com
+System Generated Password: @=+zI@_1
 Password:
 
 <--------NVP/SOAP Sandbox API Credentials-------------------->
 Username:
-sb-lndpj15241105_api1.business.example.com
+sb-qk1kf18073840_api1.business.example.com
 Password:
-VAL6KJGV7443XMZM
+U88YNPMD82SQ9J3F
 Signature:
-Amno7vrBhc-y65xQH3QncYpDqkk7AhhWzMw5zjSfpHiswt6UnWKRV4ln
+ANgXdVv8sjqFuicpIprBxtdHkRwtAQryqojvgyPPpztNXtS71rxXyFI9
 Phone Number: 4088175259
 4085477577
 Account type:
@@ -71,8 +71,8 @@ John
 Last name:
 Doe
 Email ID:
-sb-ln3ci16737461@personal.example.com
-System Generated Password: EX5*b79#
+sb-kc36l20362591@personal.example.com
+System Generated Password: 1u15Z+fK
 Notes:.........
 
 Phone Number:

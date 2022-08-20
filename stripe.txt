@@ -19,7 +19,6 @@ stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/
 or 
 
 .\stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/ 
-.\stripe listen --forward-to http://127.0.0.1:8000/team/stripe_subscription_webhook/   
 
 or 
 

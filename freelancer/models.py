@@ -141,7 +141,6 @@ class FreelancerAccount(models.Model):
             account = cls.objects.select_for_update().get(user=user)
             account.pending_balance += pending_balance
             account.save(update_fields=['pending_balance'])           
-            account.save()
 
             db_transaction.on_commit(lambda: credit_pending_balance_email(account, paid_amount, purchase))
 

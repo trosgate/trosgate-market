@@ -193,7 +193,6 @@ class Project(models.Model):
         return reverse('projects:reopen_project', args=[self.slug])
 
 
-
 class ProjectSkillRequired(models.Model):
     # level_of_proficiency
     BASIC = 'basic'

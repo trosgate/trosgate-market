@@ -160,7 +160,6 @@
     <script 
         src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}"data-sdk-integration-source="button-factory">
     </script>
-    {% comment %} <script src="{% static 'js/payments/paypal-checkout.js' %}"></script>   {% endcomment %}
     <script>
         function getCookie(name) {
             var cookieValue = null;
@@ -183,7 +182,7 @@
                 style: {
                     layout: 'vertical', //or horizontal
                     color: 'gold',
-                    shape: 'pill', //or rect
+                    shape: 'rect', //or pill
                     label: 'paypal',
                 },
                 createOrder: function (data, actions) {
@@ -195,30 +194,34 @@
                         }]
                     });
                 },
-                onApprove: function (data) {
-                    let url = "{% url 'transactions:paypal_payment_order' %}"
-                    return fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'content-type': 'application/json',
-                            'X-CSRFToken': csrftoken,
-                        },
-                        body: JSON.stringify({
-                            orderID: data.orderID
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function(){
+                        let url = "{% url 'transactions:paypal_payment_order' %}"
+                        return fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'content-type': 'application/json',
+                                'X-CSRFToken': csrftoken,
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID
+                            })
+                        }).then(function () {
+                            swal("Perfect!", 'All looked good', "success").then((value) =>{
+                                window.location.href = "{% url 'transactions:hiring_payment_success' %}"
+                            });              
+                            
                         })
-                    }).then(function () {
-                        swal("Perfect!", 'All looked good', "success").then((value) =>{
-                            window.location.href = "{% url 'transactions:hiring_payment_success' %}"
-                        });              
-                        
-                    })
+                    })                    
+                    
                 },
             }).render('#paypal-button-container');
         }
         hiringPayPalButton();
     </script>
+    {% endif %}
 
-    {% elif gateway_type.name == "Stripe" %}
+    {% if gateway_type.name == "Stripe" %}
     <script>
         var CSRF_TOKEN = '{{ csrf_token }}';
     </script>    
@@ -227,41 +230,46 @@
     <script>
     function stripePay(event) {
         event.preventDefault();
-      
-          let data = {
+        
+        $("#stripesubmit").attr("disabled", true);
+        $("#convert-currency").attr("disabled", true);
+             
+        let data = {
             'stripepCustomer': '{{request.user.get_full_name}}', 
             'stripepEmail': '{{request.user.email}}',
             'stripepCountry': '{{request.user.country.name}}',
-      
-          }
-      
-          let stripe = Stripe('{{stripe_public_key}}');
-      
-          fetch('/transaction/stripe/checkout/api/', {
+        }
+    
+        let stripe = Stripe('{{stripe_public_key}}');
+    
+        fetch('/transaction/stripe/checkout/api/', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{csrf_token}}'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{csrf_token}}'
             },
             credentials: 'same-origin',
             body: JSON.stringify(data)
-          })
+            })
             .then(function (response) {
-              return response.json()
+                return response.json()
             })
             .then(function (session) {
-              return stripe.redirectToCheckout({ sessionId: session.session.id })
+                return stripe.redirectToCheckout({ sessionId: session.session.id })
             })
             .then(function (result) {
-              return console.log(result.error.message)
+                $("#stripesubmit").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
+                return console.log(result.error.message)
             })
             .catch(function (error) {
-              return console.log(error)
+                return console.log(error)
             })
         }
     </script>
-      
-    {% elif gateway_type.name == "Flutterwave" %}
+    {% endif %}
+
+    {% if gateway_type.name == "Flutterwave" %}
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     {% comment %} <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script> {% endcomment %}
     <script>
@@ -298,9 +306,10 @@
               return console.log(error)
             })
         }
-
     </script> 
-    {% elif gateway_type.name == "Razorpay" %}
+    {% endif %}
+
+    {% if gateway_type.name == "Razorpay" %}
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
@@ -359,7 +368,7 @@
         });
         })
     </script>
-
     {% endif %}
+    
     {% endblock scripts %}
   

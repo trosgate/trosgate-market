@@ -415,36 +415,6 @@ def stripe_payment_order(request):
     return JsonResponse({'failed':'Bad Signature',})
 
 
-# @db_transaction.atomic()
-# def stripe_specific_payment_confirmation(stripe_order_key):
-#     purchase_obj = Purchase.objects.select_for_update().get(stripe_order_key=stripe_order_key)
-#     purchase_obj.status = Purchase.SUCCESS
-#     purchase_obj.save()
-
-#     if purchase_obj.category == Purchase.PROPOSAL:
-#         proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-#         for item in proposal_items:
-#             founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-#             founder_account.pending_balance += sum([item.total_earning])
-#             print('balance:::', founder_account.pending_balance)
-#             founder_account.save()
-
-#     if purchase_obj.category == Purchase.PROJECT:
-#         application_items = ApplicationSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-#         for item in application_items:
-#             founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-#             founder_account.pending_balance += sum([item.total_earnings])
-#             print('balance:::', founder_account.pending_balance)
-#             founder_account.save()
-
-#     if purchase_obj.category == Purchase.CONTRACT:
-#         contract_items = ContractSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-#         for item in contract_items:
-#             founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-#             founder_account.pending_balance += sum([item.total_earning])
-#             print('balance:::', founder_account.pending_balance)
-#             founder_account.save()
-
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -472,7 +442,6 @@ def stripe_webhook(request):
                     Purchase.stripe_order_confirmation(session.payment_intent) # Yet to test this with internet                    
                 except Exception as e:
                     print('%s' % (str(e)))
-                
             else:
                 try:                            
                     package = Package.objects.get(is_default=False, type='Team')
@@ -520,12 +489,12 @@ def paypal_payment_order(request):
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
     data = body["orderID"]
-    print(body)
 
-    if data:
-        paypal_request_order = OrdersGetRequest(data)
-        response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
-        # with db_transaction.atomic():
+    purchase = ''
+    paypal_request_order = OrdersGetRequest(data)
+    response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
+
+    if response:
         try:
             purchase = Purchase.objects.create(
                 client=request.user,
@@ -538,6 +507,7 @@ def paypal_payment_order(request):
                 salary_paid=round(float(response.result.purchase_units[0].amount.value)),
                 paypal_order_key=response.result.id,
                 unique_reference=PayPalClient.paypal_unique_reference(),
+                status = Purchase.FAILED
             )
         except Exception as e:
             print('%s' % (str(e)))
@@ -567,25 +537,11 @@ def paypal_payment_order(request):
         except Exception as e:
             print('%s' % (str(e)))
 
-        with db_transaction.atomic():
-            purchase_obj = Purchase.objects.select_for_update().get(pk=purchase.pk)
-            purchase_obj.status = Purchase.SUCCESS
-            purchase_obj.save()
+        try:
+            Purchase.paypal_order_confirmation(pk=purchase.pk)
+        except Exception as e:
+            print('%s' % (str(e)))        
 
-            proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-            for item in proposal_items:
-                founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-                founder_account.pending_balance += sum([item.total_earning])
-                founder_account.save()
-
-        # try:
-        #     credit_team_founder_pending_balance(purchase.pk)
-        # except Exception as e:
-        #     print('%s' % (str(e)))
-        # try:
-            # Mail should be sent here notifying user that payment was made
-        # except Exception as e:
-        #     print('%s' % (str(e)))
         hiringbox.clean_box()
         return JsonResponse({'Perfect':'All was successful',})
     else:
@@ -672,36 +628,23 @@ def razorpay_webhook(request):
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature
         }
-        with db_transaction.atomic():
-            purchase_obj = Purchase.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)
-            purchase_obj.razorpay_payment_id = razorpay_payment_id
-            purchase_obj.razorpay_signature = razorpay_signature
 
-            signature = razorpay_client.utility.verify_payment_signature(data)
+        signature = razorpay_client.utility.verify_payment_signature(data)
 
-            if signature == True:
-                purchase_obj.status = Purchase.SUCCESS
-                purchase_obj.save()                   
-
-                proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-                for item in proposal_items:
-                    founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-                    founder_account.pending_balance += sum([item.total_earning])
-                    founder_account.save()
-
+        if signature == True:
+            try:
+                Purchase.razorpay_order_confirmation(razorpay_order_key, razorpay_payment_id, razorpay_signature)
                 hiringbox.clean_box()
                 return JsonResponse({'Perfect':'All was successful',})
-                
-            else:
-                purchase_obj.status = Purchase.FAILED
-                purchase_obj.save()
-                return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
-                
+            except Exception as e:
+                print('%s' % (str(e))) 
+
+        else:
+            return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
+ 
                 
 @login_required
 def payment_success(request):
-    # hiringbox = HiringBox(request)
-    # hiringbox.clean_box()
 
     context = {
         "good": "good"

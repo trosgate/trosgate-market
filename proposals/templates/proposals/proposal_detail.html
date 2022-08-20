@@ -278,32 +278,40 @@
 									{% if other_proposals|length > 0 %}
 									{% if request.user.clients %}
 									<div class="wt-proposalsr"></div>
-									<div class="wt-dashboardbox">
-										<div class="wt-dashboardboxtitle">
-											<h2>Other Proposals</h2>
-										</div>
-										<div class="wt-dashboardboxcontent wt-hiredfreelance">
-											{% for oth_proposal in other_proposals %}
-											<div class="wt-userlistinghold wt-featured">
-												<a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}">
+										<div class="wt-dashboardbox wt-proposalsr">
+											<div class="wt-dashboardboxcontent wt-hiredfreelance">
+												<div class="wt-usersidebaricon">
+													<span class="fa fa-cog wt-usersidebardown"></span>
+												</div>
+												<h4>Other Proposals</h4>
+												<aside id="wt-sidebar" class="wt-sidebar wt-usersidebar">
+												{% for oth_proposal in other_proposals %}
+												<div class="wt-userlistinghold wt-featured">
 													<figure class="wt-userlistingimg">
 														<img src="{% firstof oth_proposal.thumbnail.url oth_proposal.team.created_by.freelancer.profile_photo.url oth_proposal.created_by.freelancer.profile_photo.url%}" style="height:60px; width:60px" alt="image description" class="img description">
 													</figure>
-												</a>
-												<div class="wt-proposaldetails">
-													<div class="wt-contenthead">
-														<div class="wt-title">
-															<h3>{% if request.user.is_authenticated %} {{proposal.created_by.get_full_name|capfirst}} {% else %} {{proposal.created_by.short_name|capfirst}} {% endif %}</h3><span>{{oth_proposal.title|truncatechars:255}}</span>
-															<a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
-														</div>
-													</div>													
-												</div>	
+													<div class="wt-proposaldetails">
+														<div class="wt-contenthead">
+															<div class="wt-title">
+																<a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}">
+																{% if request.user.is_authenticated %} 
+																{{proposal.created_by.get_full_name|capfirst}} 
+																{% else %} 
+																{{proposal.created_by.short_name|capfirst}} 
+																{% endif %}
+																<span>{{oth_proposal.title|truncatechars:50}}</span></a>
+																<a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
+															</div>
+														</div>													
+													</div>	
+												</div>
+												{% endfor %}
+											</aside>
 											</div>
-											{% endfor %}
 										</div>
-									</div>
-									{% endif %}
-									{% endif %}
+										{% endif %}
+										{% endif %}
+									{% comment %} </div> {% endcomment %}
 								</div>
 
 								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
@@ -351,7 +359,7 @@
 									<span>Advertisement</span>
 									<div class="wt-companyad">
 										<figure class="wt-companyadimg">
-											<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="height:350px; width:350px;" alt="img description">
+											<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="height:270px; width:350px;" alt="img description">
 										</figure>
 									</div>
 								</div>
@@ -365,15 +373,13 @@
 										<div class="wt-dashboardboxcontent wt-hiredfreelance">
 											{% for captured_proposal in all_viewed_proposals %}
 											<div class="wt-userlistinghold wt-featured">
-											<a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">
 												<figure class="wt-userlistingimg">
 													<img src="{% firstof captured_proposal.thumbnail.url captured_proposal.team.created_by.freelancer.profile_photo.url captured_proposal.created_by.freelancer.profile_photo.url%}" style="height:60px; width:60px" alt="image description" class="img description">
 												</figure>
-											</a>
 											<div class="wt-proposaldetails">
 												<div class="wt-contenthead">
 													<div class="wt-title">
-														<h3><a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">{{captured_proposal.team|truncatechars:27}}</a><span>{{captured_proposal.title|truncatechars:27}}</span></h3>
+														<a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">{{captured_proposal.team|truncatechars:25}}<span>{{captured_proposal.title|truncatechars:25}}</span></a>
 														<a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
 													</div>
 												</div>													

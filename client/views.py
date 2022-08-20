@@ -245,60 +245,87 @@ def stripe_deposit(request):
 
 
 @login_required
-def paypal_deposit_order(request):
-    message = ''
-    mes = ''
-    data = json.loads(request.body)
+def deposit_checker(request):
+    razorpay_api = RazorpayClientConfig()
+
     gateway_id = request.session["depositgateway"]["gateway_id"]
     selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
-
-    deposit_amount = data['stripeAmount']
-    narration = data['stripeNarration']
-    deposit_fee = selected_gateway.processing_fee
-    total_amount = int((deposit_amount + deposit_fee) * 100)
     
-    # stripe_obj = StripeClientConfig()
-    # stripe_reference = stripe_obj.stripe_unique_reference()
-    # stripe.api_key = stripe_obj.stripe_secret_key()
+    message = ''
+    razorpay_order = ''
+    total_amount = ''
+    narration = ''
 
-    try:
-        ClientAccount.level_one_deposit_check(
-            user=request.user, 
-            deposit_amount=deposit_amount, 
-            narration=narration, 
-            reference = payment_intent
-        )
-        message = 'The deposit was successful'
+    notes = {'Total Price': 'The total amount may change with discount'}
+    currency = get_base_currency_code()
+    razorpay_client = razorpay_api.get_razorpay_client()
 
-    except FundException as e:
-        mes = str(e)
-        message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
-            
+    if request.POST.get('action') == 'razorpay-deposit':
+        amount = int((request.POST.get('razordepositAmount')))
+        narration = str(request.POST.get('razordepositNarration'))
+        deposit_fee = selected_gateway.processing_fee
+        total_amount = int((amount + deposit_fee) * 100)
 
-    PayPalClient = PayPalClientConfig()
-    body = json.loads(request.body)
-    data = body["orderID"]
-    print(body)
+        try:
+            ClientAccount.deposit_check(
+                user=request.user, deposit_amount=amount, narration=narration
+            )
 
-    if data:
-        paypal_request_order = OrdersGetRequest(data)
-        response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
+        except FundException as e:
+            message = str(e)
+
+        try:
+            razorpay_order = razorpay_client.order.create(dict(
+                amount = total_amount, 
+                currency = currency, 
+                notes = notes, 
+            ))
+
+        except FundException as e:
+            message = str(e)
+
+        if "acceptdepoamount" not in request.session:
+            request.session["acceptdepoamount"] = {"acceptdeposit_amount": amount}
+            request.session.modified = True
+
+        return JsonResponse({'total_amount':total_amount, 'message':message, 'razorpay_order_id': str(razorpay_order['id'])})
+
+
+def razorpay_callback(request):
+    razorpay_api = RazorpayClientConfig()
+    razorpay_client = razorpay_api.get_razorpay_client()
+
+    gateway_id = int(request.session["depositgateway"]["gateway_id"])
+    deposit_amount = int(request.session["acceptdepoamount"]['acceptdeposit_amount'])
+
+    selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
+    deposit_fee = int(selected_gateway.processing_fee)
+
+    if request.POST.get('action') == 'razorpay-deposit-confirm':
+        razorpay_payment_id = str(request.POST.get('razorpay_payment_id'))    
+        razorpay_order_id = str(request.POST.get('razorpay_order_id'))    
+        razorpay_signature = str(request.POST.get('razorpay_signature'))
+        total_amount = int(request.POST.get('total_amount'))
+
+        data ={
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature
+        }
+
+        signature = razorpay_client.utility.verify_payment_signature(data)
+
+        # original_amount = total_amount - deposit_fee
+
+        # print(int(original_amount) == deposit_amount)
+
+        if signature == True:
+            print('perfecto perfecto')
         
-    
-        with db_transaction.atomic():
-            purchase_obj = Purchase.objects.select_for_update().get(pk=purchase.pk)
-            purchase_obj.status = Purchase.SUCCESS
-            purchase_obj.save()
+            del request.session["depositgateway"]
+            del request.session["acceptdepoamount"]
 
-            proposal_items = ProposalSale.objects.filter(purchase=purchase_obj, purchase__status='success')
-            for item in proposal_items:
-                founder_account = FreelancerAccount.objects.select_for_update().get(user=item.team.created_by)
-                founder_account.pending_balance += sum([item.total_earning])
-                founder_account.save()
-
-        hiringbox.clean_box()
-        return JsonResponse({'Perfect':'All was successful',})
-
+            return JsonResponse({'perfect':'perfect'})
 
 
 # level_two_deposit_check

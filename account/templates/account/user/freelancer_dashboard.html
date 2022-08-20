@@ -297,6 +297,7 @@
 
 		<!--Company listing starts-->
 								
+		{% if active_team.created_by == request.user %}
 		{% if contracts|length > 0 %}
 		<div class="wt-proposalholder">
 			<div class="container">
@@ -362,6 +363,7 @@
 			</div>
 			{% endif %}
 		</div>
+		{% endif %}
 		{% endif %}
 
 <!--Company listing starts-->

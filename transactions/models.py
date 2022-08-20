@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from general_settings.currency import get_base_currency_symbol
 from payments import signals
 from freelancer.models import FreelancerAccount
-
+from contract.models import InternalContract
 
 class Purchase(models.Model):
     SUCCESS = 'success'
@@ -67,23 +67,89 @@ class Purchase(models.Model):
             purchase.status = Purchase.SUCCESS
             purchase.save()
 
-            proposal_items = ProposalSale.objects.filter(purchase=purchase)
-            application_items = ApplicationSale.objects.filter(purchase=purchase, purchase__status='success')
-            contract_items = ContractSale.objects.filter(purchase=purchase, purchase__status='success')
-
+            contract = ''
+            contract_item = ''
+            
             if purchase.category == Purchase.PROPOSAL:
-                for item in proposal_items:
+                for item in ProposalSale.objects.filter(purchase=purchase):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
             
             if purchase.category == Purchase.PROJECT:
-                for item in application_items:
+                for item in ApplicationSale.objects.filter(purchase=purchase):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
             
-            # if purchase.category == Purchase.CONTRACT:
-            #     for item in contract_items:
-            #         FreelancerAccount.credit_pending_balance(user=item.team.created_by, purchase=purchase)            
+            if purchase.category == Purchase.CONTRACT:
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
 
-        return purchase
+        return purchase, contract_item, contract
+
+
+    @classmethod
+    def paypal_order_confirmation(cls, pk):
+        with db_transaction.atomic():
+            purchase = cls.objects.select_for_update().get(pk=pk)
+            if purchase.status != Purchase.FAILED:
+                raise Exception(_("This purchase already succeeded and cannot be processed"))
+            purchase.status = Purchase.SUCCESS
+            purchase.save()
+
+            contract = ''
+            contract_item = ''
+
+            if purchase.category == Purchase.PROPOSAL:
+                for item in ProposalSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
+            
+            if purchase.category == Purchase.PROJECT:
+                for item in ApplicationSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
+            
+            if purchase.category == Purchase.CONTRACT:
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
+
+        return purchase, contract_item, contract
+
+
+    @classmethod
+    def razorpay_order_confirmation(cls, razorpay_order_key, razorpay_payment_id, razorpay_signature):
+        with db_transaction.atomic():
+            purchase = cls.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)
+            if purchase.status != Purchase.FAILED:
+                raise Exception(_("This purchase already succeeded and cannot be processed"))
+            purchase.status = Purchase.SUCCESS
+            purchase.razorpay_payment_id = razorpay_payment_id
+            purchase.razorpay_signature = razorpay_signature
+            purchase.save()
+
+            contract = ''
+            contract_item = ''
+
+            if purchase.category == Purchase.PROPOSAL:
+                for item in ProposalSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
+            
+            if purchase.category == Purchase.PROJECT:
+                for item in ApplicationSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
+            
+            if purchase.category == Purchase.CONTRACT:
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
+
+        return purchase, contract_item, contract
+
+
 
 
 class ApplicationSale(models.Model):
@@ -170,7 +236,7 @@ class ProposalSale(models.Model):
 
 
 class ContractSale(models.Model):
-    #status choices to be added to track the state of order
+    # status choices to be added to track the state of order
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredcontractteam', on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="contractsales", on_delete=models.CASCADE)
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)

@@ -38,7 +38,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_editable = ['status']
     list_filter =  ['package']
     readonly_fields = [
-        'notice','created_by','members',#'package','package_status', 'package_expiry',
+        'notice','created_by','members','package','package_status', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',
         'paypal_customer_id', 'paypal_subscription_id',
         'razorpay_payment_id','razorpay_payment_url','razorpay_subscription_id',  
