@@ -32,3 +32,18 @@ class ProposalCompletionForm(forms.ModelForm):
         # 'Basic Info'
         self.fields['attachment'].widget.attrs.update(
             {'class': 'form-control'})
+
+
+class ContractCompletionForm(forms.ModelForm):
+
+    class Meta:
+        model = ProposalCompletionFiles
+        fields = ['attachment'] 
+
+
+    def __init__(self, *args, **kwargs):
+        super(ContractCompletionForm, self).__init__(*args, **kwargs)
+        
+        # 'Basic Info'
+        self.fields['attachment'].widget.attrs.update(
+            {'class': 'form-control'})

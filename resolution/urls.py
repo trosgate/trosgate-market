@@ -14,5 +14,8 @@ urlpatterns = [
 
     path('proposal_start_work/',views.proposal_start_work, name='proposal_start_work'),
     path('proposal_review/',views.proposal_review, name='proposal_review'),
-    path('<str:proposalsale_id>/<slug:proposal_slug>/',views.proposal_manager, name='proposal_resolution'),
+    path('pro/<str:proposalsale_id>/<slug:proposal_slug>/',views.proposal_manager, name='proposal_resolution'),
+    
+    path('contract_start_work/',views.contract_start_work, name='contract_start_work'),
+    path('con/<str:contractsale_id>/<slug:contract_slug>/',views.contract_manager, name='contract_resolution'),
 ]

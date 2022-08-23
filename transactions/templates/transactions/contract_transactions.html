@@ -56,7 +56,8 @@
 							<td>{{contract.total_sales_price}} ({{contract.disc_sales_price}}px @ {{contract.staff_hired}}staff)</td>     
 							<td>{{contract.total_earning_fee_charged}}</td>
 							<td>{{contract.total_earning}}</td>
-							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
+							{% comment %} <td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td> {% endcomment %}
+							<td><a href="{% url 'resolution:contract_resolution' contract.id contract.contract.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
 						</tr>
 						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
 						{% endfor %}

@@ -52,8 +52,7 @@ class HiringBox():
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
         else:
-            self.hiring_box[proposal_id] = {"price": int(
-                proposal.salary), "member_qty": int(member_qty)}
+            self.hiring_box[proposal_id] = {"salary": int(proposal.salary), "member_qty": int(member_qty)}
         self.commit()
 
 
@@ -84,10 +83,8 @@ class HiringBox():
     def get_total_freelancer(self):
         return sum(member["member_qty"] for member in self.hiring_box.values())
 
-
     def get_total_price_before_fee_and_discount(self):
         return sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
-
 
     def get_gateway(self):
         if settings.PROPOSALGATEWAY_SESSION_ID in self.session:
@@ -104,19 +101,20 @@ class HiringBox():
 
     def get_discount_multiplier(self):
         subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
-
+        rate = 0
         if (get_level_one_start_amount() <= subtotal <= get_level_one_delta_amount()):
-            return get_level_one_rate()
+            rate = get_level_one_rate()
 
-        elif (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
-            return get_level_two_rate()
+        if (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
+            rate = get_level_two_rate()
 
-        elif (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
-            return get_level_three_rate()
+        if (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
+            rate = get_level_three_rate()
 
-        elif subtotal > get_level_four_start_amount():
-            return get_level_four_rate()
-        return 0
+        if subtotal > get_level_four_start_amount():
+            rate = get_level_four_rate()
+        return rate
+        
 
 
     def get_discount_value(self):

@@ -2,20 +2,23 @@ from django.contrib import admin
 from . models import (
     ProjectResolution, ApplicationReview, 
     ProjectCompletionFiles, ProposalResolution, 
-    ProposalCompletionFiles, ProposalReview
+    ProposalCompletionFiles, ProposalReview, ContractResolution
 )
 
 
+@admin.register(ProjectResolution)
 class ProjectResolutionAdmin(admin.ModelAdmin):
     model = ProjectResolution
     list_display = ['team', 'application', 'start_time', 'end_time']    
 
 
+@admin.register(ProjectCompletionFiles)
 class ProjectResolutionFilesAdmin(admin.ModelAdmin):
     model = ProjectCompletionFiles
     list_display = ['application', 'attachment',]
 
 
+@admin.register(ApplicationReview)
 class ApplicationReviewAdmin(admin.ModelAdmin):
     model = ApplicationReview
     list_display = ['title', 'resolution', 'rating','status']
@@ -24,16 +27,19 @@ class ApplicationReviewAdmin(admin.ModelAdmin):
     search_fields = ['title', 'resolution__team__title']
 
 
+@admin.register(ProposalResolution)
 class ProposalResolutionAdmin(admin.ModelAdmin):
     model = ProposalResolution
     list_display = ['team','start_time', 'end_time', 'status']    
 
 
+@admin.register(ProposalCompletionFiles)
 class ProposalCompletionFilesAdmin(admin.ModelAdmin):
     model = ProposalCompletionFiles
     list_display = ['proposal', 'attachment']
 
 
+@admin.register(ProposalReview)
 class ProposalReviewAdmin(admin.ModelAdmin):
     model = ProposalReview
     list_display = ['title', 'resolution', 'rating', 'status']
@@ -42,9 +48,7 @@ class ProposalReviewAdmin(admin.ModelAdmin):
     search_fields = ['title']
 
 
-admin.site.register(ProjectResolution, ProjectResolutionAdmin)
-admin.site.register(ApplicationReview, ApplicationReviewAdmin)
-admin.site.register(ProjectCompletionFiles, ProjectResolutionFilesAdmin)
-admin.site.register(ProposalResolution, ProposalResolutionAdmin)
-admin.site.register(ProposalCompletionFiles, ProposalCompletionFilesAdmin)
-admin.site.register(ProposalReview, ProposalReviewAdmin)
+@admin.register(ContractResolution)
+class ContractResolutionAdmin(admin.ModelAdmin):
+    model = ContractResolution
+    list_display = ['team','start_time', 'end_time', 'status'] 

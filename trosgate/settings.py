@@ -291,7 +291,7 @@ timezone = 'Africa/Accra'
 #two weeks in seconds
 SESSION_COOKIE_AGE = 1209600
 #If SESSION_COOKIE_SECURE is False, session can run on http. set to true in production to run only with https
-SESSION_COOKIE_SECURE = True 
+SESSION_COOKIE_SECURE = False 
 
 HIRINGBOX_SESSION_ID = "proposal_box"
 PROPOSALGATEWAY_SESSION_ID = "proposalgateway"

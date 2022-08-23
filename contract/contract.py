@@ -63,19 +63,19 @@ class BaseContract():
 
     def get_discount_multiplier(self, contract):
         subtotal = self.get_total_price_before_fee_and_discount(contract)
-
+        rate = 0
         if (get_level_one_start_amount() <= subtotal <= get_level_one_delta_amount()):
-            return get_level_one_rate()
+            rate = get_level_one_rate()
 
-        elif (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
-            return get_level_two_rate()
+        if (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
+            rate = get_level_two_rate()
 
-        elif (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
-            return get_level_three_rate()
+        if (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
+            rate = get_level_three_rate()
 
-        elif subtotal > get_level_four_start_amount():
-            return get_level_four_rate()
-        return 0
+        if subtotal > get_level_four_start_amount():
+            rate = get_level_four_rate()
+        return rate
 
     def get_total_price_after_discount_and_fee(self, contract):
         subtotal = self.get_total_price_before_fee_and_discount(contract)

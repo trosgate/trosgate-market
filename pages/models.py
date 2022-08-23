@@ -40,7 +40,7 @@ class Hiring(models.Model):
 
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    ordering = models.PositiveIntegerField(_("Order Priority"), null=True, blank=True)
+    ordering = models.PositiveIntegerField(_("Order Priority"), default=0)
 
     def get_howitwork_hiring_tag(self):
         if self.thumbnail:

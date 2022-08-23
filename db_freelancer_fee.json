@@ -5,14 +5,14 @@
         "fields": {
             "preview": "Freelancer fees and charges",
             "contract_fee_percentage": 20,
-            "contract_fee_fixed": 10,
-            "contract_delta_amount": 400,
+            "contract_fee_extra": 5,
+            "contract_delta_amount": 350,
             "proposal_fee_percentage": 20,
-            "proposal_fee_fixed": 10,
-            "proposal_delta_amount": 400,
+            "proposal_fee_extra": 5,
+            "proposal_delta_amount": 350,
             "application_fee_percentage": 20,
-            "application_fee_fixed": 10,
-            "application_delta_amount": 400
+            "application_fee_extra": 5,
+            "application_delta_amount": 300
         }
     }
 ]

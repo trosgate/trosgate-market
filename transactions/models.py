@@ -150,8 +150,6 @@ class Purchase(models.Model):
         return purchase, contract_item, contract
 
 
-
-
 class ApplicationSale(models.Model):
     #status choices to be added to track the state of order
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredapplicantteam', on_delete=models.CASCADE)

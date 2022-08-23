@@ -37,7 +37,7 @@
 												
 												{% if active_team.created_by == request.user %}
 												<div id = 'startwork-begins' class="wt-updatall">
-													<span>Are you Ready to grab your {{currency}} {{proposal_sold.total_sales_price}}? Click the button to start work</span>
+													<span>Are you Ready to grab your {{currency}} {{contract_sold.total_sales_price}}? Click the button to start work</span>
 													<button id="start-work-now" type="button" class="wt-btn">Start Work</button>
 												</div>
 												<div id = 'startwork-confirm' class="wt-updatall">
@@ -46,14 +46,15 @@
 														<div class="btn btn-inline-danger text-white">Ok I Understand</div>
 													</a>
 												</div>
-												{% elif proposal_sold.purchase.client %}
+												{% elif contract_sold.purchase.client %}
 												<div class="wt-updatall">
 													<span>Team founder has not started work Yet. Please check back or contact them</span>
 													<button class="wt-btn">Pending Team Action</button>
 												</div>
 												{% endif %} 
 											</div>
-										{% endif %} 
+										{% endif %}
+
 										{% if resolution %}
 										<div class="row justify-content-md-center">
 											<div class="wt-sectionhead wt-textcenter">
@@ -188,14 +189,14 @@
 								<div class="wt-managejobcontent wt-userlistinghold wt-userlistingsingle wt-bgcolor">
 									<div class="wt-userlistinghold wt-featured wt-proposalitem">
 										<figure class="wt-userlistingimg">
-											{% if proposal_sold.team.created_by.freelancer.profile_photo %}
-												<img src="{{proposal_sold.team.created_by.freelancer.profile_photo.url}}" alt="image description" class="mCS_img_loaded">
+											{% if contract_sold.team.created_by.freelancer.profile_photo %}
+												<img src="{{contract_sold.team.created_by.freelancer.profile_photo.url}}" alt="image description" class="mCS_img_loaded">
 											{% endif %}
 										</figure>
 										<div class="wt-proposaldetails">
 											<div class="wt-contenthead">
 												<div class="wt-title">
-													<a href="{{proposal_sold.applied_by.freelancer.profile_get_absolute_url}}"> {{ proposal_sold.team.created_by.get_full_name }}</a>
+													<a href="{{contract_sold.contract.created_by.clients.profile_get_absolute_url}}"> {{contract_sold.team.created_by.get_full_name}}</a>
 												</div>
 											</div>
 											<div class="wt-proposalfeedback text-center">
@@ -212,12 +213,12 @@
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-dollar" style='color:green;'></i>
 												{% if active_team.created_by == request.user %}
-												<span>{{currency}}{{proposal_sold.total_earning}}</span>
-												{% elif request.user == proposal_sold.purchase.client %}
-												<span>{{currency}}{{proposal_sold.total_sales_price}}</span>
+												<span>{{currency}}{{contract_sold.total_earning}}</span>
+												{% elif request.user == contract_sold.purchase.client %}
+												<span>{{currency}}{{contract_sold.total_sales_price}}</span>
 												{% endif %}
 											</div>
-											{% if request.user == proposal_sold.purchase.client %}
+											{% if request.user == contract_sold.purchase.client %}
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-star fill" style='color:orange'></i>
 												<span><button type='button' class='btn btn-success btn-sm' data-toggle="modal" data-target="#projectreviewmodalbox">Approve</button></span>
@@ -257,7 +258,7 @@
 								<div class="wt-sectiontitle">
 									<span>Proposal Review </span>
 								</div>
-								<div id="refreshProposal" class="table-responsive"><button class="btn btn-success btn-sm mb-4 text-white float-left"><i class="fas fa-sync fa-spin"></i>Refresh</button>
+								<div id="refreshContract" class="table-responsive"><button class="btn btn-success btn-sm mb-4 text-white float-left"><i class="fas fa-sync fa-spin"></i>Refresh</button>
 
 									{% for review in client_review %}
 								<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
@@ -435,9 +436,9 @@
 
 {% block scripts %}
 <script> 
-	$(document).on('click', '#refreshProposal', function (e) {
+	$(document).on('click', '#refreshContract', function (e) {
         e.preventDefault();
-		$("#refreshProposal").load(window.location.href + " #refreshProposal" );
+		$("#refreshConract").load(window.location.href + " #refreshContract" );
 	});
 </script>
 
@@ -458,9 +459,9 @@
 
 	$.ajax({
 		type: 'POST',
-		url: '{% url "resolution:proposal_start_work" %}',
+		url: '{% url "resolution:contract_start_work" %}',
 		data: {
-			proposalSoldId: '{{proposal_sold.id}}',
+			contractId: '{{contract_sold.id}}',
 			csrfmiddlewaretoken: "{{csrf_token}}",
 			action: 'start-work'
 		},

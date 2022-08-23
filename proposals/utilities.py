@@ -50,14 +50,3 @@ def five_months():
 def six_months():
     return (timezone.now() + relativedelta(months = 6))
 
-
-#prev function with datetime
-
-# def three_months():
-#     return (timezone.now() + timedelta(days = 90))
-
-# def four_months():
-#     return (timezone.now() + timedelta(days = 120))
-
-# def five_months():
-#     return (timezone.now() + timedelta(days = 150))

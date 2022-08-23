@@ -8,12 +8,12 @@
 						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 							<div class="wt-innerbannercontent">
 							<div class="wt-title"><h2>How it Works</h2></div>
-							{% if user.is_authenticated %}
 							<ol class="wt-breadcrumb">
-								<li><a href="index-2.html">Home</a></li>
-								<li class="wt-active">Terms &amp; Conditions</li>
+								{% if user.is_authenticated %}
+								<li><a href="{% url 'account:dashboard' %}">Home</a></li>
+								{% endif %}
+								<li class="wt-active">Workflow</li>
 							</ol>
-							{% endif %}
 							</div>
 						</div>
 					</div>
@@ -34,13 +34,26 @@
 											<a id="business-tab" data-toggle="tab" href="#forfreelancing">For Freelancing</a>
 										</li>
 										<li class="nav-item">
-											<a id="trading-tab" data-toggle="tab" href="#faq">For Sponsors</a>
+											<a id="trading-tab" data-toggle="tab" href="#faq">For Payment</a>
 										</li>
 									</ul>
 									<div class="tab-content wt-haslayout">
 										<div class="wt-contentarticle tab-pane active fade show" id="forhiring">
+											<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+												<h3>Checkout Flow</h3>
+												<div class="wt-freelancerholder wt-rcvproposalholder">												
+													<div class="wt-tabscontenttitle">
+														<div class="alert alert-warning" role="alert">
+															<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																This section breaksdown the checkout products and discount offerings. These products (Proposals, Projects, Contracts), are only available for 'client' type of users on {{website.site_name}} site. 
+															</span>
+														</div>
+													</div>									 
+												</div>
+											</div>	
 											<div class="row">
-												{% if hiring %}
+												
+											{% if hiring %}
 												{% for works in hiring %}
 												<div class="wt-starthiringhold wt-innerspace wt-haslayout">
 													{% if not forloop.counter == 1 and not forloop.counter == 3 and not forloop.counter == 5 and not forloop.counter == 7 and not forloop.counter == 9 %}
@@ -56,7 +69,7 @@
 														<div class="wt-starthiringcontent">
 															<div class="wt-sectionhead">
 																<div class="wt-sectiontitle">
-																	<h2>{{works.title}}</h2>
+																	<h3>#{{works.ordering}}. Product: {{works.title}}</h3>
 																	<span>{{works.subtitle}}</span>
 																</div>
 																<div class="wt-description">
@@ -78,8 +91,66 @@
 													{% endif %}
 												</div>
 												{% endfor %}
-												{% endif %}
+											{% endif %}
 											</div>
+
+											<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+												<h3>Added Value</h3>
+												<div class="wt-freelancerholder wt-rcvproposalholder">												
+													<div class="wt-tabscontenttitle">
+														<div class="alert alert-warning" role="alert">
+															<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																{{website.site_name}} believe in added value. The more your checkout value, the more you save. The table below breaksdown the checkout value with discount. This is applicable to all our products (Proposal, Projects, Contracts). 
+															</span>
+														</div>
+													</div>									 
+													<div class="table-responsive">
+													<table class="table">
+													<thead>
+														<tr>
+															<th>Discount</th>
+															<th>Value</th>
+															<th>Eligibility</th>
+															<th>Savings</th>
+														</tr>
+													</thead>
+													<body>
+														<tr>
+															<th>Level 1</th>
+															<td>{{base_currency_symbol}}{{level_one_start_amount}} - {{base_currency_symbol}}{{level_one_delta_amount}}</td>
+															<td>{% if level_one_rate > 0 %} Applied {% else %} Not Applied {% endif %}</td>
+															<td>{{level_one_rate}}%</td>
+														</tr>
+													</body>	
+													<body>
+														<tr>
+															<th>Level 2</th>
+															<td>{{base_currency_symbol}}{{level_two_start_amount}} - {{base_currency_symbol}}{{level_two_delta_amount}}</td>
+															<td>{% if level_two_rate > 0 %} Applied {% else %} Not Applied {% endif %}</td>
+															<td>{{level_two_rate}}%</td>
+														</tr>
+													</body>	
+													<body>
+														<tr>
+															<th>Level 3</th>
+															<td>{{base_currency_symbol}}{{level_three_start_amount}} - {{base_currency_symbol}}{{level_three_delta_amount}}</td>
+															<td>{% if level_three_rate > 0 %} Applied {% else %} Not Applied {% endif %}</td>
+															<td>{{level_three_rate}}%</td>
+														</tr>
+													</body>	
+													<body>
+														<tr>
+															<th>Level 4</th>
+															<td>Above {{base_currency_symbol}}{{level_four_start_amount}}</td>
+															<td>{% if level_four_rate > 0 %} Applied {% else %} Not Applied {% endif %}</td>
+															<td>{{level_four_rate}}%</td>
+														</tr>
+													</body>	
+													</table>
+													</div> 
+												</div>
+											</div>	
+
 										</div>
 										<div class="wt-contentarticle tab-pane fade" id="forfreelancing">
 											<div class="row">
@@ -100,7 +171,7 @@
 															<ul class="wt-accordionhold accordion">
 																<li>
 																	<div class="wt-accordiontitle collapsed" id="headingOneq" data-toggle="collapse" data-target="#collapseOneq">
-																		{% if freelance.option_one %}<span>{{freelance.option_one}}</span>{% endif %}
+																		{% if freelance.option_one %}<span style='color:green'>Option 1: {{freelance.option_one}}</span>{% endif %}
 																	</div>
 																	<div class="wt-accordiondetails collapse" id="collapseOneq" aria-labelledby="headingOneq">
 																		<div class="wt-title">
@@ -113,7 +184,7 @@
 																</li>
 																<li>
 																	<div class="wt-accordiontitle collapsed" id="headingtwoq" data-toggle="collapse" data-target="#collapsetwoq">
-																		{% if freelance.option_two %}<span>{{freelance.option_two}}</span>{% endif %}
+																		{% if freelance.option_two %}<span style='color:green'>Option 2: {{freelance.option_two}}</span>{% endif %}
 																	</div>
 																	<div class="wt-accordiondetails collapse" id="collapsetwoq" aria-labelledby="headingtwoq">
 																		<div class="wt-title">
@@ -126,7 +197,7 @@
 																</li>
 																<li>
 																	<div class="wt-accordiontitle collapsed" id="headingthreeq" data-toggle="collapse" data-target="#collapsethreeq">
-																		{% if freelance.option_three %}<span>{{freelance.option_three}}</span>{% endif %}
+																		{% if freelance.option_three %}<span style='color:green'>Option 3: {{freelance.option_three}}</span>{% endif %}
 																	</div>
 																	<div class="wt-accordiondetails collapse" id="collapsethreeq" aria-labelledby="headingthreeq">
 																		<div class="wt-title">
@@ -152,128 +223,244 @@
 													{% endfor %}
 													{% endif %}
 													<section class="wt-haslayout wt-dbsectionspace">
-														<div class="wt-freelancerholder wt-rcvproposalholder">
-															<div class="row">
-																<div class="col-12 col-sm-12 col-md-12 col-lg-12">
-																<div class="card">
-																	<div class="card-header">
-																		<h6>Pricing Structure </h6>
+														<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+															<h3>Gross Earning</h3>
+															<div class="wt-freelancerholder wt-rcvproposalholder">												
+																<div class="wt-tabscontenttitle">
+																	<div class="alert alert-warning" role="alert">
+																		<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																			Info: This table breaksdown the checkout gross amount base on single price. There are exceptions to this rule when checking out multiple. 
+																		</span>
 																	</div>
-											
-																	<div class="row">
-																	<div class="col-lg-12">
-											
-																		<div class="table-responsive">
-																		<table class="table table-striped table-sm">
-																			<thead>
-																			<tr>
-										
-																				<th>#</th>
-																				<th>Title</th>
-																				<th>Availability</th>
-																				<th>Payment</th>
-																				{% comment %} <th>Total Salary</th> {% endcomment %}
-										
-																			</tr>
-																			</thead>
-																			<tbody>
-																				{% comment %} {% for member in hiringbox %} {% endcomment %}
-																				<tr>
-																				<td>{{forloop.counter}}</td> 
-																				<td>{{proposal.image_tag}}</td>
-																				<td>{{proposal.title}}</td>
-																				<td>{{proposal.title}}</td>
-																				</tr>
-																				{% comment %} {% endfor %} {% endcomment %}
-																			</tbody>
-																		</table>
-																	</div>
-																</div>										
+																</div>									 
+																<div class="table-responsive">
+																<table class="table">
+																<thead>
+																	<tr>
+																		<th>Original Price</th>
+																		<th>Rate</th>
+																		<th>Sample Price</th>
+																		<th>Cost of Sales</th>
+																		<th>Gross Earning</th>
+																	</tr>
+																</thead>
+																<body>
+																	<tr>
+																		<td>{{base_currency_symbol}}{{level_one_start_amount}} - {{base_currency_symbol}}{{level_one_delta_amount}}</td>
+																		<td>{{level_one_rate}}%</td>
+																		<td>{{base_currency_symbol}}{{level_one_delta_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l1_discount_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l1_disc_sales_price}}</td>
+																	</tr>
+																</body>	
+																<body>
+																	<tr>
+																		<td>{{base_currency_symbol}}{{level_two_start_amount}} - {{base_currency_symbol}}{{level_two_delta_amount}}</td>
+																		<td>{{level_two_rate}}%</td>
+																		<td>{{base_currency_symbol}}{{level_two_start_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l2_discount_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l2_disc_sales_price}}</td>
+																	</tr>
+																</body>	
+																<body>
+																	<tr>
+																		<td>{{base_currency_symbol}}{{level_three_start_amount}} - {{base_currency_symbol}}{{level_three_delta_amount}}</td>
+																		<td>{{level_three_rate}}%</td>
+																		<td>{{base_currency_symbol}}{{level_three_start_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l3_discount_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l3_disc_sales_price}}</td>
+																	</tr>
+																</body>	
+																<body>
+																	<tr>
+																		<td>Above {{base_currency_symbol}}{{level_four_start_amount}}</td>
+																		<td>{{level_four_rate}}%</td>
+																		<td>{{base_currency_symbol}}{{level_four_start_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l4_discount_amount}}</td>
+																		<td>{{base_currency_symbol}}{{l4_disc_sales_price}}</td>
+																	</tr>
+																</body>	
+																</table>
+																</div> 
 															</div>
+														</div>								
 													</section>
-												</div>
+
+													<section class="wt-haslayout wt-dbsectionspace">
+														<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+															<h3>Earning Calculator</h3>
+															<div class="wt-freelancerholder wt-rcvproposalholder">												
+																<div class="wt-tabscontenttitle">
+																	<div class="alert alert-warning" role="alert">
+																		<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																			Info: The table below computes the earning structure based on assumption that a single product is bought. There are exceptions to this rule when checking out multiple. 
+																		</span>
+																	</div>
+																</div>									 
+																<div class="table-responsive">
+																<table class="table">
+																<thead>
+																	<tr>
+																		<th>Gross Earning</th>
+																		<th>{{base_currency_symbol}}{{l1_disc_sales_price}}</th>
+																		<th>{{base_currency_symbol}}{{l2_disc_sales_price}}</th>
+																		<th>{{base_currency_symbol}}{{l3_disc_sales_price}}</th>
+																		<th>{{base_currency_symbol}}{{l4_disc_sales_price}}</th>
+																	</tr>
+																</thead>
+																<body>
+																	<tr>
+																		<td>1st {{base_currency_symbol}}{{proposal_delta_amount}}</td>
+																		<td>{% if l1_disc_sales_price > proposal_delta_amount %}{{proposal_delta_amount}} {% else %} {{l1_disc_sales_price}}{% endif %} @ {{proposal_fee_percentage}}%</td>
+																		<td>{% if l2_disc_sales_price > proposal_delta_amount %}{{proposal_delta_amount}} {% else %} {{l2_disc_sales_price}}{% endif %} @ {{proposal_fee_percentage}}%</td>
+																		<td>{% if l3_disc_sales_price > proposal_delta_amount %}{{proposal_delta_amount}} {% else %} {{l3_disc_sales_price}}{% endif %} @ {{proposal_fee_percentage}}%</td>
+																		<td>{% if l4_disc_sales_price > proposal_delta_amount %}{{proposal_delta_amount}} {% else %} {{l4_disc_sales_price}}{% endif %} @ {{proposal_fee_percentage}}%</td>
+																	</tr>
+																	<tr>
+																		<td>extra {{base_currency_symbol}}{{proposal_delta_amount}}</td>
+																		<td>{{l1_extra_proposal_value}} @ {{proposal_fee_extra}}%</td>
+																		<td>{{l2_extra_proposal_value}} @ {{proposal_fee_extra}}%</td>
+																		<td>{{l3_extra_proposal_value}} @ {{proposal_fee_extra}}%</td>
+																		<td>{{l4_extra_proposal_value}} @ {{proposal_fee_extra}}%</td>
+																	</tr>
+																	<tr>
+																		<th>Total (Proposal)</th>
+																		<th>{{base_currency_symbol}}{{l1_proposal_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l2_proposal_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l3_proposal_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l4_proposal_net_earning}}</th>
+																	</tr>
+																</body>
+																
+																<body>
+																	<tr>
+																		<td>1st {{base_currency_symbol}}{{contract_delta_amount}}</td>
+																		<td>{% if l1_disc_sales_price > contract_delta_amount %}{{contract_delta_amount}} {% else %} {{l1_disc_sales_price}}{% endif %} @ {{contract_fee_percentage}}%</td>
+																		<td>{% if l2_disc_sales_price > contract_delta_amount %}{{contract_delta_amount}} {% else %} {{l2_disc_sales_price}}{% endif %} @ {{contract_fee_percentage}}%</td>
+																		<td>{% if l3_disc_sales_price > contract_delta_amount %}{{contract_delta_amount}} {% else %} {{l3_disc_sales_price}}{% endif %} @ {{contract_fee_percentage}}%</td>
+																		<td>{% if l4_disc_sales_price > contract_delta_amount %}{{contract_delta_amount}} {% else %} {{l4_disc_sales_price}}{% endif %} @ {{contract_fee_percentage}}%</td>
+																	</tr> 
+																	<tr>
+																		<td>extra {{base_currency_symbol}}{{contract_delta_amount}}</td>
+																		<td>{{l1_extra_contract_value}} @ {{contract_fee_extra}}%</td>
+																		<td>{{l2_extra_contract_value}} @ {{contract_fee_extra}}%</td>
+																		<td>{{l3_extra_contract_value}} @ {{contract_fee_extra}}%</td>
+																		<td>{{l4_extra_contract_value}} @ {{contract_fee_extra}}%</td>
+																	</tr>
+																	<tr>
+																		<th>Total (Contract)</th>
+																		<th>{{base_currency_symbol}}{{l1_contract_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l2_contract_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l3_contract_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l4_contract_net_earning}}</th>
+																	</tr>
+																</body>	
+																<body>
+																	<tr>
+																		<td>1st {{base_currency_symbol}}{{application_delta_amount}}</td>
+																		<td>{% if l1_disc_sales_price > application_delta_amount %}{{application_delta_amount}} {% else %} {{l1_disc_sales_price}}{% endif %} @ {{application_fee_percentage}}%</td>
+																		<td>{% if l2_disc_sales_price > application_delta_amount %}{{application_delta_amount}} {% else %} {{l2_disc_sales_price}}{% endif %} @ {{application_fee_percentage}}%</td>
+																		<td>{% if l3_disc_sales_price > application_delta_amount %}{{application_delta_amount}} {% else %} {{l3_disc_sales_price}}{% endif %} @ {{application_fee_percentage}}%</td>
+																		<td>{% if l4_disc_sales_price > application_delta_amount %}{{application_delta_amount}} {% else %} {{l4_disc_sales_price}}{% endif %} @ {{application_fee_percentage}}%</td>
+																	</tr>
+																	<tr>
+																		<td>extra {{base_currency_symbol}}{{application_delta_amount}}</td>
+																		<td>{{l1_extra_application_value}} @ {{application_fee_extra}}%</td>
+																		<td>{{l2_extra_application_value}} @ {{application_fee_extra}}%</td>
+																		<td>{{l3_extra_application_value}} @ {{application_fee_extra}}%</td>
+																		<td>{{l3_extra_application_value}} @ {{application_fee_extra}}%</td>
+																	</tr>
+																	<tr>
+																		<th>Total (Project)</th>
+																		<th>{{base_currency_symbol}}{{l1_application_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l2_application_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l3_application_net_earning}}</th>
+																		<th>{{base_currency_symbol}}{{l4_application_net_earning}}</th>
+																	</tr>
+																</body>	
+																</table>
+																</div> 
+															</div>
+														</div>								
+													</section>
+												</div>        
 											</div>
 										</div>
 										<div class="wt-contentarticle tab-pane fade" id="faq">
 											<div class="row">
-												<div class="wt-starthiringhold wt-innerspace wt-haslayout">
-													<div class="col-12 col-sm-12 col-md-12 col-lg-7 float-left">
-														<div class="wt-starthiringcontent">
-															{% if sponsorship %}
-															{% for sponsors in sponsorship %}
-															<div class="wt-sectionhead">
-																<div class="wt-sectiontitle"> 
-																	{% if sponsors.title %}<h2>{{sponsors.title}}</h2>{% endif %}
-																	{% if sponsors.subtitle %}<span>{{sponsors.subtitle}}</span>{% endif %}
-																</div>
-																<div class="wt-description">
-																	{% if sponsors.preview %}<p>{{sponsors.preview|linebreaksbr}}{% endif %} {% if sponsors.backlink %}<a href="{{sponsors.backlink}}" target='_blank'>Learn more</a>{% endif %}</p>
+												<section class="wt-haslayout wt-dbsectionspace">
+													<div class="row justify-content-md-center">				
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+															<div class="wt-dashboardbox">
+																<div class="wt-dashboardboxcontent wt-rcvproposala">
+																	
+																	<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+																		<h3>Payment Modes</h3>
+																		<div class="wt-freelancerholder wt-rcvproposalholder">												
+																			<p>
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy When client buy
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy When client buy
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy When client buy
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy When client buy
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy 
+																				When client buy When client buy When client buy When client buy
+																			</p>
+																			<div class="wt-tabscontenttitle">
+																				<div class="alert alert-warning" role="alert">
+																					<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																						{{website.site_name}} comes with multiple options for both checkout and payouts as shown below. 
+																					</span>
+																				</div>
+																			</div>									 
+																			<div class="table-responsive">
+																			<table class="table">
+																			<thead>
+																				<tr>
+																					<th>#</th>
+																					<th>Name</th>
+																					<th>Client Fee</th>
+																				</tr>
+																			</thead>
+																			<tbody>
+																				{% for gateway in gateways %}
+																				<tr>
+																					<td>{{forloop.counter}} </td>
+																					<td>{{gateway.name}}</td>
+																					<td>{{gateway.processing_fee}}</td>
+																				</tr> 
+																				{% endfor %}
+																			</tbody>
+																			</table>
+																			</div> 
+																		</div>
+																	</div>
+																	<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+																		<h3>Freelancer Payout</h3>
+																		<div class="wt-freelancerholder wt-rcvproposalholder">												
+																			<div class="wt-tabscontenttitle">
+																				<div class="alert alert-warning" role="alert">
+																					<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																						Info: This table breaksdown the checkout discount. This is available for clients on all our products (Proposal, Projects, Contracts). 
+																					</span>
+																				</div>
+																			</div>									 
+																			
+																			
+																		</div>
+																	</div>								
 																</div>
 															</div>
 														</div>
 													</div>
-													<div class="col-12 col-sm-12 col-md-4 col-lg-5 float-right">
-														<div class="wt-howtoworkimg">
-															{% if sponsors.thumbnail %}
-															<figure>
-																<img src="{{sponsors.thumbnail.url}}" alt="img description">
-															</figure>
-															{% endif %}
-														</div>
-													</div>
-													{% endfor %}
-													{% endif %}
-													<section class="wt-haslayout">
-														<div class="container">
-															<div class="row">
-																<div class="col-12 col-sm-12 col-md-12 col-lg-12">
-																	<div class="wt-greeting-holder">
-																		<div class="row">
-																			<div class="col-12">
-																				<div class="wt-greetingcontent">
-																					<div class="wt-sectionhead">
-																						<div class="wt-sectiontitle">
-																							<h4>We will assign a manager to review and contact you</h4>
-																						</div>
-																						<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
-																							
-																							<div class="form-group">
-																								{{sponsorform.name.label}}
-																								{{sponsorform.name}}
-																							</div>
-																							<div class="form-group">
-																								{{sponsorform.email.label}}
-																								{{sponsorform.email}}
-																							</div>
-																							<div class="form-group">
-																								{{sponsorform.availability1.label}}
-																								{{sponsorform.availability1}}
-																							</div>
-																							<div class="form-group">
-																								{{sponsorform.availability2.label}}
-																								{{sponsorform.availability2}}
-																							</div>
-																							<div class="form-group">
-																								{{sponsorform.availability3.label}}
-																								{{sponsorform.availability3}}
-																							</div> 
-																							<div class="form-group">
-																								{{sponsorform.comment.label}}
-																								{{sponsorform.comment}}
-																							</div> 
-																							<div class="form-group wt-btnarea mt-5">
-																								<button type="submit" class="btn btn-success"> Submit Info </button>
-																							</div>											
-																						</form>
-																					</div>
-																				</div>
-																			</div>
-																		</div>									
-																	</div>
-																</div>
-															</div>						
-														</div>
-													</section>
+												</section>
 												</div>
 											</div>
 										</div>

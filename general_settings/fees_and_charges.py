@@ -21,6 +21,14 @@ def get_contract_delta_amount():
     except:
         return 0
 
+
+def get_extra_contract_value(amount):
+    contract_extras = 0
+    if (int(amount) > int(get_contract_delta_amount())):
+        contract_extras = (amount - get_contract_delta_amount())
+    return contract_extras
+
+
 def get_contract_fee_calculator(amount):
     contract_total_fee = 0
     contract_fee = 0
@@ -59,6 +67,13 @@ def get_proposal_delta_amount():
         return 0
 
 
+def get_extra_proposal_value(amount):
+    proposal_extras = 0
+    if (int(amount) > int(get_proposal_delta_amount())):
+        proposal_extras = (amount - get_proposal_delta_amount())
+    return proposal_extras
+
+
 def get_proposal_fee_calculator(amount):
     proposal_total_fee = 0
     proposal_fee = 0
@@ -75,6 +90,7 @@ def get_proposal_fee_calculator(amount):
 
     proposal_grand_total_fee = proposal_total_fee
     return proposal_grand_total_fee
+
 
 # APPLICATION FEES AND CHARGES STARTS
 
@@ -99,13 +115,20 @@ def get_application_delta_amount():
         return 0
 
 
+def get_extra_application_value(amount):
+    application_extras = 0
+    if (int(amount) > int(get_application_delta_amount())):
+        application_extras = (amount - get_application_delta_amount())
+    return application_extras
+
+
 def get_application_fee_calculator(amount):
     application_total_fee = 0
     application_fee = 0
 
     if (0 <= amount <= get_application_delta_amount()):
         application_total_fee =  ((amount * get_application_fee_percentage())/100)
-
+ 
     elif (int(amount) > int(get_application_delta_amount())):
         application_fee =  ((get_application_delta_amount() * get_application_fee_percentage())/100)
         application_extras = (amount - get_application_delta_amount())

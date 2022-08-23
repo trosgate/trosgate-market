@@ -655,6 +655,7 @@ def payment_success(request):
 @login_required
 def proposal_transaction(request):
     base_currency = get_base_currency_code()
+    proposals = ''
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
         proposals = ProposalSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -673,6 +674,7 @@ def proposal_transaction(request):
 @login_required
 def application_transaction(request):
     base_currency = get_base_currency_code()
+    applications = ''
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
         applications = ApplicationSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -690,16 +692,18 @@ def application_transaction(request):
 @login_required
 def contract_transaction(request):
     base_currency = get_base_currency_code()
+    contracts = ''
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
-        contracts = ContractSale.objects.filter(team=team, contract__status=InternalContract.PAID, purchase__status=Purchase.SUCCESS)
+        contracts = ContractSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
 
     elif request.user.user_type == Customer.CLIENT:
-        contracts = ContractSale.objects.filter(contract__status=InternalContract.PAID, purchase__client=request.user, purchase__status=Purchase.SUCCESS)
-
+        contracts = ContractSale.objects.filter(purchase__client=request.user, purchase__status=Purchase.SUCCESS)
+    
     context = {
         'contracts':contracts,
         'base_currency': base_currency,        
     }
     return render(request, 'transactions/contract_transactions.html', context)
+
 

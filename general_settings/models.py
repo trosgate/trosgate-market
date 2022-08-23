@@ -306,36 +306,36 @@ class DiscountSystem(models.Model):
     level_one_name = models.CharField(
         _("Level One(L1)"), max_length=30, default="Level One Discount System", unique=True)
     level_one_rate = models.PositiveIntegerField(_("L1 Rate"), default=0, help_text=_(
-        "Starting Rate for L1 Discount with minimum of 0%"), validators=[MinValueValidator(0)])
+        "Starting Rate for L1 Discount with minimum default of 0 %"), validators=[MinValueValidator(0), MaxValueValidator(0)])
     level_one_start_amount = models.PositiveIntegerField(_("L1 Amount Start"), default=0, help_text=_(
-        "Minimum checkout Amount is $0"), validators=[MinValueValidator(0), MaxValueValidator(0)])
+        "Minimum checkout amount with default of zero(0) currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
     level_one_delta_amount = models.PositiveIntegerField(_("L1 Amount Delta"), default=199, help_text=_(
-        "checkout Amount between $0 - $299"), validators=[MinValueValidator(0), MaxValueValidator(299)])
+        "checkout amount delta with default of 199 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
 
     level_two_name = models.CharField(
         _("Level Two(L2)"), max_length=30, default="Level Two Discount System", unique=True)
     level_two_rate = models.PositiveIntegerField(_("L2 Rate"), default=3, help_text=_(
-        "Second level Rate for L2 Discount with minimum of 3%"), validators=[MinValueValidator(3)])
+        "Second level Rate for L2 Discount with minimum default of 3%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     level_two_start_amount = models.PositiveIntegerField(_("L2 Amount Start"), default=300, help_text=_(
-        "Minimum checkout Amount is $300"), validators=[MinValueValidator(300), MaxValueValidator(300)])
+        "Minimum checkout amount with default of 300 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
     level_two_delta_amount = models.PositiveIntegerField(_("L2 Amount Delta"), default=499, help_text=_(
-        "checkout Amount between $300 - $499"), validators=[MinValueValidator(300), MaxValueValidator(499)])
+        "checkout amount delta with default of 499 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
 
     level_three_name = models.CharField(
         _("Level Three(L3)"), max_length=30, default="Level Three Discount System", unique=True)
     level_three_rate = models.PositiveIntegerField(_("L3 Rate"), default=5, help_text=_(
-        "Medium Rate for L3 Discount with minimum of 5%"), validators=[MinValueValidator(5)])
+        "Medium Rate for L3 Discount with minimum default of 5%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     level_three_start_amount = models.PositiveIntegerField(_("L3 Amount Start"), default=500, help_text=_(
-        "Minimum checkout Amount is $500"), validators=[MinValueValidator(500), MaxValueValidator(500)])
+        "Minimum checkout amount with default of 500 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
     level_three_delta_amount = models.PositiveIntegerField(_("L3 Amount Delta"), default=999, help_text=_(
-        "checkout Amount between $500 - $999"), validators=[MinValueValidator(500), MaxValueValidator(999)])
+        "checkout amount delta with default of 999 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
 
     level_four_name = models.CharField(
         _("Level Four(L4)"), max_length=30, default="Level Four Discount System", unique=True)
     level_four_rate = models.PositiveIntegerField(_("L4 Rate"), default=7, help_text=_(
-        "Highest Rate for L4 Discount with minimum of 7%"), validators=[MinValueValidator(7)])
+        "Highest Rate for L4 Discount with minimum default of 7%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     level_four_start_amount = models.PositiveIntegerField(_("L4 Amount Start"), default=1000, help_text=_(
-        "Minimum checkout Amount is $1000 and Above"), validators=[MinValueValidator(1000), MaxValueValidator(1000)])
+        "Minimum checkout Amount with default of 1000 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
 
     class Meta:
         verbose_name = _("Discount Level System")
@@ -356,28 +356,79 @@ class DiscountSystem(models.Model):
     def level_four_discount(self):
         return f'{self.level_four_rate}%'
 
+    def clean(self):
+        # Start amount against delta validation
+        if self.level_one_start_amount >= self.level_one_delta_amount:
+            raise ValidationError(
+                {'level_one_start_amount': _('L1 Amount Start cannot be bigger than L1 Amount Delta')})
+        
+        if self.level_two_start_amount >= self.level_two_delta_amount:
+            raise ValidationError(
+                {'level_two_start_amount': _('L2 Amount Start cannot be bigger than L2 Amount Delta')})
+        
+        if self.level_three_start_amount >= self.level_three_delta_amount:
+            raise ValidationError(
+                {'level_three_start_amount': _('L3 Amount Start cannot be bigger than L3 Amount Delta')})
+        
+        if self.level_four_start_amount < self.level_three_start_amount or self.level_four_start_amount < self.level_two_start_amount or self.level_four_start_amount < self.level_one_start_amount:
+            raise ValidationError(
+                {'level_four_start_amount': _('L4 Amount Start must be the biggest of all levels start amount')})
+        
+        # Rate against other rates validation
+        if self.level_one_rate > self.level_two_rate or self.level_one_rate > self.level_three_rate or self.level_one_rate > self.level_four_rate:
+            raise ValidationError(
+                {'level_one_rate': _('L1 Rate must be the smallest of all 4 level rates')})
+        
+        if self.level_two_rate > self.level_three_rate or self.level_two_rate > self.level_four_rate:
+            raise ValidationError(
+                {'level_two_rate': _('L2 Rate must be the second lowest rate after L1 level rate')})
+        
+        if self.level_three_rate > self.level_four_rate:
+            raise ValidationError(
+                {'level_three_rate': _('L3 Rate must be the third lowest rate after L1 and L2 rate')})
+        
+        # Start amount vrs delta validation
+        if self.level_one_delta_amount >= self.level_two_start_amount:
+            raise ValidationError(
+                {'level_one_delta_amount': _('L1 Amount delta cannot be bigger or equal to L2 Amount Start')})
+                        
+        if self.level_two_delta_amount >= self.level_three_start_amount:
+            raise ValidationError(
+                {'level_two_delta_amount': _('L2 Amount delta cannot be bigger or equal to L3 Amount Start')})
+        
+        if self.level_three_delta_amount >= self.level_four_start_amount:
+            raise ValidationError(
+                {'level_three_delta_amount': _('L3 Amount delta cannot be bigger or equal to L4 Amount Start')})
+                        
+        return super().clean()
+
+
+
 
 class HiringFee(models.Model):
     preview = models.CharField(
         _("Freelancer fees and charges"), max_length=50, default="Freelancer fees and charges")
-    contract_fee_percentage = models.PositiveIntegerField(_("Contract Fee - Percentage (%)"), default=0, help_text=_(
-        "This is the percentage fee per contract up to delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    contract_fee_extra = models.PositiveIntegerField(_("Contract Extra Fee - Extra (#)"), default=10, help_text=_(
-        "An extra contract Extra value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    contract_delta_amount = models.PositiveIntegerField(_("Contract Break-Point ($)"), default=400, help_text=_(
-        "The break-point for charging Contract extra fee on freelancer earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
-    proposal_fee_percentage = models.PositiveIntegerField(_("Proposal Fee - Percentage (%)"), default=10, help_text=_(
-        "This is the percentage fee per proposal up to delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    proposal_fee_extra = models.PositiveIntegerField(_("Proposal Extra Fee - Extra (#)"), default=10, help_text=_(
-        "An extra Proposal Extra value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    proposal_delta_amount = models.PositiveIntegerField(_("Proposal Break-Point ($)"), default=400, help_text=_(
-        "The break-point for charging Proposal extra fee on freelancer earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
-    application_fee_percentage = models.PositiveIntegerField(_("Application Fee - Percentage (%)"), default=10, help_text=_(
-        "This is the percentage fee per Proposal up to delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    application_fee_extra = models.PositiveIntegerField(_("Application Extra Fee - Extra (#)"), default=10, help_text=_(
-        "An extra Proposal Extra value charged beyond delta amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    application_delta_amount = models.PositiveIntegerField(_("Application Break-Point ($)"), default=400, help_text=_(
-        "The break-point for charging Proposal extra fee on freelancer earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+    # Contract fee and charges
+    contract_fee_percentage = models.PositiveIntegerField(_("Contract Fee - (%)"), default=20, help_text=_(
+        "This is the first percentage fee per contract up to Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    contract_fee_extra = models.PositiveIntegerField(_("Contract Extra Fee - (%)"), default=5, help_text=_(
+        "An extra percentage contract fee charged beyond Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(70)])
+    contract_delta_amount = models.PositiveIntegerField(_("Contract Break-Point (Value)"), default=300, help_text=_(
+        "The break-point for charging extra Contract fee on freelancer total earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+    # Proposal fee and charges
+    proposal_fee_percentage = models.PositiveIntegerField(_("Proposal Fee - (%)"), default=20, help_text=_(
+        "This is the first percentage fee per proposal up to Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    proposal_fee_extra = models.PositiveIntegerField(_("Proposal Extra Fee - (%)"), default=5, help_text=_(
+        "An extra percentage Proposal fee charged beyond Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(70)])
+    proposal_delta_amount = models.PositiveIntegerField(_("Proposal Break-Point (Value)"), default=300, help_text=_(
+        "The break-point for charging extra Proposal fee on freelancer total earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+    # Project fee and charges
+    application_fee_percentage = models.PositiveIntegerField(_("Job Applicant Fee - (%)"), default=20, help_text=_(
+        "This is the first percentage fee per project applied up to Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    application_fee_extra = models.PositiveIntegerField(_("Job Applicant Extra Fee - (%)"), default=5, help_text=_(
+        "An extra percentage project hiring fee charged beyond Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(70)])
+    application_delta_amount = models.PositiveIntegerField(_("Job Applicant Break-Point (Value)"), default=300, help_text=_(
+        "The break-point for charging extra project hiring fee on freelancer total earning"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
 
     class Meta:
         verbose_name = _("Hiring Fee System")
@@ -387,13 +438,13 @@ class HiringFee(models.Model):
         return self.preview
 
     def contract_percentage(self):
-        return f'{self.contract_fee_percentage}% + {self.contract_fee_extra}'
+        return f'{self.contract_fee_percentage}% + {self.contract_fee_extra}%'
 
     def proposal_percentage(self):
-        return f'{self.proposal_fee_percentage}% + {self.proposal_fee_extra}'
+        return f'{self.proposal_fee_percentage}% + {self.proposal_fee_extra}%'
 
     def application_percentage(self):
-        return f'{self.application_fee_percentage}% + {self.application_fee_extra}'
+        return f'{self.application_fee_percentage}% + {self.application_fee_extra}%'
 
 
 class Currency(models.Model):

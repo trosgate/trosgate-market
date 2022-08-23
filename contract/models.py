@@ -135,41 +135,41 @@ class InternalContract(models.Model):
         return reverse('contract:internal_contract_fee_structure', args=[self.slug])
 
     def save(self, *args, **kwargs):
-        if self.urlcode is None:
+        if self.urlcode == '':
             self.urlcode = str(uuid4())
-        if self.reference is None:
+        if self.reference == '':
             self.reference = 'In-' + str(uuid4()).split('-')[4]
         self.slug = slugify(self.proposal.title)
 
         if self.contract_duration == self.ONE_DAY:
             self.duration = one_day()
-        elif self.contract_duration == self.TWO_DAYS:
+        if self.contract_duration == self.TWO_DAYS:
             self.duration = two_days()
-        elif self.contract_duration == self.THREE_DAYS:
+        if self.contract_duration == self.THREE_DAYS:
             self.duration = three_days()
-        elif self.contract_duration == self.FOUR_DAYS:
+        if self.contract_duration == self.FOUR_DAYS:
             self.duration = four_days()
-        elif self.contract_duration == self.FIVE_DAYS:
+        if self.contract_duration == self.FIVE_DAYS:
             self.duration = five_days()
-        elif self.contract_duration == self.SIX_DAYS:
+        if self.contract_duration == self.SIX_DAYS:
             self.duration = six_days()
-        elif self.contract_duration == self.ONE_WEEK:
+        if self.contract_duration == self.ONE_WEEK:
             self.duration = one_week()
-        elif self.contract_duration == self.TWO_WEEK:
+        if self.contract_duration == self.TWO_WEEK:
             self.duration = two_weeks()
-        elif self.contract_duration == self.THREE_WEEK:
+        if self.contract_duration == self.THREE_WEEK:
             self.duration = three_weeks()
-        elif self.contract_duration == self.ONE_MONTH:
+        if self.contract_duration == self.ONE_MONTH:
             self.duration = one_month()
-        elif self.contract_duration == self.TWO_MONTH:
+        if self.contract_duration == self.TWO_MONTH:
             self.duration = two_months()
-        elif self.contract_duration == self.THREE_MONTH:
+        if self.contract_duration == self.THREE_MONTH:
             self.duration = three_months()
-        elif self.contract_duration == self.FOUR_MONTH:
+        if self.contract_duration == self.FOUR_MONTH:
             self.duration = four_months()
-        elif self.contract_duration == self.FIVE_MONTH:
+        if self.contract_duration == self.FIVE_MONTH:
             self.duration = five_months()
-        elif self.contract_duration == self.SIX_MONTH:
+        if self.contract_duration == self.SIX_MONTH:
             self.duration = six_months()
         super(InternalContract, self).save(*args, **kwargs)        
 
