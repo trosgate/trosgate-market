@@ -17,5 +17,6 @@ urlpatterns = [
     path('pro/<str:proposalsale_id>/<slug:proposal_slug>/',views.proposal_manager, name='proposal_resolution'),
     
     path('contract_start_work/',views.contract_start_work, name='contract_start_work'),
+    path('contract_review/',views.contract_review, name='contract_review'),
     path('con/<str:contractsale_id>/<slug:contract_slug>/',views.contract_manager, name='contract_resolution'),
 ]

@@ -2,7 +2,7 @@ from django.contrib import admin
 from . models import (
     ProjectResolution, ApplicationReview, 
     ProjectCompletionFiles, ProposalResolution, 
-    ProposalCompletionFiles, ProposalReview, ContractResolution
+    ProposalCompletionFiles, ProposalReview, ContractResolution, ContractReview
 )
 
 
@@ -52,3 +52,12 @@ class ProposalReviewAdmin(admin.ModelAdmin):
 class ContractResolutionAdmin(admin.ModelAdmin):
     model = ContractResolution
     list_display = ['team','start_time', 'end_time', 'status'] 
+
+
+@admin.register(ContractReview)
+class ProposalReviewAdmin(admin.ModelAdmin):
+    model = ContractReview
+    list_display = ['title', 'resolution', 'rating', 'status']
+    list_display_links = ['title']
+    list_editable = [ 'status', 'rating']
+    search_fields = ['title']

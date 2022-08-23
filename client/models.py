@@ -10,7 +10,7 @@ import uuid
 from account.fund_exception import FundException
 from general_settings.fund_control import get_max_deposit, get_min_deposit, get_max_depositor_balance, get_min_depositor_balance
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
-
+from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
 class Client(models.Model):
     STORAGE = activate_storage_type()
@@ -99,10 +99,10 @@ class ClientAccount(models.Model):
             client_account = cls.objects.select_for_update().get(user=user)
 
             if client_account.user.first_name == '':
-                raise FundException(_("First name must be specified on your profile"))
+                raise FundException(_("Please complete your profile to perform this task"))
 
             if client_account.user.last_name == '':
-                raise FundException(_("Last name must be specified on your profile"))
+                raise FundException(_("Please complete your profile to perform this task"))
 
             if narration == '':
                 raise FundException(_("Narration is required"))
@@ -111,10 +111,10 @@ class ClientAccount(models.Model):
                 raise FundException(_("Deposit amount is required"))
 
             if deposit_amount > get_max_deposit():
-                raise FundException(_("Invalid amount entered"))
+                raise FundException(_(f"Invalid amount entered. Amount > {get_max_deposit()}"))
 
             if not (int(get_min_deposit()) <= int(deposit_amount) <= int(get_max_deposit())):
-                raise FundException(_('Deposit amount is out of range'))
+                raise FundException(_(f'Deposit amount is out of value range {get_min_deposit()} - {get_max_deposit()}'))
 
             if int(client_account.available_balance) + int(deposit_amount) > int(get_max_depositor_balance()):
                 raise FundException(_('Maximum account balance exceeded'))
@@ -122,73 +122,62 @@ class ClientAccount(models.Model):
             if int(client_account.available_balance) + int(deposit_amount) < int(get_min_depositor_balance()):
                 raise FundException(_('Deposited amount is below minimum'))
 
-            client_account.available_balance += int(0)
-            client_account.save(update_fields=['available_balance'])
-
         return client_account
 
 
     @classmethod
-    def level_two_deposit_check(cls, transaction_id, depositor, deposit_amount, deposit_fee, reference):
+    def final_deposit(cls, user, amount, deposit_fee, narration, gateway):
         with transaction.atomic():
-            client_account = cls.objects.select_for_update().get(user=depositor)
+            client_account = cls.objects.select_for_update().get(user=user)
 
-            if not deposit_amount:
-                raise FundException(_("Deposit amount is required"))
+            if user is None:
+                raise FundException(_("Sorry! operation failed"))
 
-            client_account.available_balance += int(deposit_amount)
+            if amount == '':
+                raise FundException(_("Amount must be specified"))
+
+            if narration == '':
+                raise FundException(_("Narration must be specified"))
+
+
+            client_account.available_balance += int(amount)
             client_account.save(update_fields=['available_balance'])
 
-            # account_action = cls.objects.select_for_update().get(account=client_account, transaction_id=transaction_id, reference=reference, status=False)
-
             account_action = ClientAction.create(
-                account=client_account, narration=narration, deposit_amount=deposit_amount, deposit_fee=deposit_fee, status=False
+                account=client_account, 
+                narration=narration, 
+                amount=amount, 
+                deposit_fee=deposit_fee, 
+                gateway=gateway
             )
-            account_action.available_balance += int(deposit_amount)
-            account_action.status = True
-            account_action.save(update_fields=['available_balance', 'status'])
 
         return client_account, account_action
 
 
 class ClientAction(models.Model):
     account = models.ForeignKey(ClientAccount, verbose_name=_("Account"), related_name="clientfundaccount", on_delete=models.PROTECT)
-    narration = models.CharField(_("Deposit Narration"), max_length=100, blank=True, null=True)
-    stripe_order_id = models.CharField(_("Stripe Order ID"), max_length=100, blank=True, null=True)
-    deposit_amount = models.PositiveIntegerField(_("Deposit Amount"), default=0)
-    deposit_fee = models.PositiveIntegerField(_("Deposit Fee"), default=0)
-    reference = models.CharField(_("Reference"), max_length=100)
-    status = models.BooleanField(_("Status"), choices=((False, 'Failed'), (True, 'Success')), default=False)
+    narration = models.CharField(_("Narration"), max_length=100, blank=True, null=True)
+    amount = models.PositiveIntegerField(_("Amount"), default=0,)
+    deposit_fee = models.PositiveIntegerField(_("Deposit Fee"), default=0,)
+    status = models.BooleanField(_("Status"), choices=((False, 'Failed'), (True, 'Paid')), default=False)
+    gateway = models.CharField(_("Payment Method"), max_length=20)
+    created_at = models.DateTimeField(_("Requested On"), auto_now_add=True,)
+    reference = models.CharField(_("Ref Number"), max_length=15, blank=True, help_text=_("This is a unique number assigned for audit purposes"),)
 
-    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
-    modified_on = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ('-created_at',)
-        verbose_name = _("Client Action")
-        verbose_name_plural = _("Client Action")
+        ordering = ['-created_at']
+        verbose_name = 'Client Deposit'
+        verbose_name_plural = 'Client Deposits'
 
     def __str__(self):
-        return self.account.user.get_full_name()
+        return f'{self.account.user.first_name} {self.account.user.last_name}'
+
 
     @classmethod
-    def create(cls, account, deposit_amount, deposit_fee, reference, narration, status=None):
-
-        if not account:
-            raise FundException(_("You donnot qualify for this operation"))
-
-        if not deposit_amount:
-            raise FundException(_("Amount must be specified"))
-
-        if not deposit_fee:
-            raise FundException(_("fee type not specified"))
-
-        if not reference:
-            raise FundException(_("Reference must be specified"))
-
-        if not narration:
-            raise FundException(_("Narration not specified"))
-
-        action = cls.objects.create(
-            account=account, deposit_amount=deposit_amount, deposit_fee=deposit_fee, narration=narration, reference=reference)
-        return action
+    def create(cls, account, amount, deposit_fee, narration, gateway):
+        deposit =  cls.objects.create(account=account, amount=amount, deposit_fee=deposit_fee, narration=narration, gateway=gateway, status=True)
+        stan = f'{deposit.pk}'.zfill(8)
+        deposit.reference = f'DEP-{stan}'
+        deposit.save()
+        return deposit  

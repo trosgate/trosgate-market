@@ -10,7 +10,7 @@
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 								<div class="wt-innerbannercontent">
-								<div class="wt-title"><h3 style="color:white">{{proposal_sold.team}} <> vrs <>{{proposal_sold.purchase.client.get_short_name}} </h3></div>
+								<div class="wt-title"><h3 style="color:white">{{contract_sold.team}} <> vrs <>{{contract_sold.purchase.client.get_short_name}} </h3></div>
 								<ol class="wt-breadcrumb">
 									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
 									<li class="wt-active"> Manager </li>
@@ -199,7 +199,7 @@
 													<a href="{{contract_sold.contract.created_by.clients.profile_get_absolute_url}}"> {{contract_sold.team.created_by.get_full_name}}</a>
 												</div>
 											</div>
-											<div class="wt-proposalfeedback text-center">
+											<div class="wt-contractfeedback text-center">
 												<span class="wt-starsvtwo">
 													<i class="fa fa-star fill"></i>
 													<i class="fa fa-star fill"></i>
@@ -322,7 +322,7 @@
 									<input class="form-control" id="feedbacktitle" name="reviewtitle" value="" placeholder="Add Your title*"></input>
 								</div>
 								<div class="form-group">
-									<textarea class="form-control" id="proposalfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
+									<textarea class="form-control" id="contractfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
 								</div>
 								<div class="wt-boxtitle">
 									<h2> Select Rating </h2>
@@ -398,7 +398,7 @@
 									<span class="wt-ratingdescription">This Team can't be recommended</span>
 								</div>
 								<div class="form-group wt-btnarea">
-									<button id="proposal-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
+									<button id="contract-reviews" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
 								</div>
 								
 							{% comment %} </fieldset> {% endcomment %}
@@ -421,7 +421,7 @@
 					<div class="wt-modalbody modal-body">
 						<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
 								<div class="form-group">
-									<textarea class="form-control" id="proposalfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
+									<textarea class="form-control" id="contractfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
 								</div>
 								<div class="form-group wt-btnarea">
 									<button id="proposal-cancelled" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
@@ -438,7 +438,7 @@
 <script> 
 	$(document).on('click', '#refreshContract', function (e) {
         e.preventDefault();
-		$("#refreshConract").load(window.location.href + " #refreshContract" );
+		$("#refreshContract").load(window.location.href + " #refreshContract" );
 	});
 </script>
 
@@ -480,11 +480,11 @@
 
 <script>
 	//PROPOSAL REVIEW 
-	$(document).on('click', '#proposal-reviews', function (e) {
+	$(document).on('click', '#contract-reviews', function (e) {
 		e.preventDefault();	
 
 		messageTitle = $('#feedbacktitle').val()
-		messageBody = $('#proposalfeedback').val()
+		messageBody = $('#contractfeedback').val()
 		ratingBody = $("input[name='approveandrate']:radio:checked").val()
 
 		if(messageTitle =='' || messageBody =='' || ratingBody == ''){
@@ -494,19 +494,19 @@
         else{
 			$.ajax({
 			type: "POST",
-			url: '{% url "resolution:proposal_review" %}',
+			url: '{% url "resolution:contract_review" %}',
 			data: {
-				proposalSoldId: '{{proposal_sold.id}}',
+				contractSoldId: '{{contract_sold.id}}',
 				title: messageTitle,
 				message: messageBody,
 				rating: ratingBody,
 				csrfmiddlewaretoken: "{{csrf_token}}",
-				action: 'proposal-review',
+				action: 'contract-review',
 			},
 			success: function (json) {
 				console.log(json)
 				$('#feedbacktitle').val('')
-				$('#proposalfeedback').val('')
+				$('#contractfeedback').val('')
 				document.getElementById("reviewerror-message").innerHTML = json.success_or_error_message;
 				             
 			},

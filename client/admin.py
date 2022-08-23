@@ -53,8 +53,8 @@ class ClientAccountAdmin(admin.ModelAdmin):
 @admin.register(ClientAction)
 class ClientActionAdmin(admin.ModelAdmin):
     model = ClientAction
-    list_display = ['account', 'created_at', 'modified_on', 'deposit_amount', 'status']
-    list_editable = ['deposit_amount']
+    list_display = ['account', 'gateway', 'created_at', 'amount', 'deposit_fee', 'status']
+    list_editable = ['amount']
     list_display_links = None
 
     def has_add_permission(self, request):

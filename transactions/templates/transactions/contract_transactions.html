@@ -101,7 +101,7 @@
 							<td>{{contract.disc_sales_price}}</td>
 							<td>{{contract.staff_hired}}</td>
 							<td>{{contract.total_sales_price}}</td>     
-							<td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+							<td><a href="{% url 'resolution:contract_resolution' contract.id contract.contract.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
 						</tr>
 						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
 						{% endfor %}

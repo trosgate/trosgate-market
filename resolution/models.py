@@ -155,7 +155,6 @@ class ProjectCompletionFiles(models.Model):
         verbose_name = _("Project File")
         verbose_name_plural = _("Project Files")
 
-
     def __str__(self):
         return self.application.team.title
 

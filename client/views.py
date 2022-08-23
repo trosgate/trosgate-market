@@ -243,7 +243,6 @@ def stripe_deposit(request):
     return JsonResponse({'session':session, 'order':payment_intent, 'message':message})
 
 
-
 @login_required
 def deposit_checker(request):
     razorpay_api = RazorpayClientConfig()
@@ -302,11 +301,13 @@ def razorpay_callback(request):
     deposit_fee = int(selected_gateway.processing_fee)
 
     if request.POST.get('action') == 'razorpay-deposit-confirm':
+        narration = str(request.POST.get('razordepositNarration'))
         razorpay_payment_id = str(request.POST.get('razorpay_payment_id'))    
         razorpay_order_id = str(request.POST.get('razorpay_order_id'))    
         razorpay_signature = str(request.POST.get('razorpay_signature'))
         total_amount = int(request.POST.get('total_amount'))
 
+        print('type:', type(total_amount))
         data ={
             'razorpay_order_id': razorpay_order_id,
             'razorpay_payment_id': razorpay_payment_id,
@@ -315,12 +316,21 @@ def razorpay_callback(request):
 
         signature = razorpay_client.utility.verify_payment_signature(data)
 
-        # original_amount = total_amount - deposit_fee
+        new_total_amount = total_amount/100
+        original_amount = int(new_total_amount) - int(deposit_fee)
 
-        # print(int(original_amount) == deposit_amount)
+
+        if original_amount == deposit_amount:
+            print(';all matched ;all matched ;all matched')
 
         if signature == True:
-            print('perfecto perfecto')
+            ClientAccount.final_deposit(
+                user=request.user, 
+                amount=int(original_amount), 
+                deposit_fee=deposit_fee, 
+                narration=narration, 
+                gateway=str(selected_gateway)
+            )
         
             del request.session["depositgateway"]
             del request.session["acceptdepoamount"]

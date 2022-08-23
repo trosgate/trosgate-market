@@ -475,6 +475,7 @@
                                             razorpay_order_id: responseOne.razorpay_order_id,
                                             razorpay_signature: responseOne.razorpay_signature,
                                             total_amount: response.total_amount,
+                                            razordepositNarration: razordepositNarration,
                                             csrfmiddlewaretoken: "{{csrf_token}}",
                                             action: "razorpay-deposit-confirm",
                                         },

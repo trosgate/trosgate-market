@@ -318,6 +318,47 @@ def contract_start_work(request):
         return response
 
 
+login_required
+@user_is_client
+def contract_review(request):
+    success_or_error_message = ''
+    error_messages = ''
+    if request.POST.get('action') == 'contract-review':
+        contract_sold_id = int(request.POST.get('contractSoldId'))
+        rating = int(request.POST.get('rating'))
+        title = str(request.POST.get('title'))
+        message = str(request.POST.get('message'))
+
+        contract_sale = get_object_or_404(ContractSale, pk=contract_sold_id, purchase__client = request.user, purchase__status = Purchase.SUCCESS)
+        resolution = get_object_or_404(ContractResolution, contract_sale=contract_sale, team=contract_sale.team)
+
+        reviews = ContractReview.objects.filter(resolution=resolution, status=True)
+        if reviews.count() > 0:
+            review = reviews.first()
+            review.resolution = resolution
+            review.title = title
+            review.message = message
+            review.rating = rating
+            review.status = True
+            review.save()
+            success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review modified Successfully</span>'
+        else:
+            try:
+                ContractResolution.review_and_approve(
+                    resolution_pk=resolution.pk, 
+                    team=contract_sale.team, 
+                    title=title, 
+                    message=message, 
+                    rating=rating
+                )
+                success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review received Successfully</span>'
+            except Exception as e:
+                error_messages = str(e)
+                success_or_error_message = f'<span id="reviewerror-message" style="color:red;"> {error_messages}</span>'
+
+        response = JsonResponse({'success_or_error_message': success_or_error_message})
+        return response
+
 
 
 
