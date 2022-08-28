@@ -45,7 +45,7 @@ class InternalContractAdmin(admin.ModelAdmin):
     )    
     radio_fields = {'contract_duration': admin.HORIZONTAL}
 
-class ContractChat(admin.TabularInline):
+class ContractChatInline(admin.TabularInline):
     # readonly_fields = ['team','sender','content']
     model = ContractChat
     extra = 0
@@ -57,7 +57,7 @@ class InternalContractChatAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Contract Parties', {'fields': ['created_by', 'team'],}),
     )
-    inlines = [ContractChat]
+    inlines = [ContractChatInline]
 
 
     class Meta:

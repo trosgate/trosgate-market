@@ -38,6 +38,7 @@
 								<span>Transactions</span>
 							</a>
 							<ul class="sub-menu">
+								<li><hr><a href="{% url 'transactions:one_click_transaction' %}">One-Click</a></li>
 								<li><hr><a href="{% url 'transactions:proposal_transaction' %}">Proposal</a></li>
 								<li><hr><a href="{% url 'transactions:application_transaction' %}">Application</a></li>
 								<li><hr><a href="{% url 'transactions:contract_transaction' %}">Contract</a></li>
@@ -112,7 +113,7 @@
 							</a>
 							<ul class="sub-menu">
 								{% if active_team.created_by == request.user %}
-								<li class="wt-active"><hr><a href="{% url 'freelancer:transfer_or_withdraw' %}">New Action</a></li>
+								<li class="wt-active"><hr><a href="{% url 'freelancer:transfer_or_withdraw' %}">Move Fund</a></li>
 								{% endif %}
 								<li><hr><a href="{% url 'payments:transfer_transactions' %}">Transfer</a></li>
 								<li><hr><a href="{% url 'payments:withdrawal_transactions' %}">Withdawals</a></li>
@@ -179,19 +180,7 @@
 								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
 							</ul>
 						</li>							
-												
-						<li class="menu-item-has-children">
-							<a href="javascript:void(0);">
-								<i class="ti-package"></i>
-								<span>Application By Status</span>
-							</a>
-							<ul class="sub-menu">
-								<li><hr><a href="dashboard-completejobs.html">Completed Jobs</a></li>
-								<li><hr><a href="dashboard-canceljobs.html">Cancelled Jobs</a></li>
-								<li><hr><a href="dashboard-ongoingjob.html">Ongoing Jobs</a></li>
-								<li><hr><a href="dashboard-ongoingsingle.html">Ongoing Single</a></li>
-							</ul>
-						</li>
+		
 						<li class="wt-notificationicon menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-pencil-alt"></i>
@@ -227,12 +216,17 @@
 								<span>Account Settings</span>
 							</a>
 						</li>
-						<li>
-							<a href="{% url 'marketing:support' %}">
-								<i class="ti-tag"></i>
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-pencil-alt"></i>
 								<span>Help and Support</span>
 							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'marketing:support' %}">Help Desk</a></li>
+								<li><hr><a href="{% url 'marketing:customer_ticket_list' %}">My Tickets</a></li>
+							</ul>
 						</li>
+						
 						<li>
 							<a href="{% url 'account:logout' %}" data-bs-toggle="modal" data-bs-target="#genericlogoutModal">
 								<i class="ti-shift-right"></i>

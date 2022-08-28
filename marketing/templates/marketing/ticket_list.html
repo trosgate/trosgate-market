@@ -1,0 +1,123 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<main class="wt-main wt-haslayout">
+    {% comment %} <div class="wt-haslayout wt-innerbannerholder">
+        {% include "account/partials/transfer.html" %}
+    </div> {% endcomment %}
+
+    {% if active_team.id == request.user.freelancer.active_team_id %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>Team Tickets</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-info" role="alert">
+                                        <span style="color: green; font-weight: bold;"> 
+                                            The Team's 20 latest tickets will be seen here. View details to reply each ticket
+                                        </span>
+                                    </div>
+                                </div>									 
+                                <div class="table-responsive">
+                                <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ticket #</th>
+                                        <th>Creator</th>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for ticket in tickets %}
+                                    <tr>
+                                        <td>{{forloop.counter}} </td>
+                                        <td>{{ticket.reference}} </td>
+                                        <td>{{ticket.created_by.short_name|capfirst}}</td>
+                                        <td>{{ticket.title|truncatechars:50}}</td>
+                                        <td>{{ticket.created_at}}</td>
+                                        <td {% if ticket.states == 'closed' %} style="color:red;" {% else %} style="color:green;" {% endif %}>{{ticket.get_states_display}}</td>
+                                        <td><a href="{% url 'marketing:customer_ticket_detail' ticket.id ticket.slug %} "><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i>Detail</button></a></td>
+                                    </tr> 
+                                {% endfor %}					
+                                    </tbody>
+                                </table>
+                                {% if not tickets %}
+                                <hr>
+                                <p class='text-center'><strong>No Ticket to show now</strong></p>
+                                {% endif %}											
+                                </div> 
+                            </div>
+                        </div>								
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}    
+        
+    {% if request.user.clients %}
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row justify-content-md-center">				
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent wt-rcvproposala">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <h3>My Tickets</h3>
+                            <div class="wt-freelancerholder wt-rcvproposalholder">												
+                                <div class="wt-tabscontenttitle">
+                                    <div class="alert alert-info" role="alert">
+                                        <span style="color: green; font-weight: bold;"> 
+                                            Your 20 latest tickets will be seen here. View details to reply each ticket
+                                        </span>
+                                    </div>
+                                </div>									 
+                                    <div class="table-responsive">
+                                    <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Ticket #</th>
+                                            <th>Title</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ticket in tickets %}
+                                        <tr>
+                                            <td>{{forloop.counter}} </td>
+                                            <td>{{ticket.reference}} </td>
+                                            <td>{{ticket.title|truncatechars:50}}</td>
+                                            <td>{{ticket.created_at}}</td>
+                                            <td {% if ticket.states == 'closed' %} style="color:red;" {% else %} style="color:green;" {% endif %}>{{ticket.get_states_display}}</td>
+                                            <td><a href="{% url 'marketing:customer_ticket_detail' ticket.id ticket.slug %} "><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i>View</button></a></td>
+                                        </tr> 
+                                    {% endfor %}					
+                                        </tbody>
+                                    </table>
+                                    {% if not tickets %}
+                                    <hr>
+                                    <p class='text-center'><strong>No Ticket to show now</strong></p>
+                                    {% endif %}											
+                                </div> 
+                            </div>
+                        </div>								
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% endblock content %}

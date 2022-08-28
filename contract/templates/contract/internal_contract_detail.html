@@ -152,13 +152,19 @@
                             {% endif %}	
                             {% if request.user == contract.created_by %}
                             {% if contract.reaction == 'accepted' %}
+                            
                             </div>
                                 </div>
                                     </div>
                                     <div class="wt-updatall">
                                         <i class="ti-announcement"></i>
-                                        <span>Redeem your Contract</span>
-                                        <a href="{% url 'contract:internal_contract_fee_structure' contract.id contract.slug %}" class="wt-btn">Confirm and Pay</a>
+                                        <span>Redeem Contract with 1-Click Checkout (1CC)</span>
+                                        <button class="wt-btn" data-toggle="modal" data-target="#oneClickContractCheckout">1 Click Pay</button>
+                                    </div>
+                                    <div class="wt-updatall">
+                                        <i class="ti-announcement"></i>
+                                        <span>Redeem Contract and pay direct</span>
+                                        <a href="{% url 'contract:internal_contract_fee_structure' contract.id contract.slug %}" class="wt-btn">Direct Pay</a>
                                     </div>
                                 </div>
                             </div>
@@ -178,60 +184,102 @@
         </div>
                 
         </main>
+        {% include 'client/partials/one_click_contract_modal.html' %}
 
-        <script>
-            $(document).on('click', '.accept-contract', function (e) {
-              e.preventDefault();
-              $.ajax({
-                type: 'POST',
-                url: '{% url "contract:accept_or_reject_contract" %}',
-                data: {
-                    contractid: $(this).data('index'),
-                    csrfmiddlewaretoken: "{{csrf_token}}",
-                    action: 'accept'
-                },
-                beforeSend:function(){
-                    $("#accept-contract").attr("disabled", true);
-                    $("#reject-contract").attr("disabled", true);
-                },
-                success: function (json) {
-                    if(json.status == 'accepted'){
-                        alert('Thank you for acceptance. We shall inform the client to proceed with payment')
-                        window.location.href = ""
-                    }
-                },
-                error: function (xhr, errmsg, err) {
-                    $("#accept-contract").attr("disabled", false);
-                }
-              });
-            })
-          </script>
-          <script>
-            $(document).on('click', '.reject-contract', function (e) {
-              e.preventDefault();
-              $.ajax({
-                type: 'POST',
-                url: '{% url "contract:accept_or_reject_contract" %}',
-                data: {
-                    contractid: $(this).data('index'),
-                    csrfmiddlewaretoken: "{{csrf_token}}",
-                    action: 'reject'
-                },
-                beforeSend:function(){
-                    $("#accept-contract").attr("disabled", true);
-                    $("#reject-contract").attr("disabled", true);
-                },
-                success: function (json) {
-                    if(json.status == 'rejected'){
-                        alert('We are sorry you had a bad offer. Other doors will open soon')
-                        window.location.href = ""
-                    }
-                },
-                error: function (xhr, errmsg, err) {
-                    $("#reject-contract").attr("disabled", false);
-                }
-              });
-            })
-          </script>
 {% endblock %}
+
+{% block scripts %}
+
+<script>
+    $(document).on('click', '.accept-contract', function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '{% url "contract:accept_or_reject_contract" %}',
+        data: {
+            contractid: $(this).data('index'),
+            csrfmiddlewaretoken: "{{csrf_token}}",
+            action: 'accept'
+        },
+        beforeSend:function(){
+            $("#accept-contract").attr("disabled", true);
+            $("#reject-contract").attr("disabled", true);
+        },
+        success: function (json) {
+            if(json.status == 'accepted'){
+                alert('Thank you for acceptance. We shall inform the client to proceed with payment')
+                window.location.href = ""
+            }
+        },
+        error: function (xhr, errmsg, err) {
+            $("#accept-contract").attr("disabled", false);
+        }
+      });
+    })
+  </script>
+  <script>
+    $(document).on('click', '.reject-contract', function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '{% url "contract:accept_or_reject_contract" %}',
+        data: {
+            contractid: $(this).data('index'),
+            csrfmiddlewaretoken: "{{csrf_token}}",
+            action: 'reject'
+        },
+        beforeSend:function(){
+            $("#accept-contract").attr("disabled", true);
+            $("#reject-contract").attr("disabled", true);
+        },
+        success: function (json) {
+            if(json.status == 'rejected'){
+                alert('We are sorry you had a bad offer. Other doors will open soon')
+                window.location.href = ""
+            }
+        },
+        error: function (xhr, errmsg, err) {
+            $("#reject-contract").attr("disabled", false);
+        }
+      });
+    })
+  </script>
+
+<script>
+	$(document).on('click', '#oneClickCheckout', function (e) {
+	  e.preventDefault();
+
+	  let displayMessage = document.getElementById('oneClick-message');
+	  let displayError = document.getElementById("oneClick-error")
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "client:one_click_contract_checkout" %}',
+		data: {
+			contractId:'{{contract.id}}',
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'oneclick-pay'
+		},
+		beforeSend:function(){
+			$("#oneClickCheckout").attr("disabled", true);
+		},
+		success: function (json) {
+			if(json.errors != ''){
+				displayError.innerHTML = json.errors;
+				$("#oneClickCheckout").attr("disabled", false);
+				return false
+			}
+			else{
+				displayError.innerHTML = '';
+				displayMessage.innerHTML = json.message;
+				$("#oneClickCheckout").attr("disabled", true);
+			}
+		},
+		error: function (xhr, errmsg, err) {
+			$("#oneClickCheckout").attr("disabled", false);
+		}
+	  });
+	})
+  </script>
+
+  {% endblock scripts %}
 

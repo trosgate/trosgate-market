@@ -103,7 +103,8 @@ class PaymentRequest(models.Model):
             payout = cls.objects.select_for_update().get(pk=pk)
             if payout.status != False:
                 raise Exception(_("The request must be in Pending state before you can mark as paid"))
-            if message is None:
+            
+            if message == '':
                 raise Exception(_("message is required"))
 
             message_count = len(message)

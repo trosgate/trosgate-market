@@ -14,14 +14,17 @@ import mimetypes
 from django.utils import timezone
 from account.fund_exception import ReviewException
 from transactions.models import (
+    OneClickPurchase,
     Purchase, 
     ProposalSale, 
     ContractSale,
     ApplicationSale 
 )
 from . models import (
+    OneClickResolution,
     ProjectResolution,
-    ProposalResolution, 
+    ProposalResolution,
+    OneClickReview, 
     ApplicationReview,
     ProposalReview,
     ContractResolution,
@@ -43,7 +46,7 @@ def application_manager(request, application_id, project_slug):
     completion_form = ProjectCompletionForm(request.POST, request.FILES)
     if request.user.user_type == Customer.FREELANCER:
         if request.user != application.team.created_by:
-            return redirect('transactions:application_transaction')
+            return redirect('transactions:one_click_transaction')
 
         project_resolution = ProjectResolution.objects.filter(
             application=application, 
@@ -63,7 +66,7 @@ def application_manager(request, application_id, project_slug):
 
     elif request.user.user_type == Customer.CLIENT:
         if request.user != application.purchase.client:
-            return redirect('transactions:application_transaction')        
+            return redirect('transactions:one_click_transaction')        
         
         project_resolution = ProjectResolution.objects.filter(application=application, application__purchase__client = request.user)
         if project_resolution.count() > 0:
@@ -360,6 +363,112 @@ def contract_review(request):
         return response
 
 
+@login_required
+def oneclick_manager(request, purchase_pk, reference):
+    resolution = ''
+    duration_end_time = ''
+    oneclick_resolution=''
+
+    oneclick_sold = get_object_or_404(OneClickPurchase, pk=purchase_pk, reference=reference)
+    client_review = OneClickReview.objects.filter(resolution__oneclick_sale=oneclick_sold)
+    # completion_form = ContractCompletionForm(request.POST or None, request.FILES or None)
+    if request.user.user_type == Customer.FREELANCER:
+        if request.user != oneclick_sold.team.created_by:
+            return redirect('transactions:one_click_transaction')
+
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+        oneclick_resolution = OneClickResolution.objects.filter(oneclick_sale=oneclick_sold, oneclick_sale__team=team)
+        if oneclick_resolution.count() > 0:
+            resolution = oneclick_resolution.first()
+            duration_end_time = resolution.end_time
+
+
+    elif request.user.user_type == Customer.CLIENT:
+        if request.user != oneclick_sold.client:
+            return redirect('transactions:one_click_transaction')
+
+        oneclick_resolution = OneClickResolution.objects.filter(oneclick_sale=oneclick_sold, oneclick_sale__client=request.user)
+        if oneclick_resolution.count() > 0:
+            resolution = oneclick_resolution.first()
+            duration_end_time = resolution.end_time
+
+
+    context = {
+        "oneclick_sold": oneclick_sold,
+        "resolution": resolution,
+        # "completion_form": completion_form,
+        "client_review": client_review,
+        "duration_end_time": duration_end_time,
+        "currency": get_base_currency_code,
+    }
+    return render(request, "resolution/oneclick_resolution.html", context)
+
+
+@login_required
+@user_is_freelancer
+def oneclick_start_work(request):
+    if request.POST.get('action') == 'start-work':
+        oneclick_id = int(request.POST.get('oneclickId'))
+
+        oneclick_sale = get_object_or_404(OneClickPurchase, pk=oneclick_id, team__created_by=request.user, status = OneClickPurchase.SUCCESS)
+        if OneClickResolution.objects.filter(oneclick_sale=oneclick_sale, team=oneclick_sale.team).exists():
+            print('%s' % (str('Oneclick task already started'))) 
+            pass
+        else:
+            try:
+                OneClickResolution.start_oneclick(
+                    oneclick_sale=oneclick_sale, 
+                    team=oneclick_sale.team
+                )
+
+            except Exception as e:
+                print('%s' % (str(e)))            
+        response = JsonResponse({'message': 'work started'})
+        return response
+
+
+login_required
+@user_is_client
+def oneclick_review(request):
+    success_or_error_message = ''
+    error_messages = ''
+    reviews=''
+    resolution=''
+    if request.POST.get('action') == 'oneclick-review':
+        oneclick_id = int(request.POST.get('oneclickId'))
+        rating = int(request.POST.get('rating'))
+        title = str(request.POST.get('title'))
+        message = str(request.POST.get('message'))
+
+        oneclick_sale = get_object_or_404(OneClickPurchase, pk=oneclick_id, client=request.user, status = OneClickPurchase.SUCCESS)
+        resolution = get_object_or_404(OneClickResolution, oneclick_sale=oneclick_sale, team=oneclick_sale.team)
+
+        reviews = OneClickReview.objects.filter(resolution=resolution, status=True)
+        if reviews.count() > 0:
+            review = reviews.first()
+            review.resolution = resolution
+            review.title = title
+            review.message = message
+            review.rating = rating
+            review.status = True
+            review.save()
+            success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review modified Successfully</span>'
+        else:
+            try:
+                OneClickResolution.review_and_approve(
+                    resolution_pk=resolution.pk, 
+                    team=oneclick_sale.team, 
+                    title=title, 
+                    message=message, 
+                    rating=rating
+                )
+                success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review received Successfully</span>'
+            except Exception as e:
+                error_messages = str(e)
+                success_or_error_message = f'<span id="reviewerror-message" style="color:red;"> {error_messages}</span>'
+
+            response = JsonResponse({'success_or_error_message': success_or_error_message})
+            return response
 
 
 

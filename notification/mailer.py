@@ -156,6 +156,46 @@ def send_credit_to_team(account):
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 
+
+def new_ticket_email(ticket):
+    # Blueprint for sending mail when new ticket created
+    from_email = get_from_email()
+    acceptation_url = settings.WEBSITE_URL
+    subject = f'New Ticket {ticket.reference} created'
+    preview = f'Ticket No. {ticket.reference} created'
+    text_content = f'A New Checkout was paid_amount.'
+    html_content = render_to_string('notification/new_ticket_email.html', {
+        'preview': preview,
+        'ticket': ticket,
+        'mywebsite': website(),
+        'acceptation_url': acceptation_url,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [ticket.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def ticket_reply_email(ticketreply):
+    # Blueprint for sending mail when ticket replied by support
+    from_email = get_from_email()
+    acceptation_url = settings.WEBSITE_URL
+    subject = f'Ticket number {ticketreply.ticket.reference} replied'
+    preview = f'Ticket No: {ticketreply.ticket.reference} replied'
+    text_content = f'A New Checkout was paid_amount.'
+    html_content = render_to_string('notification/ticket_reply.html', {
+        'preview': preview,
+        'ticketreply': ticketreply,
+        'mywebsite': website(),
+        'acceptation_url': acceptation_url,
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [ticketreply.ticket.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+
 # To be continued
 # To be continued
 # To be continued
@@ -210,3 +250,4 @@ def send_invitation_accepted_mail(team, invitation):
     msg = EmailMultiAlternatives(subject, text_content, from_email, [team.created_by.email])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
+

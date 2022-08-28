@@ -226,14 +226,14 @@ LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
 
 #Custom Email Backend for this software
-EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 
 ### option two for email setup in development mode ###
 # I am using gmail setup
 
 ####option one for email setup in development mode###
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ####option two for email setup in development mode###
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

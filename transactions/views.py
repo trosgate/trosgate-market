@@ -20,7 +20,7 @@ from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
-from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from .models import OneClickPurchase, ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
 from . forms import PurchaseForm
 from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
@@ -705,5 +705,23 @@ def contract_transaction(request):
         'base_currency': base_currency,        
     }
     return render(request, 'transactions/contract_transactions.html', context)
+
+
+@login_required
+def one_click_transaction(request):
+    base_currency = get_base_currency_code()
+    oneclicks = ''
+    if request.user.user_type == Customer.FREELANCER:
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
+        oneclicks = OneClickPurchase.objects.filter(team=team, status=OneClickPurchase.SUCCESS)
+
+    elif request.user.user_type == Customer.CLIENT:
+        oneclicks = OneClickPurchase.objects.filter(client=request.user, status=OneClickPurchase.SUCCESS)
+    
+    context = {
+        'oneclicks':oneclicks,
+        'base_currency': base_currency,        
+    }
+    return render(request, 'transactions/oneclicks_transactions.html', context)
 
 

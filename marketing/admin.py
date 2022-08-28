@@ -1,8 +1,11 @@
 from django.contrib import admin
-from .models import Blog, HelpDesk, AutoTyPist, Announcement, Ticket
+from .models import Blog, HelpDesk, AutoTyPist, Announcement, Ticket, TicketMessage
+from .forms import TicketMessageForm
 
-# Register your models here.
+
+
 class BlogAdmin(admin.ModelAdmin):
+    model = Blog
     list_display = [ 'identifier', 'title', 'created_by', 'number_of_likes','type', 'published', 'ordering',]
     list_display_links = ['identifier']
     exclude = ['likes', 'number_of_likes']
@@ -20,7 +23,9 @@ class BlogAdmin(admin.ModelAdmin):
     radio_fields = {'published': admin.HORIZONTAL}
 
 
+
 class HelpDeskAdmin(admin.ModelAdmin):
+    model = HelpDesk
     list_display = ['title', 'created_at', 'published']
     list_display_links = ['title']
     list_editable = ['published']
@@ -40,18 +45,48 @@ class HelpDeskAdmin(admin.ModelAdmin):
     radio_fields = {'published': admin.HORIZONTAL}
 
 
-class TicketAdmin(admin.ModelAdmin):
-    list_display = ['title', 'modified_at', 'reference', 'states']
-    list_display_links = ['title']
-    list_editable = ['states']
-    readonly_fields = ['modified_at','reference', 'query_type_reference', 'created_by', 'assisted_by','created_at', 'team']
+class TicketMessageInline(admin.StackedInline):
+    model = TicketMessage
+    # form =TicketMessageForm
+    readonly_fields = ('support', 'created_at',)
+    extra = 0
 
     fieldsets = (
-        ('Introduction', {'fields': ('title', 'reference','states',)}),
-        ('Detail', {'fields': ('query_type', 'query_type_reference', 'content',)}),
-        ('Other Info', {'fields': ('created_by', 'assisted_by','created_at', 'modified_at', 'team',)}),
+        ('Reply Body', {'fields': ('content','link_title_one','link_title_one_backlink','link_title_two','link_title_two_backlink',)}),
+    )
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class TicketAdmin(admin.ModelAdmin):
+    list_display = [ 'created_by', 'get_user_type', 'reference', 'title','created_at', 'states']
+    list_display_links = ['created_by', 'title']
+    list_editable = ['states']
+    readonly_fields = [
+        'title', 'query_type', 'slug', 'product_type_reference', 'content',
+        'modified_at','reference', 'product_type_reference', 
+        'created_by', 'created_at', 'support', 'team', 'product_type'
+    ]
+
+    fieldsets = (
+        ('Introduction', {'fields': ('title',  'slug', 'reference', 'states',)}),
+        ('Ticket Detail', {'fields': ('query_type', 'product_type', 'product_type_reference', 'content',)}),
+        ('Other Info', {'fields': ('created_by', 'support','created_at', 'modified_at', 'team',)}),
     )
     radio_fields = {'states': admin.HORIZONTAL}
+    inlines = [TicketMessageInline]
+
+    def save_model(self, request, obj, form, change):
+        obj.support = request.user
+        super().save_model(request, obj, form, change)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description='Customer Type', ordering='created_by__user_type')
+    def get_user_type(self, obj):
+        return obj.created_by.get_user_type_display()
 
 
 class AutoTyPistAdmin(admin.ModelAdmin):
@@ -60,7 +95,9 @@ class AutoTyPistAdmin(admin.ModelAdmin):
     list_editable = ['title', 'is_active', 'ordering']
 
 
+
 class AnnouncementAdmin(admin.ModelAdmin):
+    model = Announcement
     list_display = ['content', 'backlink', 'default']
     list_display_links = ['content']
     list_editable = ['backlink', 'default']
@@ -68,8 +105,8 @@ class AnnouncementAdmin(admin.ModelAdmin):
 
 
     
-admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Blog, BlogAdmin)
+admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(HelpDesk, HelpDeskAdmin)
 admin.site.register(AutoTyPist, AutoTyPistAdmin)
 admin.site.register(Ticket, TicketAdmin)

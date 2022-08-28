@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models, transaction as db_transaction
 from django.urls import reverse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -6,11 +6,11 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-import uuid
 from account.fund_exception import FundException
 from general_settings.fund_control import get_max_deposit, get_min_deposit, get_max_depositor_balance, get_min_depositor_balance
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+
 
 class Client(models.Model):
     STORAGE = activate_storage_type()
@@ -94,8 +94,20 @@ class ClientAccount(models.Model):
 
 
     @classmethod
+    def debit_available_balance(cls, user, available_balance):
+        with db_transaction.atomic():
+            account = cls.objects.select_for_update().get(user=user)
+            account.available_balance -= available_balance
+            account.save(update_fields=['available_balance'])           
+
+            db_transaction.on_commit(lambda: print('client debited:', account, available_balance))
+
+        return account
+
+
+    @classmethod
     def deposit_check(cls, user, deposit_amount, narration):
-        with transaction.atomic():
+        with db_transaction.atomic():
             client_account = cls.objects.select_for_update().get(user=user)
 
             if client_account.user.first_name == '':
@@ -127,18 +139,23 @@ class ClientAccount(models.Model):
 
     @classmethod
     def final_deposit(cls, user, amount, deposit_fee, narration, gateway):
-        with transaction.atomic():
+        with db_transaction.atomic():
             client_account = cls.objects.select_for_update().get(user=user)
 
             if user is None:
-                raise FundException(_("Sorry! operation failed"))
+                raise FundException(_("Sorry! deposit operation failed"))
 
             if amount == '':
                 raise FundException(_("Amount must be specified"))
+            
+            if deposit_fee == '':
+                raise FundException(_("We could not verify the selected payment method. Try again"))
 
             if narration == '':
                 raise FundException(_("Narration must be specified"))
-
+            
+            if gateway == '':
+                raise FundException(_("something went wrong on our side. Check back in few minutes. "))
 
             client_account.available_balance += int(amount)
             client_account.save(update_fields=['available_balance'])
@@ -161,9 +178,8 @@ class ClientAction(models.Model):
     deposit_fee = models.PositiveIntegerField(_("Deposit Fee"), default=0,)
     status = models.BooleanField(_("Status"), choices=((False, 'Failed'), (True, 'Paid')), default=False)
     gateway = models.CharField(_("Payment Method"), max_length=20)
-    created_at = models.DateTimeField(_("Requested On"), auto_now_add=True,)
+    created_at = models.DateTimeField(_("Deposited On"), auto_now_add=True,)
     reference = models.CharField(_("Ref Number"), max_length=15, blank=True, help_text=_("This is a unique number assigned for audit purposes"),)
-
 
     class Meta:
         ordering = ['-created_at']
@@ -172,7 +188,6 @@ class ClientAction(models.Model):
 
     def __str__(self):
         return f'{self.account.user.first_name} {self.account.user.last_name}'
-
 
     @classmethod
     def create(cls, account, amount, deposit_fee, narration, gateway):

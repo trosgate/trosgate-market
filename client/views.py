@@ -20,10 +20,11 @@ from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.fund_control import get_min_depositor_balance, get_max_depositor_balance, get_min_deposit, get_max_deposit
-
+from django.contrib.sites.shortcuts import get_current_site
+from transactions.models import Purchase, OneClickPurchase
+from contract.models import InternalContract
 import stripe
 import json
-from django.contrib.sites.shortcuts import get_current_site
 
 
 @login_required
@@ -89,6 +90,63 @@ def client_listing(request):
         'client_profile_list': client_profile_list,
     }
     return render(request, 'client/client_listing.html', context)
+
+
+@login_required
+@user_is_client
+def one_click_proposal_checkout(request):
+    errors = ''
+    err = ''
+    message = ''
+    if request.POST.get('action') == 'oneclick-pay':
+        proposal_id = int(request.POST.get('proposalId'))
+        print(proposal_id)
+        
+        proposal = get_object_or_404(Proposal, pk=proposal_id, status=Proposal.ACTIVE)
+     
+        if request.user.clientfunduser.available_balance >= proposal.salary:
+            try:
+                OneClickPurchase.one_click_proposal(user=request.user, proposal=proposal)
+                message = f'<span id="oneClick-message" style="color:green; text-align:right;">"Congrats! Checkout Successful"</span>'
+            except Exception as e:
+                err = 'Error occured and we could not create order. Try again'
+                errors = f'<span id="oneClick-error" style="color:red; text-align:right;">{err}</span>'
+                print('%s' % (str(e)))
+            return JsonResponse({'message':message, 'errors':errors})
+        else:
+            errors = f'<span id="oneClick-error" style="color:red; text-align:right;">Insufficient Balance to checkout</span>'
+            return JsonResponse({'errors':errors})
+
+
+
+@login_required
+@user_is_client
+def one_click_contract_checkout(request):
+    errors = ''
+    err = ''
+    message = ''
+    if request.POST.get('action') == 'oneclick-pay':
+        contract_id = int(request.POST.get('contractId'))
+        
+        contract = get_object_or_404(InternalContract, pk=contract_id, created_by=request.user, reaction=InternalContract.ACCEPTED)
+     
+        if request.user.clientfunduser.available_balance >= contract.grand_total:
+            try:
+                OneClickPurchase.one_click_contract(user=request.user, contract=contract)
+                message = f'<span id="oneClick-message" style="color:green; text-align:right;">"Congrats! Checkout Successful"</span>'
+            except FundException as e:
+                # err = 'Error occured and we could not create order. Try again'
+                err = str(e)
+                errors = f'<span id="oneClick-error" style="color:red; text-align:right;">{err}</span>'
+                print('%s' % (str(e)))
+            return JsonResponse({'message':message, 'errors':errors})
+        else:
+            errors = f'<span id="oneClick-error" style="color:red; text-align:right;">Insufficient Balance to checkout</span>'
+            return JsonResponse({'errors':errors})
+
+
+
+
 
 
 @login_required

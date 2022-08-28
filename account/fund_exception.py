@@ -11,3 +11,6 @@ class InvitationException(Exception):
 class ContractException(Exception):
     pass
 
+class GenException(Exception):
+    pass
+

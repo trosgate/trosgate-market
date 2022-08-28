@@ -1,0 +1,187 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+            <main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Ticket Tracker</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Ticket Detail</li>
+							</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+            
+            <section class="wt-haslayout wt-dbsectionspace">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-6 float-left">
+                        <div class="wt-dashboardbox">
+                            <div class="wt-dashboardboxtitle wt-titlewithsearch">
+                                <h2>Manage Ticket</h2>
+                            </div>
+                            <div class="wt-dashboardboxcontent wt-helpsupporthead">
+                                <div class="wt-tabscontenttitle">
+                                    <h2>{{ticket.title}}</h2>
+                                </div>
+                                <div class="wt-helpsupportcontent">
+                                    <div class="wt-description">
+                                        <h5>Main Message <span class="notification" style="background-color:green; font-size:10px; color:white; border-radius: 70px;padding:2px;">{{ticket.get_states_display}}</span></h5><br>
+                                        <h6>Ticket #: {{ticket.reference}}</h6>
+                                        <p>{{ticket.content|linebreaks}}</p>
+                                    </div>
+
+                                    {% for tickets in replies %}
+                                    <ul class="wt-accordionhold accordion">
+                                        <li>
+                                            <div class="wt-accordiontitle collapsed" id="heading{{tickets.id}}" data-toggle="collapse" data-target="#{{tickets.id}}">
+                                                <span>{{forloop.counter}}. 
+                                                    {% if tickets.action == True %} 
+                                                    Support Reply on {{tickets.created_at}}
+                                                    {% else %} 
+                                                    Your Reply on {{tickets.created_at}} 
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="wt-accordiondetails collapse" id="{{tickets.id}}" aria-labelledby="heading{{tickets.id}}">
+                                                <div class="wt-title">
+                                                    <p>Support: {% if tickets.support %}{{tickets.support.get_full_name}} {% else %} Yet to Respond {% endif %}</p>
+                                                    <p>Customer: {{tickets.ticket.created_by.get_full_name}}</p>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{tickets.content|linebreaks}}</p>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{tickets.created_at}}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-6 float-left">
+                        <div class="wt-dashboardbox wt-holdersolution">
+                            <div class="wt-dashboardboxtitle">
+                                <h2>Reply to Ticket Response</h2>
+                            </div>
+                            <div class="wt-dashboardboxcontent wt-querycontent">
+                                <span id="ticket-message" style="color:green; text-align:right;"></span>
+                                <span id="ticket-error" style="color:red; text-align:right;"></span>
+                                <br>
+                                <div class="wt-tabscontenttitle">
+                                    <h2>Create your Reply</h2>
+                                </div>
+                                {% if ticket.states != 'closed' %}
+                                <form method='POST' class="wt-formtheme wt-userform">
+                                    {% csrf_token %}
+                                  
+                                    <div class="form-group">
+                                        {{statusform.states.label}}
+                                        {{statusform.states}}
+                                        <span style="color:red;" role="alert">{{statusform.states.errors}}</span>
+                                    </div>
+                                    <div class="form-group">
+                                        {{replyform.content.label}}
+                                        {{replyform.content}}
+                                        <span style="color:red;" role="alert">{{replyform.content.errors}}</span>
+                                    </div>
+                                    
+                                    <div class="form-group form-group-half wt-btnarea">
+                                        <button type="submit" class="wt-btn"> Submit </button>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <p class='text-center'><strong style="color:red;" role="alert">This ticket is closed and cannot be replied</strong></p>
+                                {% endif %}	
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="wt-proposalholder">
+                <div class="row justify-content-md-center">
+                    <div class="wt-sectionhead wt-textcenter">
+                        <span>Copyright @ {{website.site_name}}</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--Main End-->	
+     
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

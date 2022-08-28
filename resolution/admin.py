@@ -1,9 +1,24 @@
 from django.contrib import admin
 from . models import (
-    ProjectResolution, ApplicationReview, 
-    ProjectCompletionFiles, ProposalResolution, 
+    OneClickResolution, ProjectResolution, ApplicationReview, 
+    ProjectCompletionFiles, ProposalResolution,OneClickReview, 
     ProposalCompletionFiles, ProposalReview, ContractResolution, ContractReview
 )
+
+
+@admin.register(OneClickResolution)
+class OneClickResolutionAdmin(admin.ModelAdmin):
+    model = OneClickResolution
+    list_display = ['team','start_time', 'end_time', 'status']    
+
+
+@admin.register(OneClickReview)
+class OneClickReviewAdmin(admin.ModelAdmin):
+    model = OneClickReview
+    list_display = ['title', 'resolution', 'rating','status']
+    list_display_links = ['title']
+    list_editable = [ 'status','rating']
+    search_fields = ['title', 'resolution__team__title']
 
 
 @admin.register(ProjectResolution)

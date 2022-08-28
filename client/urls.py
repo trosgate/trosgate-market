@@ -6,8 +6,6 @@ app_name = 'client'
 
 # shared app urls
 urlpatterns = [
-    path('profile/<slug:short_name>/', views.client_profile, name='client_profile'),
-    path('modify/<str:user_id>/', views.update_client, name='update_client_profile'),
     path('listing/', views.client_listing, name='client_listing'),
     path('deposit-fee/', views.deposit_fee_structure, name='deposit_fee_structure'),
     path('deposit_fee_session/', views.deposit_fee_session, name='deposit_fee_session'),
@@ -16,5 +14,9 @@ urlpatterns = [
     path('deposit_checker/', views.deposit_checker, name='deposit_checker'),
     path('razorpay_callback/', views.razorpay_callback, name='razorpay_callback'),
     path('congrats/', views.payment_success, name='payment_success'),
+    path('proposal_oneclick/', views.one_click_proposal_checkout, name='one_click_proposal_checkout'),
+    path('contract_oneclick/', views.one_click_contract_checkout, name='one_click_contract_checkout'),
+    path('profile/<slug:short_name>/', views.client_profile, name='client_profile'),
+    path('modify/<str:user_id>/', views.update_client, name='update_client_profile'),
     
 ]

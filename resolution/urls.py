@@ -10,13 +10,17 @@ urlpatterns = [
     # Urls for team table
     path('applicant_start_work/',views.applicant_start_work, name='applicant_start_work'),
     path('applicant_review/',views.applicant_review, name='applicant_review'),
-    path('app/<str:application_id>/<slug:project_slug>/',views.application_manager, name='application_resolution'),
+    path('app/<int:application_id>/<slug:project_slug>/',views.application_manager, name='application_resolution'),
 
     path('proposal_start_work/',views.proposal_start_work, name='proposal_start_work'),
     path('proposal_review/',views.proposal_review, name='proposal_review'),
-    path('pro/<str:proposalsale_id>/<slug:proposal_slug>/',views.proposal_manager, name='proposal_resolution'),
+    path('pro/<int:proposalsale_id>/<slug:proposal_slug>/',views.proposal_manager, name='proposal_resolution'),
     
     path('contract_start_work/',views.contract_start_work, name='contract_start_work'),
     path('contract_review/',views.contract_review, name='contract_review'),
-    path('con/<str:contractsale_id>/<slug:contract_slug>/',views.contract_manager, name='contract_resolution'),
+    path('con/<int:contractsale_id>/<slug:contract_slug>/',views.contract_manager, name='contract_resolution'),
+    
+    path('oneclick_start_work/',views.oneclick_start_work, name='oneclick_start_work'),
+    path('oneclick_review/',views.oneclick_review, name='oneclick_review'),
+    path('one/<int:purchase_pk>/<str:reference>/',views.oneclick_manager, name='oneclick_manager'),
 ]

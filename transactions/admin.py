@@ -1,6 +1,21 @@
 from django.contrib import admin
-from . models import Purchase, ApplicationSale, ProposalSale, ContractSale, SubscriptionItem
+from . models import OneClickPurchase, Purchase, ApplicationSale, ProposalSale, ContractSale, SubscriptionItem
 
+
+class OneClickPurchaseAdmin(admin.ModelAdmin):
+    model = OneClickPurchase
+    list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status']
+    list_filter = ['category']
+    readonly_fields = [
+        'client', 'payment_method','salary_paid','created_at','reference',
+        'client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status',
+        'team', 'category', 'proposal','contract'
+    ]
+    fieldsets = (
+        ('Transaction Details', {'fields': ('client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'reference', 'created_at',)}),
+        ('Product Type', {'fields': ('team', 'category', 'proposal','contract')}),
+        
+    )
 
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
@@ -85,6 +100,7 @@ class SubscriptionItemAdmin(admin.ModelAdmin):
         ('Timestamp', {'fields': ('created_at', 'activation_time','expired_time',)}),
     )
 
+admin.site.register(OneClickPurchase, OneClickPurchaseAdmin)
 admin.site.register(Purchase, PurchaseAdmin)
 admin.site.register(ApplicationSale, ApplicationSaleAdmin)
 admin.site.register(ProposalSale, ProposalSaleAdmin)

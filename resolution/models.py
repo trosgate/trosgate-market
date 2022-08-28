@@ -28,6 +28,204 @@ def contract_file_directory(instance, filename):
     return "proposal/%s/%s" % (instance.contract.team.title, filename)
 
 
+
+class OneClickResolution(models.Model):
+    ONE_DAY = "one_day"
+    TWO_DAYS = "two_days"
+    THREE_DAYS = "three_days"
+    FOUR_DAYS = "four_days"
+    FIVE_DAYS = "five_days"
+    SIX_DAYS = "six_days"
+    ONE_WEEK = "one_week"
+    TWO_WEEK = "two_weeks"
+    THREE_WEEK = "three_weeks"
+    ONE_MONTH = "one_month"
+    TWO_MONTH = "two_month"
+    THREE_MONTH = "three_months"
+    FOUR_MONTH = "four_months"
+    FIVE_MONTH = "five_months"
+    SIX_MONTH = "six_months"
+
+    ONGOING = 'ongoing'
+    COMPLETED = 'completed'
+    STATUS_CHOICES = (
+        (ONGOING, _("Ongoing")),
+        (COMPLETED, _("Completed")),
+    ) 
+    # Resolution parameters
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='paidoneclickteam', on_delete=models.CASCADE)
+    oneclick_sale = models.ForeignKey("transactions.OneClickPurchase", verbose_name=_("One Click Product"), related_name="oneclickaction", on_delete=models.CASCADE)
+    start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
+    end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)   
+    status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=ONGOING)    
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+        
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("One Click Hired")
+        verbose_name_plural = _("One Click Hired")
+
+    def __str__(self):
+        return f'{self.team.title} vrs. {self.oneclick_sale.client.get_full_name()}'
+
+
+    @classmethod
+    def start_oneclick(cls, oneclick_sale, team):
+        with db_transaction.atomic():  
+            oneclick = cls.objects.create(
+                oneclick_sale=oneclick_sale, team=team, start_time=timezone.now()
+            )
+
+            if oneclick.oneclick_sale.category == 'contract':
+
+                if oneclick.oneclick_sale.contract.contract_duration == cls.ONE_DAY:
+                    oneclick.end_time = one_day()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.TWO_DAYS:
+                    oneclick.end_time =two_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.THREE_DAYS:
+                    oneclick.end_time = three_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.FOUR_DAYS:
+                    oneclick.end_time = four_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.FIVE_DAYS:
+                    oneclick.end_time = five_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.SIX_DAYS:
+                    oneclick.end_time = six_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.ONE_WEEK:
+                    oneclick.end_time = one_week()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.TWO_WEEK:
+                    oneclick.end_time = two_weeks()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.THREE_WEEK:
+                    oneclick.end_time = three_weeks()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.ONE_MONTH:
+                    oneclick.end_time = one_month()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.TWO_MONTH:
+                    oneclick.end_time = two_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.THREE_MONTH:
+                    oneclick.end_time = three_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.FOUR_MONTH:
+                    oneclick.end_time = four_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.FIVE_MONTH:
+                    oneclick.end_time = five_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.contract.contract_duration == cls.SIX_MONTH:
+                    oneclick.end_time = six_months()
+                    oneclick.save()
+            
+            elif oneclick.oneclick_sale.category == 'proposal':
+
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.ONE_DAY:
+                    oneclick.end_time = one_day()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.TWO_DAYS:
+                    oneclick.end_time = two_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.THREE_DAYS:
+                    oneclick.end_time = three_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.FOUR_DAYS:
+                    oneclick.end_time = four_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.FIVE_DAYS:
+                    oneclick.end_time = five_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.SIX_DAYS:
+                    oneclick.end_time = six_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.ONE_WEEK:
+                    oneclick.end_time = one_week()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.TWO_WEEK:
+                    oneclick.end_time = two_weeks()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.THREE_WEEK:
+                    oneclick.end_time = three_weeks()
+                    oneclick.save()
+                if oneclick.oneclick_sale.proposal.dura_converter == cls.ONE_MONTH:
+                    oneclick.end_time = one_month()
+                    oneclick.save()
+
+        return oneclick
+
+
+    @classmethod
+    def review_and_approve(cls, resolution_pk, team, title:str, message:str, rating:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution_pk)
+            oneclick_team = Team.objects.select_for_update().get(pk=team.id)
+            team_manager = FreelancerAccount.objects.select_for_update().get(user=team.created_by)
+
+            if title == '':
+                raise ReviewException(_("Title is required"))
+            if message == '':
+                raise ReviewException(_("Message is required"))
+            if rating is None:
+                raise ReviewException(_("rating is required"))
+
+            review = OneClickReview.create(
+                resolution=resolution, 
+                title=title, 
+                message=message, 
+                rating=rating, 
+            )
+
+            team_manager.pending_balance -= int(resolution.oneclick_sale.total_earning)
+            team_manager.save(update_fields=['pending_balance'])
+
+            team_manager.available_balance += int(resolution.oneclick_sale.total_earning)
+            team_manager.save(update_fields=['available_balance'])
+
+            oneclick_team.team_balance += int(resolution.oneclick_sale.total_earning)
+            oneclick_team.save(update_fields=['team_balance'])
+
+            resolution.status = 'completed'
+            resolution.save(update_fields=['status'])          
+
+            return resolution, oneclick_team, team_manager, review
+
+
+
+class OneClickReview(models.Model):
+    resolution = models.ForeignKey(OneClickResolution, verbose_name=_("OneClick Review"), related_name="reviewoneclick", on_delete=models.CASCADE)
+    title = models.CharField(_("Title"), max_length=100)
+    message = models.TextField(_("Message"), max_length=650)
+    rating = models.PositiveSmallIntegerField(_("Rating"), default=3)
+    status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')), default=True)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _("OneClick Review")
+        verbose_name_plural = _("OneClick Review")
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def create(cls, resolution, title, message, rating):
+        
+        if title == '':
+            raise ReviewException(_("Title is required"))
+        if message == '':
+            raise ReviewException(_("Message is required"))
+        if rating is None:
+            raise ReviewException(_("rating is required"))   
+
+        return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
+
+
 class ProjectResolution(models.Model):
     '''
     We used signal to compare the project completion time and the default values below to obtain end_time
@@ -354,25 +552,23 @@ class ProposalReview(models.Model):
         return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
 
 
+
 class ContractResolution(models.Model):
-    '''
-    We used signal to compare the contract completion time and the default values below to obtain end_time
-    '''
-    ONE_DAY = "01 day"
-    TWO_DAYS = "02 days"
-    THREE_DAYS = "03 days"
-    FOUR_DAYS = "04 days"
-    FIVE_DAYS = "05 days"
-    SIX_DAYS = "06 days"
-    ONE_WEEK = "01 week"
-    TWO_WEEK = "02 week"
-    THREE_WEEK = "03 week"
-    ONE_MONTH = "01 month"
-    TWO_MONTH = "02 month"
-    THREE_MONTH = "03 month"
-    FOUR_MONTH = "04 month"
-    FIVE_MONTH = "05 month"
-    SIX_MONTH = "06 month"
+    ONE_DAY = "one_day"
+    TWO_DAYS = "two_days"
+    THREE_DAYS = "three_days"
+    FOUR_DAYS = "four_days"
+    FIVE_DAYS = "five_days"
+    SIX_DAYS = "six_days"
+    ONE_WEEK = "one_week"
+    TWO_WEEK = "two_weeks"
+    THREE_WEEK = "three_weeks"
+    ONE_MONTH = "one_month"
+    TWO_MONTH = "two_month"
+    THREE_MONTH = "three_months"
+    FOUR_MONTH = "four_months"
+    FIVE_MONTH = "five_months"
+    SIX_MONTH = "six_months"
 
     ONGOING = 'ongoing'
     COMPLETED = 'completed'

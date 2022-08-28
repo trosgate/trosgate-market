@@ -8,8 +8,11 @@ urlpatterns = [
 
     # Urls for blog
     path('articles/', views.article_list, name='article_list'),
+    path('support/', views.ticket_and_support, name='support'),
+    path('create-ticket/', views.create_ticket, name='create_ticket'),
+    path('ticket-list/', views.customer_ticket_list, name='customer_ticket_list'),
     path('articles/<slug:article_slug>', views.article_detail, name='article_detail'),
-    path('support/', views.support, name='support'),
+    path('ticket/<int:ticket_id>/<slug:ticket_slug>/', views.customer_ticket_detail, name='customer_ticket_detail'),
 
 ]
 

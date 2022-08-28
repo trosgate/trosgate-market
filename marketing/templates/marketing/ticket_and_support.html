@@ -194,28 +194,36 @@
                                 <h2>Didn't Find Your Solution?</h2>
                             </div>
                             <div class="wt-dashboardboxcontent wt-querycontent">
+                                <span id="ticket-message" style="color:green; text-align:right;"></span>
+                                <span id="ticket-error" style="color:red; text-align:right;"></span>
+                                <br>
                                 <div class="wt-tabscontenttitle">
-                                    <h2>Ask Your Query</h2>
+                                    <h2>Create your Ticket</h2>
                                 </div>
                                 <form class="wt-formtheme wt-userform">
                                     <div class="form-group">
-                                        <input name="title" class="form-control" placeholder="Query Description"></input>
+                                        {{ticketform.title.label}}
+                                        {{ticketform.title}}
                                     </div>
                                     <div class="form-group">
-                                        <span class="wt-select">
-                                            <select>
-                                                <option value="" disabled="">Select Query Type</option>
-                                                <option value="">Query</option>
-                                                <option value="">Query Type</option>
-                                            </select>
-                                        </span>
+                                        {{ticketform.query_type.label}}
+                                        {{ticketform.query_type}}
                                     </div>
-
                                     <div class="form-group">
-                                        <textarea name="message" class="form-control" placeholder="Query Description"></textarea>
+                                        {{ticketform.product_type.label}}
+                                        {{ticketform.product_type}}
                                     </div>
+                                    <div class="form-group">
+                                        {{ticketform.product_type_reference.label}}
+                                        {{ticketform.product_type_reference}}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ticketform.content.label}}
+                                        {{ticketform.content}}
+                                    </div>
+                                    
                                     <div class="form-group form-group-half wt-btnarea">
-                                        <a href="javascript:void(0);" class="wt-btn">Submit</a>
+                                        <button id='ticket-button' type="button" class="wt-btn"> Submit </button>
                                     </div>
                                 </form>
                             </div>
@@ -230,7 +238,125 @@
                     </div>
                 </div>
             </div>
-            </main>
-            <!--Main End-->	
+        </main>
+        <!--Main End-->	
      
 {% endblock content %}
+
+{% block scripts %}
+
+<script>
+    //TRANSFER OF FUND             
+    $(document).on('click', '#ticket-button', function (e) {
+    e.preventDefault();
+
+    let title = $('[name="title"]').val();
+    let query_type = $('[name="query_type"]').val();
+    let content = $('[name="content"]').val();
+
+    let displayMessage = document.getElementById('ticket-message');
+    let displayError = document.getElementById('ticket-error');
+    if(title == ''||query_type == ''|| content ==''){
+        displayMessage.textContent = ''
+        displayError.textContent = 'Title, query type and content fields required'
+        return false;
+    }
+    else{
+        displayError.textContent = ''
+        $.ajax({
+            type: 'POST',
+            url: '{% url "marketing:create_ticket" %}',
+            data: {
+                ticketTitle: $('#id_title').val(),
+                ticketQuery_type: $('#id_query_type option:selected').val(),
+                ticketProduct_type: $('#id_product_type option:selected').val(),
+                ticketProduct_Reference: $('#id_product_type_reference').val(),
+                ticketContent: $('#id_content').val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'create-ticket'
+            },
+            success: function (json) {
+                if(json.error != ''){
+                    displayError.textContent = json.error
+                    return false
+                }
+                else{
+                    displayError.textContent = '';
+                    $('#id_title').val('');
+                    $('#id_content').val('');
+                    $('#id_debit_amount').val('');                   
+                    $('#id_product_type').val('');                   
+                    $('#id_product_type_reference').val('');                   
+                    displayMessage.innerHTML = json.message
+                }
+             },
+            error: function (xhr, errmsg, err) {}
+        });
+    }
+})
+</script>
+{% endblock scripts %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

@@ -210,7 +210,6 @@
         let position = $('[name="position"]').val();
         let amount = $('[name="debit_amount"]').val();
         let displayMessage = document.getElementById('transfer-message');
-        let displayError = document.getElementById('transfer-error');
 
         if(staff == ''||position == ''|| amount ==''){
             swal("Alert!", "All fields are required", "error");
@@ -236,7 +235,6 @@
                 },
                 error: function (error) {
                     document.getElementById('transfer-message').innerHTML = error.message
-                    //$("#transfer-message").delay(1000).fadeOut(800);
                 }
             });
         }

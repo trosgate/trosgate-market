@@ -32,8 +32,7 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(ClientAccount)
 class ClientAccountAdmin(admin.ModelAdmin):
     model = ClientAccount
-    list_display = ['user', 'created_at', 'modified_on', 'debug_balance', 'available_balance']
-    list_editable = ['available_balance']
+    list_display = ['user', 'created_at', 'modified_on', 'available_balance']
     list_display_links = None
 
     def has_add_permission(self, request):
@@ -53,9 +52,9 @@ class ClientAccountAdmin(admin.ModelAdmin):
 @admin.register(ClientAction)
 class ClientActionAdmin(admin.ModelAdmin):
     model = ClientAction
-    list_display = ['account', 'gateway', 'created_at', 'amount', 'deposit_fee', 'status']
-    list_editable = ['amount']
-    list_display_links = None
+    list_display = ['account', 'reference', 'gateway', 'created_at', 'amount', 'deposit_fee', 'status']
+    readonly_fields = ['account','reference', 'gateway', 'narration', 'created_at', 'amount', 'deposit_fee', 'status']
+    search_fields = ['account__user__first_name', 'account__user__last_name', 'reference', 'gateway']
 
     def has_add_permission(self, request):
         return False

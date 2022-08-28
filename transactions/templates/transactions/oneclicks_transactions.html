@@ -1,0 +1,121 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<!--Main Start-->
+	<main id="wt-main" class="wt-main wt-haslayout">
+
+		<!--Company listing starts-->
+		<div class="wt-proposalholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-12">
+						<div class="wt-sectionhead wt-textcenter">
+							<div class="wt-sectiontitle">
+								<h3>oneclick Transactions</h3>
+								<div class="alert alert-info" role="alert">
+									<span style="color: green; font-weight: bold;"> All Your Transactions history</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% if request.user.freelancer %}
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Reference</th>
+							<th>Client</th>
+							<th>Date</th>
+							<th>Product</th>
+							<th>Salary ({{base_currency}})</th>
+							<th>Fees </th>
+							<th>Est. Earning</th>
+							{% if active_team.created_by == request.user %}
+							<th>Manager</th>
+							{% endif %}
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for oneclick in oneclicks %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{oneclick.reference}}</td>
+							<td>{{oneclick.client.get_full_name|capfirst}}</td>
+							<td>{{oneclick.created_at}}</td>
+							<td>{{oneclick.get_category_display}}</td>
+							<td>{{oneclick.salary_paid}}</td>
+							<td>{{oneclick.earning_fee}}</td>
+							<td>{{oneclick.total_earning}}</td>
+							{% if active_team.created_by == request.user %}
+							<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Start Work</button></a></td>
+							{% endif %}
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not oneclicks %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No oneclick sale made Yet. Better times ahead</span>
+					</div>
+					{% endif %}
+			</div> 
+			{% endif %}
+
+			{% if request.user.clients %}
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Reference</th>
+							<th>Product Type</th>
+							<th>Product</th>
+							<th>Date</th>
+							<th>Salary ({{base_currency}})</th>
+							<th>Manager</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for oneclick in oneclicks %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td>{{oneclick.reference}}</td>
+							<td>{{oneclick.get_category_display}}</td>
+							<td>{% if oneclick.category == 'proposal' %}{{oneclick.proposal.title}}{% elif oneclick.category == 'contract' %}{{oneclick.contract.proposal.title}} {% endif %}</td>
+							<td>{{oneclick.created_at}}</td>
+							<td>{{oneclick.salary_paid}}</td>
+							<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+						</tr>
+						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not oneclicks %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No one-clicks transactions yet but you can change that</span>
+					</div>
+					{% endif %}
+				</div>  
+				{% endif %}
+		</div>
+		
+		
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	{% endblock %}
+

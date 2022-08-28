@@ -1,0 +1,51 @@
+	{% comment %} Modal section for 1 Click Checkout {% endcomment %}
+	<div class="wt-uploadimages modal fade" id="oneClickContractCheckout" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="wt-modaldialog modal-dialog" role="document">
+			<div class="wt-modalcontent modal-content">
+				<div class="wt-boxtitle">
+					<h2>One Click Checkout(1CC) <i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
+				</div>
+
+				<div class="wt-modalbody modal-body">
+					<div class="wt-freelancerholder wt-rcvproposalholder">
+						<div class="wt-sectiontitle">
+							<span>1CC - A quick way to checkout with Balance</span>
+						</div>
+						<ul class="wt-projectliststyle">
+							<div class="wt-title">
+								<h5>Benefits of 1CC</h5>
+							</div>	
+							<li><span><i class="fa fa-check"></i>#1: No form required, just click and we will create your order</span></li>
+							<li><span><i class="fa fa-check"></i>#2: No extra fees. You only pay the exact amount of contract price</span></li>
+							<li><span><i class="fa fa-check"></i>#3: Regardless of inflation, your account balance never change</span></li>
+							<li><span><i class="fa fa-check"></i>#4: Suitable when hiring a single freelancer</span></li>
+							
+							{% if request.user.clientfunduser.available_balance >= contract.grand_total %}
+							<div class="wt-title">
+								<h5>Insufficient Balance?</h5>
+							</div>
+							<li><span><i class="fa fa-check"></i>#1: {{ website.site_name }} have a deposit system that will credit your account</span></li>
+							<li><span><i class="fa fa-check"></i>#2: Then you can use 1CC</span></li>
+							<li><span><i class="fa fa-check"></i>#3: You can make <a href="{% url 'client:deposit_fee_structure' %}">deposit here</a></span></li>
+							{% endif %}
+						</ul>
+					</div>
+					<div class='text-center'>
+						<span id="oneClick-message"></span>
+						<span id="oneClick-error"></span>	
+					</div>
+					{% if request.user.clientfunduser.available_balance >= contract.grand_total %}
+					<div class="form-group wt-btnarea">
+						<button id="oneClickCheckout" type="button" class="btn btn-danger">Checkout Now</button>
+					</div>
+					{% else %}
+					<div class="wt-btnarea alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+							Your account balance is insufficient. You can <a href="{% url 'client:deposit_fee_structure' %}">add deposit to your account here</a> 
+						</span>
+					</div>	
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>

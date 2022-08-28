@@ -48,8 +48,10 @@
 											<li><span><i class="fa fa-dollar-sign"></i> {{proposal.get_service_level_display}}</span></li>
 											<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
 											<li><span><i class="far fa-clock"></i> Duration: {{proposal.get_dura_converter_display }}</span></li>
-											<li><span><i class="far fa-folder"></i> Revision: {{proposal.get_revision_display}}</span></li>
-											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Min Salary: ${{proposal.salary}}</span></li>
+											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Min Salary: ${{proposal.salary}}</span></li>
+											{% if request.user.clients %}
+											<li><span><button class="btn btn-success btn-sm text-white"  data-toggle="modal" data-target="#oneClickProposalCheckout">1-Click Purchase</button></span></li>
+											{% endif %}
 										</ul>
 									</div>
 									{% if request.user.is_authenticated and request.user.clients %}
@@ -134,7 +136,7 @@
 														<tbody>
 					
 															<tr>
-															<td><a href="javascript:void(0);" class="btn btn-outline-primary btn-sm mt-2"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} Available</a></td>
+															<td><a href="javascript:void(0);" class="btn btn-outline-primary btn-sm mt-2"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} Avail.</a></td>
 															<td><button class="btn btn-outline-primary btn-sm mt-2" type="button"> ${{proposal.salary}}</a></button></td>
 															<td>
 																<div class="form-group">
@@ -402,6 +404,8 @@
 		<!--Content Wrapper End-->
 	</div>
 
+	{% include 'client/partials/one_click_proposal_modal.html' %}
+
 {% endblock content %}
 
 {% block scripts %}
@@ -418,10 +422,45 @@
 			action: 'post'
 		},
 		success: function (json) {
-			console.log(json)
 			document.getElementById("members-qty").innerHTML = json.member_qty
 		},
 		error: function (xhr, errmsg, err) {}
+	  });
+	})
+  </script>
+
+  <script>
+	$(document).on('click', '#oneClickCheckout', function (e) {
+	  e.preventDefault();
+
+	  let displayMessage = document.getElementById('oneClick-message');
+	  let displayError = document.getElementById("oneClick-error")
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "client:one_click_proposal_checkout" %}',
+		data: {
+			proposalId:'{{proposal.id}}',
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'oneclick-pay'
+		},
+		beforeSend:function(){
+			$("#oneClickCheckout").attr("disabled", true);
+		},
+		success: function (json) {
+			if(json.errors != ''){
+				displayError.innerHTML = json.errors;
+				$("#oneClickCheckout").attr("disabled", false);
+				return false
+			}
+			else{
+				displayMessage.innerHTML = '';
+				displayMessage.innerHTML = json.message;
+				$("#oneClickCheckout").attr("disabled", true);
+			}
+		},
+		error: function (xhr, errmsg, err) {
+			$("#oneClickCheckout").attr("disabled", false);
+		}
 	  });
 	})
   </script>

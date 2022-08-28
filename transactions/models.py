@@ -5,14 +5,122 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils.safestring import mark_safe
 from django.urls import reverse
-from freelancer.models import Freelancer
+from freelancer.models import FreelancerAccount
 from proposals.models import Proposal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from general_settings.currency import get_base_currency_symbol
-from payments import signals
-from freelancer.models import FreelancerAccount
 from contract.models import InternalContract
+from client.models import ClientAccount
+from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator
+from account.fund_exception import FundException
+
+
+class OneClickPurchase(models.Model):
+    SUCCESS = 'success'
+    FAILED = 'failed'
+    STATUS_CHOICES = (
+        (SUCCESS, _('Success')),
+        (FAILED, _('Failed'))
+    )    
+
+    PROPOSAL = 'proposal'
+    CONTRACT = 'contract'
+    PURCHASE_CATEGORY = (
+        (PROPOSAL, _('Proposal')),
+        (CONTRACT, _('Contract'))
+    )    
+    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="oneclickclient")
+    salary_paid = models.PositiveIntegerField(_("Salary Paid"))
+    total_earning = models.PositiveIntegerField(_("Totoal Earning"))
+    earning_fee = models.PositiveIntegerField(_("Earning Fee"))
+    payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
+    category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
+    status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
+    reference = models.CharField(_("Reference"), max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+    
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='oneclickteam', on_delete=models.PROTECT)
+    proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal"), related_name="oneclickproposal", null=True, blank=True, on_delete=models.PROTECT)
+    contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract"), related_name="oneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = ("One Click Purchase")
+        verbose_name = ("One Click Purchase")
+
+    def __str__(self):
+        return f'1-Click Purchase - {self.reference}'
+
+
+    @classmethod
+    def one_click_proposal(cls, user, proposal):
+        with db_transaction.atomic():
+            account = ClientAccount.objects.select_for_update().get(user = user)
+            if account.available_balance < proposal.salary:
+                raise FundException('Insufficuent Balance')
+
+            earning_fee = get_proposal_fee_calculator(proposal.salary)
+            total_earning = int(proposal.salary) - int(earning_fee)
+            
+            purchass = cls.objects.create(
+                client=account.user,
+                category = cls.PROPOSAL,
+                payment_method='Balance',
+                salary_paid=proposal.salary,
+                total_earning=round(total_earning),
+                earning_fee=earning_fee,
+                team = proposal.team,
+                proposal = proposal,
+                status = cls.SUCCESS,
+            )           
+            stan = f'{purchass.pk}'.zfill(8)
+            purchass.reference = f'1click{purchass.client.id}{stan}'
+            purchass.save()
+
+            ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
+
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, paid_amount=purchass.salary_paid, purchase=purchass.proposal)
+        
+        return account, purchass
+
+
+    @classmethod
+    def one_click_contract(cls, user, contract):
+        with db_transaction.atomic():
+            account = ClientAccount.objects.select_for_update().get(user=user)
+            if account.available_balance < contract.grand_total:
+                raise FundException('Insufficient Balance')
+
+            earning_fee = get_contract_fee_calculator(contract.grand_total)
+            total_earning = int(contract.grand_total) - int(earning_fee)
+            
+            purchass = cls.objects.create(
+                client=account.user,
+                category = cls.CONTRACT,
+                payment_method='Balance',
+                salary_paid=contract.grand_total,
+                total_earning=round(total_earning),
+                earning_fee=earning_fee,
+                team = contract.team,
+                contract = contract,
+                status = cls.SUCCESS,
+            )           
+            stan = f'{purchass.pk}'.zfill(8)
+            purchass.reference = f'1click{purchass.client.id}{stan}'
+            purchass.save()
+
+            ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
+
+            selected_contract = InternalContract.objects.select_for_update().get(pk=purchass.contract.id)
+            selected_contract.reaction = 'paid'
+            selected_contract.save(update_fields=['reaction'])
+            
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, paid_amount=purchass.salary_paid, purchase=selected_contract)
+
+        return account, purchass, selected_contract
+
 
 class Purchase(models.Model):
     SUCCESS = 'success'
@@ -22,10 +130,12 @@ class Purchase(models.Model):
         (FAILED, _('Failed'))
     )    
 
+    ONE_CLICK = 'one_click'
     PROPOSAL = 'proposal'
     PROJECT = 'project'
     CONTRACT = 'contract'
     PURCHASE_CATEGORY = (
+        (ONE_CLICK, _('One Click')),
         (PROPOSAL, _('Proposal')),
         (PROJECT, _('Project')),
         (CONTRACT, _('Contract'))
@@ -41,13 +151,12 @@ class Purchase(models.Model):
     category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
     unique_reference = models.CharField(_("Unique Reference"), max_length=100, blank=True)
-    paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, blank=True)
-    flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=250, null=True, blank=True)
-    stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=250, null=True, blank=True)
-    razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=250, null=True, blank=True)
-    razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=250, null=True, blank=True)
-    razorpay_signature = models.CharField(_("Razorpay Signature"), max_length=250, null=True, blank=True)
-
+    paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, null=True, blank=True)
+    flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=200, null=True, blank=True)
+    stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=200, null=True, blank=True)
+    razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=200, null=True, blank=True)
+    razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=200, null=True, blank=True)
+    razorpay_signature = models.CharField(_("Razorpay Signature"), max_length=200, null=True, blank=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
 
