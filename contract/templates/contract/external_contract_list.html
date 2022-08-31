@@ -64,10 +64,7 @@
 								<td>{{contract.get_contract_duration_display}}</td>
 								<td>{{contract.grand_total}}</td>
 								<td>
-									<a href="{% url 'contract:external_contract_detail' contract.id contract.urlcode %}" class="btn btn-success"><i class="fa fa-info"> Preview</i></a>
-									{% if request.user.freelancer %}
-									<a href="javascript:void(0);" class="btn btn-info"><i class="fa fa-folder-open"> Send Client Email</i></a>
-									{% endif %}
+									<a href="{% url 'contract:external_contract_detail' contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
 								</td> 
 								</tr>
 								{% endfor %}

@@ -26,6 +26,38 @@ from account.fund_exception import ContractException
 from notification.mailer import send_contract_accepted_email, send_contract_rejected_email
 
 
+        # if self.contract_duration == self.ONE_DAY:
+        #     self.duration = one_day()
+        # if self.contract_duration == self.TWO_DAYS:
+        #     self.duration = two_days()
+        # if self.contract_duration == self.THREE_DAYS:
+        #     self.duration = three_days()
+        # if self.contract_duration == self.FOUR_DAYS:
+        #     self.duration = four_days()
+        # if self.contract_duration == self.FIVE_DAYS:
+        #     self.duration = five_days()
+        # if self.contract_duration == self.SIX_DAYS:
+        #     self.duration = six_days()
+        # if self.contract_duration == self.ONE_WEEK:
+        #     self.duration = one_week()
+        # if self.contract_duration == self.TWO_WEEK:
+        #     self.duration = two_weeks()
+        # if self.contract_duration == self.THREE_WEEK:
+        #     self.duration = three_weeks()
+        # if self.contract_duration == self.ONE_MONTH:
+        #     self.duration = one_month()
+        # if self.contract_duration == self.TWO_MONTH:
+        #     self.duration = two_months()
+        # if self.contract_duration == self.THREE_MONTH:
+        #     self.duration = three_months()
+        # if self.contract_duration == self.FOUR_MONTH:
+        #     self.duration = four_months()
+        # if self.contract_duration == self.FIVE_MONTH:
+        #     self.duration = five_months()
+        # if self.contract_duration == self.SIX_MONTH:
+        #     self.duration = six_months()
+
+
 class InternalContract(models.Model):
     """
     This is the Internal contract Model
@@ -78,24 +110,20 @@ class InternalContract(models.Model):
   
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="internalcontractteam", on_delete=models.CASCADE)
     proposal = models.ForeignKey('proposals.Proposal', verbose_name=_("Proposal"), related_name="internalcontractproposal", on_delete=models.CASCADE)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), null=True, blank=True, related_name="internalcontractauthor", on_delete=models.SET_NULL)
-    date_created = models.DateTimeField(_('Created On'),blank=True, null=True, default=timezone.now)
-    last_updated = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="internalcontractauthor", on_delete=models.CASCADE)
     contract_duration = models.CharField(_('Duration'), choices=CONTRACT_DURATION, default=ONE_DAY, max_length=20)
-    duration = models.DateTimeField(_("Completion In"), blank=True, help_text=_("deadline for contract"))
     reaction = models.CharField(_('State'), choices=STATE, default=AWAITING, max_length=30)
     notes = models.TextField(null=True, blank=True, max_length=500)
 
-    reference = models.CharField(_('Reference'), unique=True, null=True, blank=True, max_length=100)
-    urlcode = models.CharField(unique=True, null=True, blank=True, max_length=100)
-    slug = models.SlugField(_('Slug'), max_length=100, blank=True, null=True)
+    reference = models.CharField(_('Reference'), unique=True, blank=True, max_length=100)
+    slug = models.SlugField(_('Slug'), blank=True, max_length=350)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     
-    line_one = models.CharField(_('Service Description'), max_length=120, default=None, blank=True, null=True)
-    line_one_quantity = models.PositiveIntegerField(_('Quantity'), default=0, blank=True, null=True)
-    line_one_unit_price = models.PositiveIntegerField(_('Unit Price'), default=0, blank=True, null=True)
-    line_one_total_price = models.PositiveIntegerField(_('Total'), default=0, blank=True, null=True)
+    line_one = models.CharField(_('Service Description'), max_length=120)
+    line_one_quantity = models.PositiveIntegerField(_('Quantity'), default=0)
+    line_one_unit_price = models.PositiveIntegerField(_('Unit Price'), default=0)
+    line_one_total_price = models.PositiveIntegerField(_('Total'), default=0)
 
     line_two = models.CharField('Service Extras One', max_length=120, default=None, blank=True, null=True)
     line_two_quantity = models.PositiveIntegerField(_('Quantity'), default=0, blank=True, null=True)
@@ -134,45 +162,6 @@ class InternalContract(models.Model):
     def get_redeem_internal_contract_absolute_url(self):
         return reverse('contract:internal_contract_fee_structure', args=[self.slug])
 
-    def save(self, *args, **kwargs):
-        if self.urlcode == '':
-            self.urlcode = str(uuid4())
-        if self.reference == '':
-            self.reference = 'In-' + str(uuid4()).split('-')[4]
-        self.slug = slugify(self.proposal.title)
-
-        if self.contract_duration == self.ONE_DAY:
-            self.duration = one_day()
-        if self.contract_duration == self.TWO_DAYS:
-            self.duration = two_days()
-        if self.contract_duration == self.THREE_DAYS:
-            self.duration = three_days()
-        if self.contract_duration == self.FOUR_DAYS:
-            self.duration = four_days()
-        if self.contract_duration == self.FIVE_DAYS:
-            self.duration = five_days()
-        if self.contract_duration == self.SIX_DAYS:
-            self.duration = six_days()
-        if self.contract_duration == self.ONE_WEEK:
-            self.duration = one_week()
-        if self.contract_duration == self.TWO_WEEK:
-            self.duration = two_weeks()
-        if self.contract_duration == self.THREE_WEEK:
-            self.duration = three_weeks()
-        if self.contract_duration == self.ONE_MONTH:
-            self.duration = one_month()
-        if self.contract_duration == self.TWO_MONTH:
-            self.duration = two_months()
-        if self.contract_duration == self.THREE_MONTH:
-            self.duration = three_months()
-        if self.contract_duration == self.FOUR_MONTH:
-            self.duration = four_months()
-        if self.contract_duration == self.FIVE_MONTH:
-            self.duration = five_months()
-        if self.contract_duration == self.SIX_MONTH:
-            self.duration = six_months()
-        super(InternalContract, self).save(*args, **kwargs)        
-
 
     @classmethod
     def capture(cls, pk:int, reaction):
@@ -199,50 +188,43 @@ class Contractor(models.Model):
     """
     name = models.CharField(blank=True, max_length=100)
     email = models.CharField(max_length=100)
-    reference = models.CharField(blank=True, max_length=100)
     address = models.CharField(null=True, blank=True, max_length=150)
     postal_code = models.CharField(null=True, blank=True, max_length=6)
     phone_Number = models.CharField(null=True, blank=True, max_length=100)
-    tax_Number = models.CharField(null=True, blank=True, max_length=100)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="contractors", on_delete=models.CASCADE)
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="contractors", on_delete=models.CASCADE)    
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.name} - {self.email}'
 
     class Meta:
         ordering = ['-date_created']
-        verbose_name = _("External Contractor")
-        verbose_name_plural = _("External Contractor")
-
-    def save(self, *args, **kwargs):
-        if self.reference == '':
-            self.reference = str(uuid4()).split('-')[4]       
-        super(Contractor, self).save(*args, **kwargs)
+        verbose_name = _("External Client")
+        verbose_name_plural = _("External Client")
 
 
 class Contract(models.Model):
     """
-    This is the external contract to be shared with contractor
-    """
-    # contract Duration
-    ONE_DAY = "01 day"
-    TWO_DAYS = "02 days"
-    THREE_DAYS = "03 days"
-    FOUR_DAYS = "04 days"
-    FIVE_DAYS = "05 days"
-    SIX_DAYS = "06 days"
-    ONE_WEEK = "01 week"
-    TWO_WEEK = "02 week"
-    THREE_WEEK = "03 week"
-    ONE_MONTH = "01 month"
-    TWO_MONTH = "02 month"
-    THREE_MONTH = "03 month"
-    FOUR_MONTH = "04 month"
-    FIVE_MONTH = "05 month"
-    SIX_MONTH = "06 month"
+    This is the External contract Model
+    """    
+    # Internal Contract Duration
+    ONE_DAY = "one_day"
+    TWO_DAYS = "two_days"
+    THREE_DAYS = "three_days"
+    FOUR_DAYS = "four_days"
+    FIVE_DAYS = "five_days"
+    SIX_DAYS = "six_days"
+    ONE_WEEK = "one_week"
+    TWO_WEEK = "two_weeks"
+    THREE_WEEK = "three_weeks"
+    ONE_MONTH = "one_month"
+    TWO_MONTH = "two_month"
+    THREE_MONTH = "three_months"
+    FOUR_MONTH = "four_months"
+    FIVE_MONTH = "five_months"
+    SIX_MONTH = "six_months"
     CONTRACT_DURATION = (
         (ONE_DAY, _("01 Day")),
         (TWO_DAYS, _("02 Days")),
@@ -261,31 +243,35 @@ class Contract(models.Model):
         (SIX_MONTH, _("06 Months")),
     )   
     #
-    # Invoice States
-    PENDING = 'pending'
+    #states 
+    AWAITING = 'awaiting'
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
     PAID = 'paid'
-    STATUS = (
-        (PENDING, _('Pending')),
+    STATE = (
+        (AWAITING, _('Awaiting')),
+        (ACCEPTED, _('Accepted')),
+        (REJECTED, _('Rejected')),
         (PAID, _('Paid')),
-    )  
+    )   
+   
     #
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="contractsteam", on_delete=models.CASCADE)
     client = models.ForeignKey(Contractor, verbose_name=_("External Client"), related_name="contractsclient", blank=True, on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), blank=True, related_name="contractsauthor", on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True)
-    contract_duration = models.CharField(_('Completion Time'), choices=CONTRACT_DURATION, default=ONE_DAY, max_length=20)
-    status = models.CharField(choices=STATUS, default=PENDING, max_length=10)
+    contract_duration = models.CharField(_('Duration'), choices=CONTRACT_DURATION, default=THREE_DAYS, max_length=20)
+    reaction = models.CharField(_('State'), choices=STATE, default=ACCEPTED, max_length=30)
     notes = models.TextField(null=True, blank=True, max_length=500)
 
-    reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
-    urlcode = models.CharField(unique=True, null=True, blank=True, max_length=100)
-    slug = models.SlugField(max_length=100, blank=True, null=True)
+    reference = models.CharField(_('Reference'), unique=True, blank=True, max_length=100)
+    slug = models.SlugField(_('Slug'), max_length=150, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
     
-    line_one = models.CharField(_('Service Description'), max_length=120, default=None, blank=True, null=True)
-    line_one_quantity = models.PositiveIntegerField(_('Quantity'), default=0, blank=True, null=True)
-    line_one_unit_price = models.PositiveIntegerField(_('Unit Price'), default=0, blank=True, null=True)
-    line_one_total_price = models.PositiveIntegerField(_('Total'), default=0, blank=True, null=True)
+    line_one = models.CharField(_('Service Description'), max_length=120)
+    line_one_quantity = models.PositiveIntegerField(_('Quantity'), default=0)
+    line_one_unit_price = models.PositiveIntegerField(_('Unit Price'), default=0)
+    line_one_total_price = models.PositiveIntegerField(_('Total'), default=0)
 
     line_two = models.CharField('Service Extras One', max_length=120, default=None, blank=True, null=True)
     line_two_quantity = models.PositiveIntegerField(_('Quantity'), default=0, blank=True, null=True)
@@ -308,7 +294,7 @@ class Contract(models.Model):
     line_five_total_price = models.PositiveIntegerField(_('Total'), default=0, blank=True, null=True)
 
     grand_total = models.PositiveIntegerField(_('Grand Total'), default=0, blank=True, null=True)  
-      
+     
     
     def __str__(self):
         return self.team.title
@@ -317,23 +303,13 @@ class Contract(models.Model):
         ordering = ['-date_created']
         verbose_name = _("External Contract")
         verbose_name_plural = _("External Contract")
-
+ 
 
     def get_contract_detail_absolute_url(self):
         return reverse('contract:contract_single', args=[self.id])
 
-
     def get_redeem_contract_absolute_url(self):
         return reverse('contract:redeem_contract', args=[self.id])
-
-
-    def save(self, *args, **kwargs):
-        if self.urlcode is None:
-            self.urlcode = str(uuid4())
-        if self.reference is None:
-            self.reference = 'Ex-' + str(uuid4()).split('-')[4]
-        self.slug = slugify(self.line_one)
-        super(Contract, self).save(*args, **kwargs)
 
 
 class InternalContractChat(InternalContract):

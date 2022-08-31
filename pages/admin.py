@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import TermsAndConditions, Hiring, Freelancing, Sponsorship, Sponsor
 
 MAX_OBJECTS = 1
-HIRING_MAX_OBJECTS = 3
+HIRING_MAX_OBJECTS = 4
 
 
 class TermsAndConditionsAdmin(admin.ModelAdmin):

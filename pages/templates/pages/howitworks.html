@@ -34,7 +34,7 @@
 											<a id="business-tab" data-toggle="tab" href="#forfreelancing">For Freelancing</a>
 										</li>
 										<li class="nav-item">
-											<a id="trading-tab" data-toggle="tab" href="#faq">For Payment</a>
+											<a id="trading-tab" data-toggle="tab" href="#faq">For Teams</a>
 										</li>
 									</ul>
 									<div class="tab-content wt-haslayout">
@@ -149,6 +149,38 @@
 													</table>
 													</div> 
 												</div>
+											</div>
+											<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+												<h3>Payment Modes</h3>
+												<div class="wt-freelancerholder wt-rcvproposalholder">												
+													<div class="wt-tabscontenttitle">
+														<div class="alert alert-warning" role="alert">
+															<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																{{website.site_name}} comes with multiple options for both checkout and deposit as shown below. 
+															</span>
+														</div>
+													</div>									 
+													<div class="table-responsive">
+													<table class="table">
+													<thead>
+														<tr>
+															<th>#</th>
+															<th>Name</th>
+															<th>Client Fee</th>
+														</tr>
+													</thead>
+													<tbody>
+														{% for gateway in gateways %}
+														<tr>
+															<td>{{forloop.counter}} </td>
+															<td>{{gateway.name}}{% if gateway.name == 'Balance' %} (1CC){% endif %}</td>
+															<td>{{gateway.processing_fee}}</td>
+														</tr> 
+														{% endfor %}
+													</tbody>
+													</table>
+													</div> 
+												</div>
 											</div>	
 
 										</div>
@@ -224,7 +256,7 @@
 													{% endif %}
 													<section class="wt-haslayout wt-dbsectionspace">
 														<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-															<h3>Gross Earning</h3>
+															<h4>Gross Earning</h4>
 															<div class="wt-freelancerholder wt-rcvproposalholder">												
 																<div class="wt-tabscontenttitle">
 																	<div class="alert alert-warning" role="alert">
@@ -288,7 +320,7 @@
 
 													<section class="wt-haslayout wt-dbsectionspace">
 														<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-															<h3>Earning Calculator</h3>
+															<h4>Earning Calculator</h4>
 															<div class="wt-freelancerholder wt-rcvproposalholder">												
 																<div class="wt-tabscontenttitle">
 																	<div class="alert alert-warning" role="alert">
@@ -381,7 +413,73 @@
 																</table>
 																</div> 
 															</div>
-														</div>								
+														</div>
+													</section>
+													<section class="wt-haslayout wt-dbsectionspace">	
+														<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+															<h4>Cashflow Timelines</h4>
+															<div class="wt-freelancerholder wt-rcvproposalholder">												
+																<div class="wt-tabscontenttitle">
+																	<div class="alert alert-warning" role="alert">
+																		<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																			When a client checkout is successful, money goes to pending balance of team founder. Upon task approval by client, we move cash to team balance and available balance of founder. Important: Every cashflow impact on available balance affect team balance same way as illustrated below. 
+																		</span>
+																	</div>
+																</div>									 
+																<div class="table-responsive">
+																<table class="table">
+																<thead>
+																	<tr>
+																		<th>Stages</th>
+																		<th>Condition</th>
+																		<th>Treatment</th>
+																		<th>Notification</th>
+																		<th>Payout Mode</th>
+																		<th>Timeline</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	<tr>
+																		<td><strong>Stage One</strong></td>
+																		<td><strong>Sales:</strong>When a client checkout is successful</td>
+																		<td>+Pending Balance</td>
+																		<td>Email</td>
+																		<td>Not Available</td>
+																		<td>Service Timeline</td>
+																	</tr> 
+																	<tr>
+																		<td><strong>Stage Two</strong></td>
+																		<td><strong>Request:</strong>When client approves a task</td>
+																		<td>-Pending Balance, <br>+Available Balance, <br>+Team Balance</td>
+																		<td>Email</td>
+																		<td>User Request</td>
+																		<td>Every <strong>{% firstof payday.get_payday_converter_display '03 Days' %}</strong> from the time of request</td>
+																	</tr> 
+																	<tr>
+																		<td><strong>Stage Three</strong></td>
+																		<td><strong>Payday:</strong>On transfer within team, When {{website.site_name}} management approves a withdrawal request</td>
+																		<td>-Available Balance, <br>-Team Balance</td>
+																		<td>Email</td>
+																		<td>Fund Transfer - (within Team), <br>Withdrawal Request, <br>Any Payment method allowed</td>
+																		<td>Paid and mark as close</td>
+																	</tr> 
+																</tbody>
+																</table>
+																</div> 
+															</div>
+														</div>
+													</section>
+													<section class="wt-haslayout wt-dbsectionspace">	
+														<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+															<h4>Special credit</h4>
+															<div class="wt-freelancerholder wt-rcvproposalholder">												
+																<p> Management of {{website.site_name}} has a periodic policy for rewarding high performance team. When our sales team submit the list, memo is raised for management to approve base on merit. At all times, {{website.site_name}} has exclusive right to decide who, and how to grant credit. In order not to be left out of this huge gains, here are some parameters we consider:</p>
+																<span><i class="ti-check" style='color:green'></i> Above average sales rate</span><br>
+																<span><i class="ti-check" style='color:green'></i> Low cancellation rate</span><br>
+																<span><i class="ti-check" style='color:green'></i> High review rate</span><br>
+																<span><i class="ti-check" style='color:green'></i> Active rate</span><br>
+															</div>
+														</div>
 													</section>
 												</div>        
 											</div>
@@ -395,28 +493,14 @@
 																<div class="wt-dashboardboxcontent wt-rcvproposala">
 																	
 																	<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-																		<h3>Payment Modes</h3>
+																		<h4>The Manager</h4>
 																		<div class="wt-freelancerholder wt-rcvproposalholder">												
-																			<p>
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy When client buy
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy When client buy
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy When client buy
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy When client buy
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy 
-																				When client buy When client buy When client buy When client buy
-																			</p>
+																			<p>When it comes to freelancers, nothing can be achieved without a team. Every freelancer, including external invites are assigned a default Team. If there is a team, there is a manager/founder.</p>
+																			
 																			<div class="wt-tabscontenttitle">
 																				<div class="alert alert-warning" role="alert">
 																					<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-																						{{website.site_name}} comes with multiple options for both checkout and payouts as shown below. 
+																						At {{website.site_name}}, the creator of a team is called the manager or founder. As such, the manager assumes the task of receiving all email notifications and payments on behalf of the team. 
 																					</span>
 																				</div>
 																			</div>									 
@@ -426,15 +510,15 @@
 																				<tr>
 																					<th>#</th>
 																					<th>Name</th>
-																					<th>Client Fee</th>
+																					<th>Label</th>
 																				</tr>
 																			</thead>
 																			<tbody>
-																				{% for gateway in gateways %}
+																				{% for package in packages %}
 																				<tr>
 																					<td>{{forloop.counter}} </td>
-																					<td>{{gateway.name}}</td>
-																					<td>{{gateway.processing_fee}}</td>
+																					<td>{% firstof package.verbose_type package.type %}</td>
+																					<td>{{package.get_status_display}}</td>
 																				</tr> 
 																				{% endfor %}
 																			</tbody>
@@ -442,21 +526,68 @@
 																			</div> 
 																		</div>
 																	</div>
+
 																	<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-																		<h3>Freelancer Payout</h3>
+																		<h4>Packages</h4>
 																		<div class="wt-freelancerholder wt-rcvproposalholder">												
 																			<div class="wt-tabscontenttitle">
 																				<div class="alert alert-warning" role="alert">
 																					<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-																						Info: This table breaksdown the checkout discount. This is available for clients on all our products (Proposal, Projects, Contracts). 
+																						The various teams come with their limitations. The largest team paid a price via subscription and for that, they have added advantage. At one point in time, the largest team was once a default team that ugraded
 																					</span>
 																				</div>
-																			</div>									 
-																			
-																			
+																			</div>
+																			<div id="packaging" class="wt-dashboardboxcontent wt-packages">
+																				<div class="wt-package wt-packagedetails">
+																					<div class="wt-packagehead">
+																					</div>
+																					<div class="wt-packagecontent">
+																						<ul class="wt-packageinfo">
+																							<li class="wt-packageprices"><span>Price</span></li>
+																							<li><span>Group Chat</span></li>
+																							<li><span>Fund Transfer - Within Team</span></li>
+																							<li><span>Member Per Team</span></li>
+																							<li><span>Monthly Contracts Per Team</span></li>
+																							<li><span>Max Proposals Per Team</span></li>
+																							<li><span>Monthly Application Per Team</span></li>
+																						</ul>
+																					</div>
+																				</div>
+																				{% for package in packages %}
+																				<div class="wt-package wt-baiscpackage">
+																					<div class="wt-packagehead">
+																						<h3>{% firstof package.verbose_type package.type %}</h3>
+																						<span>{{package.get_status_display}}</span>
+																					</div>
+																					<div class="wt-packagecontent">
+																						<ul class="wt-packageinfo">
+																							<li class="wt-packageprice"><span><sup>{{base_currency_symbol}}</sup>{{package.price}}<sub>\ Month</sub></span></li>
+																							<li><span>{% if package.type == 'Team' %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+																							<li><span>{% if package.type == 'Team' %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+																							<li><span>{% if package.max_member_per_team > 0 %} <i class="ti-check"> {{package.max_member_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_member_per_team}} </i>{% endif %}</span></li>
+																							<li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">{{package.monthly_offer_contracts_per_team}}</i> {% else %} <i class="ti-na">.</i>{% endif %}</span></li>
+																							<li><span>{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">{{package.max_proposals_allowable_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
+																							<li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check">{{package.monthly_projects_applicable_per_team}}</i>{% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
+																						</ul>
+																					</div>
+																				</div>
+																				{% endfor %}
+																				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-3 float-left">
+																					<div class="wt-dashboardboxcontent wt-offersidebar wt-dashboardbox-margin">
+																						<figure><img src="{% static 'images/save-img-01.jpg'%}" alt="img description"></figure>
+																						<div class="wt-offercontent">
+																							<h4>Save Big, Do Big</h4>
+																							<p>For every money spent, there is absolutely high value for it.</p>
+																							{% if not request.user.is_authenticated %}
+																							<a class="wt-btn" href="{% url 'account:login' %}"><span>Join Now</span></a>
+																							{% endif %}
+																						</div>
+																					</div>
+																				</div>
+																			</div>
 																		</div>
-																	</div>								
-																</div>
+																	</div>
+
 															</div>
 														</div>
 													</div>
@@ -472,6 +603,8 @@
 				</div>
 			</div>
 			<!--Limitless Experience End-->
+			{% if not request.user.is_authenticated %}
 			{% include 'dashboard/main_footer.html' %}
+			{% endif %}
 
 {% endblock %}

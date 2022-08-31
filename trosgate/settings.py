@@ -246,6 +246,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # DEFAULT_EMAIL_FROM = 'Trosgate <myvoistudio@gmail.com>'
 
 
+
+USE_HTTPS = 'https://'
+USE_HTTP = 'http://'
 WEBSITE_URL = 'http://127.0.0.1:8000'
 ACCEPTATION_URL = WEBSITE_URL + '/account/register/'
 

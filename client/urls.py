@@ -15,7 +15,8 @@ urlpatterns = [
     path('razorpay_callback/', views.razorpay_callback, name='razorpay_callback'),
     path('congrats/', views.payment_success, name='payment_success'),
     path('proposal_oneclick/', views.one_click_proposal_checkout, name='one_click_proposal_checkout'),
-    path('contract_oneclick/', views.one_click_contract_checkout, name='one_click_contract_checkout'),
+    path('contract_oneclick/', views.one_click_interncontract_checkout, name='one_click_contract_checkout'),
+    path('externcontract_one_click_checkout/', views.one_click_externcontract_checkout, name='externcontract_one_click_checkout'),
     path('profile/<slug:short_name>/', views.client_profile, name='client_profile'),
     path('modify/<str:user_id>/', views.update_client, name='update_client_profile'),
     

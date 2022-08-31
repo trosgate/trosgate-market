@@ -109,40 +109,41 @@
     
     function subscribePayPalButton() { 
         paypal.Buttons({
-        style: {
-            shape: 'rect',
-            color: 'gold',
-            layout: 'vertical',
-            label: 'subscribe'
-        },
-        createSubscription: function(data, actions) {
-            return actions.subscription.create({
-                plan_id: '{{paypal_subscription_price_id}}'
-            });
-        },
-        onApprove: function(data) {
-            console.log(data.subscriptionID)
-            let url = "{% url 'teams:activate_paypal_subscription' %}"
-            return fetch(url, {
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                    'X-CSRFToken': '{{csrf_token}}',
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'subscribe'
+            },
+            createSubscription: function(data, actions) {
+                return actions.subscription.create({
+                    plan_id:'{{paypal_subscription_price_id}}'
+                  });
                 },
-                body: JSON.stringify({
-                    subscriptionID: data.subscriptionID,
-                    customerID: '{{request.user.freelancer.active_team_id}}'
-                })
-                }).then(function (json) {
-                    swal("Perfect!", 'All looked good', "success").then((value) =>{
-                        window.location.href = "/team/packages/"
-                    });              
+                
+            onApprove: function(data, actions) {
+                let url = "{% url 'teams:activate_paypal_subscription' %}"
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                        'X-CSRFToken': '{{csrftoken}}',
+                    },
                     
-                })
-            },      
-            }).render('#paypal-button-container');
-        }
-        subscribePayPalButton(); // Renders the PayPal button
+                    body: JSON.stringify({
+                        subscriptionID: data.subscriptionID,
+                        customerID: '{{request.user.freelancer.active_team_id}}'
+                    })
+                    }).then(function (json) {
+                        swal("Perfect!", 'All looked good', "success").then((value) =>{
+                            window.location.href = "/team/packages/"
+                        });              
+                        
+                    })
+                },      
+                }).render('#paypal-button-container');
+            }
+            subscribePayPalButton(); // Renders the PayPal button
     </script>
 
 

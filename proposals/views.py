@@ -141,16 +141,18 @@ def proposal_step_one(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
     session = request.session
     proposal = ''
+    proposalstepone=None
     can_create_new_proposal = PackageController(team).max_proposals_allowable_per_team()
     
     if "proposalstepone" not in session:
-        proposalformone = ProposalStepOneForm(request.POST or None)
+        proposalformone = ProposalStepOneForm(request.POST or None, request.FILES or None)
         
         if proposalformone.is_valid():
             proposal = proposalformone.save(commit=False)
             proposal.created_by = request.user
             proposal.team = team
             proposal.slug = slugify(proposal.title)
+            proposal.progress = int(30)
             proposal.save()
             proposalformone.save_m2m()
 
@@ -160,7 +162,11 @@ def proposal_step_one(request):
             return redirect("proposals:proposal_step_two")
 
     else:
-        proposalstepone = Proposal.objects.get(pk=session["proposalstepone"]["proposalstepone_id"], team=team)
+        try:
+            proposalstepone = Proposal.objects.get(pk=session["proposalstepone"]["proposalstepone_id"], team=team)
+        except:
+            del session["proposalstepone"]
+
         proposalformone = ProposalStepOneForm(request.POST, instance = proposalstepone) 
 
         if proposalformone.is_valid():
@@ -168,7 +174,6 @@ def proposal_step_one(request):
             proposalformone.instance.preview = proposalformone.cleaned_data['preview']
             proposalformone.instance.category = proposalformone.cleaned_data['category']
             proposalformone.save()
-
  
             return redirect("proposals:proposal_step_two") 
 
@@ -176,6 +181,7 @@ def proposal_step_one(request):
 
     context = {
         'proposalformone': proposalformone,
+        'proposalstepone': proposalstepone,
         'can_create_new_proposal': can_create_new_proposal,
     }
     return render(request, 'proposals/proposal_step_one.html', context)
@@ -188,19 +194,24 @@ def proposal_step_two(request):
     if "proposalstepone" not in request.session:
         return redirect("proposals:proposal_step_one")
 
-    proposal = ''                                                  
-    proposalformtwo = ''           
+    proposal = None                                                  
+    proposalformtwo = None           
+    proposalsteptwo = None           
     session = request.session
 
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposalsteptwo = Proposal.objects.get(pk=session["proposalstepone"]["proposalstepone_id"], team=team)
+    try:
+        proposalsteptwo = Proposal.objects.get(pk=session["proposalstepone"]["proposalstepone_id"], team=team)
+    except:
+        del session["proposalstepone"]
 
     if "proposalsteptwo" not in session:
-        proposalformtwo = ProposalStepTwoForm(request.POST, instance = proposalsteptwo)
+        proposalformtwo = ProposalStepTwoForm(request.POST or None, instance = proposalsteptwo)
 
         if proposalformtwo.is_valid():
             proposalformtwo.instance.description = proposalformtwo.cleaned_data['description']
             proposalformtwo.instance.sample_link = proposalformtwo.cleaned_data['sample_link']
+            proposalformtwo.instance.progress = int(70)
             proposal = proposalformtwo.save()
 
             session["proposalsteptwo"] = {"proposalsteptwo_id": proposal.id}
@@ -230,9 +241,9 @@ def proposal_step_two(request):
 @login_required
 @user_is_freelancer
 def proposal_step_three(request):
-    proposal = ''                                       
-    proposalstepthree = ''           
-    proposalformthree = ''           
+    proposal = None                                       
+    proposalstepthree = None           
+    proposalformthree = None           
     session = request.session
 
     if "proposalstepone" not in request.session:
@@ -243,11 +254,13 @@ def proposal_step_three(request):
 
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
 
-    proposalstepthree = Proposal.objects.get(pk=session["proposalsteptwo"]["proposalsteptwo_id"], team=team)
-
+    try:
+        proposalstepthree = Proposal.objects.get(pk=session["proposalsteptwo"]["proposalsteptwo_id"], team=team)
+    except:
+        del session["proposalsteptwo"]
 
     if "proposalstepthree" not in session:
-        proposalformthree = ProposalStepThreeForm(request.POST, instance=proposalstepthree)
+        proposalformthree = ProposalStepThreeForm(request.POST or None, instance=proposalstepthree)
 
         if proposalformthree.is_valid():                        
             proposalformthree.instance.faq_one = proposalformthree.cleaned_data['faq_one']
@@ -256,6 +269,7 @@ def proposal_step_three(request):
             proposalformthree.instance.faq_two_description = proposalformthree.cleaned_data['faq_two_description']
             proposalformthree.instance.faq_three = proposalformthree.cleaned_data['faq_three']
             proposalformthree.instance.faq_three_description = proposalformthree.cleaned_data['faq_three_description']
+            proposalformthree.instance.progress = int(85)
             proposal = proposalformthree.save()
 
             session["proposalstepthree"] = {"proposalstepthree_id": proposal.id}
@@ -292,7 +306,7 @@ def proposal_step_three(request):
 @login_required
 @user_is_freelancer
 def proposal_step_four(request):                              
-    proposalformfour = ''           
+    proposalformfour = None           
     session = request.session
 
     if "proposalstepone" not in request.session:
@@ -305,16 +319,19 @@ def proposal_step_four(request):
         return redirect("proposals:proposal_step_three")
 
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposalstepfour = Proposal.objects.get(pk=session["proposalstepthree"]["proposalstepthree_id"], team=team)   
+    try:    
+        proposalstepfour = Proposal.objects.get(pk=session["proposalstepthree"]["proposalstepthree_id"], team=team)   
+    except:
+        del session["proposalstepthree"]
 
-    proposalformfour = ProposalStepFourForm(request.POST, request.FILES, instance = proposalstepfour)
+    proposalformfour = ProposalStepFourForm(request.POST or None, instance = proposalstepfour)
 
     if proposalformfour.is_valid():
         proposalformfour.instance.salary = proposalformfour.cleaned_data['salary']
         proposalformfour.instance.service_level = proposalformfour.cleaned_data['service_level']
         proposalformfour.instance.revision = proposalformfour.cleaned_data['revision']
         proposalformfour.instance.dura_converter = proposalformfour.cleaned_data['dura_converter']
-        proposalformfour.instance.thumbnail = proposalformfour.cleaned_data['thumbnail']
+        proposalformfour.instance.progress = int(100)
         proposalformfour.save()
 
         del session["proposalstepone"]
@@ -412,7 +429,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
     proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
-    proposalformfour = ProposalStepFourForm(request.POST or None, request.FILES or None, instance=proposal)
+    proposalformfour = ProposalStepFourForm(request.POST or None, instance=proposal)
 
     if proposalformfour.is_valid():
         proposalformfour.save()

@@ -134,7 +134,8 @@ def freelancer_search(request):
 @login_required
 def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
-    team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=freelancer.active_team_id)
+    proposal_count = len(Proposal.objects.filter(team=team, status=Proposal.ACTIVE)) > 0
     monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
     
     max_team_members = ''
@@ -143,13 +144,13 @@ def freelancer_profile(request, short_name):
         try:
             my_team = Team.objects.get(pk=request.user.freelancer.active_team_id)
         except Exception as e:
-            return False
+            return None
         max_team_members = PackageController(my_team).max_member_per_team()
     
-    print('max_team_members:', max_team_members)
     context = {
         'freelancer': freelancer,
         'team': team,
+        'proposal_count': proposal_count,
         'monthly_contracts_limiter': monthly_contracts_limiter,
         'max_team_members': max_team_members,
     }

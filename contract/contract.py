@@ -46,13 +46,13 @@ class BaseContract():
         if (get_level_one_start_amount() <= subtotal <= get_level_one_delta_amount()):
             discount = 0
 
-        if (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
+        elif (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
             discount = ((subtotal * get_level_two_rate())/100)
 
-        if (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
+        elif (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
             discount = ((subtotal * get_level_three_rate())/100)
 
-        if subtotal > get_level_four_start_amount():
+        elif subtotal > get_level_four_start_amount():
             discount = ((subtotal * get_level_four_rate())/100)
 
         total_discount = round(discount)
@@ -67,13 +67,13 @@ class BaseContract():
         if (get_level_one_start_amount() <= subtotal <= get_level_one_delta_amount()):
             rate = get_level_one_rate()
 
-        if (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
+        elif (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
             rate = get_level_two_rate()
 
-        if (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
+        elif (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
             rate = get_level_three_rate()
 
-        if subtotal > get_level_four_start_amount():
+        elif subtotal > get_level_four_start_amount():
             rate = get_level_four_rate()
         return rate
 

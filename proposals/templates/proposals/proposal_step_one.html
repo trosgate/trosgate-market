@@ -44,7 +44,7 @@
                         {% if can_create_new_proposal %}
                             <div class="wt-dashboardboxcontent">                                                               
 
-                            <form method='POST' action=''>{% csrf_token %}
+                            <form id='proposalForm' method='POST' enctype="multipart/form-data">{% csrf_token %}
                                 
                                 {% if proposalformone.errors %}
                                 <div class="alert alert-danger text-center" role="alert">
@@ -87,6 +87,18 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% if proposalstepone.thumbnail != 100 %}
+                                    <div class="wt-attachmentsholder">
+                                        <div class="wt-tabscontenttitle">
+                                            <h2>Thumbnail</h2>
+                                        </div> 
+                                        <div class="form-group">
+                                            {{proposalformone.thumbnail}}
+                                            <span style="color:red;" role="alert">{{ proposalformone.thumbnail.errors}}</span>
+                                        </div>
+                                        <div id="image-box" style='display:block; max-width:10%; max-width:100%;'></div>
+                                    </div>
+                                    {% endif %}
                                     </div>
                                         </div>
                                             </div>
@@ -117,8 +129,11 @@
                     </div>
                 </div>					
             </main>
-        {% endblock content %}
-
+            
+    {% endblock content %}
+    {% block scripts %}
+    <script src="{% static 'js/image-previewer.js' %}"></script>
+    {% endblock scripts %}
 
 
 

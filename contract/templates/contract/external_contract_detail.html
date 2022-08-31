@@ -51,8 +51,9 @@
                                     <div class="form-row">
                                         
                                         <div class="form-group col-md-6">
-                                            <span><i class="fa fa-group"> Client Name: {{contract.created_by.get_full_name}}</i></span><br><br>
-                                            <span><i class="fa fa-dollar-sign"> Contract Status: {{contract.get_status_display}}</i></span><br><br>
+                                            <span><i class="fa fa-group"> Freelancer: {{contract.created_by.get_full_name}}</i></span><br><br>
+                                            <span><i class="fa fa-group"> Team: {{contract.team.title}}</i></span><br><br>
+                                            <span><i class="fa fa-arrow-up"> Contract Status: {{contract.get_reaction_display}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Duration: {{contract.get_contract_duration_display}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Reference: {{contract.reference}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Time Created: {{contract.date_created}}</i></span><br><br>
@@ -139,21 +140,27 @@
                                 </div>
                                 {% endif %}
                             </div>
-                                
                             </div>
-                            {% if request.user.clients %}
+                            
                             {% if request.user.email == contract.client.email %}
+                            {% if contract.reaction == 'accepted' %}
+                            {% if client %}
                             </div>
                                 </div>
                                     </div>
                                     <div class="wt-updatall">
                                         <i class="ti-announcement"></i>
-                                        <span>Redeem your Contract</span>
-                                        {% comment %} <a href="{% url 'contract:internal_contract_fee_structure' contract.id contract.slug %}" class="wt-btn">Confirm and Pay</a> {% endcomment %}
-                                        <a href="" class="wt-btn">Confirm and Pay</a>
+                                        <span>Redeem Contract with 1-Click Checkout (1CC)</span>
+                                        <button class="wt-btn" data-toggle="modal" data-target="#oneClickContractCheckout">1 Click Pay</button>
+                                    </div>
+                                    <div class="wt-updatall">
+                                        <i class="ti-announcement"></i>
+                                        <span>Redeem Contract and pay direct</span>
+                                        <a href="{% url 'contract:external_contract_fee_structure' contract.id contract.slug %}" class="wt-btn">Direct Pay</a>
                                     </div>
                                 </div>
                             </div>
+                            {% endif %}
                             {% endif %}
                             {% endif %}
                         </div>  
@@ -161,50 +168,48 @@
                 </div>
             </div>
         </div>
-                
         </main>
+        {% include 'client/partials/one_click_contract_modal.html' %}
 
-        <script>
-            $(document).on('click', '.accept-contract', function (e) {
-              e.preventDefault();
-              $.ajax({
-                type: 'POST',
-                url: '{% url "contract:accept_or_reject_contract" %}',
-                data: {
-                    contractid: $(this).data('index'),
-                    csrfmiddlewaretoken: "{{csrf_token}}",
-                    action: 'accept'
-                },
-                success: function (json) {
-                    if(json.status == 'accepted'){
-
-                        alert('Thanks for acceptance. We have informed the client to pay')
-                    }
-                },
-                error: function (xhr, errmsg, err) {}
-              });
-            })
-          </script>
-          <script>
-            $(document).on('click', '.reject-contract', function (e) {
-              e.preventDefault();
-              $.ajax({
-                type: 'POST',
-                url: '{% url "contract:accept_or_reject_contract" %}',
-                data: {
-                    contractid: $(this).data('index'),
-                    csrfmiddlewaretoken: "{{csrf_token}}",
-                    action: 'reject'
-                },
-                success: function (json) {
-                    if(json.status == 'rejected'){
-
-                        alert('We are sorry you had a bad offer. Other doors will open soon')
-                    }
-                },
-                error: function (xhr, errmsg, err) {}
-              });
-            })
-          </script>
 {% endblock %}
+
+{% block scripts %}
+
+<script>
+	$(document).on('click', '#oneClickCheckout', function (e) {
+	  e.preventDefault();
+
+	  let displayMessage = document.getElementById('oneClick-message');
+	  let displayError = document.getElementById("oneClick-error")
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "client:externcontract_one_click_checkout" %}',
+		data: {
+			contractId:'{{contract.id}}',
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'oneclick-extpay'
+		},
+		beforeSend:function(){
+			$("#oneClickCheckout").attr("disabled", true);
+		},
+		success: function (json) {
+			if(json.errors != ''){
+				displayError.innerHTML = json.errors;
+				$("#oneClickCheckout").attr("disabled", false);
+				return false
+			}
+			else{
+				displayError.innerHTML = '';
+				displayMessage.innerHTML = json.message;
+				$("#oneClickCheckout").attr("disabled", true);
+			}
+		},
+		error: function (xhr, errmsg, err) {
+			$("#oneClickCheckout").attr("disabled", false);
+		}
+	  });
+	})
+  </script>
+
+  {% endblock scripts %}
 

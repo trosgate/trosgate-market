@@ -83,28 +83,28 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Sender/Receiver</th>
-                                                        <th>Action Type</th>
-                                                        <th>Position/Narration</th>
-                                                        <th>Transfered On</th>
-                                                        <th>Debited Amount</th>
+                                                        <th>Reference</th>
+                                                        <th>Date</th>
+                                                        <th>Type</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% for manager_transfer in manager_transfers %}
+                                                {% for deposit in deposits %}
                                                     <tr>
                                                         <td>{{forloop.counter}} </td>
-                                                        <td>{% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.manager.get_full_name}} {% else %} {{manager_transfer.team_staff.get_full_name}}{% endif %}</td>
-                                                        <td>{{manager_transfer.get_action_choice_display}}</td>
-                                                        <td>{% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.narration|truncatechars:60}} {% else %} {{manager_transfer.get_position_display}}{% endif %}</td>
-                                                        <td>{{manager_transfer.created_at}}</td>
-                                                        <td>$ {% if manager_transfer.action_choice == 'withdrawal'%}{{manager_transfer.withdraw_amount}} {% else %} {{manager_transfer.debit_amount}}{% endif %}</td>
+                                                        <td>{{deposit.reference}}</td>
+                                                        <td>{{deposit.created_at}}</td>
+                                                        <td>{{deposit.gateway}}</td>
+                                                        <td>{{deposit.amount}}</td>
+                                                        <td>{{deposit.get_status_display}}</td>
                                                     </tr> 
                                                 {% endfor %}					
                                                     </tbody>
                                                 </table>
-                                                {% if not manager_transfers %}
-                                                <p><strong>{% if request.user == active_team.created_by %} You have not created profit rights to your members.{% else %}You have not been alloted right to share in profit. Please contact your Team Manager.{% endif %}</strong></p>
+                                                {% if not deposits %}
+                                                <p><strong>You have no deposit at the moment but you can change that</strong></p>
                                                 {% endif %}											
                                             </div> 
                                         </div>

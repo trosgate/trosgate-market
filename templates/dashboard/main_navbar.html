@@ -73,13 +73,17 @@
 									{% if request.user.is_authenticated %}
 									<div class="wt-userlogedin">
                     <figure class="wt-userimg">
-                      <img src="{% if request.user.freelancer %}{{request.user.freelancer.profile_photo.url}}{% elif request.user.clients %}{{request.user.clients.profile_photo.url}} {% else %} {% static 'images/user-login.png' %}{% endif %}"
-                        alt="image description"/>
+                      {% if request.user.freelancer %}
+                      <img src="{% if request.user.freelancer.profile_photo %}{{request.user.freelancer.profile_photo.url}}{% endif %}" alt="image description"/>
+                      {% endif  %}
+                      {% if request.user.clients %}
+                      <img src="{% if request.user.clients.profile_photo %}{{request.user.clients.profile_photo.url}}{% endif %}" alt="image description"/>
+                      {% endif  %}
                     </figure>
                     <div class="wt-username">
                       <h3>{{request.user.short_name|capfirst}}</h3>
                       <span>
-                        {% if active_team %} {{active_team.title|capfirst}}
+                        {% if active_team %} {{active_team.title|slice:10}}
                         {% else %}
                         {{request.user.get_user_type_display}}
                         {% endif %}

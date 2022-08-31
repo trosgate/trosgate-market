@@ -21,6 +21,9 @@ from general_settings.fund_control import (
 from payments.models import PaymentRequest, AdminCredit
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email
+from PIL import Image
+
+
 
 class ActiveFreelancer(models.Manager):
     def get_queryset(self):
@@ -43,7 +46,7 @@ class Freelancer(models.Model):
     description = models.TextField(_("Description"), max_length=2000, blank=True, error_messages={"name": {"max_length": _("Ensure a maximum character of 2000 for description field")}},)
     brand_name = models.CharField(_("Brand Name"), max_length=60, null=True, blank=True)
     support = models.CharField(unique=True, max_length=15, null=True, blank=True,)
-    profile_photo = models.ImageField(_("Profile Photo"), upload_to='freelancer/', default='freelancer/avatar5.png')
+    profile_photo = models.ImageField(_("Profile Photo"), upload_to='freelancer/', default='freelancer/user-login.png')
     banner_photo = models.ImageField(_("Banner Photo"),  upload_to='freelancer/', default='freelancer/banner.png')
     department = models.ForeignKey('general_settings.Department', verbose_name=_("Department"),  null=True, blank=True, on_delete=models.RESTRICT)
     business_size = models.ForeignKey('general_settings.Size', verbose_name=_("Business Size"), related_name="freelancers", null=True, blank=True, on_delete=models.RESTRICT)
@@ -83,9 +86,12 @@ class Freelancer(models.Model):
         return f'{self.user.first_name} {self.user.last_name}'
 
     def save(self, *args, **kwargs):
-        if self.support is None:
-            self.support = 'Fr-' + create_random_code()[:10]
         super(Freelancer, self).save(*args, **kwargs)
+        new_profile_photo = Image.open(self.profile_photo.path)
+        if new_profile_photo.height > 255 or new_profile_photo.width > 255:
+            output_size = (255, 255)
+            new_profile_photo.thumbnail(output_size)
+            new_profile_photo.save(self.profile_photo.path)
 
     def clean(self):
         if self.start_date > self.end_date:
@@ -117,6 +123,7 @@ class Freelancer(models.Model):
         return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.banner_photo))
 
     banner_tag.short_description = 'banner_photo'
+
 
 
 class FreelancerAccount(models.Model):

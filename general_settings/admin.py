@@ -53,7 +53,7 @@ class WebsiteSettingAdmin(admin.ModelAdmin):
     list_per_page = sys.maxsize
     fieldsets = (
         ('Site Description', {'fields': ('site_name', 'tagline', 'site_Logo',
-         'protocol', 'www', 'site_domain', 'site_url', 'site_description',)}),
+         'protocol', 'use_www', 'site_domain', 'site_url', 'site_description',)}),
     )
 
     radio_fields = {'protocol': admin.HORIZONTAL}
@@ -297,7 +297,8 @@ class HiringFeeAdmin(admin.ModelAdmin):
     readonly_fields = ['contract_percentage',
                        'proposal_percentage', 'application_percentage']
     fieldsets = (
-        ('Contract Fee Structure', {'fields': (
+        ('External Contract Fee - It is single fee because freelancer did the hard job of getting client', {'fields': ('extcontract_fee_percentage',)}),
+        ('Internal Contract Fee Structure', {'fields': (
             'contract_fee_percentage', 'contract_fee_extra', 'contract_delta_amount',)}),
         ('Proposal Fee Structure', {'fields': (
             'proposal_fee_percentage', 'proposal_fee_extra', 'proposal_delta_amount',)}),

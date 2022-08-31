@@ -36,10 +36,12 @@
 
 													{% if active_team.created_by == request.user %}
 													{% if max_team_members %}
+													{% if team.status == 'active' %}
 													<div id="invitation-message"></div>
 													<div class="form-group wt-btnarea">
 														<button id="userInvitation" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"> Invite to Team</i></button>
 													</div>
+													{% endif %}
 													{% endif %}
 													{% endif %}
 												</div>
@@ -80,9 +82,14 @@
 												</div>
 												<div class="wt-description">
 													{% if request.user.clients %}
-													
 													{% if monthly_contracts_limiter %}
+													
+													{% if team.status == 'active' %}
+													{% if proposal_count %}
 													<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
+													{% endif %}
+													{% endif %}
+
 													{% else %}
 													<p style='color:green'>* Hi {{request.user.short_name|capfirst}}, {{freelancer.user.short_name|capfirst}} does not have open slot for contracts at the moment.</p>
 													<a href="{% url 'freelancer:freelancer_listing' %}" class="wt-btn">Try others</a>

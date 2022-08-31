@@ -13,6 +13,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from general_settings.models import WebsiteSetting
+from general_settings.utilities import get_protocol
 from general_settings.backends import get_from_email
 import random
 
@@ -58,8 +59,8 @@ def auth_code():
 
 
 #
-# Utility function for sending envites to team
-def new_user_registration(user, to_email):
+# Utility function for sending signup mail
+def new_user_registration(domain, user, to_email):
     from_email = get_from_email()
     # current_site = get_current_site(request)
     subject = 'Activate your Account'
@@ -70,7 +71,8 @@ def new_user_registration(user, to_email):
         # 'domain': current_site.domain,
         'website_email': from_email,
         'website_name': website.site_name,
-        'website_url': website.site_url,
+        'domain': domain,
+        'protocol': get_protocol(),
         'website_logo': website_logo,
         'user': user,
         'website': website,

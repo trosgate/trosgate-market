@@ -9,10 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Team, Package
 from transactions.models import SubscriptionItem
 from general_settings.gateways import PayPalClientConfig, get_gateway_environment
-from django.contrib import messages
 from django.utils import timezone
 from .utilities import get_expiration
-from django.shortcuts import render, redirect, get_object_or_404
 
 
 def get_paypal_subscription_url():
@@ -50,7 +48,7 @@ def activate_paypal_subscription(request):
     headers = {'Content-Type':'application/json', 'Authorization':bearer_token}
 
     url = get_paypal_subscription_url()
-    url_prefix = 'v1/billing/subscriptions/'
+    url_prefix = 'v1/billing/subscriptions'
     url_full_path =  f'{url}{url_prefix}{package_id}'
     data = requests.get(url_full_path, headers=headers).json()
 
@@ -88,7 +86,7 @@ def activate_paypal_subscription(request):
         except Exception as e:
             error = str(e)
 
-    return JsonResponse({'Success':'it worked', 'error':error})
+    return JsonResponse({'Success':'successfully subscribed', 'error':error})
 
 
 def deactivate_paypal_subscription(request):
@@ -118,39 +116,3 @@ def deactivate_paypal_subscription(request):
                         
         except:
             error = 'Ooops! Something went wrong. Please try again later!'
-
-
-    
-
-@login_required
-def packages(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, package_status=Team.ACTIVE)
-    if not team.created_by == request.user:
-        messages.error(request, 'Bad request. Page is restricted to non-founders')
-        return redirect("account:dashboard")
-
-    StripeClient = StripeClientConfig()
-    packages = Package.objects.all()
-    error = ''
-
-    if request.GET.get('cancel_package', ''):
-        try:
-            default_package = Package.objects.get(is_default=True)
-            team.package = default_package
-            team.package_status = Team.DEFAULT
-            team.package_expiry = datetime.now()
-            team.save()
-            
-            stripe.api_key = StripeClient.stripe_secret_key
-            stripe.Subscription.delete(team.stripe_subscription_id)
-        except:
-            error = 'Ooops! Something went wrong. Please try again later!'
-
-    context = {
-        'team': team,
-        'error': error,
-        'packages': packages,
-        'stripe_pub_key': StripeClient.stripe_public_key
-    }
-
-    return render(request, 'teams/packages.html', context)

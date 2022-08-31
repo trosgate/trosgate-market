@@ -66,7 +66,7 @@ def create_ticket(request):
         content = str(request.POST.get('ticketContent'))
 
         if request.user.user_type == Customer.FREELANCER:
-            team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
+            team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user])
         
             try:
                 Ticket.create(

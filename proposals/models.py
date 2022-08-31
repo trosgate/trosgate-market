@@ -14,23 +14,6 @@ from uuid import uuid4
 from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
-from .utilities import (
-    one_day,
-    two_days,
-    three_days,
-    four_days,
-    five_days,
-    six_days,
-    one_week,
-    two_weeks,
-    three_weeks,
-    one_month,
-    two_months,
-    three_months,
-    four_months,
-    five_months,
-    six_months
-)
 
 
 def proposal_images_path(instance, filename):
@@ -111,8 +94,8 @@ class Proposal(models.Model):
     service_level = models.CharField(_("Service level"), max_length=20, choices=SERVICE_LEVEL, default=BASIC, error_messages={"name": {"max_length": _("Service Level field is required")}},)
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     dura_converter = models.CharField(_("Duration"), max_length=100, choices=DURATION_CONVERTER, default=ONE_DAY)
-    thumbnail = models.ImageField(_("Proposal Thumbnail"), default='proposal_files/thumbnail.jpg', help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"),upload_to=proposal_images_path, blank=True, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
-    progress = models.PositiveIntegerField(_("Proposal Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+    thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
+    progress = models.PositiveIntegerField(_("% Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     published = models.BooleanField(_("Published"), choices=((False, 'Private'), (True, 'Public')), default=False)
@@ -139,9 +122,16 @@ class Proposal(models.Model):
         return sum(tracker.minutes for tracker in self.trackings.all())
 
     def save(self, *args, **kwargs):
-        if self.reference is None:
-            self.reference = 'P-' + str(uuid4()).split('-')[4]
         super(Proposal, self).save(*args, **kwargs)
+        new_thumbnail = Image.open(self.thumbnail.path)
+        if new_thumbnail.height > 769 or new_thumbnail.width > 1280:
+            output_size = (769, 1280)
+            new_thumbnail.thumbnail(output_size)
+            new_thumbnail.save(self.thumbnail.path)
+
+
+    def percent_progress(self):
+        return f'{self.progress}%'
 
     # def num_tasks_todo(self):
     #     return self.assignproposal.filter(status=Task.TODO).count()

@@ -10,9 +10,9 @@ from proposals.models import Proposal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from general_settings.currency import get_base_currency_symbol
-from contract.models import InternalContract
+from contract.models import InternalContract, Contract
 from client.models import ClientAccount
-from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator
+from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator, get_external_contract_fee_calculator
 from account.fund_exception import FundException
 
 
@@ -26,9 +26,11 @@ class OneClickPurchase(models.Model):
 
     PROPOSAL = 'proposal'
     CONTRACT = 'contract'
+    EXTERNAL_CONTRACT = 'externalcontract'
     PURCHASE_CATEGORY = (
         (PROPOSAL, _('Proposal')),
-        (CONTRACT, _('Contract'))
+        (CONTRACT, _('Contract')),
+        (EXTERNAL_CONTRACT, _('External Contract'))
     )    
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="oneclickclient")
     salary_paid = models.PositiveIntegerField(_("Salary Paid"))
@@ -43,7 +45,8 @@ class OneClickPurchase(models.Model):
     
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='oneclickteam', on_delete=models.PROTECT)
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal"), related_name="oneclickproposal", null=True, blank=True, on_delete=models.PROTECT)
-    contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract"), related_name="oneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
+    contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Int Contract"), related_name="intoneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
+    extcontract = models.ForeignKey("contract.Contract", verbose_name=_("Ext Contract"), related_name="extoneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
 
     class Meta:
         ordering = ("-created_at",)
@@ -87,7 +90,7 @@ class OneClickPurchase(models.Model):
 
 
     @classmethod
-    def one_click_contract(cls, user, contract):
+    def one_click_intern_contract(cls, user, contract):
         with db_transaction.atomic():
             account = ClientAccount.objects.select_for_update().get(user=user)
             if account.available_balance < contract.grand_total:
@@ -114,6 +117,42 @@ class OneClickPurchase(models.Model):
             ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
 
             selected_contract = InternalContract.objects.select_for_update().get(pk=purchass.contract.id)
+            selected_contract.reaction = 'paid'
+            selected_contract.save(update_fields=['reaction'])
+            
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, paid_amount=purchass.salary_paid, purchase=selected_contract)
+
+        return account, purchass, selected_contract
+
+
+    @classmethod
+    def one_click_extern_contract(cls, user, contract):
+        with db_transaction.atomic():
+            account = ClientAccount.objects.select_for_update().get(user=user)
+            if account.available_balance < contract.grand_total:
+                raise FundException('Insufficient Balance')
+
+            earning_fee = get_external_contract_fee_calculator(contract.grand_total)
+            total_earning = int(contract.grand_total) - int(earning_fee)
+            
+            purchass = cls.objects.create(
+                client=account.user,
+                category = cls.EXTERNAL_CONTRACT,
+                payment_method='Balance',
+                salary_paid=contract.grand_total,
+                total_earning=round(total_earning),
+                earning_fee=earning_fee,
+                team = contract.team,
+                extcontract = contract,
+                status = cls.SUCCESS,
+            )           
+            stan = f'{purchass.pk}'.zfill(8)
+            purchass.reference = f'1click{purchass.client.id}{stan}'
+            purchass.save()
+
+            ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
+
+            selected_contract = Contract.objects.select_for_update().get(pk=purchass.extcontract.id)
             selected_contract.reaction = 'paid'
             selected_contract.save(update_fields=['reaction'])
             

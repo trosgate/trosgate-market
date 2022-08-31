@@ -3,6 +3,13 @@ from .models import HiringFee
 
 # CONTRACT FEES AND CHARGES STARTS
 
+def get_extcontract_fee_percentage():
+    try:
+        return HiringFee.objects.get(id=1).extcontract_fee_percentage
+    except:
+        return 0
+
+
 def get_contract_fee_percentage():
     try:
         return HiringFee.objects.get(id=1).contract_fee_percentage
@@ -27,6 +34,14 @@ def get_extra_contract_value(amount):
     if (int(amount) > int(get_contract_delta_amount())):
         contract_extras = (amount - get_contract_delta_amount())
     return contract_extras
+
+
+def get_external_contract_fee_calculator(amount):
+    return ((amount * get_extcontract_fee_percentage())/100)
+
+def get_external_contract_gross_earning(amount):
+    return (amount - get_external_contract_fee_calculator(amount))
+
 
 
 def get_contract_fee_calculator(amount):

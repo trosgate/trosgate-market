@@ -199,7 +199,7 @@ class ExternalContractForm(forms.ModelForm):
 class ContractorForm(forms.ModelForm):
     class Meta:
         model = Contractor
-        fields = ['name', 'email', 'address', 'postal_code','phone_Number','tax_Number',] 
+        fields = ['name', 'email', 'address', 'postal_code','phone_Number',] 
         required = [
          # Required details 
             'name', 'email', 'address',               
@@ -219,8 +219,7 @@ class ContractorForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'Postal Code'})
         self.fields['phone_Number'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Phone number'})            
-        self.fields['tax_Number'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Tax ID or Number'})
+
      
         for field in self.Meta.required:
             self.fields[field].required = True
@@ -229,7 +228,7 @@ class ContractorForm(forms.ModelForm):
 class ChangeContractorForm(forms.ModelForm):
     class Meta:
         model = Contractor
-        fields = ['name', 'address', 'postal_code','phone_Number','tax_Number',] 
+        fields = ['name', 'address', 'postal_code','phone_Number'] 
 
 
     def __init__(self, *args, **kwargs):
@@ -243,8 +242,7 @@ class ChangeContractorForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'Postal Code'})
         self.fields['phone_Number'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Phone number'})            
-        self.fields['tax_Number'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Tax ID or Number'})
+
      
 
 

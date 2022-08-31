@@ -23,12 +23,12 @@ from general_settings.fund_control import get_min_balance, get_max_receiver_bala
 
 
 def code_generator():
-        generated_code = secrets.token_urlsafe(6)[:6]
-        similar_ref = Invitation.objects.filter(code=generated_code)
-        while not similar_ref:
-            code = generated_code
-            break
-        return code
+    generated_code = secrets.token_urlsafe(6)[:6]
+    similar_ref = Invitation.objects.filter(code=generated_code)
+    while not similar_ref:
+        code = generated_code
+        break
+    return code
 
 # NB ---> create seperate status for each of the fields and display to users
 class Package(models.Model):
@@ -48,10 +48,10 @@ class Package(models.Model):
     type = models.CharField(_("Package Type"), unique=True, help_text=_("package type can be eg. BASIC"), max_length=50)
     verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_("Customize name for the package. If empty, the default names will be displayed"), max_length=50)
     max_member_per_team = models.PositiveIntegerField(_("Max member Per Team"), default=1, help_text=_("You can only add up to 4 members for the biggest package"), validators=[MinValueValidator(1), MaxValueValidator(5)])
-    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts Per Team"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Project Applicable Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    daily_Handshake_mails_to_clients = models.PositiveIntegerField(_("Daily Handshake Mails Per Invoice to client"), default=0, help_text=_("team can send followup mail per invoice to client. Daily min is 1 amd max is 3"), validators=[MinValueValidator(1), MaxValueValidator(3)])
+    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    daily_Handshake_mails_to_clients = models.PositiveIntegerField(_("Daily Contract Mail reminder"), default=0, help_text=_("New feature Coming Soon: Here, freelancer team can send followup/ reminder mail per external contract to client. Daily sending will have min of 1 amd max is 3 mails"), validators=[MinValueValidator(0), MaxValueValidator(3)])
     price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
     status = models.CharField(_("Package Label"), max_length=20, choices=STATUS, default=STARTER)
     is_default = models.BooleanField(_("Make Default"), choices=((False, 'No'), (True, 'Yes')), help_text=_("Only 1 package should have a default set to 'Yes'"), default=False)

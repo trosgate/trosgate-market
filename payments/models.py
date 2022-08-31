@@ -155,7 +155,7 @@ class AdminCredit(models.Model):
     def approve_credit_memo(cls, pk, user):
         with db_transaction.atomic():
             credit_account = cls.objects.select_for_update().get(pk=pk)
-            super_admin_user = Customer.objects.select_for_update().get(pk=credit_account.receiver.id)
+            super_admin_user = Customer.objects.select_for_update().filter(is_superuser=True).first()
             owner_active_team = Team.objects.select_for_update().filter(created_by=credit_account.team.created_by, status=Team.ACTIVE).first()
             account = Customer.objects.select_for_update().get(pk=credit_account.team.created_by.id).fundtransferuser #I am accessing from customer to avoid circular import
             

@@ -14,14 +14,12 @@ class DateInput(forms.DateInput):
 
 
 class ProposalStepOneForm(forms.ModelForm):
-
+    thumbnail = forms.ImageField(widget=forms.FileInput,)
     category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label='Select category')
     class Meta:
         model = Proposal
-        fields = [
-            'title', 'preview', 'category','skill'
-        ]
-        required = ['title', 'preview', 'category','skill']
+        fields = ['title', 'preview', 'category','skill', 'thumbnail']
+        required = ['title', 'preview', 'category','skill', 'thumbnail']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,6 +32,8 @@ class ProposalStepOneForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'Proposal Category'})        
         self.fields['skill'].widget.attrs.update(
             {'class': 'form-control chosen-select Skills', 'placeholder': 'select some skills'})
+        self.fields['thumbnail'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ''})
 
         for field in self.Meta.required:
             self.fields[field].required = True
@@ -86,11 +86,11 @@ class ProposalStepThreeForm(forms.ModelForm):
 
 
 class ProposalStepFourForm(forms.ModelForm):
-    thumbnail = forms.ImageField(widget=forms.FileInput,)
+    
     class Meta:
         model = Proposal
-        fields = ['salary', 'service_level','revision', 'dura_converter', 'thumbnail']
-        required = ['salary', 'service_level','revision', 'dura_converter', 'thumbnail']
+        fields = ['salary', 'service_level','revision', 'dura_converter',]
+        required = ['salary', 'service_level','revision', 'dura_converter']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -101,8 +101,6 @@ class ProposalStepFourForm(forms.ModelForm):
         self.fields['revision'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': ''})
         self.fields['dura_converter'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['thumbnail'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': ''})
 
 

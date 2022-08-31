@@ -4,9 +4,8 @@
 {% include 'dashboard/main_sidebar.html' %}
 
 
-
 			<!--Main Start-->
-			<main id="wt-main" class="wt-main wt-haslayout">
+		<main id="wt-main" class="wt-main wt-haslayout">
                
             <!--Inner Home Banner Start-->
             <div class="wt-haslayout wt-innerbannerholder">
@@ -38,15 +37,10 @@
                                                                                             
                             <form method='POST' action=''>{% csrf_token %}
                                 {% if contractform.errors %}
-                                    <p>{{ contractform.non_field_errors }}</p>
-                                    {% for field in contractform %}
-                                    {% if field.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{ field.label}}:  {{ field.errors|striptags }}
-                                    </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                {% endif %}
+                                <div class="alert alert-danger text-center" role="alert">
+                                    Ooop! form error occured. Please check below and correct
+                                </div>
+                                {% endif %}  
                                     <div class="wt-jobdescription wt-tabsinfo">
                                         <div class="wt-tabscontenttitle">
                                             <h2>Contract Details</h2>
@@ -57,11 +51,13 @@
                                                 {{contractform.client}}
                                                 
                                                 <a href="javascript:void(0);" class="text-success" data-toggle="modal" data-target="#invoiceclientmodal">Add different Contractor</a>								
+                                                <span style="color:red;" role="alert">{{ contractform.client.errors}}</span>
                                             </div>
                                             
                                             <div class="form-group col-md-12">
                                                 {{contractform.contract_duration.label}}
                                                 {{contractform.contract_duration}}
+                                                <span style="color:red;" role="alert">{{ contractform.contract_duration.errors}}</span>
                                             </div>
                                            
                                         </div>  
@@ -73,18 +69,22 @@
                                             <div class="form-group col-md-6">
                                                 {{ contractform.line_one.label}}
                                                 {{ contractform.line_one}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_one.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_one_quantity.label}}
                                                 {{ contractform.line_one_quantity}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_one_quantity.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_one_unit_price.label}}
                                                 {{ contractform.line_one_unit_price}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_one_unit_price.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_one_total_price.label }}
                                                 {{ contractform.line_one_total_price }}
+                                                <span style="color:red;" role="alert">{{ contractform.line_one_total_price.errors}}</span>
                                             </div>
                                         </div>
 
@@ -92,18 +92,22 @@
                                             <div class="form-group col-md-6">
                                                 {{ contractform.line_two.label}}
                                                 {{ contractform.line_two}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_two.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_two_quantity.label}}
                                                 {{ contractform.line_two_quantity}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_two_quantity.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_two_unit_price.label}}
                                                 {{ contractform.line_two_unit_price}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_two_unit_price.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_two_total_price.label }}
                                                 {{ contractform.line_two_total_price }}
+                                                <span style="color:red;" role="alert">{{ contractform.line_two_total_price.errors}}</span>
                                             </div>
                                         </div>
 
@@ -111,18 +115,22 @@
                                             <div class="form-group col-md-6">
                                                 {{ contractform.line_three.label}}
                                                 {{ contractform.line_three}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_three.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_three_quantity.label}}
                                                 {{ contractform.line_three_quantity}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_three_quantity.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_three_unit_price.label}}
                                                 {{ contractform.line_three_unit_price}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_three_unit_price.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_three_total_price.label }}
                                                 {{ contractform.line_three_total_price }}
+                                                <span style="color:red;" role="alert">{{ contractform.line_three_total_price.errors}}</span>
                                             </div>
                                         </div>
 
@@ -130,18 +138,22 @@
                                             <div class="form-group col-md-6">
                                                 {{ contractform.line_four.label}}
                                                 {{ contractform.line_four}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_four.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_four_quantity.label}}
                                                 {{ contractform.line_four_quantity}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_four_quantity.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_four_unit_price.label}}
                                                 {{ contractform.line_four_unit_price}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_four_unit_price.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_four_total_price.label }}
                                                 {{ contractform.line_four_total_price }}
+                                                <span style="color:red;" role="alert">{{ contractform.line_four_total_price.errors}}</span>
                                             </div>
                                         </div>
 
@@ -149,18 +161,22 @@
                                             <div class="form-group col-md-6">
                                                 {{ contractform.line_five.label}}
                                                 {{ contractform.line_five}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_five.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_five_quantity.label}}
                                                 {{ contractform.line_five_quantity}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_five_quantity.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_five_unit_price.label}}
                                                 {{ contractform.line_five_unit_price}}
+                                                <span style="color:red;" role="alert">{{ contractform.line_five_unit_price.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
                                                 {{ contractform.line_five_total_price.label }}
                                                 {{ contractform.line_five_total_price }}
+                                                <span style="color:red;" role="alert">{{ contractform.line_five_total_price.errors}}</span>
                                             </div>
                                         </div>                                        
                                             <button type="button" id="proposal-extras" class="btn btn-success"> add/hide More Service </button>                               
@@ -168,6 +184,7 @@
                                             <div class="form-group col-md-12">
                                                 {{ contractform.grand_total.label }}
                                                 {{ contractform.grand_total }}
+                                                <span style="color:red;" role="alert">{{ contractform.grand_total.errors}}</span>
                                             </div>
                                         </div>      
                                         <div class="wt-jobdetails wt-tabsinfo">
@@ -178,6 +195,7 @@
                                             <div class="form-group col-md-12">
                                                 {{ contractform.notes.label }}
                                                 {{ contractform.notes }}
+                                                <span style="color:red;" role="alert">{{ contractform.notes.errors}}</span>
                                             </div>
                                         </div>
                                     </div>

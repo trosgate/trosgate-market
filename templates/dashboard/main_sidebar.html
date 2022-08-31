@@ -16,14 +16,21 @@
 					</figure>
 					<div class="wt-companysinfo">
 						<figure>
-							<img src="{% if request.user.freelancer %}{{request.user.freelancer.profile_photo.url}}{% elif request.user.clients %}{{request.user.clients.profile_photo.url}} {% else %} {% static 'images/user-login.png' %}{% endif %}" alt="img description">
+							{% if request.user.freelancer %}
+							<img src="{% if request.user.freelancer.profile_photo %}{{request.user.freelancer.profile_photo.url}}{% endif %}" alt="image description"/>
+							{% endif  %}
+							{% if request.user.clients %}
+							<img src="{% if request.user.clients.profile_photo %}{{request.user.clients.profile_photo.url}}{% endif %}" alt="image description"/>
+							{% endif  %}
 						</figure>
 						<div class="wt-title">
 							<h2><a href="{{freelancer_profile.freelancer_profile_absolute_url}}"> {{request.user.short_name}}</a></h2>
 						</div>
 						<div class="wt-btnarea">
 							{% if request.user.freelancer %}
+							{% if active_team.status == 'active' %}
 							<a href="{% url 'proposals:proposal_step_one' %}" class="wt-btn">Proposal</a>
+							{% endif %}
 							{% elif request.user.clients %}
 							<a href="{% url 'projects:create_project' %}" class="wt-btn">New Job</a>
 							{% endif %}
@@ -32,6 +39,24 @@
 				</div>
 				<nav id="wt-navdashboard" class="wt-navdashboard">
 					<ul>
+						{% if request.user.freelancer %}
+						<li class="menu-item-has-children wt-active">
+							<a href="javascript:void(0);">
+								<i class="ti-dashboard"></i>
+								<span>Transactions</span>
+							</a>
+							{% if active_team.status == 'active' %}						
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'transactions:one_click_transaction' %}">One-Click</a></li>
+								<li><hr><a href="{% url 'transactions:proposal_transaction' %}">Proposal</a></li>
+								<li><hr><a href="{% url 'transactions:application_transaction' %}">Application</a></li>
+								<li><hr><a href="{% url 'transactions:contract_transaction' %}">Contract</a></li>
+							</ul>
+							{% endif %}
+						</li>		
+						{% endif %}
+
+						{% if request.user.clients %}
 						<li class="menu-item-has-children wt-active">
 							<a href="javascript:void(0);">
 								<i class="ti-dashboard"></i>
@@ -43,24 +68,24 @@
 								<li><hr><a href="{% url 'transactions:application_transaction' %}">Application</a></li>
 								<li><hr><a href="{% url 'transactions:contract_transaction' %}">Contract</a></li>
 							</ul>
-						</li>		
-						{% if request.user.clients %}
-						<li>
-							<a href="{% url 'client:update_client_profile' user_id=user.id %}">
-								<i class="ti-briefcase"></i>
-								<span>My Profile</span>
-							</a>
-						</li>						
+						</li>
+												
 						<li class="menu-item-has-children wt-active">
-							<a href="javascript:void(0);">
+							<a href="{% url 'client:deposit_fee_structure' %}">
 								<i class="ti-dashboard"></i>
-								<span>Deposits</span>
+								<span>Fund Deposits</span>
+							</a>
+						</li>
+						<li class="menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-package"></i>
+								<span>My Contracts</span>
 							</a>
 							<ul class="sub-menu">
-								<li class="wt-active"><hr><a href="{% url 'client:deposit_fee_structure' %}">Fund Deposit</a></li>
-								<li><hr><a href="dashboard-insightsuser.html">Insights User</a></li>
+								<li><hr><a href="{% url 'contract:internal_contract_list' %}">Internal Contracts</a></li>
+								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
 							</ul>
-						</li>
+						</li>		
 						
 						<li>
 							<a href="{% url 'transactions:hiring_box_summary' %}">
@@ -97,20 +122,17 @@
 								<li><hr><a href="{% url 'projects:archived_project_view' %}">Archived Jobs</a></li>
 							</ul>
 						</li>
-											
 						{% endif %}
+
+											
 						{% if request.user.freelancer %}						
-						<li>
-							<a href="{% url 'freelancer:update_freelancer_profile' user_id=user.id %}">
-								<i class="ti-briefcase"></i>
-								<span>My Profile</span>
-							</a>
-						</li>
+						
 						<li class="menu-item-has-children wt-active">
 							<a href="javascript:void(0);">
 								<i class="ti-dashboard"></i>
 								<span>Fund Manager</span>
 							</a>
+							{% if active_team.status == 'active' %}
 							<ul class="sub-menu">
 								{% if active_team.created_by == request.user %}
 								<li class="wt-active"><hr><a href="{% url 'freelancer:transfer_or_withdraw' %}">Move Fund</a></li>
@@ -118,8 +140,9 @@
 								<li><hr><a href="{% url 'payments:transfer_transactions' %}">Transfer</a></li>
 								<li><hr><a href="{% url 'payments:withdrawal_transactions' %}">Withdawals</a></li>
 							</ul>
+							{% endif %}
 						</li>																		
-																						
+						{% if active_team.status == 'active' %}																
 						<li>
 							<a href="{% url 'teams:accept_invite' %}">
 								<i class="ti-announcement"></i>
@@ -138,49 +161,58 @@
 								<span>Create Proposal</span>
 							</a>
 						</li>
+						{% endif %}
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-bookmark-alt"></i>
 								<span>Assigned Tasks</span>
 							</a>
+							{% if active_team.status == 'active' %}
 							<ul class="sub-menu">
 								<li><hr><a href="{% url 'teams:assign_to_me' %}">To Me</a></li>
 								<li><hr><a href="{% url 'teams:assign_to_members' %}">To Members</a></li>
 								<li><hr><a href="{% url 'analytics:time_tracker' %}">Performance</a></li>
 							</ul>
+							{% endif %}
 						</li>												
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-bookmark-alt"></i>
 								<span>My Proposals</span>
 							</a>
+							{% if active_team.status == 'active' %}
 							<ul class="sub-menu">
 								<li><hr><a href="{% url 'proposals:active_proposal' %}">Active</a></li>
 								<li><hr><a href="{% url 'proposals:review_proposal' %}">Review</a></li>
 								<li><hr><a href="{% url 'proposals:archive_proposal_page' %}">Archived</a></li>
 							</ul>
+							{% endif %}
 						</li>
+						{% if active_team.status == 'active' %}
 						<li class="menu-item-has-children">
 							<a href="{% url 'applications:freelancer_application' %}">
 								<i class="ti-bookmark-alt"></i>
 								<span>Applications</span>
 							</a>
 						</li>
-						{% endif %}	
+						{% endif %}
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-package"></i>
 								<span>My Contracts</span>
 							</a>
+							{% if active_team.status == 'active' %}
 							<ul class="sub-menu">
-								{% if request.user.freelancer %}
 								<li><hr><a href="{% url 'contract:contract_client' %}">Contractors</a></li>
-								{% endif %}
 								<li><hr><a href="{% url 'contract:internal_contract_list' %}">Internal Contracts</a></li>
 								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
 							</ul>
+							{% endif %}
 						</li>							
-		
+							
+						{% comment %} {% endif %}	 {% endcomment %}
+						{% endif %}	
+						{% if request.user.clents %}
 						<li class="wt-notificationicon menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-pencil-alt"></i>
@@ -188,7 +220,6 @@
 							</a>
 							<ul class="sub-menu">
 								<li><hr><a href="dashboard-messages.html">Messages</a></li>
-								<li><hr><a href="dashboard-messages2.html">Messages V 2</a></li>
 							</ul>
 						</li>
 						<li>
@@ -197,34 +228,47 @@
 								<span>Invoices</span>
 							</a>
 						</li>
-						<li>
-							<a href="">
-								<i class="ti-layers"></i>
-								<span>Category</span>
+						{% if request.user.freelancer %}
+						{% if active_team.status == 'active' %}
+						<li class="wt-notificationicon menu-item-has-children">
+							<a href="javascript:void(0);">
+								<i class="ti-pencil-alt"></i>
+								<span>Messages</span>
 							</a>
+							<ul class="sub-menu">
+								<li><hr><a href="dashboard-messages.html">Messages</a></li>
+							</ul>
 						</li>
 						<li>
-							<a href="dashboard-packages.html">
-								<i class="ti-money"></i>
-								<span>Packages</span>
+							<a href="dashboard-invocies.html">
+								<i class="ti-file"></i>
+								<span>Invoices</span>
 							</a>
 						</li>
-					
-						<li>
-							<a href="dashboard-accountsettings.html">
-								<i class="ti-anchor"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
+						{% endif %}
+						{% endif %}
+
+						{% endif %}
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-pencil-alt"></i>
 								<span>Help and Support</span>
 							</a>
+							{% if request.user.freelancer %}
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'marketing:support' %}">Help Desk</a></li>
+								{% if active_team.status == 'active' %}
+								<li><hr><a href="{% url 'marketing:customer_ticket_list' %}">My Tickets</a></li>
+								{% endif %}
+							</ul>
+							{% endif %}
+
+							{% if request.user.clients %}
 							<ul class="sub-menu">
 								<li><hr><a href="{% url 'marketing:support' %}">Help Desk</a></li>
 								<li><hr><a href="{% url 'marketing:customer_ticket_list' %}">My Tickets</a></li>
 							</ul>
+							{% endif %}
 						</li>
 						
 						<li>

@@ -119,6 +119,9 @@ def homepage(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def loginView(request):
 
+    # Admin is exempted from two step verification via sms
+    # Otherwise if there is server error in sms sending, admin is also lock out 
+    # To still make it secure, user must be STAFF and must be ACTIVE before login 
     session = request.session
 
     loginform = UserLoginForm(request.POST or None)
@@ -127,9 +130,6 @@ def loginView(request):
         password = request.POST.get('password')
         user = authenticate(request, email=email, password=password)
 
-        # Admin is exempted from two step verification via sms
-        # Otherwise if there is server error in sms sending, admin is also lock out 
-        # To still make it secure, user must be STAFF and must be ACTIVE before login 
         if user is not None and user.user_type == Customer.ADMIN and user.is_active and user.is_staff == True:
              
             login(request, user)
@@ -139,7 +139,7 @@ def loginView(request):
             return redirect('/admin')
 
         # Checks for freelancer and redirect to 2FA or otherwise
-        if user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and user.is_staff == True and get_sms_feature():
+        elif user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and user.is_staff == False and get_sms_feature():
 
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
@@ -148,7 +148,7 @@ def loginView(request):
 
             return redirect('account:two_factor_auth')
 
-        if user is not None and user.user_type == Customer.FREELANCER and user.is_active == True:
+        elif user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and user.is_staff == False and not get_sms_feature():
             
             login(request, user)
 
@@ -156,7 +156,7 @@ def loginView(request):
 
             return redirect('account:dashboard')                    
 
-        if user is not None and user.user_type == Customer.CLIENT and user.is_active == True and get_sms_feature():
+        elif user is not None and user.user_type == Customer.CLIENT and user.is_active == True and user.is_staff == False and get_sms_feature():
 
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
@@ -165,14 +165,15 @@ def loginView(request):
 
             return redirect('account:two_factor_auth')
 
-
-        if user is not None and user.user_type == Customer.CLIENT and user.is_active == True:            
+        elif user is not None and user.user_type == Customer.CLIENT and user.is_active == True and user.is_staff == False and not get_sms_feature():            
             
             login(request, user)
 
             messages.info(request, f'Welcome back {user.short_name}')
 
-            return redirect('account:dashboard')            
+            return redirect('account:dashboard')
+        else:
+             messages.error(request, f'Invalid email or Password.')           
         
     else:
         loginform = UserLoginForm()
@@ -219,7 +220,7 @@ def two_factor_auth(request):
 
             return redirect("account:dashboard")
 
-        messages.error(request, 'Invalid email or password!')
+        messages.error(request, 'Invalid code!')
 
     context = {
         'twofactorform': twofactorform
@@ -228,7 +229,6 @@ def two_factor_auth(request):
 
 
 
-# @confirm_recaptcha
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def account_register(request):
     if request.user.is_authenticated:
@@ -241,6 +241,8 @@ def account_register(request):
         return redirect('/admin')
 
     supported_country = Country.objects.filter(supported=True)
+
+    domain = get_current_site(request)
     if request.method == 'POST':
         regform = CustomerRegisterForm(supported_country, request.POST)
         if regform.is_valid():  # and request.recaptcha_is_valid:
@@ -251,7 +253,9 @@ def account_register(request):
             user.save()
 
             to_email = user.email
-            new_user_registration(user, to_email)
+            messages.info(request, f'Please check your email for a confirmation mail')
+
+            new_user_registration(domain, user, to_email)
 
             return redirect('account:login')
 
@@ -259,13 +263,6 @@ def account_register(request):
         regform = CustomerRegisterForm(supported_country)
     return render(request, 'account/register.html', {'regform': regform})
 
-
-__all__ = ['new_user_registration']
-
-# def states(request):
-#     country = request.GET.get('country')
-#     states= State.objects.filter(country=country)
-#     return render(request, 'account/partials/states.html', {'states': states})
 
 
 def account_activate(request, uidb64, token):
@@ -293,16 +290,26 @@ def user_dashboard(request):
 
     we create new team within dashboard
     '''
-    package = ''
+    package = None
+    contracts=None
+    proposals=None
+    user_active_team=None
     if request.user.user_type == Customer.FREELANCER and request.user.is_active == True:
-        user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-        freelancer_profile = Freelancer.active.get(user__id=request.user.id)
+        try:
+            user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+            contracts = user_active_team.internalcontractteam.filter(reaction=InternalContract.AWAITING)[:10]
+            proposals = Proposal.objects.filter(team=user_active_team)[:12]
+        except:
+            user_active_team = None
+        try:
+            freelancer_profile = Freelancer.active.get(user__id=request.user.id)
+        except:
+            freelancer_profile = None
         open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gt=timezone.now())[:10]
-        contracts = user_active_team.internalcontractteam.filter(reaction=InternalContract.AWAITING)[:10]
-        proposals = user_active_team.proposalteam.all()[:12]
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
+
 
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)
@@ -325,10 +332,6 @@ def user_dashboard(request):
 
                 # TODO There should be a special class to add founder to accepted members automatically
                 Invitation.founder_invitation(team=team, sender= request.user, type=Invitation.INTERNAL, email=team.created_by.email, status=Invitation.ACCEPTED)
-                # try:
-                # except InvitationException as e:
-                #     error = str(e)
-                #     return HttpResponse(error)
 
                 messages.success(request, f'The {team.title} was created successfully!')
                 # send_new_team_email(email, team)

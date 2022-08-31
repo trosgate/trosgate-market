@@ -121,7 +121,6 @@ def update_teams(request, team_id):
 def team_single(request, team_id):
     team = get_object_or_404(Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
     proposals = team.proposalteam.all()
-    # proposal_assigned = team.assignteam.all()
     applications = team.applications.all()
     invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
     accepted = Invitation.objects.filter(team=team, status=Invitation.ACCEPTED)
@@ -135,7 +134,6 @@ def team_single(request, team_id):
         'accepted': accepted,
         "proposals": proposals,
         "applications": applications,
-        # "proposal_assigned": proposal_assigned,
     }
     return render(request, 'teams/team_detail.html', context)
 
@@ -260,8 +258,7 @@ def accept_team_invitation(request):
             else:
                 messages.error(request, 'Sorry! No invitation for the given information')
         else:
-            messages.error(
-                request, f'Invalid code. Please contact team founder to assist')
+            messages.error(request, f'Invalid code. Please contact team founder to assist')
 
     return render(request, 'teams/accept_team_invitation.html')
 
@@ -309,7 +306,7 @@ def assign_proposal(request, team_slug, proposal_slug):
             assign.is_assigned = True
             assign.save()
 
-            messages.info(request, f'Member - "{assign.assignee.short_name}" assigned successfuly')
+            messages.info(request, f"Member - '{assign.assignee.short_name}' assigned successfuly")
 
             return redirect('teams:team_single', team_id=team.id)
 
@@ -531,7 +528,7 @@ def packages(request):
     access_token = ''
     headers = ''
     url = ''
-    cancelled = ''
+
     if SubscriptionItem.objects.filter(team__created_by=request.user, team=team).exists():
         latest_team_subscription = SubscriptionItem.objects.filter(team__created_by=request.user, team=team).order_by('id').last()
         print(latest_team_subscription.id, latest_team_subscription.payment_method)
@@ -596,8 +593,7 @@ def paypal_package_order(request):
     body = json.loads(request.body)
 
     data = body["orderID"]
-    team = get_object_or_404(
-        Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     paypal_request_order = OrdersGetRequest(data)
     response = PayPalClient.client.execute(paypal_request_order)
     SubscriptionItem.objects.create(
@@ -608,3 +604,4 @@ def paypal_package_order(request):
         payment_method='PayPal',
         status=True
     )
+    return JsonResponse({'done':'done deal'})

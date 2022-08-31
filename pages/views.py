@@ -35,7 +35,8 @@ from general_settings.fees_and_charges import (
     get_extra_proposal_value,
     get_extra_contract_value   
 )
-from general_settings.models import PaymentGateway
+from general_settings.models import PaymentGateway, Payday
+from teams.models import Package
 
 def terms_and_conditions(request):
     termsandcond = TermsAndConditions.objects.filter(is_published = True)
@@ -46,7 +47,12 @@ def how_it_works(request):
     hiring = Hiring.objects.filter(is_published = True)
     freelancing = Freelancing.objects.filter(is_published = True)
     gateways = PaymentGateway.objects.filter(status=True)
+    packages = Package.objects.all()
 
+    try:
+        payday = Payday.objects.get(pk=1)
+    except:
+        payday = None
     level_one_rate = get_level_one_rate() 
     level_one_start_amount = get_level_one_start_amount()
     level_one_delta_amount = get_level_one_delta_amount()
@@ -104,6 +110,8 @@ def how_it_works(request):
         "hiring":hiring, 
         'freelancing':freelancing, 
         'gateways':gateways, 
+        'packages':packages, 
+        'payday':payday, 
         'l1_proposal_net_earning':l1_proposal_net_earning, 
         'l2_proposal_net_earning':l2_proposal_net_earning, 
         'l3_proposal_net_earning':l3_proposal_net_earning, 

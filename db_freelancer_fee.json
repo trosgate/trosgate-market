@@ -4,6 +4,7 @@
         "pk": 1,
         "fields": {
             "preview": "Freelancer fees and charges",
+            "extcontract_fee_percentage": 20,
             "contract_fee_percentage": 20,
             "contract_fee_extra": 5,
             "contract_delta_amount": 350,

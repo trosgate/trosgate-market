@@ -10,7 +10,8 @@ class PackageAdmin(admin.ModelAdmin):
     list_display = ['type','price', 'is_default', 'status', 'verbose_type', 'ordering']
     list_display_links = ['type','price']
     list_editable = ['verbose_type', 'ordering']
-    readonly_fields = ['type']
+    excludes = ['daily_Handshake_mails_to_clients']
+    readonly_fields = ['type', 'daily_Handshake_mails_to_clients']
     radio_fields = {'is_default': admin.HORIZONTAL}    
 
 

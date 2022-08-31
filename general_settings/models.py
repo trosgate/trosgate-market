@@ -12,19 +12,19 @@ from django.core.exceptions import ValidationError
 
 
 class WebsiteSetting(models.Model):
-    HTTPS = "https://"
-    HTTP = "https://"
+    USE_HTTPS = "https://"
+    USE_HTTP = "http://"
     PROTOCOL_TYPE = (
-        (HTTPS, _("https://")),
-        (HTTP, _("http://")),
+        (USE_HTTPS, _("https://")),
+        (USE_HTTP, _("http://")),
+    )
+    USE_WWW = "www"
+    NO_WWW = "no_www"
+    APPLY_WWW = (
+        (USE_WWW, _("Use WWW")),
+        (NO_WWW, _("No WWW")),
     )
 
-    WWW = "www."
-    NONE = "none"
-    USE_WWW = (
-        (WWW, _("www.")),
-        (NONE, _("none")),
-    )
     site_name = models.CharField(
         _("Site Name"), max_length=50, default="Example", null=True, blank=True)
     tagline = models.CharField(
@@ -34,9 +34,8 @@ class WebsiteSetting(models.Model):
     site_Logo = models.ImageField(
         _("Site Logo"),  upload_to='site/', default='site/logo.png', null=True, blank=True)
     protocol = models.CharField(
-        _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=HTTPS)
-    www = models.CharField(_("Use www path"), max_length=20,
-                           choices=USE_WWW, default=WWW)
+        _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS)
+    use_www = models.BooleanField(_("Use WWW Url"), choices=((True, 'Use WWW'), (False, 'No WWW')), default=False)
     site_domain = models.CharField(_("Website Domain"), max_length=255, default="example.com", help_text=_(
         'E.x: example.com'), null=True, blank=True)
     site_url = models.URLField(_("Website URL"), help_text=_(
@@ -49,16 +48,6 @@ class WebsiteSetting(models.Model):
         verbose_name = 'Site Settings'
         verbose_name_plural = 'Site Settings'
 
-    def save(self, *args, **kwargs):
-        if self.protocol == self.HTTPS and self.www == self.WWW:
-            self.site_url = f'{self.HTTPS}{self.WWW}{self.site_domain}'
-        elif self.protocol == self.HTTP and self.www == self.WWW:
-            self.site_url = f'{self.HTTP}{self.WWW}{self.site_domain}'
-        elif self.protocol == self.HTTPS and self.www == self.NONE:
-            self.site_url = f'{self.HTTPS}{self.site_domain}'
-        elif self.protocol == self.HTTP and self.www == self.NONE:
-            self.site_url = f'{self.HTTP}{self.site_domain}'
-        super(WebsiteSetting, self).save(*args, **kwargs)
 
     # image display in Admin
 
@@ -94,24 +83,6 @@ class StorageBuckets(models.Model):
     def clean(self):       
         if  self.storage_type == False and not (self.bucket_name is not None and self.access_key is not None and self.secret_key is not None):
             raise ValidationError(_("All extra Amazon S3 setting fields below are required to activate S3 Bucket."))
-
-
-# class EmailConfig(models.Model):
-
-#     # Twilio SMS API
-#     twilio_account_sid = encrypt(models.CharField(
-#         _("Twilio Account SID"), max_length=255, null=True, blank=True, default='Dvtksh883c9c3e9d9913a715557dddff99'))
-#     twilio_auth_token = encrypt(models.CharField(_("Twilio Account Auth Token"),
-#                                 max_length=255, null=True, blank=True, default='abd4d45dd57dd79gldjrb1df2e2a6cd5'))
-#     twilio_phone_number = encrypt(models.CharField(
-#         _("Twilio Sending Phone Number"), max_length=255, null=True, blank=True, default='+18001110005'))
-
-#     def __str__(self):
-#         return f'Email: {self.email_hosting_server_email}'
-
-#     class Meta:
-#         verbose_name = 'Email Settings'
-#         verbose_name_plural = 'Email Settings'
 
 
 class TestEmail(models.Model):
@@ -404,11 +375,12 @@ class DiscountSystem(models.Model):
 
 
 
-
 class HiringFee(models.Model):
     preview = models.CharField(
         _("Freelancer fees and charges"), max_length=50, default="Freelancer fees and charges")
     # Contract fee and charges
+    extcontract_fee_percentage = models.PositiveIntegerField(_("External Contract Fee - (%)"), default=20, help_text=_(
+        "This is the first and final percentage fee per external contract"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     contract_fee_percentage = models.PositiveIntegerField(_("Contract Fee - (%)"), default=20, help_text=_(
         "This is the first percentage fee per contract up to Break-Point amount"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     contract_fee_extra = models.PositiveIntegerField(_("Contract Extra Fee - (%)"), default=5, help_text=_(
@@ -587,7 +559,7 @@ class Payday(models.Model):
         (ONE_MONTH, _("01 Month")),
     )  
     preview = models.CharField(_("Preview"), max_length=100, default = 'Payday Timelines that users should expect money', help_text=_('"01 Week" means 7 Days, "02 Weeks" means 14 Days, "03 Weeks" means 21 Days, "01 Month" means 28-30 Days'))
-    payday_converter = models.CharField(_("Duration"), max_length=20, choices=PAYDAY_DURATION, default = ONE_DAY)
+    payday_converter = models.CharField(_("Duration"), max_length=20, choices=PAYDAY_DURATION, default = THREE_DAYS)
 
     class Meta:
         verbose_name = 'Payday Setting'

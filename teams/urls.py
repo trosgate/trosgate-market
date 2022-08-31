@@ -26,6 +26,16 @@ urlpatterns = [
     path('accept/', views.accept_team_invitation, name='accept_invite'),
     path('assigned/to/me/', views.assign_proposals_to_me, name='assign_to_me'),
     path('assigned/to/members/', views.assigned_proposals_to_members, name='assign_to_members'),
+
+    # payment api with stripe urls
+    path('stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
+    path('razorpay_subscription_checkout_session/', razorpay_subscription_checkout_session, name='razorpay_subscription_checkout_session'),
+    path('razorpay_subscription_webhook/', razorpay_subscription_webhook, name='razorpay_subscription_webhook'),
+
+    # payment api with paypal urls
+    path('activate_paypal_subscription/', activate_paypal_subscription, name='activate_paypal_subscription'),
+    path('deactivate_paypal_subscription/', deactivate_paypal_subscription, name='deactivate_paypal_subscription'),
+
     path('reassigned/<str:assign_id>/<slug:proposal_slug>/',
          views.re_assign_proposal_to_any_member, name='re_assign_proposal_to_any_member'),
     path('reassigned/<str:member_id>/', views.reassign_proposals_to_myself,
@@ -38,6 +48,7 @@ urlpatterns = [
     path('detail/<int:team_id>/', views.team_single, name='team_single'),
     path('internal_invitation/', views.internal_invitation, name='internal_invitation'),
     path('external_invitation/', views.external_invitation, name='external_invitation'),
+    
     path('<slug:team_slug>/<slug:proposal_slug>/',
          views.assign_proposal, name='assign_proposal'),
     path('tracker/<slug:proposal_slug>/<int:assign_id>/',
@@ -47,13 +58,5 @@ urlpatterns = [
     path('delete/<slug:proposal_slug>/<int:assign_id>/<int:tracking_id>/',
          views.delete_proposal_tracking, name='delete_proposal_tracking'),
 
-    # payment api with stripe urls
-    path('stripe_subscription_checkout_session/', stripe_subscription_checkout_session, name='stripe_subscription_checkout_session'),
-    path('razorpay_subscription_checkout_session/', razorpay_subscription_checkout_session, name='razorpay_subscription_checkout_session'),
-    path('razorpay_subscription_webhook/', razorpay_subscription_webhook, name='razorpay_subscription_webhook'),
-
-    # payment api with paypal urls
-    path('activate_paypal_subscription/', activate_paypal_subscription, name='activate_paypal_subscription'),
-    path('deactivate_paypal_subscription/', deactivate_paypal_subscription, name='deactivate_paypal_subscription'),
 
 ]

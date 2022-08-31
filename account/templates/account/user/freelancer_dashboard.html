@@ -6,16 +6,17 @@
 
 <!--Main Start-->
 	<main class="wt-main wt-haslayout">
-
+		{% if active_team.status == 'active' %}
 		<div class="wt-proposalholder">
 			<div class="row justify-content-md-center">
 				<div class="wt-sectionhead wt-textcenter">
 					<div class="alert alert-info" role="alert">
-						<span style="color: blue; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Notice: At any given time where you belong to more than 1 Team, we will show proposals from your currently active team (whether you are online or offline) to clients that will offer contract to you.</span>
+						<span style="color: blue; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Notice: We will show proposals belonging to your currently active Team when clients offer you contract.</span>
 					</div>
 				</div>
 			</div>
 		</div>
+		{% endif %}
 
 		<!--More Details Start-->
 		<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
@@ -403,7 +404,7 @@
 				<tr>
 					<td>{{forloop.counter}} </td>
 					<td>{% if proposal.thumbnail %}<img src="{{proposal.thumbnail.url}}" alt="img description" width="50">{% endif %}</td>
-					<td class='text-left'><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}">{{proposal.title|truncatechars:100}}</a></td>
+					<td class='text-left'><a href="{% url 'proposals:proposal_preview' proposal.created_by.short_name proposal.slug %}">{{proposal.title|truncatechars:100}}</a></td>
 					<td>{{proposal.created_by.get_full_name}}</td>
 					<td>{{proposal.created_at|date:"M-d-Y"}}</td>
 					<td>{{proposal.salary}}</td>

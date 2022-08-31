@@ -5,6 +5,13 @@
 <body class="wt-login">
 {% include 'dashboard/main_navbar.html' %}
 
+    {% if request.user.freelancer %}
+	{% if active_team.status == 'inactive' %}
+    <div class="alert alert-warning alert-dismissible fade show text-center">
+        <span> You are currently logged into inactive team and most features are disabled. </span>
+    </div>
+    {% endif %} 
+    {% endif %} 
     <!-- Alert message Start -->
     {% if messages %}
         {% for message in messages %}        
