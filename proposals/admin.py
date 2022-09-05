@@ -7,7 +7,7 @@ class ProposalAdmin(admin.ModelAdmin):
     model = Proposal
     list_display = ['image_tag', 'title', 'team','category', 'salary', 'percent_progress', 'status', 'published']
     prepopulated_fields = {'slug': ('title',)}
-    list_display_links = ['image_tag', 'title', ]
+    list_display_links = ['image_tag', 'title']
     list_editable = [ 'status','published']
     search_fields = ['team__title', 'title', 'category__name']
     readonly_fields = ['image_tag']

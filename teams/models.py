@@ -129,9 +129,11 @@ class Team(models.Model):
 # this is for External User Invitations
 class Invitation(models.Model):
     # Type
+    FOUNDER = 'founder'
     INTERNAL = 'internal'
     EXTERNAL = 'external'
     TYPE = (
+        (FOUNDER, _('Founder')),
         (INTERNAL, _('Internal')),
         (EXTERNAL, _('External'))
     )
@@ -143,14 +145,14 @@ class Invitation(models.Model):
         (ACCEPTED, _('Accepted'))
     )
 
-    team = models.ForeignKey(Team, related_name='invitations', on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, verbose_name=_("Team"), related_name='invitations', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.PROTECT) #CASCADE
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
-    email = models.EmailField(max_length=100, blank=True) #External Email
-    code = models.CharField(unique=True, max_length=10, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS, default=INVITED)
-    type = models.CharField(max_length=20, choices=TYPE)
-    sent_on = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField(_("Email"),max_length=100, blank=True)
+    code = models.CharField(_("Code"), unique=True, max_length=10, blank=True)
+    status = models.CharField(_("Status"),max_length=20, choices=STATUS, default=INVITED)
+    type = models.CharField(_("Invite Type"),max_length=20, choices=TYPE, default=FOUNDER)
+    sent_on = models.DateTimeField(_("Date"),auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if self.code == "":
@@ -320,14 +322,15 @@ class AssignMember(models.Model):
     assignor = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Assignor"), related_name="assignors", on_delete=models.CASCADE)
     assignee = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Assignee"), related_name='assignees', on_delete=models.CASCADE)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
+    modified = models.DateTimeField(_("Assign On"), auto_now=True)
     duty = models.TextField(_("Job description"),max_length=500, blank=True, null=True)
     is_assigned = models.BooleanField(choices=((False, 'Unassigned'), (True, 'Assigned')), default=False)
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('-modified',)
         verbose_name = _("Assign Member")
         verbose_name_plural = _("Assign Member")
-        # unique_together = ("proposal", "assignee")
+
 
     def __str__(self):
         return f'{self.assignor.short_name} assign to {self.assignee.short_name}'

@@ -40,7 +40,7 @@ class AssignForm(forms.ModelForm):
 
     class Meta:
         model = AssignMember
-        fields = ['assignee', 'duty', 'status'] 
+        fields = ['assignee', 'duty'] 
 
 
     def __init__(self, assignee, *args, **kwargs):
@@ -51,8 +51,7 @@ class AssignForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': ''})
         self.fields['duty'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'describe the main duty e.g marketing of this proposal'})
-        self.fields['status'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'status'})
+
 
 
 

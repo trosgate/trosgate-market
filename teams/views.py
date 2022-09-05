@@ -35,6 +35,8 @@ from general_settings.models import PaymentAPIs
 from django.conf import settings
 from account.fund_exception import InvitationException
 from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 # from .tasks import email_all_users
 # from django_celery_beat.models import PeriodicTask, CrontabSchedule
@@ -291,7 +293,7 @@ def teamchatroom(request):
 @login_required
 @user_is_freelancer
 def assign_proposal(request, team_slug, proposal_slug):
-    team = get_object_or_404(Team, slug=team_slug, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, slug=team_slug, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
     assignee = request.user.team_member.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
 
@@ -325,7 +327,16 @@ def assign_proposal(request, team_slug, proposal_slug):
 @user_is_freelancer
 def assign_proposals_to_me(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
-    assigned = team.assignteam.filter(assignee=request.user, is_assigned=True)
+    assign = team.assignteam.filter(assignee=request.user, is_assigned=True)
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(assign, 10)
+    try:
+        assigned = paginator.page(page)
+    except PageNotAnInteger:
+        assigned = paginator.page(1)
+    except EmptyPage:
+        assigned = paginator.page(paginator.num_pages)
 
     context = {
         'team': team,
@@ -350,8 +361,16 @@ def reassign_proposals_to_myself(request, member_id):
 @user_is_freelancer
 def assigned_proposals_to_members(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
-    assigned = team.assignteam.filter(
-        proposal__status=Proposal.ACTIVE, is_assigned=True)
+    assign = team.assignteam.filter(proposal__status=Proposal.ACTIVE, is_assigned=True)
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(assign, 10)
+    try:
+        assigned = paginator.page(page)
+    except PageNotAnInteger:
+        assigned = paginator.page(1)
+    except EmptyPage:
+        assigned = paginator.page(paginator.num_pages)
 
     context = {
         'team': team,
@@ -363,25 +382,18 @@ def assigned_proposals_to_members(request):
 @login_required
 @user_is_freelancer
 def re_assign_proposal_to_any_member(request, assign_id, proposal_slug):
-    team = get_object_or_404(
-        Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-    proposal = get_object_or_404(
-        Proposal, slug=proposal_slug, team=team, status=Proposal.ACTIVE)
-    assigned = get_object_or_404(
-        AssignMember, team=team, id=assign_id, proposal=proposal)
-    assignee = request.user.team_member.filter(
-        pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team, status=Proposal.ACTIVE)
+    assigned = get_object_or_404(AssignMember, team=team, id=assign_id, proposal=proposal, is_assigned=True)
+    assignee = request.user.team_member.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
 
     if request.method == 'POST':
-
-        assignform = AssignForm(assignee, request.POST, instance=assigned)
+        assignform = AssignForm(assignee, request.POST or None, instance=assigned)
         if assignform.is_valid():
             assignform.instance.assignor = request.user
             assignform.save()
 
-            messages.info(
-                request, f'Member - "{assignform.instance.assignor.short_name}" assigned successfuly')
-
+            messages.info(request, f'Member - {assignform.instance.assignee.short_name} assigned')
             return redirect('teams:assign_to_members')
 
     else:

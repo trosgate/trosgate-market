@@ -298,7 +298,7 @@ def user_dashboard(request):
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
             contracts = user_active_team.internalcontractteam.filter(reaction=InternalContract.AWAITING)[:10]
-            proposals = Proposal.objects.filter(team=user_active_team)[:12]
+            proposals = Proposal.objects.filter(team=user_active_team, progress__lte=99)
         except:
             user_active_team = None
         try:
@@ -331,7 +331,7 @@ def user_dashboard(request):
                 freelancer.save()
 
                 # TODO There should be a special class to add founder to accepted members automatically
-                Invitation.founder_invitation(team=team, sender= request.user, type=Invitation.INTERNAL, email=team.created_by.email, status=Invitation.ACCEPTED)
+                Invitation.founder_invitation(team=team, sender=request.user, type=Invitation.INTERNAL, email=team.created_by.email, status=Invitation.ACCEPTED)
 
                 messages.success(request, f'The {team.title} was created successfully!')
                 # send_new_team_email(email, team)
@@ -354,7 +354,7 @@ def user_dashboard(request):
 
     elif request.user.user_type == Customer.CLIENT and request.user.is_active == True:
         client_profile = Client.objects.get(user=request.user)
-        proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
+        proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction=InternalContract.PAID)[:10]

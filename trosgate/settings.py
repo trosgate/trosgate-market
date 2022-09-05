@@ -208,6 +208,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # this will keep files on server
 STATIC_URL = '/static/'
 
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 MEDIA_URL = '/media/'
@@ -216,7 +217,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # This saves a copy of files on local pc
 # STATIC_URL = '/static/'
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 
 # ENV_PATH = os.path.dirname(BASE_DIR)
 # MEDIA_URL = '/media/'
@@ -226,14 +226,14 @@ LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
 
 #Custom Email Backend for this software
-# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 
 ### option two for email setup in development mode ###
 # I am using gmail setup
 
 ####option one for email setup in development mode###
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ####option two for email setup in development mode###
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

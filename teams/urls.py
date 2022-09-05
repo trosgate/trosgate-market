@@ -36,10 +36,8 @@ urlpatterns = [
     path('activate_paypal_subscription/', activate_paypal_subscription, name='activate_paypal_subscription'),
     path('deactivate_paypal_subscription/', deactivate_paypal_subscription, name='deactivate_paypal_subscription'),
 
-    path('reassigned/<str:assign_id>/<slug:proposal_slug>/',
-         views.re_assign_proposal_to_any_member, name='re_assign_proposal_to_any_member'),
-    path('reassigned/<str:member_id>/', views.reassign_proposals_to_myself,
-         name='reassign_proposals_to_myself'),
+    path('reassign/<int:assign_id>/<slug:proposal_slug>/', views.re_assign_proposal_to_any_member, name='re_assign_proposal_to_any_member'),
+    path('myself/<int:member_id>/', views.reassign_proposals_to_myself, name='reassign_proposals_to_myself'),
     path('invitation/', views.invitation, name='invitation'),
     path('update/<int:team_id>/', views.update_teams, name='update_team'),
     path('activate/<int:team_id>/', views.activate_team, name='activate_team'),
@@ -49,14 +47,10 @@ urlpatterns = [
     path('internal_invitation/', views.internal_invitation, name='internal_invitation'),
     path('external_invitation/', views.external_invitation, name='external_invitation'),
     
-    path('<slug:team_slug>/<slug:proposal_slug>/',
-         views.assign_proposal, name='assign_proposal'),
-    path('tracker/<slug:proposal_slug>/<int:assign_id>/',
-         views.proposal_tracking, name='proposal_tracking'),
-    path('modify/<slug:proposal_slug>/<int:assign_id>/<int:tracking_id>/',
-         views.modify_proposal_tracking, name='modify_proposal_tracking'),
-    path('delete/<slug:proposal_slug>/<int:assign_id>/<int:tracking_id>/',
-         views.delete_proposal_tracking, name='delete_proposal_tracking'),
+    path('assign/<slug:team_slug>/<slug:proposal_slug>/',views.assign_proposal, name='assign_proposal'),
+    path('tracker/<slug:proposal_slug>/<int:assign_id>/',views.proposal_tracking, name='proposal_tracking'),
+    path('modify/<slug:proposal_slug>/<int:assign_id>/<int:tracking_id>/',views.modify_proposal_tracking, name='modify_proposal_tracking'),
+    path('delete/<slug:proposal_slug>/<int:assign_id>/<int:tracking_id>/',views.delete_proposal_tracking, name='delete_proposal_tracking'),
 
 
 ]

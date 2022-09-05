@@ -23,7 +23,11 @@ def create_default_team_and_package_and_invitation(sender, instance, created, **
 
     '''    
     if created and instance.is_active == False and instance.user_type == Customer.FREELANCER:
-        package = Package.objects.get(pk=1) #this represents the basic package
+        try:
+            package = Package.objects.get(pk=1)
+        except:
+            package = None
+            pass
         team = Team.objects.create(
             title=instance.short_name,
             notice="this is the basic team", 

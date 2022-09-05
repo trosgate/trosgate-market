@@ -14,7 +14,7 @@ urlpatterns = [
     path('archived-proposals/', views.archive_proposal_page, name='archive_proposal_page'),
     path('archived<str:short_name>/<slug:proposal_slug>', views.archive_proposal, name='archive_proposal'),
     path('restore/<str:short_name>/<slug:proposal_slug>', views.reactivate_archive_proposal, name='reactivate_archive_proposal'),
-    path('<str:short_name>/<slug:proposal_slug>', views.proposal_detail, name='proposal_detail'),
+    path('detail<str:short_name>/<slug:proposal_slug>', views.proposal_detail, name='proposal_detail'),
     path('preview/<str:short_name>/<slug:proposal_slug>', views.proposal_preview, name='proposal_preview'),
 
     # Proposal creation Steps

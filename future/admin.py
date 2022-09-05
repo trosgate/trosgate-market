@@ -15,7 +15,7 @@ class FutureReleaseAdmin(admin.ModelAdmin):
         ('Client Deposit Feature', {'fields': ('deposit',)}),                 
         ('More Teams Per Freelancer Feature', {'fields': ('more_team_per_user',)}),
         ('Freelancer External client Feature', {'fields': ('ext_contract',)}),
-        ('Two Factor Authenticator(Twilio SMS)', {'fields': ('sms_authenticator',)}),       
+        ('Two Factor Authenticator(Email Alert Available) - Twilio SMS Will be Added Soon', {'fields': ('sms_authenticator',)}),       
     )
 
     def has_add_permission(self, request):

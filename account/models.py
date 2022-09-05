@@ -146,7 +146,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 class TwoFactorAuth(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='twofactorauth', on_delete=models.CASCADE)
-    pass_code = encrypt(models.CharField(max_length=255, blank=True, null=True))
+    pass_code = encrypt(models.CharField(_("Access Token"), max_length=255, blank=True, null=True))
     last_login = models.DateTimeField(_("Last Login"), auto_now=True)
     
     def __str__(self):

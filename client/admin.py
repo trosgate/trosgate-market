@@ -33,7 +33,7 @@ class ClientAdmin(admin.ModelAdmin):
 class ClientAccountAdmin(admin.ModelAdmin):
     model = ClientAccount
     list_display = ['user', 'created_at', 'modified_on', 'available_balance']
-    list_display_links = None
+    # list_display_links = None
 
     def has_add_permission(self, request):
         return False

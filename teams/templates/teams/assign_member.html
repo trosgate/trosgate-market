@@ -27,10 +27,7 @@
 										<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
                                             <div class="form-group">
                                             	<h5>Proposal:</h5><span>{{proposal.title}}</span>
-                                            </div>
-											<div class="form-group">
-                                                {{assignform.status.label}}
-                                                {{assignform.status}}
+                                            </div>											
                                             <div class="form-group">
                                                 {{assignform.assignee.label}}
                                                 {{assignform.assignee}}
