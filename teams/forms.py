@@ -7,12 +7,27 @@ from freelancer.models import Freelancer
 from django.utils.translation import gettext_lazy as _
 
 class TeamCreationForm(forms.ModelForm):
-    # title = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'team title',}))
-    # notice = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'team Notice',})) 
+
     class Meta:
         model = Team
         fields = ['title','notice'] 
-   
+
+
+class TeamModifyForm(forms.ModelForm):
+
+    class Meta:
+        model = Team
+        fields = ['title','notice'] 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['title'].widget.attrs.update(
+            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center'})
+
+        self.fields['notice'].widget.attrs.update(
+            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center'})
+
 
 class InvitationForm(forms.ModelForm):
     email = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control col-6', 'placeholder': 'enter email',}))    

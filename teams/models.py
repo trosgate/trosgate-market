@@ -1,7 +1,7 @@
 from io import BytesIO
 from PIL import Image
 from django.core.files import File
-from django.db import models, transaction
+from django.db import models, transaction as db_transaction
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -125,6 +125,18 @@ class Team(models.Model):
     def get_team_preview_url(self):
         return reverse('teams:preview_inactive_team', args=[self.id])
 
+    @classmethod
+    def add_new_team(cls, title, created_by, package, notice=None):
+        with db_transaction.atomic():
+            team = cls.objects.create(
+                title=title,
+                created_by=created_by,
+                package=package,
+                notice=notice
+            )
+            team.members.add(team.created_by)
+        return team
+
 
 # this is for External User Invitations
 class Invitation(models.Model):
@@ -156,7 +168,10 @@ class Invitation(models.Model):
 
     def save(self, *args, **kwargs):
         if self.code == "":
-            self.code = code_generator()[:6]            
+            try:
+                self.code = code_generator()[:6]
+            except:
+                self.code = code_generator()[:6]            
         super(Invitation, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -164,37 +179,23 @@ class Invitation(models.Model):
 
 
     @classmethod
-    def founder_invitation(cls, team, sender, type, email, status):
+    def new_team_and_invitation(cls, current_team, created_by, title, package, type, status, notice=None):
+        with db_transaction.atomic():
 
-        if not team:
-            raise InvitationException(_("Your team is unknown"))
+            if notice is None:
+                notice= ''    
 
-        if not sender:
-            raise InvitationException(_("Bad and unknown request"))
+            if not (current_team.created_by == created_by):
+                raise InvitationException(_("You must be in your founded team to create new Teams"))
 
-        if not email:
-            raise InvitationException(_("credentials of invitee incomplete"))
+            new_team = Team.add_new_team(
+                title=title, created_by=created_by, package=package,notice=notice
+            )
 
-        if not (team.package_status == 'active'):
-            raise InvitationException(_("Please upgrade your team to invite others"))
-
-        if not (team.package.type == 'Team'):
-            raise InvitationException(_("Please activate subscription to invite others"))
-
-        if team.created_by != sender:
-            raise InvitationException(_("This action requires upgraded team founder"))
-
-        if cls.objects.filter(team=team, sender=sender).exists():
-            raise InvitationException(_("You are already on this team"))     
-
-        if cls.objects.filter(team=team, team__members__email=email).exists():
-            raise InvitationException(_("User already a member of your Team"))
-
-        if sender in team.members.all():
-            raise InvitationException(_("User already a member"))
-
-        internal_invite = cls.objects.create(team=team, sender=sender, type=type, email=email, status=status)
-        return internal_invite
+            internal_invite = cls.objects.create(
+                team=new_team, type=type, sender=new_team.created_by, email=new_team.created_by.email, status=status
+            )
+        return new_team, internal_invite
 
 
     @classmethod
@@ -281,11 +282,6 @@ class Invitation(models.Model):
 
         external_invite = cls.objects.create(team=team, sender=sender, email=email, type=type)
         return external_invite
-
-
-    @classmethod
-    def accept_invitation(cls, team, sender, email, type):
-        pass
 
 
 class TeamChat(models.Model):

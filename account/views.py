@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from .tokens import account_activation_token
+from django.db import transaction as db_transaction
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login
@@ -228,7 +229,6 @@ def two_factor_auth(request):
     return render(request, "account/two_factor_auth.html", context)
 
 
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def account_register(request):
     if request.user.is_authenticated:
@@ -264,7 +264,6 @@ def account_register(request):
     return render(request, 'account/register.html', {'regform': regform})
 
 
-
 def account_activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -285,15 +284,13 @@ def account_activate(request, uidb64, token):
 def user_dashboard(request):
     '''
     function for getting freelancer properties
-
     function for getting client properties
-
     we create new team within dashboard
     '''
     package = None
     contracts=None
     proposals=None
-    user_active_team=None
+    msg = ''
     if request.user.user_type == Customer.FREELANCER and request.user.is_active == True:
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
@@ -309,35 +306,34 @@ def user_dashboard(request):
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
-
+        try:
+            package=Package.objects.get(id=1)
+        except:
+            package = None
 
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)
-            try:
-                package=Package.objects.get(id=1)
-            except:
-                pass
             if teamform.is_valid():
-                team = teamform.save(commit=False)
-                team.created_by = request.user
-                team.package = package
-                team.slug = slugify(team.title)
-                team.save()
-                team.members.add(request.user)
-
-                # email = team.created_by.email
-                freelancer = request.user.freelancer
-                freelancer.active_team_id = team.id
-                freelancer.save()
-
-                # TODO There should be a special class to add founder to accepted members automatically
-                Invitation.founder_invitation(team=team, sender=request.user, type=Invitation.INTERNAL, email=team.created_by.email, status=Invitation.ACCEPTED)
-
-                messages.success(request, f'The {team.title} was created successfully!')
-                # send_new_team_email(email, team)
+                try:
+                    Invitation.new_team_and_invitation(
+                        current_team = user_active_team,
+                        created_by=request.user,
+                        type=Invitation.INTERNAL,
+                        title=teamform.cleaned_data['title'],
+                        notice=teamform.cleaned_data['notice'],
+                        package=package,
+                        status=Invitation.ACCEPTED
+                    )
+                    messages.success(request, f'The Team was created successfully!')
+                except Exception as e:
+                    msg = str(e)
+                    messages.error(request, f'Sorry! {msg}')
+                    pass
 
                 return redirect('account:dashboard')
-
+            
+            messages.error(request, f'Sorry! an error occured. Please try in few time')
+                        
         else:
             teamform = TeamCreationForm()
         context = {
@@ -368,7 +364,7 @@ def user_dashboard(request):
         }
         return render(request, 'account/user/client_dashboard.html', context)
     
-    elif request.user.user_type == Customer.ADMIN and request.user.is_staff == True:
+    elif request.user.user_type == Customer.ADMIN and request.user.is_active == True and request.user.is_staff == True:
         messages.info(request, f'Welcome back {request.user.short_name}')
 
         return redirect('/admin/')

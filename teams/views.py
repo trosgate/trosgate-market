@@ -7,7 +7,7 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Team, Invitation, TeamChat, AssignMember, Tracking, Package
 from django.contrib.auth.decorators import login_required
-from .forms import TeamCreationForm, InvitationForm, TeamChatForm, AssignForm
+from .forms import TeamCreationForm, InvitationForm, TeamModifyForm, TeamChatForm, AssignForm
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -58,12 +58,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 @login_required
 @user_is_freelancer
 def team(request):
-    team = Team.objects.filter(status=Team.ACTIVE, pk=request.user.freelancer.active_team_id)
-    # teams = team.teams.all()
+    teams = "Ooops! You seem to be lost but dont worry, we have other resources for you"
 
     context = {
-        # 'teamform': teamform,
-        # 'teams': teams,
+        'teams': teams,
     }
     return render(request, 'teams/add_team.html', context)
 
@@ -100,18 +98,18 @@ def update_teams(request, team_id):
         Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
 
     if request.method == 'POST':
-        update_teamform = TeamCreationForm(request.POST, instance=update_team)
+        update_teamform = TeamModifyForm(request.POST, instance=update_team)
 
         if update_teamform.is_valid():
             update_teamform.instance.slug = slugify(update_team.title)
             update_teamform.save()
 
-            messages.success(request, 'The Changes were saved successfully!')
+            messages.info(request, 'The Changes were saved successfully!')
 
-            return HttpResponseRedirect(reverse('account:dashboard'))
+            return redirect('account:dashboard')
 
     else:
-        update_teamform = TeamCreationForm(instance=update_team)
+        update_teamform = TeamModifyForm(instance=update_team)
     context = {
         "update_teamform": update_teamform,
     }
@@ -172,8 +170,6 @@ def invitation(request):
     return render(request, 'teams/invitation_detail.html', context)
 
 
-# remove team member
-# Inviting a user that already exist to your team via user profile page
 @login_required
 @user_is_freelancer
 def internal_invitation(request):
@@ -283,7 +279,7 @@ def teamchat(request):
 def teamchatroom(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     chats = team.teamchats.all()
-    admin = Customer.objects.filter(user_type=Customer.ADMIN, is_active=True, is_admin=True).first()
+    admin = Customer.objects.filter(user_type=Customer.ADMIN, is_active=True, is_staff=True).first()
     if request.htmx:
         return render(request, 'teams/components/partial_team_message.html', {'chats': chats})
     else:
