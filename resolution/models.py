@@ -408,9 +408,11 @@ class ProposalResolution(models.Model):
     ONE_MONTH = "one_month"
 
     ONGOING = 'ongoing'
+    CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
     ) 
     #Resolution parameters

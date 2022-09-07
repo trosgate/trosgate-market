@@ -9,7 +9,6 @@ from account.models import Customer
 from teams.models import Team
 
 
-
 class PaymentAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='paymentaccount', on_delete=models.PROTECT,)
     paypal = encrypt(models.CharField(_("PayPal Account"), max_length=100, help_text=_(

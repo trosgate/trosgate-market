@@ -14,6 +14,9 @@ from contract.models import InternalContract, Contract
 from client.models import ClientAccount
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator, get_external_contract_fee_calculator
 from account.fund_exception import FundException
+from teams.models import Team
+from client.models import ClientAccount
+from resolution.models import ProposalResolution
 
 
 class OneClickPurchase(models.Model):
@@ -352,6 +355,7 @@ class ProposalSale(models.Model):
     total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -379,6 +383,43 @@ class ProposalSale(models.Model):
 
     def status_value(self):
         return self.purchase.get_status_display()
+
+
+    @classmethod
+    def issue_refund(cls, pk:int):
+        with db_transaction.atomic():
+            proposal_sale = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=proposal_sale.purchase.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=proposal_sale.team.created_by)
+            
+            try:
+                resolution = ProposalResolution.objects.select_for_update().get(proposal_sale=proposal_sale)            
+            except:
+                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
+            
+            if proposal_sale.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            if proposal_sale.purchase.status != Purchase.SUCCESS:
+                raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == ProposalResolution.COMPLETED:
+                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
+
+            resolution.status = ProposalResolution.CANCELLED
+            resolution.save()
+
+            proposal_sale.is_refunded = True
+            proposal_sale.save()
+            
+            client.available_balance += int(proposal_sale.total_sales_price)
+            client.save(update_fields=['available_balance'])
+            
+            freelancer.pending_balance -= int(proposal_sale.total_sales_price)
+            freelancer.save(update_fields=['pending_balance'])
+
+        return proposal_sale, client, freelancer, resolution
+
 
 
 class ContractSale(models.Model):

@@ -45,7 +45,8 @@ class ApplicationReviewAdmin(admin.ModelAdmin):
 @admin.register(ProposalResolution)
 class ProposalResolutionAdmin(admin.ModelAdmin):
     model = ProposalResolution
-    list_display = ['team','start_time', 'end_time', 'status']    
+    list_display = ['team','start_time', 'end_time', 'status']
+    readonly_fields = ['team','start_time', 'end_time', 'status', 'proposal_sale']    
 
 
 @admin.register(ProposalCompletionFiles)

@@ -44,12 +44,6 @@ class BaseMemoForm(forms.Form):
             error_message = str(e)
             self.add_error(None, error_message)           
             raise
-        
-        # try:
-        #     send_credit_to_team(account)
-        # except Exception as e:
-        #     error_message = str(e)
-        #     print(error_message)
             
         return account, action
 
