@@ -113,7 +113,7 @@ class InternalContract(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="internalcontractauthor", on_delete=models.CASCADE)
     contract_duration = models.CharField(_('Duration'), choices=CONTRACT_DURATION, default=ONE_DAY, max_length=20)
     reaction = models.CharField(_('State'), choices=STATE, default=AWAITING, max_length=30)
-    notes = models.TextField(null=True, blank=True, max_length=500)
+    notes = models.TextField(null=True, blank=True, max_length=250)
 
     reference = models.CharField(_('Reference'), unique=True, blank=True, max_length=100)
     slug = models.SlugField(_('Slug'), blank=True, max_length=350)
@@ -260,8 +260,8 @@ class Contract(models.Model):
     client = models.ForeignKey(Contractor, verbose_name=_("External Client"), related_name="contractsclient", blank=True, on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), blank=True, related_name="contractsauthor", on_delete=models.CASCADE)
     contract_duration = models.CharField(_('Duration'), choices=CONTRACT_DURATION, default=THREE_DAYS, max_length=20)
-    reaction = models.CharField(_('State'), choices=STATE, default=ACCEPTED, max_length=30)
-    notes = models.TextField(null=True, blank=True, max_length=500)
+    reaction = models.CharField(_('State'), choices=STATE, default=AWAITING, max_length=30)
+    notes = models.TextField(null=True, blank=True, max_length=250)
 
     reference = models.CharField(_('Reference'), unique=True, blank=True, max_length=100)
     slug = models.SlugField(_('Slug'), max_length=150, null=True)
@@ -297,7 +297,7 @@ class Contract(models.Model):
      
     
     def __str__(self):
-        return self.team.title
+        return self.line_one
 
     class Meta:
         ordering = ['-date_created']

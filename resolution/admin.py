@@ -10,6 +10,7 @@ from . models import (
 class OneClickResolutionAdmin(admin.ModelAdmin):
     model = OneClickResolution
     list_display = ['team','start_time', 'end_time', 'status']    
+    readonly_fields = ['team','start_time', 'end_time', 'status', 'oneclick_sale']
 
 
 @admin.register(OneClickReview)
@@ -24,7 +25,8 @@ class OneClickReviewAdmin(admin.ModelAdmin):
 @admin.register(ProjectResolution)
 class ProjectResolutionAdmin(admin.ModelAdmin):
     model = ProjectResolution
-    list_display = ['team', 'application', 'start_time', 'end_time']    
+    list_display = ['team','start_time', 'end_time', 'status']    
+    readonly_fields = ['team','start_time', 'end_time', 'status', 'application']
 
 
 @admin.register(ProjectCompletionFiles)

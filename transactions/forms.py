@@ -1,4 +1,4 @@
-from .models import Purchase, ProposalSale
+from .models import Purchase, ProposalSale, ApplicationSale, ContractSale
 from django import forms
 from account.fund_exception import FundException
 from django.utils.translation import gettext_lazy as _
@@ -51,7 +51,17 @@ class BaseMemoForm(forms.Form):
 
 class ProposalRefundForm(BaseMemoForm):
     def form_action(self, pk):
-        return ProposalSale.issue_refund(pk=pk)
+        return ProposalSale.proposal_refund(pk=pk)
+
+
+class ApplicationRefundForm(BaseMemoForm):
+    def form_action(self, pk):
+        return ApplicationSale.application_refund(pk=pk)
+
+
+class ContractRefundForm(BaseMemoForm):
+    def form_action(self, pk):
+        return ContractSale.contract_refund(pk=pk)
 
 
 

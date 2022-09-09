@@ -100,7 +100,6 @@ def one_click_proposal_checkout(request):
     message = ''
     if request.POST.get('action') == 'oneclick-pay':
         proposal_id = int(request.POST.get('proposalId'))
-        print(proposal_id)
         
         proposal = get_object_or_404(Proposal, pk=proposal_id, status=Proposal.ACTIVE)
      
@@ -128,13 +127,12 @@ def one_click_interncontract_checkout(request):
         contract_id = int(request.POST.get('contractId'))
         
         contract = get_object_or_404(InternalContract, pk=contract_id, created_by=request.user, reaction=InternalContract.ACCEPTED)
-     
+        print(contract)
         if request.user.clientfunduser.available_balance >= contract.grand_total:
             try:
                 OneClickPurchase.one_click_intern_contract(user=request.user, contract=contract)
                 message = f'<span id="oneClick-message" style="color:green; text-align:right;">"Congrats! Checkout Successful"</span>'
             except FundException as e:
-                # err = 'Error occured and we could not create order. Try again'
                 err = str(e)
                 errors = f'<span id="oneClick-error" style="color:red; text-align:right;">{err}</span>'
                 print('%s' % (str(e)))

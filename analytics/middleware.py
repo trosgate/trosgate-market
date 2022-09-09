@@ -8,7 +8,6 @@ class Middleware:
     def __init__(self, get_response):
         self.get_response = get_response
     
-
     def stats(self, os_info):
         if "win" in os_info:
             NewStats.objects.all().update(win=F('win') + 1)

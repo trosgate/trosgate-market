@@ -16,7 +16,7 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_p
 from account.fund_exception import FundException
 from teams.models import Team
 from client.models import ClientAccount
-from resolution.models import ProposalResolution
+from resolution.models import ProposalResolution, ProjectResolution, ContractResolution
 
 
 class OneClickPurchase(models.Model):
@@ -102,6 +102,12 @@ class OneClickPurchase(models.Model):
             earning_fee = get_contract_fee_calculator(contract.grand_total)
             total_earning = int(contract.grand_total) - int(earning_fee)
             
+            if not contract:
+                raise FundException('Contract not found')
+
+            if contract is None:
+                raise FundException('Contract error')
+
             purchass = cls.objects.create(
                 client=account.user,
                 category = cls.CONTRACT,
@@ -132,12 +138,22 @@ class OneClickPurchase(models.Model):
     def one_click_extern_contract(cls, user, contract):
         with db_transaction.atomic():
             account = ClientAccount.objects.select_for_update().get(user=user)
+
+            if contract is None:    
+                raise FundException('Contract error occured. Try again')
+
             if account.available_balance < contract.grand_total:
                 raise FundException('Insufficient Balance')
 
             earning_fee = get_external_contract_fee_calculator(contract.grand_total)
             total_earning = int(contract.grand_total) - int(earning_fee)
-            
+
+            if not contract:
+                raise FundException('Contract not found')
+
+            if contract is None:
+                raise FundException('Contract error')
+                            
             purchass = cls.objects.create(
                 client=account.user,
                 category = cls.EXTERNAL_CONTRACT,
@@ -147,7 +163,7 @@ class OneClickPurchase(models.Model):
                 earning_fee=earning_fee,
                 team = contract.team,
                 extcontract = contract,
-                status = cls.SUCCESS,
+                status = cls.SUCCESS,                
             )           
             stan = f'{purchass.pk}'.zfill(8)
             purchass.reference = f'1click{purchass.client.id}{stan}'
@@ -318,6 +334,7 @@ class ApplicationSale(models.Model):
     total_earnings = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -336,6 +353,41 @@ class ApplicationSale(models.Model):
 
     def status_value(self):
         return self.purchase.get_status_display()
+
+    @classmethod
+    def application_refund(cls, pk:int):
+        with db_transaction.atomic():
+            application = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=application.purchase.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=application.team.created_by)
+            
+            try:
+                resolution = ProjectResolution.objects.select_for_update().get(application=application)            
+            except:
+                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
+            
+            if application.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            if application.purchase.status != Purchase.SUCCESS:
+                raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == ProjectResolution.COMPLETED:
+                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
+
+            resolution.status = ProjectResolution.CANCELLED
+            resolution.save()
+
+            application.is_refunded = True
+            application.save()
+            
+            freelancer.pending_balance -= int(application.total_earnings)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(application.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+        return application, client, freelancer, resolution
 
 
 class ProposalSale(models.Model):
@@ -384,9 +436,8 @@ class ProposalSale(models.Model):
     def status_value(self):
         return self.purchase.get_status_display()
 
-
     @classmethod
-    def issue_refund(cls, pk:int):
+    def proposal_refund(cls, pk:int):
         with db_transaction.atomic():
             proposal_sale = cls.objects.select_for_update().get(pk=pk)
             client = ClientAccount.objects.select_for_update().get(user=proposal_sale.purchase.client)
@@ -412,14 +463,13 @@ class ProposalSale(models.Model):
             proposal_sale.is_refunded = True
             proposal_sale.save()
             
+            freelancer.pending_balance -= int(proposal_sale.total_earning)
+            freelancer.save(update_fields=['pending_balance'])
+
             client.available_balance += int(proposal_sale.total_sales_price)
             client.save(update_fields=['available_balance'])
             
-            freelancer.pending_balance -= int(proposal_sale.total_sales_price)
-            freelancer.save(update_fields=['pending_balance'])
-
         return proposal_sale, client, freelancer, resolution
-
 
 
 class ContractSale(models.Model):
@@ -439,6 +489,7 @@ class ContractSale(models.Model):
     total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -466,6 +517,41 @@ class ContractSale(models.Model):
 
     def status_value(self):
         return self.purchase.get_status_display()
+
+    @classmethod
+    def contract_refund(cls, pk:int):
+        with db_transaction.atomic():
+            contract_sale = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=contract_sale.purchase.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=contract_sale.team.created_by)
+            
+            try:
+                resolution = ContractResolution.objects.select_for_update().get(contract_sale=contract_sale)            
+            except:
+                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
+            
+            if contract_sale.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            if contract_sale.purchase.status != Purchase.SUCCESS:
+                raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == ProjectResolution.COMPLETED:
+                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
+
+            resolution.status = ProjectResolution.CANCELLED
+            resolution.save()
+
+            contract_sale.is_refunded = True
+            contract_sale.save()
+            
+            freelancer.pending_balance -= int(contract_sale.total_earning)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(contract_sale.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+        return contract_sale, client, freelancer, resolution
 
 
 class SubscriptionItem(models.Model):

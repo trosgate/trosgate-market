@@ -89,7 +89,7 @@
 							<td>{{forloop.counter}}</td>
 							<td>{{oneclick.reference}}</td>
 							<td>{{oneclick.get_category_display}}</td>
-							<td>{% if oneclick.category == 'proposal' %}{{oneclick.proposal.title}}{% elif oneclick.category == 'contract' %}{{oneclick.contract.proposal.title}} {% endif %}</td>
+							<td class="text-left">{% if oneclick.category == 'proposal' %}{{oneclick.proposal.title|truncatechars:60}}{% elif oneclick.category == 'contract' %}{{oneclick.contract.proposal.title|truncatechars:60}} {% elif oneclick.category == 'externalcontract' %}{{oneclick.extcontract.line_one|truncatechars:60}} {% endif %}</td>
 							<td>{{oneclick.created_at}}</td>
 							<td>{{oneclick.salary_paid}}</td>
 							<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>

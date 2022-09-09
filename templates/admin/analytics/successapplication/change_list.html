@@ -11,22 +11,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   const ctx = document.getElementById('myChart').getContext('2d');
 
-  const chartData = {{ status_data | safe }};
-
-  let arr = []
-
-  for (let value of Object.values(chartData[0])) {
-    arr.push(value); 
-  }
+  const chartData = {{ stat_data | safe }};
 
   // Render the chart
   const chart = new Chart(ctx, {
-    type: 'bar',
+    type: 'pie',
     data: {
-      labels: ['active','review', 'ongoing', 'archived'],
+      labels: ["Total Sales", "Total Earning", "Total Earning Fee", "Total Discount"],
       datasets: [{
-            label: 'Website Visits by Device Type',
-            data: arr,
+            label: 'Successful Proposals',
+            data: chartData,
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',

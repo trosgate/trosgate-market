@@ -1,6 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from .tokens import account_activation_token
-from django.db import transaction as db_transaction
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login
@@ -40,6 +39,7 @@ from general_settings.models import Mailer
 from general_settings.currency import get_base_currency_symbol
 from .fund_exception import InvitationException
 from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from django.db.models import F, Sum, Count, Avg
 from freelancer.models import FreelancerAccount
 from applications.application import ApplicationAddon
 from contract.contract import BaseContract
@@ -255,8 +255,10 @@ def account_register(request):
             to_email = user.email
             messages.info(request, f'Please check your email for a confirmation mail')
 
-            new_user_registration(domain, user, to_email)
-
+            try:
+                new_user_registration(domain, user, to_email)
+            except Exception as e:
+                print(str(e))
             return redirect('account:login')
 
     else:
@@ -310,6 +312,24 @@ def user_dashboard(request):
             package=Package.objects.get(id=1)
         except:
             package = None
+
+        stats_count = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).count()
+        print('stats_count::', stats_count)
+        stats_disc = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).aggregate(Sum("disc_sales_price")).values()
+        print('stats_disc::', stats_disc)
+        stats_total = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).aggregate(Sum("sales_price"))
+        print('stats_total::', stats_total)
+        stats_total_earning = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).aggregate(Sum("total_earning"))
+        print('stats_total_earning::', stats_total_earning)
+        overall = ProposalSale.objects.filter(
+            purchase__status=Purchase.SUCCESS
+            ).annotate().values("total_sales_price","total_sales_price").aggregate(Sum("total_sales_price"),Sum("total_sales_price"))
+        print('overall::', overall)
+        # stats = ProposalSale.objects.annotate(
+        #     num_of_proposals=Count("sales_price"),
+        #     tot_sales_price=Sum("sales_price"),
+        # ).values_list("tot_sales_price", "sales_price", "num_of_proposals")
+        # print(stats)
 
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)

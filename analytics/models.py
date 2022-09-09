@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from projects.models import Project
-from django.db.models import F
 from projects . models import Project
-from django.db.models import Count
+from account . models import Customer
+from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
 
 
 class NewStats(models.Model):
@@ -16,15 +16,43 @@ class NewStats(models.Model):
 
 
     class Meta:
-        verbose_name = _("Visitor Stats")
-        verbose_name_plural = _("Visitor Stats")
+        verbose_name = _("Site Visitor Statistics")
+        verbose_name_plural = _("Site Visitor Statistics")
 
     def __str__(self):
         return self.description
 
 
+class SuccessProposal(ProposalSale):
+    class Meta:
+        proxy=True
+        ordering = ('-created_at',)
+        verbose_name = _("Proposal Paid")
+        verbose_name_plural = _("Proposal Paid")
 
 
+class SuccessApplication(ApplicationSale):
+    class Meta:
+        proxy=True
+        ordering = ('-created_at',)
+        verbose_name = _("Project Applicant Paid")
+        verbose_name_plural = _("Project Applicant Paid")
+
+
+class SuccessInternalContract(ContractSale):
+    class Meta:
+        proxy=True
+        ordering = ('-created_at',)
+        verbose_name = _("Internal Contracts Paid")
+        verbose_name_plural = _("Internal Contracts Paid")
+
+
+class UserStatistics(Customer):
+    class Meta:
+        proxy=True
+        ordering = ('date_joined',)
+        verbose_name = _("User Statistics")
+        verbose_name_plural = _("User Statistics")
 
 
 

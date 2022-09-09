@@ -717,6 +717,7 @@ def create_external_contract(request):
 
 @login_required
 def external_contract_list(request):
+
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(
             Team, 
@@ -730,7 +731,7 @@ def external_contract_list(request):
         contracts = Contract.objects.filter(client__email=request.user.email)
 
     context = {
-        "contracts": contracts,
+        "contracts": contracts
     }
     return render(request, 'contract/external_contract_list.html', context)
 
@@ -1247,6 +1248,6 @@ def contract_chatroom(request,  contract_id):
     chats = contract.contractclientchat.all()
     if request.htmx:
         return render(request, 'contract/components/partial_contract_message.html', {'chats': chats})
-    else:
-        return render(request, 'contract/contract_chat.html', {'chats': chats})
+
+    return render(request, 'contract/contract_chat.html', {'chats': chats})
 

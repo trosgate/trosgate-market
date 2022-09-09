@@ -370,6 +370,7 @@ def oneclick_manager(request, purchase_pk, reference):
     oneclick_resolution=''
 
     oneclick_sold = get_object_or_404(OneClickPurchase, pk=purchase_pk, reference=reference)
+
     client_review = OneClickReview.objects.filter(resolution__oneclick_sale=oneclick_sold)
     # completion_form = ContractCompletionForm(request.POST or None, request.FILES or None)
     if request.user.user_type == Customer.FREELANCER:
@@ -416,11 +417,7 @@ def oneclick_start_work(request):
             pass
         else:
             try:
-                OneClickResolution.start_oneclick(
-                    oneclick_sale=oneclick_sale, 
-                    team=oneclick_sale.team
-                )
-
+                OneClickResolution.start_oneclick(oneclick_sale=oneclick_sale,team=oneclick_sale.team)
             except Exception as e:
                 print('%s' % (str(e)))            
         response = JsonResponse({'message': 'work started'})

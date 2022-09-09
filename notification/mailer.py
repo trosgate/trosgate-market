@@ -223,7 +223,7 @@ def send_invitation_email(to_email, code, team):
     acceptation_url = settings.WEBSITE_URL
     subject = 'Invitation to Team'
     text_content = f'Invitation to {team.title}. Your code is: %s' % code
-    html_content = render_to_string('teams/email_invitation.html', {
+    html_content = render_to_string('notification/email_invitation.html', {
         'protocol': Protocol,
         'team': team,
         'code': code,
@@ -245,7 +245,7 @@ def send_invitation_accepted_mail(team, invitation):
         'team': team, 
         'invitation': invitation
     }
-    html_content = render_to_string('teams/accept_invitation_email.html', context)
+    html_content = render_to_string('notification/accept_invitation_email.html', context)
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [team.created_by.email])
     msg.attach_alternative(html_content, 'text/html')

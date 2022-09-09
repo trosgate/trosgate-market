@@ -2,6 +2,7 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from . models import Client, ClientAccount
 from account.models import Customer
+from contract.models import Contract
 from transactions.models import Purchase, ApplicationSale, ProposalSale, ContractSale
 
 
@@ -13,6 +14,12 @@ def create_client_profile(sender, instance, created, **kwargs):
 
         client_account = ClientAccount.objects.create(user=instance)
         client_account.save()
+
+
+@receiver(post_save, sender=Client)
+def update_external_contract_status(sender, instance, created, **kwargs):
+    if created:
+        Contract.objects.filter(client__email=instance.user.email, reaction=Contract.AWAITING).update(reaction=Contract.ACCEPTED)
 
 
 @receiver(post_save, sender=ProposalSale)

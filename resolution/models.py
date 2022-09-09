@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.template.defaultfilters import truncatechars
 from django.utils.safestring import mark_safe
-from account.fund_exception import ReviewException
+from account.fund_exception import ReviewException, ContractException
 from teams.models import Team
 from freelancer.models import FreelancerAccount
 from django.utils import timezone
@@ -26,7 +26,6 @@ def proposal_file_directory(instance, filename):
 
 def contract_file_directory(instance, filename):
     return "proposal/%s/%s" % (instance.contract.team.title, filename)
-
 
 
 class OneClickResolution(models.Model):
@@ -71,13 +70,11 @@ class OneClickResolution(models.Model):
 
     @classmethod
     def start_oneclick(cls, oneclick_sale, team):
-        with db_transaction.atomic():  
-            oneclick = cls.objects.create(
-                oneclick_sale=oneclick_sale, team=team, start_time=timezone.now()
-            )
+        with db_transaction.atomic():
+
+            oneclick = cls.objects.create(oneclick_sale=oneclick_sale,team=team,start_time=timezone.now())
 
             if oneclick.oneclick_sale.category == 'contract':
-
                 if oneclick.oneclick_sale.contract.contract_duration == cls.ONE_DAY:
                     oneclick.end_time = one_day()
                     oneclick.save()
@@ -123,9 +120,55 @@ class OneClickResolution(models.Model):
                 if oneclick.oneclick_sale.contract.contract_duration == cls.SIX_MONTH:
                     oneclick.end_time = six_months()
                     oneclick.save()
-            
-            elif oneclick.oneclick_sale.category == 'proposal':
 
+            elif oneclick.oneclick_sale.category == 'externalcontract':
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.ONE_DAY:
+                    oneclick.end_time = one_day()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.TWO_DAYS:
+                    oneclick.end_time =two_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.THREE_DAYS:
+                    oneclick.end_time = three_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.FOUR_DAYS:
+                    oneclick.end_time = four_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.FIVE_DAYS:
+                    oneclick.end_time = five_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.SIX_DAYS:
+                    oneclick.end_time = six_days()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.ONE_WEEK:
+                    oneclick.end_time = one_week()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.TWO_WEEK:
+                    oneclick.end_time = two_weeks()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.THREE_WEEK:
+                    oneclick.end_time = three_weeks()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.ONE_MONTH:
+                    oneclick.end_time = one_month()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.TWO_MONTH:
+                    oneclick.end_time = two_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.THREE_MONTH:
+                    oneclick.end_time = three_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.FOUR_MONTH:
+                    oneclick.end_time = four_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.FIVE_MONTH:
+                    oneclick.end_time = five_months()
+                    oneclick.save()
+                if oneclick.oneclick_sale.extcontract.contract_duration == cls.SIX_MONTH:
+                    oneclick.end_time = six_months()
+                    oneclick.save()
+
+            elif oneclick.oneclick_sale.category == 'proposal':
                 if oneclick.oneclick_sale.proposal.dura_converter == cls.ONE_DAY:
                     oneclick.end_time = one_day()
                     oneclick.save()
@@ -242,9 +285,11 @@ class ProjectResolution(models.Model):
     ONE_MONTH = "one_month"
 
     ONGOING = 'ongoing'
+    CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
     ) 
 
@@ -554,7 +599,6 @@ class ProposalReview(models.Model):
         return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
 
 
-
 class ContractResolution(models.Model):
     ONE_DAY = "one_day"
     TWO_DAYS = "two_days"
@@ -573,11 +617,13 @@ class ContractResolution(models.Model):
     SIX_MONTH = "six_months"
 
     ONGOING = 'ongoing'
+    CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
-    ) 
+    )  
     # Resolution parameters
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='approvedcontractteam', on_delete=models.CASCADE)
     contract_sale = models.ForeignKey("transactions.ContractSale", verbose_name=_("Contract Awarded"), related_name="contractaction", on_delete=models.CASCADE)
@@ -643,28 +689,28 @@ class ContractResolution(models.Model):
                 contract.end_time = one_day()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.TWO_DAYS:
-                contract.end_time =two_days()
+                contract.end_time = two_days()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.THREE_DAYS:
-                contract.end_time =three_days()
+                contract.end_time = three_days()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.FOUR_DAYS:
-                contract.end_time =four_days()
+                contract.end_time = four_days()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.FIVE_DAYS:
-                contract.end_time =five_days()
+                contract.end_time = five_days()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.SIX_DAYS:
-                contract.end_time =six_days()
+                contract.end_time = six_days()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.ONE_WEEK:
-                contract.end_time =one_week()
+                contract.end_time = one_week()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.TWO_WEEK:
-                contract.end_time =two_weeks()
+                contract.end_time = two_weeks()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.THREE_WEEK:
-                contract.end_time =three_weeks()
+                contract.end_time = three_weeks()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.ONE_MONTH:
                 contract.end_time =one_month()
@@ -676,13 +722,13 @@ class ContractResolution(models.Model):
                 contract.end_time =three_months()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.FOUR_MONTH:
-                contract.end_time =four_months()
+                contract.end_time = four_months()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.FIVE_MONTH:
-                contract.end_time =five_months()
+                contract.end_time = five_months()
                 contract.save()
             if contract.contract_sale.contract.contract_duration == cls.SIX_MONTH:
-                contract.end_time =six_months()
+                contract.end_time = six_months()
                 contract.save()
 
         return contract

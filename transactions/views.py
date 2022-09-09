@@ -717,7 +717,7 @@ def one_click_transaction(request):
 
     elif request.user.user_type == Customer.CLIENT:
         oneclicks = OneClickPurchase.objects.filter(client=request.user, status=OneClickPurchase.SUCCESS)
-    
+
     context = {
         'oneclicks':oneclicks,
         'base_currency': base_currency,        

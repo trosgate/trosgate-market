@@ -4,7 +4,7 @@ from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
-from .forms import ProposalRefundForm
+from .forms import ProposalRefundForm, ApplicationRefundForm, ContractRefundForm
 
 
 class OneClickPurchaseAdmin(admin.ModelAdmin):
@@ -14,13 +14,14 @@ class OneClickPurchaseAdmin(admin.ModelAdmin):
     readonly_fields = [
         'client', 'payment_method','salary_paid','created_at','reference',
         'client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status',
-        'team', 'category', 'proposal','contract'
+        'team', 'category', 'proposal','contract','extcontract'
     ]
     fieldsets = (
         ('Transaction Details', {'fields': ('client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'reference', 'created_at',)}),
-        ('Product Type', {'fields': ('team', 'category', 'proposal','contract')}),
+        ('Product Type', {'fields': ('team', 'category', 'proposal', 'contract', 'extcontract')}),
         
     )
+
 
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
@@ -38,18 +39,85 @@ class PurchaseAdmin(admin.ModelAdmin):
 
 class ApplicationSaleAdmin(admin.ModelAdmin):
     model = ApplicationSale
-    list_display = ['team', 'created_at', 'sales_price', 'disc_sales_price', 'staff_hired', 'total_earning_fee', 'total_discount', 'total_earning','status_value']    
-    list_filter = ['team', 'purchase__status']
+    list_display = ['team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action']    
+    list_filter = ['purchase__status']
     readonly_fields = [
-         'purchase','project', 'sales_price', 'earning_fee_charged','discount_offered',
+         'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earnings', 'total_sales_price', 'discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value',
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','project',)}),
-        ('Revenue', {'fields': ('sales_price', 'earning_fee_charged','discount_offered',)}),
-        ('Earning/Profit', {'fields': ('staff_hired','earning',)}),
+        ('Revenue', {'fields': ('total_sales_price', 'earning_fee_charged','discount_offered','is_refunded',)}),
+        ('Earning/Profit', {'fields': ('staff_hired','earning','total_earnings',)}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
+
+    def get_urls(self):
+        urls = super().get_urls()
+        pattern = [
+            path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='application-refund'),
+        ]
+        return pattern + urls
+
+
+    def admin_action(self, obj):
+        return format_html(
+            '<a class="button" href="{}"> Refund</a>',
+            reverse('admin:application-refund', args=[obj.pk]),
+        )
+    
+    admin_action.allow_tags = True
+    admin_action.short_description = 'Admin Action'
+
+    def approve_refund(self, request, pk, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            pk=pk,
+            action_form=ApplicationRefundForm,
+            action_title='About to issue refund. Action is irreversible so be sure',
+        )
+
+    def process_action(self, request, pk, action_form, action_title):
+        account = self.get_object(request, pk)
+        form = ''
+        error_message = ''
+        if request.method != 'POST':
+            form = action_form()
+        else:
+            form = action_form(request.POST)
+            if form.is_valid():
+                try:
+                    form.save(pk)
+                except Exception as e:
+                    error_message = str(e)
+                    print(error_message)
+                    pass
+                else:
+                    self.message_user(request, 'Successfully made refund')
+                    url = reverse('admin:transactions_applicationsale_change', args=[pk], current_app=self.admin_site.name)
+                    return HttpResponseRedirect(url)
+
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        context['form'] = form
+        context['account'] = account
+        context['title'] = action_title
+
+        return TemplateResponse(request, 'admin/account/project_refund.html', context)
+
+
+    def has_add_permission(self, request):        
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 class ProposalSaleAdmin(admin.ModelAdmin):
@@ -59,16 +127,16 @@ class ProposalSaleAdmin(admin.ModelAdmin):
     ]    
     list_filter = ['purchase__status']
     readonly_fields = [
-        'team', 'purchase','proposal', 'sales_price', 'earning_fee_charged','discount_offered',
+        'team', 'purchase','proposal', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged'
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','proposal',)}),
         ('Revenue', {'fields': (
-            'sales_price', 'earning_fee_charged','total_earning_fee_charged', 
+            'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
             'discount_offered','is_refunded',
         )}),
-        ('Earning/Profit', {'fields': ('staff_hired','earning',)}),
+        ('Earning/Profit', {'fields': ('staff_hired','earning','total_earning',)}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 
@@ -82,7 +150,7 @@ class ProposalSaleAdmin(admin.ModelAdmin):
 
     def admin_action(self, obj):
         return format_html(
-            '<a class="button" href="{}"> Issue Refund</a>',
+            '<a class="button" href="{}"> Refund</a>',
             reverse('admin:approve-refund', args=[obj.pk]),
         )
     
@@ -123,8 +191,7 @@ class ProposalSaleAdmin(admin.ModelAdmin):
         context['account'] = account
         context['title'] = action_title
 
-        return TemplateResponse(request, 'admin/account/admin_refund.html', context)
-
+        return TemplateResponse(request, 'admin/account/proposal_refund.html', context)
 
     def has_add_permission(self, request):        
         return False
@@ -143,8 +210,7 @@ class ProposalSaleAdmin(admin.ModelAdmin):
 class ContractSaleAdmin(admin.ModelAdmin):
     model = ContractSale
     list_display = [
-        'team', 'created_at', 'sales_price', 'disc_sales_price','staff_hired', 'total_sales_price', 
-        'earning_fee_charged','total_earning_fee_charged', 'total_discount_offered', 'total_earning','status_value'
+        'team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action'
     ]    
     list_filter = ['purchase__status']
     readonly_fields = [
@@ -154,13 +220,65 @@ class ContractSaleAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','contract',)}),
         ('Revenue', {'fields': (
-            'sales_price', 'earning_fee_charged','total_earning_fee_charged', 
-            'discount_offered',
+            'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
+            'discount_offered','is_refunded',
         )}),
-        ('Earning/Profit', {'fields': ('staff_hired','earning',)}),
+        ('Earning/Profit', {'fields': ('staff_hired','earning','total_earning')}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 
+    def get_urls(self):
+        urls = super().get_urls()
+        pattern = [
+            path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='contract-refund'),
+        ]
+        return pattern + urls
+
+
+    def admin_action(self, obj):
+        return format_html(
+            '<a class="button" href="{}"> Refund</a>',
+            reverse('admin:contract-refund', args=[obj.pk]),
+        )
+    
+    admin_action.allow_tags = True
+    admin_action.short_description = 'Admin Action'
+
+    def approve_refund(self, request, pk, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            pk=pk,
+            action_form=ContractRefundForm,
+            action_title='About to issue refund. Action is irreversible so be sure',
+        )
+
+    def process_action(self, request, pk, action_form, action_title):
+        account = self.get_object(request, pk)
+        form = ''
+        error_message = ''
+        if request.method != 'POST':
+            form = action_form()
+        else:
+            form = action_form(request.POST)
+            if form.is_valid():
+                try:
+                    form.save(pk)
+                except Exception as e:
+                    error_message = str(e)
+                    print(error_message)
+                    pass
+                else:
+                    self.message_user(request, 'Successfully made refund')
+                    url = reverse('admin:transactions_contractsale_change', args=[pk], current_app=self.admin_site.name)
+                    return HttpResponseRedirect(url)
+
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        context['form'] = form
+        context['account'] = account
+        context['title'] = action_title
+
+        return TemplateResponse(request, 'admin/account/contract_refund.html', context)
 
     def has_add_permission(self, request):        
         return False
@@ -199,6 +317,8 @@ class SubscriptionItemAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
+
+
 
 admin.site.register(OneClickPurchase, OneClickPurchaseAdmin)
 admin.site.register(Purchase, PurchaseAdmin)
