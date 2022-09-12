@@ -247,11 +247,6 @@ EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 
 
-USE_HTTPS = 'https://'
-USE_HTTP = 'http://'
-WEBSITE_URL = 'http://127.0.0.1:8000'
-ACCEPTATION_URL = WEBSITE_URL + '/account/register/'
-
 ADMINS = (
     ('Trosgate', 'voistudio@gmail.com'),
 )

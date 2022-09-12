@@ -45,11 +45,16 @@ urlpatterns = [
     path('externalcontract/<str:contract_id>/<slug:contract_slug>/', views.final_external_contract, name='final_external_contract'),
         
     # Urls for internal contracts chats   
-    path('discord/<int:contract_id>/<slug:contract_slug>/', views.contract_chat, name='contract_discord'),
-    path('contract_chatroom/<int:contract_id>/', views.contract_chatroom, name='contract_chatroom'),
     path('modify/<int:contractor_id>/', views.update_contractor, name='update_contractor'),
     path('delete/<int:contractor_id>/', views.delete_contractor, name='delete_contractor'),
 
 ]
+htmx_urlpatterns = [
+    path('discord/<int:contract_id>/<slug:contract_slug>/', views.contract_chat, name='contract_discord'),
+    path('message/<int:contract_id>', views.create_contract_chat, name='create_contract_chat'),
+    path('fetch/<int:contract_id>', views.fetch_messages, name='fetch_messages'),
+]
+
+urlpatterns += htmx_urlpatterns
 
 

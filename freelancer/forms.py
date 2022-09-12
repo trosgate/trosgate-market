@@ -11,6 +11,8 @@ from account.fund_exception import FundException
 from notification.mailer import send_credit_to_team
 from general_settings.fund_control import get_min_deposit, get_max_deposit
 from teams.models import Team
+from payments.forms import PaymentChallengeForm
+
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -204,6 +206,34 @@ class AdminCreditForm(BaseAccountForm):
             created_at = timezone.now()
         )
 
+
+class LockFundForm(forms.Form):
+    message = forms.CharField(widget=forms.Textarea(attrs={'cols': 100, 'rows': 20}), help_text='This is where you will have to write the email from Salutation(e.g Dear John Doe), body of mail explaining why the account will be locked temporarily. IMPORTANT: Explicitly add a message that they should check back later to see if account is unlocked. This is because user will not receive mail when account is unlocked', required=True)
+
+    def form_action(self, account, message):
+        
+        if account is None:
+            raise FundException(_("Erro occured. Try later"))
+
+        if message == '':
+            raise FundException(_("Message is required"))
+
+    def save(self, account, message):
+        try:
+            action = self.form_action(account, message)
+        except Exception as e:
+            error_message = str(e)
+            self.add_error(None, error_message)           
+            raise
+        return action
+
+    field_order = ('message')
+
+    def form_action(self, account, message):
+        return FreelancerAccount.lock_freelancer_fund(
+            pk=account.pk,
+            message = self.cleaned_data['message'],
+        )
 
 
 

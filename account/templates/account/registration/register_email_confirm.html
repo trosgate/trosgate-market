@@ -1,2 +1,42 @@
 {% extends 'dashboard/main_base.html' %}
-Please confirm email
+{% load i18n static %}
+
+{% load static %}
+
+{% block content %}
+
+					
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+					<div class="wt-title"><h2>Follow your Mail</h2></div>
+					</div>					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row justify-content-md-center">				
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+			<div class="wt-dashboardbox">
+				<div class="wt-dashboardboxcontent wt-rcvproposala">
+					<div class="wt-freelancerholder wt-rcvproposalholder">												
+						<div class="wt-tabscontenttitle">
+                            <h3 class="mb-4">We have sent a mail</h3>
+							<div class="alert alert-success" role="alert">
+                                <span style="color: blue; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+									Info: Please we have sent you a mail. Kindly follow your mail to get instructions on how to complete registration, Thank you
+								</span>
+							</div>
+						</div>									 
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+

@@ -123,46 +123,31 @@ class Proposal(models.Model):
 
     def save(self, *args, **kwargs):
         super(Proposal, self).save(*args, **kwargs)
-        if self.thumbnail:
-            new_thumbnail = Image.open(self.thumbnail.path)
-            if new_thumbnail.height > 769 or new_thumbnail.width > 1280:
-                output_size = (769, 1280)
-                new_thumbnail.thumbnail(output_size)
-                new_thumbnail.save(self.thumbnail.path)
+        # if self.thumbnail:
+        #     new_thumbnail = Image.open(self.thumbnail.path)
+        #     if new_thumbnail.height > 769 or new_thumbnail.width > 1280:
+        #         output_size = (769, 1280)
+        #         new_thumbnail.thumbnail(output_size)
+        #         new_thumbnail.save(self.thumbnail.path)
 
 
     def percent_progress(self):
         return f'{self.progress}%'
 
-    # def num_tasks_todo(self):
-    #     return self.assignproposal.filter(status=Task.TODO).count()
 
-    # def get_kt_thumbnail(self):
-    #     if self.thumbnail:
-    #         return self.thumbnail.url
-    #     else:
-    #         self.thumbnail = self.make_kt_thumbnail()
-    #         self.save()
-    #         return self.thumbnail.url
 
-    # def make_kt_thumbnail(self, image, size=(300,200)):
-    #     img = Image.open(image)
-    #     img.convert('RGB')
-    #     img.thumbnail(size)
-
-    #     thumb_io = BytesIO()
-    #     img.save(thumb_io, 'JPEG', quality=85)
-
-    #     thumbnail=File(thumb_io, name=image.name)
-
-    #     return thumbnail
+class ProposalSupport(Proposal):
+    class Meta:
+        proxy=True
+        ordering = ['created_at']
+        verbose_name = _("Proposal Support")
+        verbose_name_plural = _("Proposal Support")
 
 
 class ProposalChat(models.Model):
     team = models.ForeignKey('teams.Team', verbose_name=_("Proposal Team"), related_name='proposalchats', on_delete=models.CASCADE)
     proposal = models.ForeignKey(Proposal, verbose_name=_("Proposal"), related_name='proposalschats', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='proposalsender', on_delete=models.CASCADE)
-    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name='proposalreceiver', on_delete=models.CASCADE)
     content = models.TextField()
     sent_on = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
@@ -171,7 +156,7 @@ class ProposalChat(models.Model):
         ordering = ['sent_on']
 
     def __str__(self):
-        return self.content[:50] + '...'
+        return f'Message sent by {self.sender.get_full_name()}'
 
 
 

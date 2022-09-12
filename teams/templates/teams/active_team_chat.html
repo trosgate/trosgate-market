@@ -9,11 +9,10 @@
                     <div class="row justify-content-md-center">
                         <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
                             <div class="wt-innerbannercontent">
-                            <div class="wt-title"><h2>Info Desk</h2></div>
+                            <div class="wt-title"><h2>Team Chatroom</h2></div>
 								<ol class="wt-breadcrumb">
 									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-									{% comment %} <li><a href="{% url 'teams:team_single' team.id %}">Team</a></li> {% endcomment %}
-									<li class="wt-active">Group Chat</li>
+									<li class="wt-active">Team Chat</li>
 								</ol>
 							</div>					
                         </div>
@@ -31,14 +30,12 @@
                                 <!--form Start-->
                                     <div class="wt-author">
                                         <div class="wt-authordetails">
-                                            <figure>
-                                                <a href="javascript:void(0);"><img src="{% static 'images/messages/img-12.jpg' %}" alt="image description"></a>
-                                            </figure>
+                                            <figure><img src="{% if active_team.created_by.freelancer.profile_photo %}{{ active_team.created_by.freelancer.profile_photo.url }}{% endif %}" alt="image description"></figure>
                                             <div class="wt-authorcontent">
                                                 <div class="wt-authorhead">
                                                     <div class="wt-boxleft">
-                                                        <h3><a href="javascript:void(0);">{% if admin.short_name %}{{admin.short_name}} {% else %} Admin Team {% endif %} (Moderator)</a></h3>
-                                                        <span><i class="lnr lnr-clock"></i> Admin Last Active: {{date_and_time}}</span>
+                                                        <h3><a href="javascript:void(0);">Manager</a></h3>
+                                                        <span><i class="lnr lnr-clock"></i> Admin Last Active: {{active_team.created_by.last_joined}}</span>
                                                     </div>
                                                     <div class="wt-boxright">
                                                         <ul class="wt-socialiconssimple">
@@ -57,11 +54,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="wt-comments">
-                                        {% with chats.count as total_messages %}
-                                        <h2>{{total_messages}} message{{total_messages|pluralize}}</h2>
-                                        {% endwith %}
-                                    <div>
                                             
                                     <div id="display-messages" hx-get="{% url 'teams:teamchatroom' %}" hx-trigger="every 1s" hx-swap="innerhtml">
                                         {% include 'teams/components/partial_team_message.html' %}
@@ -70,13 +62,12 @@
                                     <div>
                                         <div class="wt-replaybox">
                                             <div class="form-group">
-                                                <textarea type="text" name="content" class="form-control" placeholder="start typing..."></textarea>
+                                                <textarea id="id_content" type="text" name="content" class="form-control" placeholder="start typing..."></textarea>
                                             </div>
                                             <div class="wt-iconbox">
-                                                <i class="lnr lnr-thumbs-up"></i>
-                                                <i class="lnr lnr-thumbs-down"></i>
-                                                <i class="lnr lnr-smile"></i>
-                                                <button hx-post="{% url 'teams:teamchat' %}" hx-target="#display-messages" type="submit" class="wt-btnsendmsg">Send</button>
+                                                {% comment %} <i class="ti-announcement"></i> {% endcomment %}
+                                                <span class="float-left text-center" style="color:green;">Ask questions about this proposal or help others</span>
+                                                <button id="newMessage" hx-post="{% url 'teams:teamchat' %}" hx-target="#display-messages" type="submit" class="wt-btnsendmsg">Send</button>
                                             </div>
                                         </div>
                                     </div>
@@ -90,7 +81,14 @@
                 document.body.addEventListener('htmx:configRequest', (event) =>{
                     event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
                 });
+
             </script>
-        
+            <script>
+                $(document).on("click", "#newMessage", function(){
+                    $("#id_content").val('')
+                })
+            </script>
+
 {% endblock content %}
+
 

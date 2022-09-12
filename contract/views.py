@@ -1223,31 +1223,32 @@ def contract_success(request):
 # same contract can be applied many times so add contract ID to params --TODO
 def contract_chat(request, contract_id, contract_slug):
     if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[
-                                 request.user], status=Team.ACTIVE)
-        contract = get_object_or_404(
-            InternalContract, pk=contract_id, slug=contract_slug, team=team)
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+        contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, team=team)
 
     elif request.user.user_type == Customer.CLIENT:
-        contract = get_object_or_404(
-            InternalContract, pk=contract_id, slug=contract_slug, created_by=request.user)
-
-    content = request.POST.get('content', '')
-
-    if content:
-        ContractChat.objects.create(content=content, contract=contract,
-                                    team=contract.proposal.team, sender=request.user)  # team__proposal=team,
+        contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, created_by=request.user)
 
     chats = ContractChat.objects.all()
     return render(request, 'contract/contract_chat.html', {'chats': chats, 'contract': contract})
 
 
 @login_required
-def contract_chatroom(request,  contract_id):
+def create_contract_chat(request,  contract_id):
     contract = get_object_or_404(InternalContract, pk=contract_id)
-    chats = contract.contractclientchat.all()
-    if request.htmx:
-        return render(request, 'contract/components/partial_contract_message.html', {'chats': chats})
+    
+    content = request.POST.get('content', '')
+    if content != '':
+        ContractChat.objects.create(content=content, contract=contract, team=contract.team, sender=request.user)
+    
+    chats = ContractChat.objects.filter(contract=contract, team=contract.team)   
+    return render(request, 'contract/components/partial_contract_message.html', {'chats': chats})
 
-    return render(request, 'contract/contract_chat.html', {'chats': chats})
+
+@login_required
+def fetch_messages(request,  contract_id):
+    contract = get_object_or_404(InternalContract, pk=contract_id)
+    chats = ContractChat.objects.filter(contract=contract, team=contract.team)   
+    return render(request, 'contract/components/partial_contract_message.html', {'chats': chats})
+
 

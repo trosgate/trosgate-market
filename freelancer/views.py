@@ -237,16 +237,16 @@ def transfer_debit(request):
                 position=position
             )
             mes = f'The amount ${debit_amount} was successfully transfered to {staff.get_full_name()}'
-            message = f'<span id="debit-message" class="alert alert-info" style="color:green; text-align:right;">{mes}</span>'
+            message = f'<span id="debit-message" style="color:green; text-align:right;">{mes}</span>'
         
         except FundException as e:
             mes = str(e)
-            message = f'<span id="debit-message" class="alert alert-danger" style="color:red; text-align:right;">{mes}</span>'
+            message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
 
         response = JsonResponse({'message': message})
         return response
 
-    response = JsonResponse({'message': f'<span id="debit-message" class="alert alert-danger" style="color:red; text-align:right;">Bad request. Contact Support</span>'})
+    response = JsonResponse({'message': f'<span id="debit-message" style="color:red; text-align:right;">Bad request. Contact Support</span>'})
     return response
 
 
@@ -277,7 +277,7 @@ def withdrawal_debit(request):
             message = f'The withdrawal for ${withdraw_amount} was initiated'
         except FundException as e:
             mes = str(e)
-            message = message = f'<span id="debit-message" class="alert alert-danger" style="color:red; text-align:right;">{mes}</span>'
+            message = message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
 
         return JsonResponse({'message': message})
 

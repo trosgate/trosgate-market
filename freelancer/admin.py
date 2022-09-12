@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from .models import Freelancer, FreelancerAction, FreelancerAccount
-from .forms import AdminCreditForm
+from .forms import AdminCreditForm, LockFundForm
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from account.fund_exception import FundException
+from django.db import transaction as db_transaction
 
 MAX_OBJECTS = 0
 
@@ -44,14 +45,16 @@ class FreelancerAdmin(admin.ModelAdmin):
 
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
-    list_display = ['user', 'created_at', 'pending_balance', 'available_balance', 'admin_action']
-    readonly_fields = ['user', 'created_at', 'pending_balance', 'available_balance', 'admin_action']
+    list_display = ['user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
+    readonly_fields = ['user', 'created_at', 'pending_balance', 'available_balance','lock_fund', 'admin_action']
     list_select_related = ('user',)
-    
+    actions = ['unlock_single_or_bulk_account']
+
     def get_urls(self):
         urls = super().get_urls()
         pattern = [
             path('<int:account_id>/credit/', self.admin_site.admin_view(self.initiate_memo), name='account-credit'),
+            path('<int:account_id>/lock-fund/', self.admin_site.admin_view(self.lock_fund), name='lock-fund'),
         ]
         return pattern + urls
 
@@ -61,9 +64,15 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
             '<a class="button" href="{}"> Initiate Memo</a>',
             reverse('admin:account-credit', args=[obj.pk]),
         )
+
+    def admin_lock(self, obj):
+        return format_html(
+            '<a class="button" href="{}"> Hold Fund</a>',
+            reverse('admin:lock-fund', args=[obj.pk]),
+        )
     
     admin_action.allow_tags = True
-    admin_action.short_description = 'Admin Action'
+    admin_action.short_description = 'Admin Lock'
 
     def initiate_memo(self, request, account_id, *args, **kwargs):
         return self.process_action(
@@ -71,6 +80,14 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
             account_id=account_id,
             action_form=AdminCreditForm,
             action_title='Warning!: If you encounter error like "[Errno 11001] getaddrinfo failed", it means email was not sent to SuperAdmin due to low network from you. But it is possible that memo was initiated so verify first before re-attempting',
+        )
+
+    def lock_fund(self, request, account_id, *args, **kwargs):
+        return self.process_lock(
+            request=request,
+            account_id=account_id,
+            action_form=LockFundForm,
+            action_title='Warning!: This message is the actual mail going to the User directly. Write it in email format of your organization',
         )
 
     def process_action(self, request, account_id, action_form, action_title):
@@ -90,7 +107,7 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
                     print(error_message)
                     pass
                 else:
-                    self.message_user(request, 'Successfully initiated memo')
+                    self.message_user(request, 'Successfully initiated credit memo')
                     url = reverse('admin:freelancer_freelanceraccount_change', args=[account.pk], current_app=self.admin_site.name)
                     return HttpResponseRedirect(url)
 
@@ -101,6 +118,40 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
         context['title'] = action_title
 
         return TemplateResponse(request, 'admin/account/admin_credit.html', context)
+
+
+    def process_lock(self, request, account_id, action_form, action_title):
+        account = self.get_object(request, account_id)
+        form = ''
+        error_message = ''
+        if request.method != 'POST':
+            form = action_form()
+        else:
+            form = action_form(request.POST)
+            if form.is_valid():
+                try:
+                    form.save(account, form.cleaned_data['message'])
+                except Exception as e:
+                    error_message = str(e) 
+                    print(error_message)
+                    pass
+                else:
+                    self.message_user(request, 'Successfully locked fund')
+                    url = reverse('admin:freelancer_freelanceraccount_change', args=[account.pk], current_app=self.admin_site.name)
+                    return HttpResponseRedirect(url)
+
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        context['form'] = form
+        context['account'] = account
+        context['title'] = action_title
+
+        return TemplateResponse(request, 'admin/account/admin_lock.html', context)
+
+
+    def unlock_single_or_bulk_account(self, request, queryset):
+        self.message_user(request, 'Successfully unlocked account')
+        queryset.update(lock_fund = False)
 
 
     def has_add_permission(self, request):

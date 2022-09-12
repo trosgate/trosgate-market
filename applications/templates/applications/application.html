@@ -21,66 +21,64 @@
 		</div>
 		<!--Inner Home End-->
 			<!--Main Start-->
-		<main class="wt-main wt-haslayout wt-innerbgcolor">
-				<div class="wt-haslayout wt-main-section"> 
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2">
-							
-								<div class="wt-proposalholder">
-									<div class="wt-proposalhead">
-										<div class="wt-proposalhead">
-											<h2>{{project.title}}</h2>
-											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-												<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{project.get_service_level_display}}</span></li>
-												<li><span><i class="far fa-money-bill-alt"></i> Type: {{project.get_project_type_display}}</span></li>
-												<li><span><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>
-												<li><span><i class="far fa-clock"></i> Budget: ${{project.amount}}</span></li>
-											</ul>
-										</div>
-									</div>
+		<div class="wt-haslayout wt-main-section"> 
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2">
+					
+						<div class="wt-proposalholder">
+							<div class="wt-proposalhead">
+								<div class="wt-proposalhead">
+									<h2>{{project.title}}</h2>
+									<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+										<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{project.get_service_level_display}}</span></li>
+										<li><span><i class="far fa-money-bill-alt"></i> Type: {{project.get_project_type_display}}</span></li>
+										<li><span><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>
+										<li><span><i class="far fa-clock"></i> Budget: ${{project.amount}}</span></li>
+									</ul>
 								</div>
-							{% if can_apply_for_project %}
-							<form method="POST" enctype="multipart/form-data"> {% csrf_token %}
-								<div class="wt-proposalholder"> 
-									<div class="wt-proposalamount-holder">
-										<div class="form-group">
-												{{applyform.budget.label}}
-												{{applyform.budget}}
-										</div>										
-										<div class="form-group">
-												{{applyform.message.label}}
-												{{applyform.message}}
-										</div>													
-										<div class="form-group">																																														
-												{{applyform.estimated_duration.label}}
-												{{applyform.estimated_duration}}
-										</div>
-									</div>
-								</div>
-							<div class="wt-updatall">
-								<i class="ti-announcement"></i>
-								<span>Apply by just clicking on “Apply Now” button.</span>
-								<button type="submit" class="wt-btn"> Apply Now </button>
 							</div>
 						</div>
-					</form>
-					{% else %}
-					<div class="wt-btnarea text-center alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-							{% if active_team.package.type == 'Basic' and active_team.created_by == request.user %} 
-							Maximum application threshold reached but you can change that. <a href="{% url 'teams:packages' %}"> Please upgrade </a>
-							{% elif active_team.package.type == 'Basic' and active_team.created_by != request.user %} 
-							Please prompt your team founder to upgrade
-							{% elif active_team.package.type == 'Team' %}
-							Maximum application limit reached for this Team
-							{% endif %}
-						</span>
-					</div>	
-					{% endif %}
+					{% if can_apply_for_project %}
+					<form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+						<div class="wt-proposalholder"> 
+							<div class="wt-proposalamount-holder">
+								<div class="form-group">
+									{{applyform.budget.label}}
+									{{applyform.budget}}
+								</div>										
+								<div class="form-group">
+									{{applyform.message.label}}
+									{{applyform.message}}
+								</div>													
+								<div class="form-group">																																														
+									{{applyform.estimated_duration.label}}
+									{{applyform.estimated_duration}}
+								</div>
+							</div>
+						</div>
+					<div class="wt-updatall">
+						<i class="ti-announcement"></i>
+						<span>Apply by just clicking on “Apply Now” button.</span>
+						<button type="submit" class="wt-btn"> Apply Now </button>
+					</div>
 				</div>
+			</form>
+			{% else %}
+			<div class="wt-btnarea text-center alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+					{% if active_team.package.type == 'Basic' and active_team.created_by == request.user %} 
+					Maximum application threshold reached but you can change that. <a href="{% url 'teams:packages' %}"> Please upgrade </a>
+					{% elif active_team.package.type == 'Basic' and active_team.created_by != request.user %} 
+					Please prompt your team founder to upgrade
+					{% elif active_team.package.type == 'Team' %}
+					Maximum application limit reached for this Team
+					{% endif %}
+				</span>
+			</div>	
+			{% endif %}
+		</div>
 			<!-- User Listing End-->
-		</main>
 		<!--Main End-->
 
 {% endblock %} 

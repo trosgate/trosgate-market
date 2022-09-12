@@ -1,0 +1,17 @@
+{% load i18n %}{% autoescape off %}
+{% load static %} 
+{% block content %}
+
+Hello {{ website_name }} Admin,
+
+This is a Test email. 
+
+You are receiving this mail because you wanted to test your email settings"
+
+Everything looks fine now so all the best
+
+{% endblock %}
+
+{% blocktranslate %}Thank you, the {{ website_name }} team {% endblocktranslate %}
+
+{% endautoescape %}

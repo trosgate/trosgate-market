@@ -1,7 +1,7 @@
 import random
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Proposal
+from .models import Proposal, ProposalChat
 from teams.models import Team
 from django.contrib.auth.decorators import login_required
 from .forms import ProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalChatForm
@@ -17,7 +17,8 @@ from account.models import Country
 from django.template.loader import render_to_string
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from teams.controller import PackageController
-
+from account.models import Customer
+from client.models import Client
 
 #this will appear in search results
 def proposal_listing(request):
@@ -510,12 +511,6 @@ def reactivate_archive_proposal(request, short_name, proposal_slug):
     return redirect('proposals:archive_proposal_page')
 
 
-# @login_required
-# @user_is_freelancer
-# def modify_proposal_page(request, proposal_slug):
-#     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-#     Proposal.objects.filter(team=team, slug=proposal_slug).update(status = Proposal.MODIFY)
-
 
 @login_required
 @user_is_freelancer
@@ -579,29 +574,60 @@ def proposal_detail(request, short_name, proposal_slug):
 
 
 @login_required
-@user_is_freelancer
-def proposal_chat_messages(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
-    chats = team.proposalchats.all() #.filter(status = Proposal.ACTIVE)
+def proposal_chat_messages(request, short_name, proposal_slug):
+    proposal=None
+    if request.user.user_type == Customer.FREELANCER:    
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+        proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team, created_by__short_name=short_name)
+
+    elif request.user.user_type == Customer.CLIENT:
+        proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name)
+
+    proposalchatform = ProposalChatForm()
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
 
     context = {
-        'team':team,
+        'proposalchatform':proposalchatform,
+        'proposal':proposal,
         'chats':chats,
     }
+
     return render(request, 'proposals/chat_messages.html', context)
     
 
 
 @login_required
-@user_is_freelancer
-def proposal_chat_details(request, proposal_slug):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE) 
-    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
-    chat_form = ProposalChatForm()
-    context = {
-        'team':team,
-        'chat_form':chat_form,
-    }
-    return render(request, 'proposals/chat_messages_details.html', context)
+def create_message(request, proposal_id):
+    proposal = get_object_or_404(Proposal, pk=proposal_id)
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
 
-    # ProposalChatForm
+    content = request.POST.get('content', '')
+    if content != '':
+        ProposalChat.objects.create(
+            content=content, 
+            proposal=proposal,
+            team=proposal.team, 
+            sender=request.user
+        )
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
+    context = {
+        'proposal':proposal,
+        'chats':chats,
+    }    
+    
+    return render(request, 'proposals/components/partial_proposal.html', context)
+
+
+
+@login_required
+def fetch_messages(request, proposal_id):
+    proposal = get_object_or_404(Proposal, pk=proposal_id)
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
+    context = {
+        'proposal':proposal,
+        'chats':chats,
+    }
+
+    return render(request, 'proposals/components/partial_proposal.html', context)
+
+    

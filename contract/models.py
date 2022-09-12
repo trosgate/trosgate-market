@@ -26,38 +26,6 @@ from account.fund_exception import ContractException
 from notification.mailer import send_contract_accepted_email, send_contract_rejected_email
 
 
-        # if self.contract_duration == self.ONE_DAY:
-        #     self.duration = one_day()
-        # if self.contract_duration == self.TWO_DAYS:
-        #     self.duration = two_days()
-        # if self.contract_duration == self.THREE_DAYS:
-        #     self.duration = three_days()
-        # if self.contract_duration == self.FOUR_DAYS:
-        #     self.duration = four_days()
-        # if self.contract_duration == self.FIVE_DAYS:
-        #     self.duration = five_days()
-        # if self.contract_duration == self.SIX_DAYS:
-        #     self.duration = six_days()
-        # if self.contract_duration == self.ONE_WEEK:
-        #     self.duration = one_week()
-        # if self.contract_duration == self.TWO_WEEK:
-        #     self.duration = two_weeks()
-        # if self.contract_duration == self.THREE_WEEK:
-        #     self.duration = three_weeks()
-        # if self.contract_duration == self.ONE_MONTH:
-        #     self.duration = one_month()
-        # if self.contract_duration == self.TWO_MONTH:
-        #     self.duration = two_months()
-        # if self.contract_duration == self.THREE_MONTH:
-        #     self.duration = three_months()
-        # if self.contract_duration == self.FOUR_MONTH:
-        #     self.duration = four_months()
-        # if self.contract_duration == self.FIVE_MONTH:
-        #     self.duration = five_months()
-        # if self.contract_duration == self.SIX_MONTH:
-        #     self.duration = six_months()
-
-
 class InternalContract(models.Model):
     """
     This is the Internal contract Model
@@ -146,8 +114,7 @@ class InternalContract(models.Model):
     line_five_total_price = models.PositiveIntegerField(_('Total'), default=0, blank=True, null=True)
 
     grand_total = models.PositiveIntegerField(_('Grand Total'), default=0, blank=True, null=True)  
-     
-    
+        
     def __str__(self):
         return self.proposal.title
 
@@ -323,7 +290,6 @@ class ContractChat(models.Model):
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='contractchatsender', on_delete=models.PROTECT)    
     content = models.TextField()
     sent_on = models.DateTimeField(auto_now_add=True)
-
 
     def __str__(self):
         return self.team.title

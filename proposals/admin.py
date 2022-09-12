@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Proposal, ProposalChat
+from .models import Proposal, ProposalSupport, ProposalChat
 from django import forms
 
 
@@ -28,27 +28,69 @@ class ProposalAdmin(admin.ModelAdmin):
         queryset.update(published = False)
 
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     def get_actions(self, request):
         actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
 
+
+class ProposalSupportInline(admin.StackedInline):
+    model = ProposalChat
+    list_display = ['team', 'sender', 'sent_on','content']
+    readonly_fields = ['team', 'sender', 'sent_on','content']
+    extra = 0
+
+    fieldsets = (
+        ('Reply Messages', {'fields': ('sender', 'content', 'sent_on',)}),
+    )
+
+
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
 
-class ProposalChatAdmin(admin.ModelAdmin):
-    model = ProposalChat
-    list_display = ['team', 'sender', 'receiver', 'sent_on','content']
-    list_display_links = ['team']
-    search_fields = ['team']
-    list_filter = ['team']
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
+
+class ProposalSupportAdmin(admin.ModelAdmin):
+    model = ProposalSupport
+    list_display = ['team', 'title', 'created_at']
+    list_display_links = ['team','title',]
+    readonly_fields = ['team', 'title']
+    search_fields = ['team__title', 'title']
+
+    fieldsets = (
+        ('Proposal Info', {'fields': ('team', 'title',)}),
+    )
+    inlines = [ProposalSupportInline]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 admin.site.register(Proposal, ProposalAdmin)
-admin.site.register(ProposalChat, ProposalChatAdmin)
+admin.site.register(ProposalSupport, ProposalSupportAdmin)
 
 
 

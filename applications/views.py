@@ -38,7 +38,7 @@ from general_settings.fees_and_charges import get_application_fee_calculator
 from django.db import transaction as db_transaction
 from freelancer.models import FreelancerAccount
 from teams.controller import PackageController
-
+from notification.mailer import application_notification
 
 @login_required
 @user_is_freelancer
@@ -55,7 +55,7 @@ def apply_for_project(request, project_slug):
         return redirect("projects:project_detail", project_slug=project.slug)
 
     if request.method == 'POST':
-        applyform = ApplicationForm(request.POST, request.FILES)
+        applyform = ApplicationForm(request.POST or None)
 
         if applyform.is_valid():
             application = applyform.save(commit=False)
@@ -65,8 +65,10 @@ def apply_for_project(request, project_slug):
             application.save()
 
             messages.info(request, 'Your application was created successfully!')
-            # utility function called for notification
-            create_notification(request, project.created_by, 'application', slug=project.slug)
+            try:
+                application_notification(application)
+            except:
+                print('application mail not sent')
 
             return redirect(reverse("applications:freelancer_application"))
 

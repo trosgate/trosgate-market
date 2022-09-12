@@ -5,6 +5,10 @@ from .forms import PasswordResetForm, PasswordResetConfirmForm
 from django.views.generic import TemplateView
 from . import views
 from . validators import verify_username, verify_team, user_types
+from general_settings.utilities import (
+    website_name,
+    get_protocol_with_domain_path,
+)
 
 app_name = 'account'
 
@@ -27,6 +31,7 @@ urlpatterns = [
         template_name="account/user/password_reset_form.html",
         success_url="password_reset_email_confirm",
         email_template_name="account/user/password_reset_email.html",
+        extra_context = {'protocol_with_domain_path':get_protocol_with_domain_path(), 'website_name':website_name()},
         form_class=PasswordResetForm,
     ),
         name="passwordreset",
@@ -34,6 +39,7 @@ urlpatterns = [
     path("password_reset_confirm/<uidb64>/<token>", auth_views.PasswordResetConfirmView.as_view(
         template_name="account/user/password_reset_confirm.html",
         success_url="/password_reset_complete/",
+        extra_context = {'protocol_with_domain_path':get_protocol_with_domain_path(), 'website_name':website_name()},        
         form_class=PasswordResetConfirmForm,
     ),
         name="password_reset_confirm",

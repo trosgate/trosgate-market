@@ -352,7 +352,7 @@
 										</div>
 									</div>
 									<div class="wt-clicksavearea">
-										<a href="javascrip:void(0);" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Chat Me</a>
+										<a href="{% url 'proposals:proposal_chat_messages' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Chat Me</a>
 									</div>
 								</div>
 									

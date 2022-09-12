@@ -13,11 +13,7 @@ from account.models import Customer
 from teams.models import Team
 from applications.models import Application
 from django.http import JsonResponse
-from django.conf import settings
 from django.contrib import messages
-import requests
-import base64
-import json
 from django.http import HttpResponseRedirect, HttpResponse
 from notification.utilities import create_notification
 
@@ -48,17 +44,14 @@ def create_project(request):
 
 
 def project_single(request, project_slug):
-    # if request.user.user_type == Customer.CLIENT:
     project = get_object_or_404(Project, slug=project_slug)
     profile_view = get_object_or_404(Client, user=project.created_by, user__is_active=True)
     applications = Application.objects.filter(project = project)
-    # application_limit = monthly_projects_applicable_per_team(request)
 
     context = {
         "projectdetail": project,
         'project':project,  
         'profile_view':profile_view,  
-        # 'application_limit':application_limit,  
         'applications':applications,  
   
     }

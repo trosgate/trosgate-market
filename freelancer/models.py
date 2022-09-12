@@ -20,7 +20,7 @@ from general_settings.fund_control import (
 )
 from payments.models import PaymentRequest, AdminCredit
 from general_settings.storage_backend import activate_storage_type, DynamicStorageField
-from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email
+from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email, lock_fund_email
 from PIL import Image
 
 
@@ -125,7 +125,6 @@ class Freelancer(models.Model):
     banner_tag.short_description = 'banner_photo'
 
 
-
 class FreelancerAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='fundtransferuser', on_delete=models.PROTECT,)
     reference = models.UUIDField(unique=True, verbose_name="Reference Number", editable=False, default=uuid.uuid4,)
@@ -133,6 +132,7 @@ class FreelancerAccount(models.Model):
     available_balance = models.PositiveIntegerField(_("Account Balance"), default=0, help_text=_("Min of $20 and Max of $500 per transaction"),)
     created_at = models.DateTimeField(auto_now=True,)
     modified_on = models.DateTimeField(auto_now=True,)
+    lock_fund = models.BooleanField(_("Lock Fund"), default=False,)
 
     class Meta:
         verbose_name = 'Freelancer Account'
@@ -140,6 +140,20 @@ class FreelancerAccount(models.Model):
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
+
+   
+    @classmethod
+    def lock_freelancer_fund(cls, pk:int, message):
+        with db_transaction.atomic():
+            account = cls.objects.select_for_update().get(pk=pk)
+            if account.lock_fund != False:
+                raise Exception(_("Error! The account is already locked"))
+            account.lock_fund = True
+            account.save()
+
+            db_transaction.on_commit(lambda: lock_fund_email(account, message))
+
+        return account
 
 
     @classmethod
@@ -219,6 +233,9 @@ class FreelancerAccount(models.Model):
             if team_owner == '':
                 raise FundException(_('You must be team Owner to transfer'))
 
+            if team_manager.lock_fund == True:
+                raise FundException(_("Sorry! Your account is temporarily locked. Try again later"))
+
             if not (int(get_min_transfer()) <= int(debit_amount) <= int(get_max_transfer())):
                 raise FundException(_(f'Transfer amount is out of range {get_min_transfer()} to {get_max_transfer()}'))
 
@@ -277,6 +294,9 @@ class FreelancerAccount(models.Model):
 
             if gateway is None:
                 raise FundException(_("Payment Account is required"))
+
+            if freelancer_account.lock_fund == True:
+                raise FundException(_("Sorry! Your account is temporarily locked. Try again later"))
 
             if team.created_by != team_owner:
                 raise FundException(_('You must be team Owner to transfer'))

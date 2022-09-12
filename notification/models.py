@@ -27,7 +27,7 @@ soon to add choices like following
         (ORDER, _("Order")),
     )
 '''
-class Notification(models.Model):
+class Notification(models.Model): #Will be changed to Announcement from Admin
 
     APPLICATION = 'application'
     MESSAGE = 'message'

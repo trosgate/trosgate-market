@@ -1,16 +1,42 @@
-
 {% extends 'dashboard/main_base.html' %}
-{% block title %}Invalid Activation{% endblock %}
-{% block content %}
-<br>
-<br>
-<br>
-<br>
-<div class="container">
-    <div>
-        <h3 class="mb-4">Error</h3>
-        <p>Please contact our support team</p>
-    </div>
-</div>
+{% load i18n static %}
 
+{% load static %}
+
+{% block content %}
+
+					
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+					<div class="wt-title"><h2>Error Occured</h2></div>
+					</div>					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row justify-content-md-center">				
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+			<div class="wt-dashboardbox">
+				<div class="wt-dashboardboxcontent wt-rcvproposala">
+					<div class="wt-freelancerholder wt-rcvproposalholder">												
+						<div class="wt-tabscontenttitle">
+                            <h3 class="mb-4">Something went wrong</h3>
+							<div class="alert alert-danger" role="alert">
+                                <span style="color: black; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+									Info: Sorry! An error occured. It could be that the path does not exist or it expired
+								</span>
+							</div>
+						</div>									 
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
+
+

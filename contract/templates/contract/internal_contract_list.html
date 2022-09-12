@@ -44,11 +44,11 @@
                                         <th>#</th>
                                         <th>Contract #</th>
                                         <th>Created By</th>
-                                        <th>Proposal</th>
                                         <th>Created On</th>
                                         <th>Completion</th>
                                         <th>Budget($)</th>
                                         <th>Status</th>
+                                        <th>Message</th>
                                         {% if active_team.created_by == request.user %}
                                         <th>Actions</th>
                                         {% endif %}
@@ -61,7 +61,6 @@
                                     <td>{{forloop.counter}} </td>
                                     <td>{{contract.reference}}</td>
                                     <td>{{contract.created_by.get_short_name}}</td>
-                                    <td>{{contract.proposal.title}}</td>
                                     <td>{{contract.date_created|date:"M-d-Y"}}</td>
                                     <td>{{contract.get_contract_duration_display}}</td>
                                     <td>{{contract.grand_total}}</td>
@@ -73,7 +72,13 @@
                                         
                                         {{contract.get_reaction_display}}
                                     </td>
-
+                                    <td>
+                                        {% if contract.reaction == 'awaiting' and contract.team.created_by != request.user %}
+                                        <button type="button" disabled class="btn btn-danger btn-sm"><strike> Chat Now</strike></button>
+                                        {% else %}
+                                        <a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-folder-open"> Chat Now</i></a>
+                                        {% endif %}
+                                    </td>
                                     {% if contract.team.created_by == request.user %}
                                     <td>
 										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
@@ -126,6 +131,7 @@
                                         <th>Completion</th>
                                         <th>Budget($)</th>
                                         <th>Status</th>
+                                        <th>Message</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -149,6 +155,9 @@
                                         {{contract.get_reaction_display}}
                                     </td>
                                     {% if contract.created_by == request.user %}
+                                    <td>
+                                        <a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-folder-open"> Chat Now</i></a>
+                                    </td>
                                     <td>
 										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
 									</td> 

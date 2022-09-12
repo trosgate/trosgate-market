@@ -53,7 +53,8 @@ class WebsiteSettingAdmin(admin.ModelAdmin):
     list_per_page = sys.maxsize
     fieldsets = (
         ('Site Description', {'fields': ('site_name', 'tagline', 'site_Logo',
-         'protocol', 'use_www', 'site_domain', 'site_url', 'site_description',)}),
+         'protocol', 'site_domain', 'site_description',)}),
+        ('Social Media', {'fields': ('twitter_url', 'instagram_url', 'youtube_url', 'facebook_url',)}),
     )
 
     radio_fields = {'protocol': admin.HORIZONTAL}
@@ -102,7 +103,6 @@ class MailerAdmin(admin.ModelAdmin):
         return actions
 
 
-
 class TestEmailAdmin(admin.ModelAdmin):
     model = TestEmail
     list_display = ['title', 'test_email']
@@ -110,7 +110,7 @@ class TestEmailAdmin(admin.ModelAdmin):
     readonly_fields = ['title']
     fieldsets = (
         ('Description', {'fields': ('title',)}),
-        ('Receiver Email', {'fields': ('test_email',)}),
+        ('Receiver Email: Enter email and click "Save" button to send Test mail', {'fields': ('test_email',)}),
     )
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:
@@ -132,7 +132,7 @@ class PaymentGatewayAdmin(admin.ModelAdmin):
     model = PaymentGateway
     list_display = ['name', 'default', 'processing_fee', 'status', 'ordering']
     list_editable = ['processing_fee', 'default', 'status', 'ordering']
-    # readonly_fields = ['name']
+    readonly_fields = ['name']
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_GATEWAYS:

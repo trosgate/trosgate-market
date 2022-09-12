@@ -16,21 +16,45 @@ class CustomerRegisterForm(forms.ModelForm):
         (FREELANCER, _('Freelancer')),
         (CLIENT, _('Client')),
     )
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Repeat password', widget=forms.PasswordInput)
-    user_type = forms.ChoiceField(required=True, choices=USER_TYPE, label="Select Type")
+    short_name = forms.CharField(label='Username', min_length=4, max_length=30)
+    email = forms.EmailField(label='Email', max_length=100)
+    first_name = forms.CharField(label='First Name',  min_length=2, max_length=50)
+    last_name = forms.CharField(label='Last Name', min_length=2, max_length=50)
+    phone = forms.CharField(label='Phone', min_length=2, max_length=50)
+    user_type = forms.ChoiceField(choices=USER_TYPE, label="Select Type")
     country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label='Select Country')
+    password1 = forms.CharField(label='Enter password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
 
     class Meta:
         model = Customer
-        fields = ['first_name', 'last_name',
-                  'email', 'short_name', 'phone', 'country', 'user_type', 'password1', 'password2']    
-        required = ['first_name', 'last_name','email', 'short_name', 'country', 'user_type', 'password1', 'password2']               
+        fields = ['first_name', 'last_name','email', 'short_name', 'phone', 'country', 'user_type', 'password1', 'password2']    
+        required = ['first_name', 'last_name','email', 'short_name', 'phone', 'country', 'user_type', 'password1', 'password2']               
 
 
     def __init__(self, supported_country, *args, **kwargs):
         super(CustomerRegisterForm, self).__init__(*args, **kwargs)
         self.fields['country'].queryset = Country.objects.filter(id__in=supported_country)
+
+        self.fields['short_name'].widget.attrs.update(
+            {'class': 'input-group col-lg-12'})
+        self.fields['email'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['first_name'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['last_name'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['phone'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['user_type'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['country'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['password1'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['password2'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+
 
         for field in self.Meta.required:
             self.fields[field].required = True
@@ -73,7 +97,7 @@ class UserLoginForm(AuthenticationForm):
 
 
 class PasswordResetForm(PasswordResetForm):
-    email = forms.EmailField(max_length=254, widget=forms.TextInput(
+    email = forms.EmailField(max_length=100, widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Email', 'id': 'form-email'}))
 
     def clean_email(self):
@@ -94,7 +118,7 @@ class PasswordResetConfirmForm(SetPasswordForm):
 
 
 class TwoFactorAuthForm(forms.ModelForm): 
-    pass_code = forms.CharField(help_text = "Enter SMS verification code sent to your phone number")
+    pass_code = forms.CharField(help_text = "Enter verification token sent to your email")
 
     class Meta:
         model = TwoFactorAuth

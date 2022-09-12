@@ -3,8 +3,8 @@ from .models import (Application)
 
 
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ['team', 'budget','project', 'created_at', 'message_slice', 'status']
-    list_filter = ['team']
+    list_display = ['team', 'budget', 'created_at', 'message_slice', 'status']
+    list_filter = ['status']
     readonly_fields = ('created_at',)
     search_fields = ['message']
     list_editable = ['status']

@@ -96,6 +96,11 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['short_name', 'user_type']
     objects = UserManager()
 
+    # def save(self, *args, **kwargs):
+    #     self.email = self.email.lower()
+    #     super(Customer, self).save(*args, **kwargs)
+
+
     def __str__(self):
         return self.get_full_name()
 
@@ -111,7 +116,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     def get_first_name(self):
         return self.first_name
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
+    def email_user(self, subject, message, from_email, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def has_perm(self, perm, obj=None):

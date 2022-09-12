@@ -67,7 +67,11 @@
 											<a class="nav-link" href="{% url 'account:login' %}"><img src="{% static 'images/user-login.png'%}" alt="img description"></a>
 										</div>
 										<div class="wt-loginoption">
-											<a class="nav-link btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}">Join</a>
+                      {% if userregistrationmodal %}
+                      <a href="javascript:void(0);" class="nav-link btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal">Join Now</a>
+                      {% else  %}			
+											<a class="nav-link btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}">Join Now</a>
+                      {% endif  %}			
 										</div>
 									{% endif  %}			
 									{% if request.user.is_authenticated %}

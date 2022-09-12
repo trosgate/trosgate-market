@@ -1,38 +1,112 @@
-from twisted.internet.protocol import Protocol
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_text
+from account.tokens import account_activation_token
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from general_settings.backends import get_from_email
 from general_settings.models import WebsiteSetting
+from general_settings.utilities import (
+    website_name,
+    get_protocol_with_domain_path,
+    get_instagram_path, 
+    get_facebook_path, 
+    get_youtube_path, 
+    get_twitter_path
+)
 
 #
-# Utility function for sending envites to team
-
-def website():
-    try:
-        return WebsiteSetting.objects.get(id=1)
-    except:
-         return None
-
-
-def send_new_test_mail(to_email):
-    # Blueprint for sending test mail
+# Utility function for sending Test email
+def send_test_mail(to_email):
     from_email = get_from_email()
-    subject = 'This is a test Email'
-    message = 'This is a test Email to confirm that my email setup is fine'
-    recipient_list = [to_email]
-    html_message ='<h1> This is a test Email to confirm that my email setup is fine </h1>'
+    subject = f'Test Email on {website_name()}'
+    text_content = f"Test Email on {website_name()}"
+    html_content = render_to_string('notification/test_email.html', {
+        'website_email': from_email,
+        'text_content': text_content,
+        'website_name': website_name(),
+    })
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
 
-    send_mail(subject, message, from_email, recipient_list)
+#
+# Utility function for sending login token via mail
+def two_factor_auth_mailer(user, pass_code):
+    from_email = get_from_email()
+    subject = f'User login activation on {website_name()}'
+    text_content = f"Hello {user.short_name}, You are about to log into your account. Please your code for login on {website_name()} is: { pass_code}"
+    html_content = render_to_string('notification/two_factor_auth.html', {
+        'website_email': from_email,
+        'website_name': website_name(),
+        'user': user.short_name,
+        'subject': subject,
+        'pass_code': pass_code,
+       
+    })
 
-__all__ = ['send_new_test_mail']
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+#
+# Utility function for sending new signup
+def new_user_registration(user, user_email):
+    from_email = get_from_email()
+    subject = 'Activate your Account'
+    subtitle = f'Welcome to {website_name()}'
+    text_content = f'Welcome to {website_name()}'
+    message = f"Welcome to {website_name()}. You are almost ready to get started. Please click on the button below to verify your email address and enjoy exclusive services with us! Link has expiration so please make hay"
+    html_content = render_to_string('notification/account_activation_mail.html', {
+        'website_email': from_email,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
+        'user': user,
+        'subtitle': subtitle,
+        'subject': subject,
+        'message': message,
+        'encode_id': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),        
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [user_email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+# Utility function for notifying project creator of new application
+def application_notification(application):
+    from_email = get_from_email()
+    subject = 'Application received on your Project'
+    subtitle = f'Your Project has new Application'
+    text_content = f'Your Project on {website_name()} received new Application'
+    html_content = render_to_string('notification/application_notification.html', {
+        'website_email': from_email,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
+        'subtitle': subtitle,
+        'application': application,
+       
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [application.project.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
 
 
 #Yet to test this.....................................
 def credit_pending_balance_email(account, paid_amount, purchase):
     # Blueprint for sending mail when checkout is complete
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
     subject = f'Congrats. Your proposal was purchased'
     preview = f'Proposal paid for {paid_amount}'
     text_content = f'A New Checkout was paid_amount.'
@@ -42,8 +116,37 @@ def credit_pending_balance_email(account, paid_amount, purchase):
         'account': account,
         'purchase': purchase,
         'paid_amount': paid_amount,
-        'mywebsite': website(),
-        'acceptation_url': acceptation_url,
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [account.user.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def lock_fund_email(account, message):
+    # Blueprint for sending mail when freelancer fund is locked
+    from_email = get_from_email()
+    subject = f'Account action taken by {website_name()}'
+    preview = f'Temporal Lock on account - {account.user.get_full_name()}'
+    text_content = f'Temporal Lock on your Fund account. Please check back later when we might have unlocked'
+    html_content = render_to_string('notification/lock_fund_email.html', {
+        'subject': subject,
+        'preview': preview,
+        'account': account,
+        'message': message,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [account.user.email])
@@ -62,8 +165,13 @@ def send_marked_paid_in_bulk_email(payout):
         'subject': subject,
         'preview': preview,
         'payout': payout,
-        'mywebsite': website(),
-        'acceptation_url': acceptation_url,
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [payout.team.created_by.email])
@@ -81,7 +189,13 @@ def send_contract_accepted_email(contract):
         'subject': subject,
         'preview': preview,
         'contract': contract,
-        'mywebsite': website(),
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),        
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [contract.created_by.email])
@@ -99,7 +213,13 @@ def send_contract_rejected_email(contract):
         'subject': subject,
         'preview': preview,
         'contract': contract,
-        'mywebsite': website(),
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),        
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [contract.created_by.email])
@@ -117,8 +237,13 @@ def send_withdrawal_marked_failed_email(payout):
     html_content = render_to_string('notification/withdrawal_request_declined.html', {
         'payout': payout,
         'preview': preview,
-        'mywebsite': website(),
-        'acceptation_url': acceptation_url,
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [payout.team.created_by.email])
@@ -134,7 +259,13 @@ def initiate_credit_memo_email(credit_memo):
     html_content = render_to_string('notification/initiate_credit_memo_email.html', {
         'subject': subject,
         'account': credit_memo,
-        'mywebsite': website(),
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),        
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [credit_memo.sender.email,credit_memo.receiver.email])
@@ -148,8 +279,14 @@ def send_credit_to_team(account):
     text_content = f'Invitation to {account.team.title}.'
     html_content = render_to_string('notification/new_credit_email.html', {
         'account': account,
-        'mywebsite': website(),
         'team': account.team,
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),        
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [account.team.created_by.email])
@@ -167,8 +304,13 @@ def new_ticket_email(ticket):
     html_content = render_to_string('notification/new_ticket_email.html', {
         'preview': preview,
         'ticket': ticket,
-        'mywebsite': website(),
-        'acceptation_url': acceptation_url,
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [ticket.created_by.email])
@@ -186,8 +328,13 @@ def ticket_reply_email(ticketreply):
     html_content = render_to_string('notification/ticket_reply.html', {
         'preview': preview,
         'ticketreply': ticketreply,
-        'mywebsite': website(),
-        'acceptation_url': acceptation_url,
+        # 'mywebsite': website(),
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [ticketreply.ticket.created_by.email])
@@ -207,9 +354,13 @@ def send_new_team_email(to_email, team):
     subject = 'Activate your Team'
     text_content = f'Invitation to {team.title}.'
     html_content = render_to_string('teams/new_team_email.html', {
-        'protocol': Protocol,
         'team': team,
-        'acceptation_url': acceptation_url,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
@@ -224,10 +375,15 @@ def send_invitation_email(to_email, code, team):
     subject = 'Invitation to Team'
     text_content = f'Invitation to {team.title}. Your code is: %s' % code
     html_content = render_to_string('notification/email_invitation.html', {
-        'protocol': Protocol,
         'team': team,
         'code': code,
-        'acceptation_url': acceptation_url,
+        # 'protocol': Protocol,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
     })
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
@@ -243,7 +399,13 @@ def send_invitation_accepted_mail(team, invitation):
     text_content = 'Your invitation was accepted'
     context={
         'team': team, 
-        'invitation': invitation
+        'invitation': invitation,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),        
     }
     html_content = render_to_string('notification/accept_invitation_email.html', context)
 

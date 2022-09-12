@@ -13,16 +13,12 @@ from django.core.exceptions import ValidationError
 
 class WebsiteSetting(models.Model):
     USE_HTTPS = "https://"
+    USE_HTTP_WITH_WWW = "https://www."
     USE_HTTP = "http://"
     PROTOCOL_TYPE = (
-        (USE_HTTPS, _("https://")),
-        (USE_HTTP, _("http://")),
-    )
-    USE_WWW = "www"
-    NO_WWW = "no_www"
-    APPLY_WWW = (
-        (USE_WWW, _("Use WWW")),
-        (NO_WWW, _("No WWW")),
+        (USE_HTTPS, _("Secure:> https://")),
+        (USE_HTTP_WITH_WWW, _("Secure https://www")),
+        (USE_HTTP, _("Insecure:> http://")),
     )
 
     site_name = models.CharField(
@@ -34,12 +30,37 @@ class WebsiteSetting(models.Model):
     site_Logo = models.ImageField(
         _("Site Logo"),  upload_to='site/', default='site/logo.png', null=True, blank=True)
     protocol = models.CharField(
-        _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS)
-    use_www = models.BooleanField(_("Use WWW Url"), choices=((True, 'Use WWW'), (False, 'No WWW')), default=False)
+        _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS, help_text=_("Warning! Make sure you have SSL Certificate for your site before switing to Secure options"))
     site_domain = models.CharField(_("Website Domain"), max_length=255, default="example.com", help_text=_(
         'E.x: example.com'), null=True, blank=True)
-    site_url = models.URLField(_("Website URL"), help_text=_(
-        'E.x: https://www.example.com'), max_length=255, null=True, blank=True)
+    twitter_url = models.URLField(
+        _("Twitter Page"), 
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        help_text=_("Enter the full secure url path of your Twitter page")
+    )
+    instagram_url = models.URLField(
+        _("Instagram Page"), 
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        help_text=_("Enter the full secure url path of your Instagram page")
+    )
+    youtube_url = models.URLField(
+        _("Youtube Page"), 
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        help_text=_("Enter the full secure url path of your Youtube page")
+    )
+    facebook_url = models.URLField(
+        _("Facebook Page"), 
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        help_text=_("Enter the full secure url path of your Facebook page")
+    )
 
     def __str__(self):
         return self.site_name
@@ -87,7 +108,7 @@ class StorageBuckets(models.Model):
 
 class TestEmail(models.Model):
     title = encrypt(models.CharField(_("Testing Email"), max_length=20, default="My Test Email", null=True, blank=True))
-    test_email = encrypt(models.EmailField(_("Enter Email and Save to send"), max_length=100, help_text=_(
+    test_email = encrypt(models.EmailField(_("Receiver Email"), max_length=100, help_text=_(
         "Test the email settings by sending a Test mail"), null=True, blank=True))
 
     def __str__(self):
@@ -227,7 +248,6 @@ class Department(models.Model):
 
     def __str__(self):
         return f'{self.name}'
-
 
 
 class Size(models.Model):
@@ -372,7 +392,6 @@ class DiscountSystem(models.Model):
                 {'level_three_delta_amount': _('L3 Amount delta cannot be bigger or equal to L4 Amount Start')})
                         
         return super().clean()
-
 
 
 class HiringFee(models.Model):
@@ -589,8 +608,8 @@ class Mailer(models.Model):
         null=True, 
         blank=True))
     from_email = encrypt(models.CharField(
-        _("From Email"), 
-        max_length=255, help_text=_('This email will be the site-wide sender email'), 
+        _("Site-Wide Support Email"), 
+        max_length=255, help_text=_('This email will be the site-wide support email for all email sending'), 
         null=True, 
         blank=True))
     email_use_tls = encrypt(models.BooleanField(

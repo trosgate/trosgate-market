@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.http import HttpResponse, HttpResponseRedirect
 from .tokens import account_activation_token
 from django.template.loader import render_to_string
@@ -6,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text
 from django.contrib import auth, messages
-from .forms import CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm
+from .forms import CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer, Country, TwoFactorAuth
 from proposals.models import Proposal
@@ -14,21 +15,15 @@ from teams.models import Invitation, Team, Package
 from teams.forms import TeamCreationForm
 from client.models import Client
 from freelancer.models import Freelancer
-from django.utils.text import slugify
 from projects.models import Project
-from . utilities import new_user_registration, send_verification_sms
+from notification.mailer import new_user_registration, two_factor_auth_mailer
 from future.utilities import get_sms_feature, get_more_team_per_user_feature
-from notification.mailer import send_new_team_email
 from quiz.models import Quizes
 from contract . models import InternalContract
-from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from general_settings.decorators import confirm_recaptcha
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import user_passes_test
-# prevent back button on browser after form submission
 from django.views.decorators.cache import cache_control
 from marketing.models import AutoTyPist
 from django.conf import settings
@@ -104,6 +99,44 @@ def homepage(request):
     proposals = Proposal.active.filter(published=True).distinct()[0:12]
     projects = Project.objects.filter(status=Project.ACTIVE, published=True).distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
+    supported_country = Country.objects.filter(supported=True)    
+    regform = CustomerRegisterForm(supported_country, request.POST or None)
+
+    if request.user.is_authenticated:
+        messages.info(request, f'Welcome back {request.user.short_name}')
+        return redirect('account:dashboard')
+
+    if request.user.is_authenticated and user.user_type == Customer.ADMIN:
+        messages.info(request, f'Welcome back {request.user.short_name}')
+
+        return redirect('/admin')
+
+    supported_country = Country.objects.filter(supported=True)
+
+    if request.method == 'POST':
+        regform = CustomerRegisterForm(supported_country, request.POST or None)
+        if regform.is_valid():
+            user = regform.save(commit=False)
+            user.email = regform.cleaned_data['email']
+            user.short_name = regform.cleaned_data['short_name']
+            user.country = regform.cleaned_data['country']
+            user.set_password(regform.cleaned_data['password1'])
+            user.is_active = False
+            user.save()
+
+            user_email = user.email
+            messages.info(request, f'Please check your email for a confirmation mail')
+
+            try:
+                new_user_registration(user, user_email)
+            except Exception as e:
+                print(str(e))
+            return render(request, 'account/registration/register_email_confirm.html', {'regform': regform})
+
+        else:
+            messages.error(request, f'Error occured. Please check and correct')
+    else:
+        regform = CustomerRegisterForm(supported_country)
 
     context = {
         'proposals': proposals,
@@ -111,6 +144,8 @@ def homepage(request):
         'packages': packages,
         'pypist': pypist,
         'users': users,
+        'regform': regform,
+        'userregistrationmodal': "userregistrationmodal",
         'base_currency': base_currency,
     }
     return render(request, 'homepage.html', context)
@@ -129,9 +164,10 @@ def loginView(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        
         user = authenticate(request, email=email, password=password)
 
-        if user is not None and user.user_type == Customer.ADMIN and user.is_active and user.is_staff == True:
+        if user is not None and user.user_type == Customer.ADMIN and user.is_active == True and user.is_staff == True:
              
             login(request, user)
 
@@ -185,23 +221,29 @@ def loginView(request):
     return render(request, "account/login.html", context)
 
 
+
 def two_factor_auth(request):
 
     if "twofactoruser" not in request.session:
         return redirect("account:login")
 
-    returned_user_pk = request.session["twofactoruser"]["user_pk"]
     try:
+        returned_user_pk = request.session["twofactoruser"]["user_pk"]
         returned_user = TwoFactorAuth.objects.get(user__pk=returned_user_pk, user__is_active=True)
         pass_code = returned_user.pass_code
         user = Customer.objects.get(pk=returned_user_pk, is_active=True)
     except:
-        print('error occured with 2FA')
+        returned_user=None
+        user=None
+        return redirect("account:login")
 
     twofactorform = TwoFactorAuthForm(request.POST or None)
 
     if not request.POST:
-        send_verification_sms(user, pass_code, user.phone)
+        try:
+            two_factor_auth_mailer(user, pass_code)
+        except:
+            print('Activation token not sent')
    
     if twofactorform.is_valid():
         received_code = twofactorform.cleaned_data['pass_code']
@@ -242,24 +284,25 @@ def account_register(request):
 
     supported_country = Country.objects.filter(supported=True)
 
-    domain = get_current_site(request)
     if request.method == 'POST':
-        regform = CustomerRegisterForm(supported_country, request.POST)
-        if regform.is_valid():  # and request.recaptcha_is_valid:
+        regform = CustomerRegisterForm(supported_country, request.POST or None)
+        if regform.is_valid():
             user = regform.save(commit=False)
             user.email = regform.cleaned_data['email']
+            user.country = regform.cleaned_data['country']
+            user.short_name = regform.cleaned_data['short_name']
             user.set_password(regform.cleaned_data['password1'])
             user.is_active = False
             user.save()
 
-            to_email = user.email
+            user_email = user.email
             messages.info(request, f'Please check your email for a confirmation mail')
 
             try:
-                new_user_registration(domain, user, to_email)
+                new_user_registration(user, user_email)
             except Exception as e:
                 print(str(e))
-            return redirect('account:login')
+            return render(request, 'account/registration/register_email_confirm.html', {'success': 'success'})
 
     else:
         regform = CustomerRegisterForm(supported_country)
@@ -276,7 +319,6 @@ def account_activate(request, uidb64, token):
         user.is_active = True
         user.save()
         return redirect('account:login')
-
     else:
         return render(request, 'account/registration/register_activation_invalid.html')
 
@@ -296,7 +338,7 @@ def user_dashboard(request):
     if request.user.user_type == Customer.FREELANCER and request.user.is_active == True:
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-            contracts = user_active_team.internalcontractteam.filter(reaction=InternalContract.AWAITING)[:10]
+            contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
             proposals = Proposal.objects.filter(team=user_active_team, progress__lte=99)
         except:
             user_active_team = None
@@ -312,24 +354,6 @@ def user_dashboard(request):
             package=Package.objects.get(id=1)
         except:
             package = None
-
-        stats_count = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).count()
-        print('stats_count::', stats_count)
-        stats_disc = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).aggregate(Sum("disc_sales_price")).values()
-        print('stats_disc::', stats_disc)
-        stats_total = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).aggregate(Sum("sales_price"))
-        print('stats_total::', stats_total)
-        stats_total_earning = ProposalSale.objects.filter(purchase__status=Purchase.SUCCESS).aggregate(Sum("total_earning"))
-        print('stats_total_earning::', stats_total_earning)
-        overall = ProposalSale.objects.filter(
-            purchase__status=Purchase.SUCCESS
-            ).annotate().values("total_sales_price","total_sales_price").aggregate(Sum("total_sales_price"),Sum("total_sales_price"))
-        print('overall::', overall)
-        # stats = ProposalSale.objects.annotate(
-        #     num_of_proposals=Count("sales_price"),
-        #     tot_sales_price=Sum("sales_price"),
-        # ).values_list("tot_sales_price", "sales_price", "num_of_proposals")
-        # print(stats)
 
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)
@@ -373,7 +397,7 @@ def user_dashboard(request):
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
-        contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction=InternalContract.PAID)[:10]
+        contracts = InternalContract.objects.filter(created_by=request.user)[:10]
 
         context = {
             'open_projects': open_projects,

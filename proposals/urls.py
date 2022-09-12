@@ -29,8 +29,18 @@ urlpatterns = [
     path('attribute/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_four, name='modify_proposal_step_four'),
 
     # Proposal chats   
-    path('chats/', views.proposal_chat_messages, name='proposal_chat_messages'),
-    path('chats/<slug:proposal_slug>', views.proposal_chat_details, name='proposal_chat_details'),
-
+    path('author/<str:short_name>/<slug:proposal_slug>', views.proposal_chat_messages, name='proposal_chat_messages'),
+    # path('messages/<str:short_name>/<slug:proposal_slug>/detail', views.proposal_chat_details, name='proposal_chat_details'),
    
 ]
+
+htmx_urlpatterns = [
+    path('message/<int:proposal_id>', views.create_message, name='create_message'),
+    path('fetch_messages/<int:proposal_id>', views.fetch_messages, name='fetch_messages'),
+]
+
+urlpatterns += htmx_urlpatterns
+
+
+
+

@@ -322,11 +322,10 @@
 						<tr>
 							<th>#</th>
 							<th>Contract #</th>
-							<th>Created By</th>
-							<th>Proposal Associated</th>
-							<th>Target In </th>
-							<th>Status</th>
-							<th>Total Budget($)</th>
+							<th>Awarded Team</th>
+							<th>Created On</th>
+							<th>Budget($)</th>
+							<th>Reaction</th>
 							<th>Message</th>
 							<th>Actions</th>
 						</tr>
@@ -336,27 +335,28 @@
 						{% for contract in contracts %}
 						<tr>
 							<td>{{forloop.counter}} </td>
-							<td>{{contract.created_by.get_full_name}}</td>
-							<td class='text-left'>{{contract.proposal.title}}</td>
+							<td>{{contract.reference}}</td>
+							<td>{{contract.team.title}}</td>
 							<td>{{contract.date_created|date:"M-d-Y"}}</td>
-							<td>{{contract.get_contract_duration_display}}</td>
-							<td>{{contract.get_reaction_display}}</td>
 							<td>{{contract.grand_total}}</td>
+							<td>{{contract.get_reaction_display}}</td>
+							
 							<td>
-								<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="far fa-envelope"> Discord</i></a>
+								<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-folder-open"> Chat Team</i></a>
 							</td>
-							<td>
-								<a href="{% url 'contract:internal_contract_detail' contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> View and Accept</i></a>
+							<td> 
+								<a href="{% url 'contract:internal_contract_detail' contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
 							</td> 
 						</tr>
 						{% endfor %}
 					</tbody>
 				</table>
-					{% if not contracts %}
-					<div class="alert alert-info justify-content-md-center text-center" role="alert">
-						<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
-					</div>
-					{% endif %}
+				{% if not contracts %}
+				<hr>
+				<div class="text-center">
+					<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
+				</div>
+				{% endif %}
 			</div>
 			{% if contracts.count == 10 %}
 			<div class="wt-commentsbtn">

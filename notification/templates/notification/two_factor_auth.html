@@ -1,0 +1,16 @@
+{% load i18n %}{% autoescape off %}
+{% load static %} 
+{% block content %}
+
+Hello {{user|capfirst}},
+
+You are about to log into your account. 
+
+Please your code for login on {{website_name}} is: {{ pass_code}}
+{% endblock %}
+
+{% translate "Note: This code is only valid for short moment" %}
+
+{% blocktranslate %}Thank you, The {{ website_name }} team {% endblocktranslate %}
+
+{% endautoescape %}

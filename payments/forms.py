@@ -144,5 +144,3 @@ class PaymentChallengeForm(forms.Form):
 
 
 
-
-
