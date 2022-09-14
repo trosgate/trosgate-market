@@ -23,8 +23,6 @@
 				</div>
 			</div>
 
-			{% comment %} <main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor"> {% endcomment %}
-
             <div class="wt-haslayout wt-main-section">
                 <div class="container">
                     <div class="row justify-content-md-center">
@@ -56,13 +54,21 @@
                                                 <span>{{blog.category}}</span>
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <i class="ti-heart"> 0</i>
-                                                <span>Likes</span>
-                                            </a>
-                                        </li>
+                                       
                                     </ul>
+                                    {% if blog.introduction %}
+                                    <div class="wt-description">
+                                        {{blog.introduction|linebreaks}}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if blog.quote %}
+                                    <div class="wt-jobdetails wt-tabsinfo">
+                                        <div class="wt-tabscontenttitle">
+                                            <p><em>{{blog.quote|linebreaks}}</em></p>
+                                        </div>      
+                                    </div>      
+                                    {% endif %}
                                     <div class="wt-description">
                                         {{blog.description|safe|linebreaks}}
                                     </div>
@@ -74,17 +80,9 @@
                                             <a href="javascript:void(0);">{{tag}}</a>
                                             {% endfor %}
                                         </div>
-                                        <ul class="wt-socialiconssimple wt-blogsocialicons">
-                                            <!-- sharethis button begins-->	
-                                            <div class="sharethis-inline-share-buttons">Share this blog</div>
-                                            <!-- sharethis button ends-->
-                                        </ul>
                                     </div>
                                     <div class="wt-description justify-content-md-center">
-                                        <blockquote class="wt-blockquotevone">
-                                            <span><i class="ti-heart"></i></span>
-                                            <q>0 Likes</q>
-                                        </blockquote>
+                                        <div class="sharethis-inline-share-buttons"></div>
                                     </div>
                                 </div>
                             </div>
@@ -94,30 +92,15 @@
             </div>
         </div>
         {% include 'dashboard/main_footer.html' %}
-			<!--Main End-->
-    {% comment %} <script>
-        $(document).on('click', '#add-box', function (e) {
-            e.preventDefault();
-            $.ajax({
-            type: 'POST',
-            url: '{% url "transactions:add_to_hiring_box" %}',
-            data: {
-                proposalid: $('#add-box').val(),
-                memberqty: $('#select option:selected').text(),
-                csrfmiddlewaretoken: "{{csrf_token}}",
-                action: 'post'
-            },
-            success: function (json) {
-                console.log(json)
-                document.getElementById("members-qty").innerHTML = json.member_qty
-            },
-            error: function (xhr, errmsg, err) {}
-            });
-        })
-    </script> {% endcomment %}
 
 {% endblock content %}
 
+{% block scripts %}
+</script>
+<!-- sharethis script begins-->	
+<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
+<!-- sharethis script ends-->
+{% endblock scripts %}
 
 
 

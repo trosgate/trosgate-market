@@ -221,7 +221,6 @@ def loginView(request):
     return render(request, "account/login.html", context)
 
 
-
 def two_factor_auth(request):
 
     if "twofactoruser" not in request.session:

@@ -292,7 +292,7 @@ class ContractChat(models.Model):
     sent_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.team.title
+        return f'Message sent by {self.sender.get_full_name()}'
 
     class Meta:
         ordering = ['sent_on']

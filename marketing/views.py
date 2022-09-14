@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Blog, HelpDesk, Ticket, TicketMessage
+from .models import Announcement, Blog, HelpDesk, Ticket, TicketMessage
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -11,6 +11,13 @@ from django.http import JsonResponse
 from account.fund_exception import GenException
 
 
+@login_required
+def notice(request):
+    notices = Announcement.objects.all()[:5]
+    context ={
+        'notices':notices
+    }
+    return render(request, 'marketing/notice.html', context)
 
 def article_list(request):
     all_blogs  = Blog.objects.filter(published=True)

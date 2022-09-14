@@ -26,10 +26,6 @@ class NewStatsAdmin(admin.ModelAdmin):
             NewStats.objects.annotate().values("win","mac","iph","android","oth")
         )
 
-        # data = NewStats.objects.all()
-        # newdata = serializers.serialize('json', list(data), fields=("win","mac","iph","android","oth"))
-        # print(newdata)
-
         as_json = json.dumps(list(stat_data), cls=DjangoJSONEncoder)
         extra_context = extra_context or {"stat_data": as_json}
 

@@ -1,0 +1,57 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+    <!--Inner Home Banner Start-->
+    <div class="wt-haslayout wt-innerbannerholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="wt-innerbannercontent">
+                <div class="wt-title"></div>
+                    <div class="alert alert-info" role="alert">
+                        <h2 class="wt-title" style="color:green;">Notices</h2>
+                        <span style="color:blue; font-weight: bold;">!Important: Here are latest updates anytime we introduce new things</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Inner Home End-->
+    <main class="wt-haslayout wt-innerbgcolor">
+        <div class="wt-haslayout wt-main-section">
+            <div class="container">
+                <div class="row">
+                    {% if notices|length == 0 %}
+                    <p> There are no new notifications yet ...</p>
+                    {% endif %}
+                    {% for notice in notices %}
+                    <aside class="wt-sidebar wt-dashboardsave">
+                        <div class="wt-proposalsr wt-box-shadow">
+                            <div class="wt-proposalsrcontent">
+                            <div class="wt-title">
+                                <h4 style="color:green;">{{forloop.counter}}. {{ notice.title|capfirst}}
+                                    
+                                </h4>
+                                <p>{{ notice.preview|linebreaksbr}}.
+                                    {% if notice.backlink %}
+                                    <a href="{{notice.backlink}}" target="_blank"></a>
+                                        <span style="color:red;">View notice details</span>
+                                    
+                                    {% endif %}
+                                </p><br>
+                                <small>{{ notice.created_at|timesince }} ago</small>
+                                
+                            </div>
+                        </div> 
+                            {% comment %} {% endif %} {% endcomment %}
+                        </div>
+                    </aside>
+                    {% endfor %}
+                </div> 
+            </div> 
+        </div> 
+    </main>
+
+     
+{% endblock %}
+

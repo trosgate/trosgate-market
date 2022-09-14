@@ -43,12 +43,12 @@ class ProposalAdmin(admin.ModelAdmin):
 
 class ProposalSupportInline(admin.StackedInline):
     model = ProposalChat
-    list_display = ['team', 'sender', 'sent_on','content']
+    list_display = ['team', 'sender', 'sent_on']
     readonly_fields = ['team', 'sender', 'sent_on','content']
     extra = 0
 
     fieldsets = (
-        ('Reply Messages', {'fields': ('sender', 'content', 'sent_on',)}),
+        ('Reply Messages', {'fields': ('content', 'sent_on',)}),
     )
 
 

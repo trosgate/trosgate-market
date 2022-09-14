@@ -86,6 +86,7 @@ class ClientAccount(models.Model):
     modified_on = models.DateTimeField(auto_now=True)
 
     class Meta:
+        ordering = ('user__pk',)
         verbose_name = 'Client Account'
         verbose_name_plural = 'Client Account'
 
@@ -183,8 +184,8 @@ class ClientAction(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Client Deposit'
-        verbose_name_plural = 'Client Deposits'
+        verbose_name = 'Deposit Ejournal'
+        verbose_name_plural = 'Deposit Ejournal'
 
     def __str__(self):
         return f'{self.account.user.first_name} {self.account.user.last_name}'

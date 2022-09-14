@@ -131,3 +131,11 @@ class TwoFactorAuthForm(forms.ModelForm):
         self.fields['pass_code'].widget.attrs.update(
             {'class': 'form-control',})
 
+    def clean_passcode(self):
+        pass_code = self.cleaned_data['pass_code']
+        checker = TwoFactorAuth.objects.filter(pass_code=pass_code)
+
+        if not checker:    
+            raise forms.ValidationError(
+                _('Invalid token entered. Please check and try again'))
+        return pass_code

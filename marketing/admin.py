@@ -3,18 +3,30 @@ from .models import Blog, HelpDesk, AutoTyPist, Announcement, Ticket, TicketMess
 from .forms import TicketMessageForm
 
 
+class AnnouncementAdmin(admin.ModelAdmin):
+    model = Announcement
+    list_display = [ 'created_by', 'title', 'ordering', 'created_at']
+    list_display_links = ['created_by', 'created_at']
+    list_editable = ['ordering']
+    readonly_fields = ['created_at','created_by',]
+
+    def save_model(self, request, obj, form, change):
+        obj.created_by = request.user
+        return super().save_model(request, obj, form, change)
+
 
 class BlogAdmin(admin.ModelAdmin):
     model = Blog
-    list_display = [ 'identifier', 'title', 'created_by', 'number_of_likes','type', 'published', 'ordering',]
+    list_display = [ 'identifier', 'title', 'created_by', 'type', 'published', 'ordering',]
     list_display_links = ['identifier']
     exclude = ['likes', 'number_of_likes']
     list_editable = ['type','published','ordering']
     search_fields = ['title']
     prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['identifier','created_by',]
 
     fieldsets = (
-        ('Introduction', {'fields': ('title', 'slug', 'ordering',)}),
+        ('Introduction', {'fields': ('title', 'slug', 'introduction', 'quote','ordering',)}),
         ('Classification', {'fields': ('type', 'category', 'tags',)}),
         ('Description', {'fields': ('description',)}),
         ('State', {'fields': ('identifier','created_by', 'published',)}),
@@ -22,6 +34,9 @@ class BlogAdmin(admin.ModelAdmin):
     )  
     radio_fields = {'published': admin.HORIZONTAL}
 
+    def save_model(self, request, obj, form, change):
+        obj.created_by = request.user
+        return super().save_model(request, obj, form, change)
 
 
 class HelpDeskAdmin(admin.ModelAdmin):
@@ -94,14 +109,6 @@ class AutoTyPistAdmin(admin.ModelAdmin):
     list_display_links = None
     list_editable = ['title', 'is_active', 'ordering']
 
-
-
-class AnnouncementAdmin(admin.ModelAdmin):
-    model = Announcement
-    list_display = ['content', 'backlink', 'default']
-    list_display_links = ['content']
-    list_editable = ['backlink', 'default']
-    radio_fields = {'default': admin.HORIZONTAL}
 
 
     

@@ -6,6 +6,10 @@ class ContractorAdmin(admin.ModelAdmin):
     model = Contractor
     list_display = ['name',  'email', 'team', 'created_by', 'date_created']
     list_display_links = ['name', 'created_by',]
+    readonly_fields = [
+        'name',  'email', 'team', 'created_by', 'date_created', 
+        'phone_Number','address','postal_code'
+        ]
 
     def has_add_permission(self, request):
         return False
@@ -56,7 +60,6 @@ class ContractAdmin(admin.ModelAdmin):
 
     def get_actions(self, request):
         actions = super().get_actions(request)
-
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
@@ -107,36 +110,47 @@ class InternalContractAdmin(admin.ModelAdmin):
         return actions
 
 
-class ContractChatInline(admin.TabularInline):
-    readonly_fields = ['team','sender']
-    model = ContractChat
-    extra = 0
-    # can_delete = False
+# class ContractChatInline(admin.StackedInline):
+#     list_display = ['team','sender','sent_on']
+#     readonly_fields = ['team','sender','sent_on','content']
+#     model = ContractChat
+#     extra = 0
+#     fieldsets = (
+#         ('Reply Messages', {'fields': ('sender', 'content', 'sent_on',)}),
+#     )
 
-class InternalContractChatAdmin(admin.ModelAdmin):
-    list_display = ['team', 'proposal']
-    readonly_fields = ['team','created_by']
-    fieldsets = (
-        ('Contract Parties', {'fields': ['created_by', 'team'],}),
-    )
-    inlines = [ContractChatInline]
 
-    class Meta:
-        model = InternalContractChat 
+# class InternalContractChatAdmin(admin.ModelAdmin):
+#     list_display = ['team', 'get_proposal_title', 'date_created']
+#     readonly_fields = ['team','created_by', 'date_created']
+#     fieldsets = (
+#         ('Contract Parties', {'fields': ['created_by', 'team', 'date_created'],}),
+#     )
+#     inlines = [ContractChatInline]
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     class Meta:
+#         model = InternalContractChat 
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def has_add_permission(self, request):
+#         return False
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#     def has_delete_permission(self, request, obj=None):
+#         return False
+
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
+
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
+
+#     @admin.display(description='Proposal', ordering='proposal__title')
+#     def get_proposal_title(self, obj):
+#         return obj.proposal.title
 
 
 admin.site.register(Contract, ContractAdmin)
 admin.site.register(InternalContract, InternalContractAdmin)
 admin.site.register(Contractor, ContractorAdmin)
-admin.site.register(InternalContractChat, InternalContractChatAdmin)
+# admin.site.register(InternalContractChat, InternalContractChatAdmin)
 

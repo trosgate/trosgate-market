@@ -143,11 +143,11 @@
 								<a href="{{active_team.get_team_detail_absolute_url}}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
 								<a href="{% url 'teams:invitation' %}"><button type="button" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite User</button></a>
 								{% if active_team.package.type == "Team" %}
-								<a href="{% url 'teams:teamchatroom' %}"><button type="button" class="btn btn-info btn-sm"><i class="far fa-envelope" aria-hidden="true"></i> Chat</button></a>
+								<a href="{% url 'teams:teamchatroom' %}"><button type="button" class="btn btn-danger btn-sm"><i class="far fa-envelope" aria-hidden="true"></i> Chat</button></a>
 								{% endif %}
 								{% else %}
 								<a href="{{active_team.get_team_detail_absolute_url}}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
-								<a href="{% url 'teams:teamchatroom' %}"><button type="button" class="btn btn-info btn-sm"><i class="far fa-envelope" aria-hidden="true"></i> Chat</button></a>
+								<a href="{% url 'teams:teamchatroom' %}"><button type="button" class="btn btn-danger btn-sm"><i class="far fa-envelope" aria-hidden="true"></i> Chat</button></a>
 							{% endif %}
 							</div>													
 						</div>

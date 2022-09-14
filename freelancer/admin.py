@@ -11,43 +11,44 @@ from django.db import transaction as db_transaction
 MAX_OBJECTS = 0
 
 
-class FreelancerAdmin(admin.ModelAdmin):
-    model = Freelancer
-    list_display = ['image_tag', 'user', 'support', 'hourly_rate', 'tagline']
-    list_display_links = ('image_tag', 'user',)    
-    readonly_fields = ['image_tag', 'banner_tag','active_team_id']
-    search_fields = ('user__short_name','gender','tagline',)
-    fieldsets = (
-        ('Personal info', {'fields': ('gender', 'hourly_rate', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
-        ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'skill', 'business_size', 'department',)}),
-        ('Education and Experience #1', {'fields': ('company_name','job_position', 'start_date', 'end_date', 'job_description',)}),
-        ('Education and Experience #2', {'fields': ('company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',)}),
-        ('Projects and Awards #1', {'fields': ( 'project_title', 'project_url', 'image_one',)}),
-        ('Projects and Awards #2', {'fields': ( 'project_title_two', 'project_url_two', 'image_two',)}),
-        ('Projects and Awards #3', {'fields': ( 'project_title_three','project_url_three', 'image_three',)}),
-    )    
+# class FreelancerAdmin(admin.ModelAdmin):
+#     model = Freelancer
+#     list_display = ['image_tag', 'user', 'support', 'hourly_rate', 'tagline']
+#     list_display_links = ('image_tag', 'user',)    
+#     readonly_fields = ['image_tag', 'banner_tag','active_team_id']
+#     search_fields = ('user__short_name','gender','tagline',)
+#     fieldsets = (
+#         ('Personal info', {'fields': ('gender', 'hourly_rate', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
+#         ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'skill', 'business_size', 'department',)}),
+#         ('Education and Experience #1', {'fields': ('company_name','job_position', 'start_date', 'end_date', 'job_description',)}),
+#         ('Education and Experience #2', {'fields': ('company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',)}),
+#         ('Projects and Awards #1', {'fields': ( 'project_title', 'project_url', 'image_one',)}),
+#         ('Projects and Awards #2', {'fields': ( 'project_title_two', 'project_url_two', 'image_two',)}),
+#         ('Projects and Awards #3', {'fields': ( 'project_title_three','project_url_three', 'image_three',)}),
+#     )    
 
-    radio_fields = {'gender': admin.HORIZONTAL}
+#     radio_fields = {'gender': admin.HORIZONTAL}
 
-    def has_add_permission(self, request):
-        return False
+#     def has_add_permission(self, request):
+#         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
-    list_display = ['user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
+    list_display = ['id', 'user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
     readonly_fields = ['user', 'created_at', 'pending_balance', 'available_balance','lock_fund', 'admin_action']
     list_select_related = ('user',)
+    list_display_links = ['id', 'user']
     actions = ['unlock_single_or_bulk_account']
 
     def get_urls(self):
@@ -72,7 +73,8 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
         )
     
     admin_action.allow_tags = True
-    admin_action.short_description = 'Admin Lock'
+    admin_action.short_description = 'Admin Memo'
+    admin_lock.short_description = 'Admin Lock'
 
     def initiate_memo(self, request, account_id, *args, **kwargs):
         return self.process_action(
@@ -175,7 +177,7 @@ class FreelancerActionAdmin(admin.ModelAdmin):
     list_display = ['account','team', 'manager', 'action_choice', 'debit_amount', 'withdraw_amount']
     list_display_links = ['account']
     search_fields = ['team__title', 'position']
-    list_filter = ['team']
+    list_filter = ['action_choice']
     readonly_fields = ['account','team', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
     list_per_page = 20
     
@@ -201,6 +203,6 @@ class FreelancerActionAdmin(admin.ModelAdmin):
         return actions
 
 
-admin.site.register(Freelancer, FreelancerAdmin)
+# admin.site.register(Freelancer, FreelancerAdmin)
 admin.site.register(FreelancerAccount, FreelancerAccountAdmin)
 admin.site.register(FreelancerAction, FreelancerActionAdmin)

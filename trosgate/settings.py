@@ -75,11 +75,11 @@ INSTALLED_APPS = [
     # 'django_celery_results',
     # 'django_celery_beat',
     # Two factor Authentication
+    
     'django_otp',
-    'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
-    'two_factor',
-    'storages',
+    # 'django_otp.plugins.otp_static',
+    # 'storages',
 ]
 
 MIDDLEWARE = [
@@ -120,7 +120,6 @@ TEMPLATES = [
                 'general_settings.context_processors.website',
                 'general_settings.context_processors.autoLogoutSystem',
                 'transactions.context_processors.hiring_box',
-                'notification.context_processors.notifications',
                 'applications.context_processors.application_addon',
                 'contract.context_processors.chosen_contract', 
                 'future.context_processors.future_release', 
@@ -276,7 +275,8 @@ MESSAGE_TAGS = {
 # result_serializer = 'json'
 # task_serializer = 'json'
 ### default timezone is "UTC". Activate this if you want a different timzone ###
-timezone = 'Africa/Accra'
+timezone = 'UTC'
+# timezone = 'Africa/Accra'
 
 # STORAGE CHOICE OF CELERY TASKS
 # result_backend = 'django-db'
@@ -286,10 +286,6 @@ timezone = 'Africa/Accra'
 
 
 # CUSTOM SESSIONS
-#two weeks in seconds
-SESSION_COOKIE_AGE = 1209600
-#If SESSION_COOKIE_SECURE is False, session can run on http. set to true in production to run only with https
-SESSION_COOKIE_SECURE = False 
 
 HIRINGBOX_SESSION_ID = "proposal_box"
 PROPOSALGATEWAY_SESSION_ID = "proposalgateway"
@@ -299,3 +295,13 @@ CONTRACT_SESSION_ID = "contract"
 CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 
+# SECURE HEADERS - below are required in production
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
+# SESSION_COOKIE_SECURE = True
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# CSRF_COOKIE_SECURE = True

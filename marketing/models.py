@@ -26,16 +26,21 @@ def ticket_reference_generator():
 
 
 class Announcement(models.Model):
-    content = models.CharField(_("Content"), max_length=255, help_text=_("title of the blog must be unique"), unique=True)
-    backlink = models.URLField(_("Target Url"), max_length=2083, null=True, blank=True, help_text=_("This Optional link will be placed after the last word of 'Content'"))
-    default = models.BooleanField(_("Default"), choices = ((False,'Private'), (True, 'Public')), default = False)
-    
+    title = models.CharField(_("Title"), max_length=255, help_text=_("title of the blog must be unique - up to max of 255 words"), unique=True)
+    preview = models.TextField(_("Preview"), max_length=350, help_text=_("Preview of the blog must be unique - up to max of 255 words"))
+    backlink = models.URLField(_("Target Url"), max_length=2083, null=True, blank=True, help_text=_("If this notice has detail page to read more, this Optional link will be placed after the last word of 'Preview' to send them there"))
+    ordering = models.PositiveIntegerField(_("Ordering"), default=1, help_text=_("This determines how each notice will appear to user eg, 1 means topmost position"),)
+    created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Publisher"), help_text=_("This blog will be removed if author is deleted"), related_name="announcer", on_delete=models.CASCADE)   
+
     class Meta:
-        verbose_name = _("Announcement")
-        verbose_name_plural = _("Announcement")
+        ordering=('-created_at',)
+        verbose_name = _("Announcement",)
+        verbose_name_plural = _("Announcement",)
 
     def __str__(self):
-        return f'{self.content}'
+        return f'{self.title}'
 
 
 class AutoTyPist(models.Model):
@@ -61,9 +66,11 @@ class Blog(models.Model):
     )
     title = models.CharField(_("Title"), max_length=255, help_text=_("title of the blog must be unique"), unique=True)
     slug = models.SlugField(_("Slug"), max_length=255)
+    introduction = models.TextField(_("Introduction"), max_length=300, blank=True, null=True, help_text=_("Optional- Must have a maximum of 350 words"))
+    quote = models.CharField(_("Special Quote"), max_length=300, blank=True, null=True, help_text=_("Optional-Must have a maximum of 200 words"))
     type = models.CharField(_("Article Type"), choices=TYPE, default=None, max_length=30) 
     category = models.ForeignKey('general_settings.Category', verbose_name=_("Category"), related_name="blogcategory", on_delete=models.RESTRICT, max_length=250)
-    description = RichTextField(verbose_name=_("Description"), max_length=20000, error_messages={"name": {"max_length": _("Description field is required")}},)    
+    description = RichTextField(verbose_name=_("Details"), max_length=10000, error_messages={"name": {"max_length": _("Description field is required")}},)    
     tags = models.ManyToManyField('general_settings.Skill', verbose_name=_("Blog Tags"), related_name="blogtags")
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Likes"), related_name="bloglikes")    
     number_of_likes = models.PositiveIntegerField(_("Total Likes"), default=0)
@@ -72,7 +79,7 @@ class Blog(models.Model):
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     published = models.BooleanField(_("Published"), choices = ((False,'Private'), (True, 'Public')), help_text=_("You can later modify this at your own convenience"), default = True)    
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), help_text=_("This blog will be removed if author is deleted"), related_name="blogauthor", on_delete=models.CASCADE)   
-    ordering = models.PositiveIntegerField(_("Ordering"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
+    ordering = models.PositiveIntegerField(_("Ordering"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"),)
     thumbnail = models.ImageField(_("Blog Thumbnail"), default='blog/thumbnail.jpg', help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to='blog', blank=True, validators=[FileExtensionValidator(allowed_extensions=['JPG','JPEG','PNG','PSD'])])  
 
     class Meta:

@@ -66,8 +66,6 @@ class Application(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     applied_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Applicant"),  related_name="applicants", on_delete=models.CASCADE)
     status = models.CharField(_("Status"), max_length=20, choices=APPLICATION_STATUS, default=PENDING)
-    reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
-    slug = models.SlugField(max_length=250, blank=True, null=True)
  
     def __str__(self):
         return f'{self.project.title}'
@@ -77,11 +75,6 @@ class Application(models.Model):
     def message_slice(self):
         return truncatechars(self.message, 50)
 
-    def save(self, *args, **kwargs):
-        if self.reference is None:
-            self.reference = str(uuid4()).split('-')[4]
-        self.slug = slugify(f'{self.team.title}-{self.reference}')
-        super(Application, self).save(*args, **kwargs)
 
     #a url route to view application detail page
     def get_application_detail_absolute_url(self):

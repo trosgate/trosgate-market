@@ -135,6 +135,7 @@ class FreelancerAccount(models.Model):
     lock_fund = models.BooleanField(_("Lock Fund"), default=False,)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Freelancer Account'
         verbose_name_plural = 'Freelancer Account'
 
@@ -400,12 +401,12 @@ class FreelancerAction(models.Model):
     debit_amount = models.PositiveIntegerField(_("Transfer Amount"), default=0, blank=True, null=True)
     withdraw_amount = models.PositiveIntegerField(_("Withdraw Amount"), default=0, blank=True, null=True)
     class Meta:
-        ordering = ('-created_at',)
-        verbose_name = _("Freelancer Action")
-        verbose_name_plural = _("Freelancer Action")
+        ordering = ('-id',)
+        verbose_name = _("Freelancer Ejournal")
+        verbose_name_plural = _("Freelancer Ejournal")
 
     def __str__(self):
-        return f'{self.team.title} - {self.position}'
+        return f'{self.get_action_choice_display()} by {self.team.title}'
 
     @classmethod
     def create(cls, account, manager, team, action_choice, transfer_status, gateway=None, debit_amount=None, withdraw_amount=None, team_staff=None, narration=None, position=None):  
