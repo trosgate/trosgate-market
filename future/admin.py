@@ -7,15 +7,15 @@ class FutureReleaseAdmin(admin.ModelAdmin):
     model = FutureRelease
     list_display = ['preview', 'alert']
     list_display_links = ['preview', 'alert']
-    readonly_fields = ['preview', 'alert']
+    readonly_fields = ['deposit','ext_contract','preview', 'alert']
 
     fieldsets = (
-    	('Know this before you launch features', {'fields': ('alert',)}),
-        ('#1 - Transfer/Gift Feature', {'fields': ('transfer',)}),
-        # ('Client Deposit Feature', {'fields': ('deposit',)}),                 
-        ('#2 - More Teams Per Freelancer Feature', {'fields': ('more_team_per_user',)}),
-        # ('Freelancer External client Feature', {'fields': ('ext_contract',)}),
-        ('#3 - Two Factor Authenticator(Email Alert Available)', {'fields': ('sms_authenticator',)}),       
+    	('Know this before you launch Plugin. Also, remember to save your changes', {'fields': ('alert',)}),
+        ('#1 - Client Deposit Plugin', {'fields': ('deposit',)}),                 
+        ('#2 - External Contract Plugin', {'fields': ('ext_contract',)}),
+        ('#3 - Payment Splitter (Transfer) Plugin', {'fields': ('transfer',)}),
+        ('#4 - Teams Builder Plus Plugin', {'fields': ('more_team_per_user',)}),
+        ('#5 - Two Factor Authenticator(Email Alert Available)', {'fields': ('sms_authenticator',)}),       
     )
 
     def get_queryset(self, request):

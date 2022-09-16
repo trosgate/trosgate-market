@@ -223,7 +223,7 @@ class OneClickResolution(models.Model):
                 message=message, 
                 rating=rating, 
             )
-
+            # ........Add a status choice to contract to CLOSE A CONTRACT and hide chat....
             team_manager.pending_balance -= int(resolution.oneclick_sale.total_earning)
             team_manager.save(update_fields=['pending_balance'])
 
@@ -237,7 +237,6 @@ class OneClickResolution(models.Model):
             resolution.save(update_fields=['status'])          
 
             return resolution, oneclick_team, team_manager, review
-
 
 
 class OneClickReview(models.Model):

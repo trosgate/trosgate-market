@@ -18,16 +18,13 @@ class ClientForm(forms.ModelForm):
     company_logo = forms.ImageField(widget=forms.FileInput,)
     department = forms.ModelChoiceField(queryset=Department.objects.all(), widget = forms.RadioSelect) 
     business_size = forms.ModelChoiceField(queryset=Size.objects.all(), widget = forms.RadioSelect) 
-
-          
+         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
          # Personal Details   
         self.fields['gender'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Select Gender'})
-        self.fields['budget_per_hourly_rate'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Budget/Hour'})            
+            {'class': 'form-control', 'placeholder': 'Select Gender'})         
         self.fields['tagline'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'tagline'})
         self.fields['description'].widget.attrs.update(
@@ -54,12 +51,12 @@ class ClientForm(forms.ModelForm):
         model = Client
         fields = [
             # personal details 
-            'gender', 'budget_per_hourly_rate','tagline','description', 'address', 'skill','profile_photo', 'banner_photo', 'brand_name','company_logo','business_size','department',                
+            'gender', 'tagline','description', 'address', 'skill','profile_photo', 'banner_photo', 'brand_name','company_logo','business_size','department',                
         ]
 
         required = [
             # Required details 
-            'gender', 'budget_per_hourly_rate','tagline','description', 'address', 'skill','profile_photo', 'banner_photo', 'brand_name','company_logo','business_size','department',                  
+            'gender', 'tagline','description', 'address', 'skill','profile_photo', 'banner_photo', 'brand_name','company_logo','business_size','department',                  
         ]
 
 class AnnouncementForm(forms.ModelForm):

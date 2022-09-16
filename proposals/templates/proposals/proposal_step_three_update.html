@@ -42,11 +42,13 @@
                             </div>
                             
                             <div class="wt-dashboardboxcontent">                                                               
-                            <div class="alert alert-info justify-content-md-center" role="alert">
-                                <span style="color: blue; font-weight: bold;"> To avoid clients doubts, You are required to create up to three Faqs.</span>
-                            </div> 
+                            
                             <form method='POST' action=''>{% csrf_token %}
-                                                           
+                                {% if proposal.faq_one == '' or proposal.faq_one_description == '' or proposal.faq_two == '' or proposal.faq_two_description == '' or proposal.faq_three == '' or proposal.faq_three_description == '' %}
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <span style="color:red;" role="alert">All Fields are required</span>
+                                </div>
+                                {% endif %}                            
                                 <div class="wt-jobdescription wt-tabsinfo">
                                     <div class="wt-jobdetails wt-tabsinfo">
 										<div class="wt-tabscontenttitle">

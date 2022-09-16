@@ -7,6 +7,7 @@ app_name = 'client'
 # shared app urls
 urlpatterns = [
     path('listing/', views.client_listing, name='client_listing'),
+    path('create_notice/', views.create_notice, name='create_notice'),
     path('deposit-fee/', views.deposit_fee_structure, name='deposit_fee_structure'),
     path('deposit_fee_session/', views.deposit_fee_session, name='deposit_fee_session'),
     path('deposit-final/', views.final_deposit, name='final_deposit'),
@@ -18,6 +19,6 @@ urlpatterns = [
     path('contract_oneclick/', views.one_click_interncontract_checkout, name='one_click_contract_checkout'),
     path('externcontract_one_click_checkout/', views.one_click_externcontract_checkout, name='externcontract_one_click_checkout'),
     path('profile/<slug:short_name>/', views.client_profile, name='client_profile'),
-    path('modify/<str:user_id>/', views.update_client, name='update_client_profile'),
+    path('modify/<slug:short_name>/', views.update_client, name='update_client_profile'),
     
 ]

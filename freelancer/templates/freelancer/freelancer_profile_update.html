@@ -45,27 +45,23 @@
 										</div>
 									<hr>	
 									<form method="POST" enctype="multipart/form-data" class="wt-formtheme wt-userform">{% csrf_token %}	
-											<div class="form-group">
-												{{profileform.gender.label}}
-												{{profileform.gender}}
-											</div>
-											<div class="form-group form-group-half">
-												{{profileform.address.label}}
-												{{profileform.address}}
-											</div>
-											<div class="form-group form-group-half">
-												{{profileform.hourly_rate.label}}
-												{{profileform.hourly_rate}}
-											</div>
-										
-											<div class="form-group">
-												{{profileform.tagline.label}}
-												{{profileform.tagline}}
-											</div>
-											<div class="form-group">
-												{{profileform.description.label}}
-												{{profileform.description}}
-											</div>
+									<div class="form-group">
+										{{profileform.gender.label}}
+										{{profileform.gender}}
+									</div>
+									<div class="form-group">
+										{{profileform.address.label}}
+										{{profileform.address}}
+									</div>
+								
+									<div class="form-group">
+										{{profileform.tagline.label}}
+										{{profileform.tagline}}
+									</div>
+									<div class="form-group">
+										{{profileform.description.label}}
+										{{profileform.description}}
+									</div>
 									</div> 
 									<div class="wt-profilephoto wt-tabsinfo">
 									<div class="wt-tabscontenttitle">
@@ -75,33 +71,33 @@
 										<div class="wt-description">
 											<p>Anytime you upload new image it will replace current one.</p>
 										</div>
-												<div class="form-group form-group-label">
-													<div class="wt-labelgroup">
-															{{profileform.profile_photo}}
-														<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
-													</div>
+											<div class="form-group form-group-label">
+												<div class="wt-labelgroup">
+														{{profileform.profile_photo}}
+													<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
 												</div>
-												<div class="form-group">
-													<ul class="wt-attachfile wt-attachfilevtwo">
-														<li class="wt-uploadingholder wt-companyimg-uploading">
-															<div class="wt-uploadingbox">
-																<div class="wt-designimg">
-																	<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
-																	{% if request.user.freelancer.profile_photo.url %}
-																	<label for="demoz"><img src="{{request.user.freelancer.profile_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
-																	{% else %}
-																	<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
-																	{% endif %}
-																</div>
-																<div class="wt-uploadingbar wt-uploading">
-																	<span class="uploadprogressbar"></span>
-																	<span>Profile Photo.jpg</span>
-																	<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
-																</div>
+											</div>
+											<div class="form-group">
+												<ul class="wt-attachfile wt-attachfilevtwo">
+													<li class="wt-uploadingholder wt-companyimg-uploading">
+														<div class="wt-uploadingbox">
+															<div class="wt-designimg">
+																<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
+																{% if request.user.freelancer.profile_photo %}
+																<label for="demoz"><img src="{{request.user.freelancer.profile_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
+																{% else %}
+																<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
+																{% endif %}
 															</div>
-														</li>
-													</ul>
-												</div>
+															<div class="wt-uploadingbar wt-uploading">
+																<span class="uploadprogressbar"></span>
+																<span>Profile Photo.jpg</span>
+																<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
 										</div> 
 									</div> 
 									<div class="wt-bannerphoto wt-tabsinfo">
@@ -124,7 +120,7 @@
 															<div class="wt-uploadingbox">
 																<div class="wt-designimg">
 																	<input id="id_banner_photo" type="radio" name="banner_photo" value="banner_photo" checked="">
-																	{% if request.user.freelancer.banner_photo.url %}
+																	{% if request.user.freelancer.banner_photo %}
 																	<label for="demoz"><img src="{{request.user.freelancer.banner_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
 																	{% else %}
 																	<label for="demoq"><img src="{% static 'images/banner.jpg' %}" alt="img description"><i class="fa fa-check"></i></label>

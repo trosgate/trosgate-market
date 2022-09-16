@@ -44,27 +44,23 @@
 										</div>
 									<hr>	
 									<form method="POST" enctype="multipart/form-data" class="wt-formtheme wt-userform">{% csrf_token %}	
-											<div class="form-group">
-												{{profileform.gender.label}}
-												{{profileform.gender}}
-											</div>
+										<div class="form-group">
+											{{profileform.gender.label}}
+											{{profileform.gender}}
+										</div>
 
-											<div class="form-group">
-												{{profileform.budget_per_hourly_rate.label}}
-												{{profileform.budget_per_hourly_rate}}
-											</div>
-											<div class="form-group">
-												{{profileform.address.label}}
-												{{profileform.address}}
-											</div>										
-											<div class="form-group">
-												{{profileform.tagline.label}}
-												{{profileform.tagline}}
-											</div>
-											<div class="form-group">
-												{{profileform.description.label}}
-												{{profileform.description}}
-											</div>
+										<div class="form-group">
+											{{profileform.address.label}}
+											{{profileform.address}}
+										</div>										
+										<div class="form-group">
+											{{profileform.tagline.label}}
+											{{profileform.tagline}}
+										</div>
+										<div class="form-group">
+											{{profileform.description.label}}
+											{{profileform.description}}
+										</div>
 									</div> 
 									<div class="wt-profilephoto wt-tabsinfo">
 										<div class="wt-tabscontenttitle">
@@ -74,34 +70,34 @@
 										<div class="wt-description">
 											<p>Anytime you upload new image it will replace current one.</p>
 										</div>
-												<div class="form-group form-group-label">
-													<div class="wt-labelgroup">
-															{{profileform.profile_photo}}
-														<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
+										<div class="form-group form-group-label">
+											<div class="wt-labelgroup">
+													{{profileform.profile_photo}}
+												<em class="wt-fileuploading">Uploading<i class="fa fa-spinner fa-spin"></i></em>
+											</div>
+										</div>
+										<div class="form-group">
+											<ul class="wt-attachfile wt-attachfilevtwo">
+												<li class="wt-uploadingholder wt-companyimg-uploading">
+													<div class="wt-uploadingbox">
+														<div class="wt-designimg">
+															<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
+															{% if request.user.clients.profile_photo.url %}
+															<label for="demoz"><img src="{{request.user.clients.profile_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
+															{% else %}
+															<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
+															{% endif %}
+														</div>
+														<div class="wt-uploadingbar wt-uploading">
+															<span class="uploadprogressbar"></span>
+															<span>Profile Photo.jpg</span>
+															<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
+														</div>
 													</div>
-												</div>
-												<div class="form-group">
-													<ul class="wt-attachfile wt-attachfilevtwo">
-														<li class="wt-uploadingholder wt-companyimg-uploading">
-															<div class="wt-uploadingbox">
-																<div class="wt-designimg">
-																	<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
-																	{% if request.user.clients.profile_photo.url %}
-																	<label for="demoz"><img src="{{request.user.clients.profile_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
-																	{% else %}
-																	<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
-																	{% endif %}
-																</div>
-																<div class="wt-uploadingbar wt-uploading">
-																	<span class="uploadprogressbar"></span>
-																	<span>Profile Photo.jpg</span>
-																	<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
-																</div>
-															</div>
-														</li>
-													</ul>
-												</div>
-										</div> 
+												</li>
+											</ul>
+										</div>
+									</div> 
 									<div class="wt-bannerphoto wt-tabsinfo">
 										<div class="wt-tabscontenttitle">
 											<h2>Banner Photo</h2>
@@ -149,7 +145,6 @@
 											</div>										
 										</div>	
 									<div class="wt-profilephoto wt-tabsinfo">
-									{% if request.user.user_type == 'client' %}
 										<div class="wt-tabscontenttitle">
 											<h2>Branding</h2>
 										</div>
@@ -174,7 +169,7 @@
 															<div class="wt-uploadingbox">
 																<div class="wt-designimg">
 																	<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
-																	{% if request.user.clients.company_logo.url %}
+																	{% if request.user.clients.company_logo %}
 																	<label for="demoz"><img src="{{request.user.clients.company_logo.url}}" alt="img description"><i class="fa fa-check"></i></label>
 																	{% else %}
 																	<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
@@ -190,16 +185,15 @@
 													</ul>
 												</div>
 										</div> 
-									{% endif %}	 					
 									</div> 	
 									<div class="wt-tabcompanyinfo wt-tabsinfo">
 										<div class="wt-tabscontenttitle">
-											<h2>Brand Size</h2>
+											<h2>Specialty</h2>
 										</div>
 										<div class="wt-accordiondetails">
 											<div class="wt-radioboxholder">
 												<div class="wt-title">
-													<h4>No. of employees you have</h4>
+													<h4>No. of employees</h4>
 												</div>
 												<span class="form-group">
 													{% for size in profileform.business_size %}
@@ -209,7 +203,7 @@
 											</div>
 											<div class="wt-radioboxholder">
 												<div class="wt-title">
-													<h4>Your Department?</h4>
+													<h4>Your Department</h4>
 												</div>
 												<span class="form-group">
 													{% for dept in profileform.department %}

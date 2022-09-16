@@ -41,7 +41,6 @@ class Freelancer(models.Model):
     # freelancer details
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("User"), related_name="freelancer", on_delete=models.CASCADE)
     gender = models.CharField(_("Gender"), max_length=10, choices=GENDER)
-    hourly_rate = models.IntegerField(_("Hourly Rate"), default=5, validators=[MinValueValidator(5), MaxValueValidator(500)])
     tagline = models.CharField(_("Tagline"), max_length=100, blank=True)
     description = models.TextField(_("Description"), max_length=2000, blank=True, error_messages={"name": {"max_length": _("Ensure a maximum character of 2000 for description field")}},)
     brand_name = models.CharField(_("Brand Name"), max_length=60, null=True, blank=True)

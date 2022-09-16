@@ -510,7 +510,7 @@
 																				<tr>
 																					<th>#</th>
 																					<th>Name</th>
-																					<th>Label</th>
+																					<th>Price({{base_currency_symbol}})</th>
 																				</tr>
 																			</thead>
 																			<tbody>
@@ -518,7 +518,7 @@
 																				<tr>
 																					<td>{{forloop.counter}} </td>
 																					<td>{% firstof package.verbose_type package.type %}</td>
-																					<td>{{package.get_status_display}}</td>
+																					<td>{{package.price}}</td>
 																				</tr> 
 																				{% endfor %}
 																			</tbody>

@@ -21,7 +21,7 @@ urlpatterns = [
 
     # Urls for Paypal gateway
     path('paypal/checkout/api/', views.paypal_contract_intent, name='paypal_contract_intent'),
-    path('external/paypal/checkout/', views.extern_paypal_contract_intent, name='extern_paypal_contract_intent'),
+    path('paypal/checkout/external/', views.extern_paypal_contract_intent, name='extern_paypal_intent'),
     # Urls for Stripe gateway
     path('stripe_contract_intent/', views.stripe_contract_intent, name='stripe_contract_intent'),
     path('extern_stripe_contract_intent/', views.extern_stripe_contract_intent, name='extern_stripe_contract_intent'),

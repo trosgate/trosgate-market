@@ -59,6 +59,7 @@ class ProposalStepTwoForm(forms.ModelForm):
         for field in self.Meta.required:
             self.fields[field].required = True
 
+
 class ProposalStepThreeForm(forms.ModelForm):
 
     class Meta:
@@ -107,6 +108,27 @@ class ProposalStepFourForm(forms.ModelForm):
         for field in self.Meta.required:
             self.fields[field].required = True
             
+
+class ModifyProposalStepOneForm(forms.ModelForm):
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label='Select category')
+    class Meta:
+        model = Proposal
+        fields = ['preview', 'category','skill']
+        required = ['preview', 'category','skill']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['preview'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Proposal Preview'})
+        self.fields['category'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Proposal Category'})        
+        self.fields['skill'].widget.attrs.update(
+            {'class': 'form-control chosen-select Skills', 'placeholder': 'select some skills'})
+
+        for field in self.Meta.required:
+            self.fields[field].required = True
+
 
 class ProposalChatForm(forms.ModelForm):
     content = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center', 'placeholder': 'send a message',}))

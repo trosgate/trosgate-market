@@ -30,67 +30,67 @@
         <div class="wt-dashboardbox">
             <div class="wt-proposalsr">
                 
-                <br>
-                <br>
-                <br>
-                <div class="container">
-                    <div class='row'>
-                        <div class='col-md-7'>
-                            <div class='card' style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                                <div class='card-body'>
-                                    <h3>Checkout Summary</h3>
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Total</th>
-                                                <th>Fees</th>
-                                                <th>Payable</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>{{base_currency_symbol}}{{contract.grand_total}} </td>
-                                                <td>{{base_currency_symbol}}{{selected_fee}}</td>
-                                                <td>{{base_currency_symbol}}{{grand_total}}</td>
-                                            </tr> 
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                <div class='col-md-12 mt-2'>
-                                    {% if gateway_type.name == "PayPal" %}
-                                    <div id="paypal-button-container"></div>
-                                    {% elif gateway_type.name == "Flutterwave" %}
-                                    <button onclick='flutterwavePay(event)' class="btn btn-success w-100 fw-bold" >
-                                        Pay with flutterwave
-                                    </button>
-                                    {% elif gateway_type.name == "Stripe" %}
-                                    <button 
-                                    onclick='stripePay(event)' id="stripesubmit" class="btn btn-success w-100 fw-bold" >
-                                    Pay with Stripe
-                                    </button>
-                                    {% elif gateway_type.name == "Razorpay" %}
-                                    <button id="rzp-button1" class="btn btn-success w-100 fw-bold">Pay with Razorpay</button>
-                                    {% endif %} 
-                                </div>
-                                <div class='card-body'>
-                                    <div class='col-md-12 mt-6'>
-                                        <h3>Currency Converter</h3>
-                                        {{ currency}}
-                                    </div>
-                                    <div class="p-2 bd-highlight">
-                                        <span id="feedback-converter" style="color:green; text-align:right;">.</span>
-                                    </div>
-                                    <div class='col-md-12 mt-4'>
-                                        <button id="convert-currency" class="btn btn-primary w-100 fw-bold" >Converter</button>
-                                    </div>
-                                    </div>
+            <br>
+            <br>
+            <br>
+            <div class="container">
+                <div class='row'>
+                    <div class='col-md-7'>
+                        <div class='card' style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                            <div class='card-body'>
+                                <h3>Checkout Summary</h3>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th>Fees</th>
+                                            <th>Payable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{base_currency_symbol}}{{contract.grand_total}} </td>
+                                            <td>{{base_currency_symbol}}{{selected_fee}}</td>
+                                            <td>{{base_currency_symbol}}{{grand_total}}</td>
+                                        </tr> 
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            <br>
-                            <br>                        
+                            <div class='row'>
+                            <div class='col-md-12 mt-2'>
+                                {% if gateway_type.name == "PayPal" %}
+                                <div id="paypal-button-container"></div>
+                                {% elif gateway_type.name == "Flutterwave" %}
+                                <button onclick='flutterwavePay(event)' class="btn btn-success w-100 fw-bold" >
+                                    Pay with flutterwave
+                                </button>
+                                {% elif gateway_type.name == "Stripe" %}
+                                <button 
+                                onclick='stripePay(event)' id="stripesubmit" class="btn btn-success w-100 fw-bold" >
+                                Pay with Stripe
+                                </button>
+                                {% elif gateway_type.name == "Razorpay" %}
+                                <button id="rzp-button1" class="btn btn-success w-100 fw-bold">Pay with Razorpay</button>
+                                {% endif %} 
+                            </div>
+                            <div class='card-body'>
+                                <div class='col-md-12 mt-6'>
+                                    <h3>Currency Converter</h3>
+                                    {{ currency}}
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span id="feedback-converter" style="color:green; text-align:right;">.</span>
+                                </div>
+                                <div class='col-md-12 mt-4'>
+                                    <button id="convert-currency" class="btn btn-primary w-100 fw-bold" >Converter</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <br>                        
                         </div>
 
                         <div class='col-md-5'>
@@ -191,7 +191,7 @@
                 },                
                 onApprove: function (data, actions) {
                     return actions.order.capture().then(function(){
-                        let url = "{% url 'contract:paypal_contract_intent' %}"
+                        let url = "{% url 'contract:extern_paypal_intent' %}"
                         return fetch(url, {
                             method: 'POST',
                             headers: {
@@ -237,8 +237,7 @@
             }
             
             let stripe = Stripe('{{stripe_public_key}}');
-                //   /contract/stripe/{{contract.id}}/
-            fetch('/contract/stripe_contract_intent/', {
+            fetch('/contract/extern_stripe_contract_intent/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # custon Apps for trosgate site
     'account',
+    'control_settings',
     'general_settings',
     'freelancer',
     'client',
@@ -69,9 +70,9 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_countries',
     'ckeditor',
+    'embed_video',
     # 'mptt',
     # 'channels',
-    # 'embed_video',
     # 'django_celery_results',
     # 'django_celery_beat',
     # Two factor Authentication

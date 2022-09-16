@@ -8,11 +8,10 @@
 					<div class="row justify-content-md-center">
 						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 							<div class="wt-innerbannercontent">
-                                <div class="wt-title"><h2>Company Detail</h2></div>
+                                <div class="wt-title"><h2>Company Profile</h2></div>
                                     <ol class="wt-breadcrumb">
-                                        <li><a href="index-2.html">Home</a></li>
-                                        <li><a href="companygrid.html">Company Grid</a></li>
-                                        <li class="wt-active">Comapny Detail</li>
+                                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                                        <li class="wt-active">Client</li>
                                     </ol>
                                 </div>
 							</div>
@@ -22,7 +21,6 @@
 			</div>
 			<!--Inner Home End-->
 			<!--Main Start-->
-			{% comment %} <main class="wt-haslayout" style="background:white;"> {% endcomment %}
 			<main class="wt-haslayout wt-innerbgcolor">
 				<div class="wt-haslayout wt-main-section">
 					<!-- User Listing Start-->
@@ -33,7 +31,9 @@
 									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
 										<div class="wt-comsingleimg">
 											{% if client.banner_photo %}
-											<figure><img src="{{client.banner_photo.url}}" alt="img description"></figure>
+											<figure><img src="{{client.banner_photo.url}}" alt="img description" height="300px" width="1110px"></figure>
+											{% else %}
+											<figure><img src="{% static 'images/bannerimg/banner.jpg' %}" alt="img description"></figure>
 											{% endif %}
 										</div>
 									</div>
@@ -50,9 +50,10 @@
 													</div>													
 												</div>		
 											</div>
+											{% if client_staffs|length > 0 %}
 											<div class="wt-widget">
 												<div class="wt-widgettitle">
-													<h2>Company Latest Staff</h2>
+													<h2>Company Hired Staffs</h2>
 												</div>
 												<div class="wt-widgetcontent wt-comfollowers wt-verticalscrollbar">
 													<ul>
@@ -67,13 +68,14 @@
 													</ul>
 												</div>
 											</div>
+											{% endif %}
 											
 											<div class="wt-widget wt-sharejob">
 												<div class="wt-widgettitle">
 													<h2>Notice Board</h2>
 												</div>
-												<div class="wt-widgetcontent">
-													{{client.announcement|linebreaksbr}}
+												<div id="clientNotice" class="wt-widgetcontent">
+													{% include 'client/partials/announcement.html' %}
 												</div>
 											</div>
 											
@@ -133,12 +135,20 @@
 												</div>
 												<div class="wt-description">
 													
-													<form method="POST">{% csrf_token %}
-													{{announcementform.announcement}}
+													<form method="POST">
+													<div class="form-group">
+														<textarea id="id_content" type="text" name="content" class="form-control" placeholder="start typing..."></textarea>
+													</div>
 													<span style="color:blue;" role="alert">Remember: Your new announcement will always replace the previous one</span>
 													<span style="color:red;" role="alert">{{ announcementform.announcement.errors}}</span>
 													<div class="form-group wt-btnarea"><br>
-														<button type="submit" class="wt-btn"> Publish </button>
+														<button type="submit" 
+														id="newAnnouncement" 
+														hx-post="{% url 'client:create_notice' %}" 
+														hx-target="#clientNotice"
+														hx-confirm="Are you sure? Publishing it will make it visible to anyone who visits your profile" 
+														type="submit" 
+														class="wt-btn">Publish</button>
 													</div>
 												</form>	
 												</div>
@@ -205,6 +215,16 @@
 					<!-- User Listing End-->
 				</div>
 			</main>
+            <script>
+                document.body.addEventListener('htmx:configRequest', (event) =>{
+                    event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+                });
 
+            </script>
+            <script>
+                $(document).on("click", "#newAnnouncement", function(){
+                    $("#id_content").val('')
+                })
+            </script>
 {% endblock %}
 

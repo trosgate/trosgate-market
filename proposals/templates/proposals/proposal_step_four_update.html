@@ -42,7 +42,12 @@
                             </div>
                             
                             <div class="wt-dashboardboxcontent">                                                               
-                            
+                                {% if proposal.salary == '' %} 
+                                {% comment %} or proposal.faq_one_description == '' or proposal.faq_two == '' or proposal.faq_two_description == '' or proposal.faq_three == '' or proposal.faq_three_description == '' %} {% endcomment %}
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <span style="color:red;" role="alert">All Fields are required</span>
+                                </div>
+                                {% endif %} 
                                 <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                                            

@@ -44,7 +44,11 @@
                             <div class="wt-dashboardboxcontent">                                                               
                             
                             <form method='POST' action=''>{% csrf_token %}
-                                                           
+                                {% if proposal.description == '' %}
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <span style="color:red;" role="alert">Description field required</span>
+                                </div>
+                                {% endif %}                               
                                 <div class="wt-jobdescription wt-tabsinfo">
                                     <div class="wt-jobdetails wt-tabsinfo">
 										<div class="wt-tabscontenttitle">
@@ -52,7 +56,7 @@
 										</div>                                          
                                         <div class="form-group">
                                             {{proposalformtwo.media|safe}}
-                                            {{proposalformtwo.description}}
+                                            {{proposalformtwo.description|linebreaksbr}}
                                             <span style="color:red;" role="alert">{{ proposalformtwo.description.errors}}</span>
                                         </div>
                                         <div class="form-group">

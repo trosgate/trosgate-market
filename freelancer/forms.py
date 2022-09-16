@@ -37,8 +37,6 @@ class FreelancerForm(forms.ModelForm):
         # personal details
         self.fields['gender'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Select Gender'})
-        self.fields['hourly_rate'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Your Hourly Rate'})
         self.fields['tagline'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'tagline'})
         self.fields['description'].widget.attrs.update(
@@ -95,7 +93,7 @@ class FreelancerForm(forms.ModelForm):
         model = Freelancer
         fields = [
             # personal details required
-            'gender', 'hourly_rate', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'brand_name', 'business_size', 'department',
+            'gender', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'brand_name', 'business_size', 'department',
             #Education and Experience
             'company_name', 'job_position', 'job_description', 'start_date', 'end_date', 'company_name_two', 'job_position_two', 'start_date_two', 'end_date_two', 'job_description_two',
             # Projects and Awards
@@ -104,7 +102,7 @@ class FreelancerForm(forms.ModelForm):
 
         required = [
             # Required details
-            'gender', 'hourly_rate', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'business_size', 'department',
+            'gender', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'business_size', 'department',
         ]
 
 

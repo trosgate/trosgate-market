@@ -21,32 +21,88 @@ class Client(models.Model):
         (FEMALE, _('Female'))
     )
     # Client and freelancer details
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_(
-        "Client"), related_name="clients", on_delete=models.CASCADE)
-    gender = models.CharField(_("Gender"), max_length=10, choices=GENDER)
-    budget_per_hourly_rate = models.IntegerField(
-        _("Budget/Hourly"), default=5, validators=[MinValueValidator(5), MaxValueValidator(500)])
-    tagline = models.CharField(_("Tagline"), max_length=100, blank=True)
-    description = models.TextField(_("Description"), max_length=2000, blank=True, error_messages={
-                                   "name": {"max_length": _("A maximum of 2000 words required")}},)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, 
+        verbose_name=_("Client"), 
+        related_name="clients", 
+        on_delete=models.CASCADE
+    )
+    gender = models.CharField(
+        _("Gender"), 
+        max_length=10, 
+        choices=GENDER
+    )
+
+    tagline = models.CharField(
+        _("Tagline"), 
+        max_length=100, 
+        blank=True
+    )
+    description = models.TextField(
+        _("Description"), 
+        max_length=2000, 
+        blank=True, 
+        error_messages={"name": {"max_length": _("A maximum of 2000 words required")}},
+    )
     brand_name = models.CharField(
-        _("Brand Name"), max_length=60, null=True, blank=True)
+        _("Brand Name"), 
+        max_length=60, 
+        null=True, 
+        blank=True
+    )
     profile_photo = models.ImageField(
-        _("Profile Photo"), upload_to='client/', default='client/avatar5.png')
+        _("Profile Photo"), 
+        upload_to='client/', 
+        default='client/avatar5.png'
+    )
     company_logo = models.ImageField(
-        _("Brand Logo"),  upload_to='client/', default='client/logo.png')
+        _("Brand Logo"), 
+        upload_to='client/', 
+        default='client/logo.png'
+    )
     banner_photo = models.ImageField(
-        _("Banner Photo"),  upload_to='client/', default='client/banner.png')
-    business_size = models.ForeignKey("general_settings.Size", verbose_name=_(
-        "Business Size"), related_name="clients", null=True, blank=True, on_delete=models.PROTECT)
+        _("Banner Photo"), 
+        upload_to='client/', 
+        default='client/banner.png'
+    )
+    business_size = models.ForeignKey(
+        "general_settings.Size", 
+        verbose_name=_("Business Size"), 
+        related_name="clients", 
+        null=True, 
+        blank=True, 
+        on_delete=models.PROTECT
+    )
+    department = models.ForeignKey(
+        'general_settings.Department', 
+        verbose_name=_("Department"),  
+        null=True, 
+        blank=True, 
+        on_delete=models.PROTECT
+    )    
     address = models.CharField(
-        _("Residence Address"), max_length=100, null=True, blank=True)
+        _("Residence Address"), 
+        max_length=100, 
+        null=True, 
+        blank=True
+    )
     skill = models.ManyToManyField(
-        "general_settings.Skill", verbose_name=_("skill"), related_name="clientskill")
+        "general_settings.Skill", 
+        verbose_name=_("skill"), 
+        related_name="clientskill"
+    )
     employees = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="employeefreelancer", default=None, blank=True)
+        settings.AUTH_USER_MODEL, 
+        related_name="employeefreelancer", 
+        default=None, 
+        blank=True
+    )
     announcement = models.TextField(
-        _("Announcement"), max_length=1000, null=True, blank=True)
+        _("Announcement"), 
+        max_length=1000, 
+        null=True, 
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Client Profile'
@@ -62,7 +118,7 @@ class Client(models.Model):
     # profile image display in Admin
     def image_tag(self):
         return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.profile_photo))
-
+    
     image_tag.short_description = 'profile_photo'
 
     # banner image display in Admin

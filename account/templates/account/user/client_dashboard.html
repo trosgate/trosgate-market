@@ -41,7 +41,7 @@
 							<div class="wt-insightdetails">
 								<div class="wt-title">
 									<h3>Profile</h3>
-									<a href="{% url 'client:update_client_profile' user_id=user.id %}">Click To Update</a> |
+									<a href="{% url 'client:update_client_profile' request.user.short_name %}">Click To Update</a> |
 									<a href="{{client_profile.client_profile_get_absolute_url}}"target='_blank'>Click To Preview</a>
 								</div>													
 							</div>	

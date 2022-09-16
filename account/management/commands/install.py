@@ -2,7 +2,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from account.models import Country, Customer
 from general_settings . models import (
-    WebsiteSetting, Category, Department, Size, PaymentsControl,
+    WebsiteSetting, Category, Department, Size, PaymentsControl, SubscriptionGateway,
     Skill, DiscountSystem, PaymentGateway, HiringFee, Currency, Payday, StorageBuckets
 )
 from teams . models import Package, Team
@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
         if not Customer.objects.count():
             call_command("loaddata", "db_admin_auth.json")
-            call_command("loaddata", "db_client_auth.json")
+            # call_command("loaddata", "db_client_auth.json")
             # call_command("loaddata", "db_freelancer_auth.json")
 
         if not WebsiteSetting.objects.count():
@@ -52,6 +52,9 @@ class Command(BaseCommand):
         if not PaymentGateway.objects.count():
             call_command("loaddata", "db_payment_gateways.json")
 
+        if not SubscriptionGateway.objects.count():
+            call_command("loaddata", "db_subscription.json")
+
         if not Payday.objects.count():
             call_command("loaddata", "db_payday.json")
 
@@ -64,8 +67,8 @@ class Command(BaseCommand):
         if not PaymentsControl.objects.count():
             call_command("loaddata", "db_fund_control.json")
 
-        if not Project.objects.count():
-          call_command("loaddata", "db_projects.json")
+        # if not Project.objects.count():
+        #   call_command("loaddata", "db_projects.json")
 
         # if not Proposals.objects.count():
             # call_command("loaddata", "db_proposals.json")

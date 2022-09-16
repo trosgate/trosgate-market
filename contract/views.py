@@ -17,7 +17,7 @@ from client.models import Client
 from django.http import HttpResponse, JsonResponse
 from .contract import BaseContract
 from django.views.decorators.csrf import csrf_exempt
-from transactions.models import Purchase, ContractSale
+from transactions.models import Purchase, ContractSale, ExtContract
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
@@ -504,10 +504,9 @@ def razorpay_contract_intent(request):
         client_fee = total_gateway_fee,
         category = Purchase.CONTRACT,
         salary_paid=grand_total,
-        unique_reference=unique_reference, 
+        unique_reference=unique_reference,
+        status = Purchase.FAILED 
     )
-    purchase.status = Purchase.FAILED
-    purchase.save()
 
     ContractSale.objects.create(
         team=contract.team, 
@@ -746,7 +745,7 @@ def external_contract_detail(request, contract_id, contract_slug):
 
     elif request.user.user_type == Customer.CLIENT:
         contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, client__email=request.user.email)
-        client = get_object_or_404(Client, user__pk=request.user.id, user__is_active=True)
+        client = get_object_or_404(Client, user=request.user, user__is_active=True)
 
     context = {
         "contract": contract,
@@ -784,8 +783,10 @@ def external_contract_fee_selection(request):
         if "externcontractchosen" not in request.session:
             session["externcontractchosen"] = {"contract_id": contract.id}
             session.modified = True
-
-        gateway = PaymentGateway.objects.get(id=gateway_type)
+        try:
+            gateway = PaymentGateway.objects.get(id=gateway_type)
+        except:
+            gateway = None
 
         if "externcontractgateway" not in request.session:
             session["externcontractgateway"] = {"gateway_id": gateway.id}
@@ -814,14 +815,13 @@ def final_external_contract(request, contract_id, contract_slug):
     try:
         gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
     except:
-        messages.error(request, "Something went wrong. Please try again")
+        messages.error(request, "Something went wrong. Please select payment and try again")
         return redirect("contract:external_contract_fee_structure", contract_id=contract.id, contract_slug=contract.slug)
     
     selected_fee = int(gateway_type.processing_fee)
     subtotal = int(contract.grand_total)
     grand_total = subtotal + selected_fee
     
-
     # Stripe payment api
     stripe_public_key = StripeClientConfig().stripe_public_key()
     # Paypal payment api
@@ -858,17 +858,15 @@ def final_external_contract(request, contract_id, contract_slug):
 @login_required
 @user_is_client
 def extern_stripe_contract_intent(request):
+    contract_id = request.session["externcontractchosen"]["contract_id"]
+    gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
     contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED, client__email=request.user.email)
-    try:
-        contract_id = request.session["externcontractgateway"]["contract_id"]
-        gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
-    except:
-        pass
-    
+
     total_gateway_fee = int(gateway_type.processing_fee)
     subtotal = int(contract.grand_total)
     grand_total = subtotal + total_gateway_fee
-    purchase = None    
+    purchase = None
+
     stripe_obj = StripeClientConfig()
     stripe_reference = stripe_obj.stripe_unique_reference()
     stripe.api_key = stripe_obj.stripe_secret_key()
@@ -905,18 +903,17 @@ def extern_stripe_contract_intent(request):
                 country=str(request.user.country),
                 payment_method=str(gateway_type.name),
                 client_fee = int(total_gateway_fee),
-                category = Purchase.CONTRACT,
+                category = Purchase.EX_CONTRACT,
                 salary_paid=contract.grand_total,
-                unique_reference=stripe_reference,           
+                unique_reference=stripe_reference,
+                status=Purchase.FAILED,
+                stripe_order_key=payment_intent           
             )           
-            purchase.stripe_order_key=payment_intent
-            purchase.status=Purchase.FAILED
-            purchase.save()
         except Exception as e:
             print('%s' % (str(e)))
 
         try:
-            ContractSale.objects.create(
+            ExtContract.objects.create(
                 team=contract.team, 
                 purchase=purchase,  
                 contract=contract, 
@@ -924,8 +921,6 @@ def extern_stripe_contract_intent(request):
                 staff_hired=int(1),
                 earning_fee_charged=int(get_external_contract_fee_calculator(contract.grand_total)),                   
                 total_earning_fee_charged=int(get_external_contract_fee_calculator(contract.grand_total)),                   
-                discount_offered=0,
-                total_discount_offered=0,
                 disc_sales_price=int(contract.grand_total),
                 total_sales_price=int(contract.grand_total),
                 earning=round(get_external_contract_gross_earning(contract.grand_total)), 
@@ -943,12 +938,9 @@ def extern_stripe_contract_intent(request):
 @login_required
 @user_is_client
 def extern_paypal_contract_intent(request):
+    contract_id = request.session["externcontractchosen"]["contract_id"]
+    gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
     contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED, client__email=request.user.email)
-    try:
-        contract_id = request.session["externcontractgateway"]["contract_id"]
-        gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
-    except:
-        pass
     
     total_gateway_fee = int(gateway_type.processing_fee)
     subtotal = int(contract.grand_total)
@@ -963,7 +955,7 @@ def extern_paypal_contract_intent(request):
     response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
     
     if response:
-        try:
+        try:        
             purchase = Purchase.objects.create(
                 client=request.user,
                 full_name=response.result.purchase_units[0].shipping.name.full_name,
@@ -975,13 +967,13 @@ def extern_paypal_contract_intent(request):
                 salary_paid=round(float(response.result.purchase_units[0].amount.value)),
                 paypal_order_key=response.result.id,
                 unique_reference=PayPalClient.paypal_unique_reference(),
-                status = Purchase.FAILED
-            )
+                status = Purchase.FAILED           
+            )           
         except Exception as e:
             print('%s' % (str(e)))
 
         try:
-            ContractSale.objects.create(
+            ExtContract.objects.create(
                 team=contract.team, 
                 purchase=purchase,  
                 contract=contract, 
@@ -989,8 +981,6 @@ def extern_paypal_contract_intent(request):
                 staff_hired=int(1),
                 earning_fee_charged=int(get_external_contract_fee_calculator(contract.grand_total)),                   
                 total_earning_fee_charged=int(get_external_contract_fee_calculator(contract.grand_total)),                   
-                discount_offered=0,
-                total_discount_offered=0,
                 disc_sales_price=int(contract.grand_total),
                 total_sales_price=int(contract.grand_total),
                 earning=round(get_external_contract_gross_earning(contract.grand_total)), 
@@ -998,6 +988,7 @@ def extern_paypal_contract_intent(request):
             )
         except Exception as e:
             print('%s' % (str(e)))
+            
         try:
             Purchase.paypal_order_confirmation(pk=purchase.pk)
         except Exception as e:

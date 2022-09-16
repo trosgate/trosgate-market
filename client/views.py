@@ -30,22 +30,10 @@ import json
 @login_required
 def client_profile(request, short_name):
     client = get_object_or_404(Client, user__short_name=short_name)
-    client_staffs = client.employees.all()
+    client_staffs = client.employees.all().exclude(id=client.user.id)
 
     projects = Project.objects.filter(created_by=client.user, status=Project.ACTIVE)
-
-    if request.method == 'POST':
-        announcementform = AnnouncementForm(request.POST or None, instance=client)
-        if announcementform.is_valid():
-            profile = announcementform.save(commit=False)
-            profile.user = request.user
-            profile.save()
-
-            messages.info(request, 'Announcement launched Successfully')
-
-            return redirect("client:client_profile", short_name=short_name)
-    else:
-        announcementform = AnnouncementForm()
+    announcementform = AnnouncementForm()
 
     context = {
         'client': client,
@@ -57,22 +45,37 @@ def client_profile(request, short_name):
 
 
 @login_required
+def create_notice(request):
+    client = get_object_or_404(Client, user=request.user)
+
+    content = request.POST.get('content', '')
+    if content != '' and len(content) <= 1000:
+        client.announcement = content
+        client.save()
+
+    context = {
+        'client':client,
+    }       
+    return render(request, 'client/partials/announcement.html', context)
+
+
+@login_required
 @user_is_client
-def update_client(request, user_id):
-    profile = get_object_or_404(Client, user_id=user_id, user=request.user)
+def update_client(request, short_name):
+    profile = get_object_or_404(Client, user__short_name=short_name, user=request.user)
     if request.method == 'POST':
         profileform = ClientForm(request.POST, request.FILES, instance=profile)
 
         if profileform.is_valid():
-            profile = profileform.save(commit=False)
-            profile.user = request.user
+            profiles = profileform.save(commit=False)
+            profiles.user = request.user
 
-            profile.save()
+            profiles.save()
             profileform.save_m2m()  # for saving manytomany items in forms
 
             messages.info(request, 'Profile updated Successfully')
 
-            return redirect("account:dashboard")
+            return redirect("client:update_client_profile", short_name=profile.user.short_name)
 
     else:
         profileform = ClientForm(instance=profile)

@@ -158,8 +158,8 @@ def freelancer_profile(request, short_name):
 
 
 @login_required
-def update_freelancer(request, user_id):
-    freelancer = get_object_or_404(Freelancer, user_id=user_id, user=request.user)
+def update_freelancer(request, short_name):
+    freelancer = get_object_or_404(Freelancer, user__short_name=short_name, user=request.user)
     if request.method == 'POST':
         profileform = FreelancerForm(request.POST, request.FILES, instance=freelancer)
 
@@ -172,7 +172,7 @@ def update_freelancer(request, user_id):
 
             messages.info(request, 'Profile updated Successfully')
 
-            return redirect("account:dashboard")
+            return redirect("freelancer:update_freelancer_profile", short_name=freelancer.user.short_name)
 
     else:
         profileform = FreelancerForm(instance=freelancer)

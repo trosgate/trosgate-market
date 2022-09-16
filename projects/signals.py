@@ -45,4 +45,3 @@ def create_deadline_of_project(sender, instance, created, **kwargs):
 
 
 
-

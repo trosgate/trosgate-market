@@ -55,9 +55,17 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                     </div>
-                                            
-                                    <div id="proposal-messages" hx-get="{% url 'proposals:fetch_messages' proposal.id %}" hx-trigger="every 2s" hx-swap="innerhtml">
+                                    <p style="color:green" id="proposal-count"> 
+                                        {{chat_count}} Message{{chat_count|pluralize}} Available
+                                    </p>
+                                    <hr>
+                                    <br>
+                                    <div id="proposal-messages" 
+                                        hx-get="{% url 'proposals:fetch_messages' proposal.id %}" 
+                                        hx-trigger="every 1s" 
+                                        hx-swap="innerhtml"> 
                                         {% include 'proposals/components/partial_proposal.html' %}
                                     </div>
                                     <form>

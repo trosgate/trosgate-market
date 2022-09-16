@@ -10,39 +10,55 @@ from django.db import transaction as db_transaction
 
 MAX_OBJECTS = 0
 
+@admin.register(Freelancer)
+class FreelancerAdmin(admin.ModelAdmin):
+    model = Freelancer
+    list_display = ['image_tag', 'user', 'support', 'tagline']
+    list_display_links = ('image_tag', 'user',)    
+    readonly_fields = [
+        'gender', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',
+        'brand_name', 'tagline','description', 'skill', 'business_size', 'department',
+        'company_name','job_position', 'start_date', 'end_date', 'job_description',
+        'company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',
+        'project_title', 'project_url', 'image_one',
+        'project_title_two', 'project_url_two', 'image_two',
+        'project_title_three','project_url_three', 'image_three',
+    ]
+    search_fields = ('user__short_name','gender','tagline',)
+    fieldsets = (
+        ('Personal info', {'fields': ('gender', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
+        ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'skill', 'business_size', 'department',)}),
+        ('Education and Experience #1', {'fields': ('company_name','job_position', 'start_date', 'end_date', 'job_description',)}),
+        ('Education and Experience #2', {'fields': ('company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',)}),
+        ('Projects and Awards #1', {'fields': ('project_title', 'project_url', 'image_one',)}),
+        ('Projects and Awards #2', {'fields': ('project_title_two', 'project_url_two', 'image_two',)}),
+        ('Projects and Awards #3', {'fields': ('project_title_three','project_url_three', 'image_three',)}),
+    )    
 
-# class FreelancerAdmin(admin.ModelAdmin):
-#     model = Freelancer
-#     list_display = ['image_tag', 'user', 'support', 'hourly_rate', 'tagline']
-#     list_display_links = ('image_tag', 'user',)    
-#     readonly_fields = ['image_tag', 'banner_tag','active_team_id']
-#     search_fields = ('user__short_name','gender','tagline',)
-#     fieldsets = (
-#         ('Personal info', {'fields': ('gender', 'hourly_rate', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
-#         ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'skill', 'business_size', 'department',)}),
-#         ('Education and Experience #1', {'fields': ('company_name','job_position', 'start_date', 'end_date', 'job_description',)}),
-#         ('Education and Experience #2', {'fields': ('company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',)}),
-#         ('Projects and Awards #1', {'fields': ( 'project_title', 'project_url', 'image_one',)}),
-#         ('Projects and Awards #2', {'fields': ( 'project_title_two', 'project_url_two', 'image_two',)}),
-#         ('Projects and Awards #3', {'fields': ( 'project_title_three','project_url_three', 'image_three',)}),
-#     )    
+    radio_fields = {'gender': admin.HORIZONTAL}
 
-#     radio_fields = {'gender': admin.HORIZONTAL}
+    def has_add_permission(self, request):
+        return False
 
-#     def has_add_permission(self, request):
-#         return False
+    def has_delete_permission(self, request, obj=None):
+        return False
 
-#     def has_delete_permission(self, request, obj=None):
-#         return False
+    def get_actions(self, request):
+        actions = super().get_actions(request)
 
-#     def get_actions(self, request):
-#         actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
-#         if 'delete_selected' in actions:
-#             del actions['delete_selected']
-#         return actions
+    def get_queryset(self, request):
+        qs = super(FreelancerAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs.all()  
+        else:
+            return qs.filter(pk=0)
 
 
+@admin.register(FreelancerAccount)
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
     list_display = ['id', 'user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
@@ -172,6 +188,7 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(FreelancerAction)
 class FreelancerActionAdmin(admin.ModelAdmin):
     model = FreelancerAction    
     list_display = ['account','team', 'manager', 'action_choice', 'debit_amount', 'withdraw_amount']
@@ -204,5 +221,5 @@ class FreelancerActionAdmin(admin.ModelAdmin):
 
 
 # admin.site.register(Freelancer, FreelancerAdmin)
-admin.site.register(FreelancerAccount, FreelancerAccountAdmin)
-admin.site.register(FreelancerAction, FreelancerActionAdmin)
+# admin.site.register(FreelancerAccount, FreelancerAccountAdmin)
+# admin.site.register(FreelancerAction, FreelancerActionAdmin)

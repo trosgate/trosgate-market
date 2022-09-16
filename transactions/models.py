@@ -192,11 +192,13 @@ class Purchase(models.Model):
     PROPOSAL = 'proposal'
     PROJECT = 'project'
     CONTRACT = 'contract'
+    EX_CONTRACT = 'excontract'
     PURCHASE_CATEGORY = (
         (ONE_CLICK, _('One Click')),
         (PROPOSAL, _('Proposal')),
         (PROJECT, _('Project')),
-        (CONTRACT, _('Contract'))
+        (CONTRACT, _('Contract')),
+        (EX_CONTRACT, _('Ex-Contract'))
     )    
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orderclient")
     full_name = models.CharField(_("Full Name"), max_length=100)
@@ -251,6 +253,13 @@ class Purchase(models.Model):
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
+            
+            if purchase.category == Purchase.EX_CONTRACT:
+                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.client)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
 
         return purchase, contract_item, contract
 
@@ -282,6 +291,13 @@ class Purchase(models.Model):
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
+            if purchase.category == Purchase.EX_CONTRACT:
+                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.client)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
+                
         return purchase, contract_item, contract
 
 
@@ -552,6 +568,51 @@ class ContractSale(models.Model):
             client.save(update_fields=['available_balance'])
 
         return contract_sale, client, freelancer, resolution
+
+
+class ExtContract(models.Model):
+    # status choices to be added to track the state of order
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredextcontractteam', on_delete=models.CASCADE)
+    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="extcontractsales", on_delete=models.CASCADE)
+    contract = models.ForeignKey("contract.Contract", verbose_name=_("Contract Hired"), related_name="extcontracthired", on_delete=models.CASCADE)
+    sales_price = models.PositiveIntegerField(_("Sales Price"))
+    total_sales_price = models.PositiveIntegerField(_("Contract Total"), blank=True, null=True)
+    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), blank=True, null=True)
+    staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
+    earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
+    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"), blank=True, null=True)
+    earning = models.PositiveIntegerField(_("Earning"))
+    total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
+    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
+    is_refunded = models.BooleanField(_("Refunded"), default=False)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return str(self.contract)
+
+    def earning_fee(self):
+        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
+
+    def total_earning_fee(self):
+        return f'{get_base_currency_symbol()} {self.total_earning_fee_charged}'
+
+    def total_discount(self):
+        return f'{get_base_currency_symbol()} {self.discount_offered}'
+
+    def total_discount(self):
+        return f'{get_base_currency_symbol()} {self.Total_discount_offered}'
+
+    def earnings(self):
+        return f'{get_base_currency_symbol()} {self.earning}'
+
+    def earnings(self):
+        return f'{get_base_currency_symbol()} {self.total_earning}'
+
+    def status_value(self):
+        return self.purchase.get_status_display()
 
 
 class SubscriptionItem(models.Model):

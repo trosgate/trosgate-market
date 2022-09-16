@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TermsAndConditions, Hiring, Freelancing, Sponsorship, Sponsor
+from .models import TermsAndConditions, Hiring, Freelancing #Sponsorship, Sponsor
 
 MAX_OBJECTS = 1
 HIRING_MAX_OBJECTS = 4
@@ -89,31 +89,31 @@ class FreelancingAdmin(admin.ModelAdmin):
         return actions
 
 
-class SponsorshipAdmin(admin.ModelAdmin):
-    list_display = ['get_sponsorship_tag', 'title',
-                    'created_at', 'updated_at', 'is_published', ]
-    list_display_links = ['get_sponsorship_tag', 'title', ]
-    list_editable = ['is_published', ]
-    prepopulated_fields = {'slug': ('title',)}
-    readonly_fields = ['get_sponsorship_tag']
-    fieldsets = (
-        ('Basic Info', {
-         'fields': ('title', 'subtitle', 'slug', 'is_published',)}),
-        ('Body Description', {
-         'fields': ('preview', 'backlink', 'thumbnail', 'get_sponsorship_tag',)}),
+# class SponsorshipAdmin(admin.ModelAdmin):
+#     list_display = ['get_sponsorship_tag', 'title',
+#                     'created_at', 'updated_at', 'is_published', ]
+#     list_display_links = ['get_sponsorship_tag', 'title', ]
+#     list_editable = ['is_published', ]
+#     prepopulated_fields = {'slug': ('title',)}
+#     readonly_fields = ['get_sponsorship_tag']
+#     fieldsets = (
+#         ('Basic Info', {
+#          'fields': ('title', 'subtitle', 'slug', 'is_published',)}),
+#         ('Body Description', {
+#          'fields': ('preview', 'backlink', 'thumbnail', 'get_sponsorship_tag',)}),
 
-    )
-    radio_fields = {'is_published': admin.VERTICAL}
+#     )
+#     radio_fields = {'is_published': admin.VERTICAL}
 
 
-class SponsorsAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'availability1',
-                    'availability2', 'availability3', 'created_at', ]
-    list_display_links = ['name', 'email', ]
+# class SponsorsAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'email', 'availability1',
+#                     'availability2', 'availability3', 'created_at', ]
+#     list_display_links = ['name', 'email', ]
 
 
 admin.site.register(TermsAndConditions, TermsAndConditionsAdmin)
 admin.site.register(Hiring, HiringAdmin)
 admin.site.register(Freelancing, FreelancingAdmin)
-admin.site.register(Sponsorship, SponsorshipAdmin)
-admin.site.register(Sponsor, SponsorsAdmin)
+# admin.site.register(Sponsorship, SponsorshipAdmin)
+# admin.site.register(Sponsor, SponsorsAdmin)

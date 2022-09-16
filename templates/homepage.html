@@ -4,6 +4,7 @@
 {% load widget_tweaks %}
 {% block content %}
 
+
 			<div class="wt-haslayout wt-bannerholder">
 				<div class="container">
 					<div class="row">
@@ -16,6 +17,7 @@
 								</figure>
 							</div>
 						</div>
+
 						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-7">
 							<div class="wt-bannercontent">
 								<div class="wt-bannerhead">
@@ -67,32 +69,6 @@
 				</div>
 			</div>
 			
-			<!--Home Banner End-->
-			<div class="wt-categoriesslider-holder wt-haslayout">
-				<div class="wt-title">
-					<h2>All Categories:</h2>
-				</div>
-				<div id="wt-categoriesslider" class="wt-categoriesslider owl-carousel">
-                    {% for category in categories %}
-					<div class="wt-categoryslidercontent item">
-						<figure><img src="{{category.icon.url}}" alt="image description"></figure>
-						<div class="wt-cattitle">
-							<h3><a href="{{category.category_absolute_url}}">{{category.name}}</a></h3>
-							<span>Items: {{category.proposal.count}}</span>
-						</div>
-					</div>
-                    {% endfor %}
-                    {% comment %} {% for category in categories %}
-					<div class="wt-categoryslidercontent item">
-						<figure><img src="{{category.icon.url}}" alt="image description"></figure>
-						<div class="wt-cattitle">
-							<h3><a href="{{category.category_absolute_url}}">{{category.name}}</a></h3>
-							<span>Items: {{category.proposal.count}}</span>
-						</div>
-					</div>
-                    {% endfor %} {% endcomment %}
-				</div>
-			</div>			
 			<!--Main Start-->
 			<main class="wt-haslayout" style="background:white;">
 				<!--Categories Start-->
@@ -123,11 +99,6 @@
 									</div>
 								</div>
                 			{% endfor %}
-								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-									<div class="wt-btnarea">
-										<a href="javascript:void(0)" class="wt-btn">View All</a>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>

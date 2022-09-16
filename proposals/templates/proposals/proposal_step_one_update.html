@@ -44,13 +44,12 @@
                             <div class="wt-dashboardboxcontent">                                                               
 
                             <form method='POST' action=''>{% csrf_token %}
-                                {% if proposalformone.errors %}
-								
+                                {% if proposal.preview == '' or proposal.category == '' or proposal.skill == ''%}
                                 <div class="alert alert-danger text-center" role="alert">
-                                    Ooop! form error occured. Please check below and correct
+                                    <span style="color:red;" role="alert">All Fields are required</span>
                                 </div>
+                                {% endif %}
                                 
-                                {% endif %}      
                                 <div class="wt-jobdescription wt-tabsinfo">
                                     <div class="wt-jobdetails wt-tabsinfo">
                                         <div class="wt-tabscontenttitle">
@@ -58,11 +57,6 @@
                                         </div>      
                                         <div class="form-row">
                                             
-                                            <div class="form-group">
-                                                {{proposalformone.title.label}}
-                                                {{proposalformone.title}}
-                                                <span style="color:red;" role="alert">{{ proposalformone.title.errors}}</span>
-                                            </div> 
                                             <div class="form-group">
                                                 {{proposalformone.preview.label}}
                                                 {{proposalformone.preview}}
@@ -85,16 +79,6 @@
                                                 <select class="chosen-select Skills"{{ proposalformone.skill}}></select>
                                                 <span style="color:red;" role="alert">{{ proposalformone.skill.errors}}</span>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="wt-attachmentsholder">
-                                        <div class="wt-tabscontenttitle">
-                                            <h2>Media</h2>
-                                        </div> 
-                                        <div class="form-group">
-                                            <span>{{proposalformfour.thumbnail.label}}</span>
-                                            {{ proposalformone.thumbnail }}
-                                            <span style="color:red;" role="alert">{{ proposalformone.thumbnail.errors}}</span>
                                         </div>
                                     </div>
                                     </div>

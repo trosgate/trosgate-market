@@ -42,7 +42,7 @@
                         {% if request.user.is_authenticated %}
                         <li
                           class="menu-item-has-children page_item_has_children">
-                          <a href="{% url 'marketing:notice' %}">Notice<sup class="badge badge-danger badge-sm text-white">New</sup></a>
+                          <a href="{% url 'marketing:notice' %}">Notice<small><sup class="badge badge-danger badge-sm text-white">New</sup></small></a>
                         </li>
                         {% endif %}
                         

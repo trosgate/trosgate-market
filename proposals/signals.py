@@ -24,14 +24,6 @@ def replace_old_thumbnail_with_new_one(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Proposal)
-def create_proposal_reference(sender, instance, created, **kwargs):
-    if created and instance.reference == '':
-        ref = f'{instance.pk}'.zfill(8)
-        instance.reference = f'P{instance.team.id}{instance.created_by.id}{ref}'
-        instance.save()
-
-
-@receiver(post_save, sender=Proposal)
 def create_and_assign_proposal_task(sender, instance, created, **kwargs):
     '''
     A good time to create assigner to the proposal

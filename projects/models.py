@@ -140,7 +140,7 @@ class Project(models.Model):
     sample_link = models.URLField(_("Sample Website"), max_length=2083, help_text=_("the link must be a verified url"),null=True,blank=True)
     project_skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("Project Skill"))
     rating = models.PositiveSmallIntegerField(_("Rating"), choices=RATINGS, default=0)
-    amount = models.IntegerField(_("Budget"), default=5, validators=[MinValueValidator(5), MaxValueValidator(50000)], error_messages={"name": {"max_length": _("Set the budget amount (eg.1000) excluding the currency sign")}},)
+    amount = models.IntegerField(_("Budget"), default=10, validators=[MinValueValidator(10), MaxValueValidator(50000)], error_messages={"name": {"max_length": _("Set the budget amount (eg.1000) excluding the currency sign")}},)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     dura_converter = models.CharField(_("Deadline"), max_length=100, choices=PROJECT_DURATION, default = ONE_DAY)
@@ -161,7 +161,10 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         if self.reference is None:
-            self.reference = 'P' + str(uuid4()).split('-')[4]
+            try:
+                self.reference = 'P' + str(uuid4()).split('-')[4]
+            except:
+                self.reference = 'P' + str(uuid4()).split('-')[4]
         super(Project, self).save(*args, **kwargs)
 
 

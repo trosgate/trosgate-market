@@ -42,7 +42,6 @@ from transactions.hiringbox import HiringBox
 import copy
 
 
-
 def Logout(request):
     '''
     This is manual method for user to logout.
@@ -396,7 +395,7 @@ def user_dashboard(request):
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
-        contracts = InternalContract.objects.filter(created_by=request.user)[:10]
+        contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
 
         context = {
             'open_projects': open_projects,

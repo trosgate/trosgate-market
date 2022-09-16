@@ -157,7 +157,7 @@ def lock_fund_email(account, message):
 def send_marked_paid_in_bulk_email(payout):
     # Blueprint for sending mail when payment is marked by admin
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
+    # acceptation_url = settings.WEBSITE_URL
     subject = f'Your withdrawal Ref {payout.reference} was Approved'
     preview = f'Payout Ref {payout.reference} was Approved'
     text_content = f'Invitation to {payout.team.title}.'
@@ -230,7 +230,7 @@ def send_contract_rejected_email(contract):
 def send_withdrawal_marked_failed_email(payout):
     # Blueprint for sending mail when payment error occured
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
+    # acceptation_url = settings.WEBSITE_URL
     subject = f'Your withdrawal Ref {payout.reference} Failed'
     preview = f'Payout Ref {payout.reference} was not processed'
     text_content = f'Your withdrawal with Ref: {payout.reference} Failed.'
@@ -297,7 +297,7 @@ def send_credit_to_team(account):
 def new_ticket_email(ticket):
     # Blueprint for sending mail when new ticket created
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
+    # acceptation_url = settings.WEBSITE_URL
     subject = f'New Ticket {ticket.reference} created'
     preview = f'Ticket No. {ticket.reference} created'
     text_content = f'A New Checkout was paid_amount.'
@@ -321,7 +321,7 @@ def new_ticket_email(ticket):
 def ticket_reply_email(ticketreply):
     # Blueprint for sending mail when ticket replied by support
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
+    # acceptation_url = settings.WEBSITE_URL
     subject = f'Ticket number {ticketreply.ticket.reference} replied'
     preview = f'Ticket No: {ticketreply.ticket.reference} replied'
     text_content = f'A New Checkout was paid_amount.'
@@ -350,7 +350,7 @@ def ticket_reply_email(ticketreply):
 # To be continued
 def send_new_team_email(to_email, team):
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
+    # acceptation_url = settings.WEBSITE_URL
     subject = 'Activate your Team'
     text_content = f'Invitation to {team.title}.'
     html_content = render_to_string('teams/new_team_email.html', {
@@ -371,7 +371,7 @@ def send_new_team_email(to_email, team):
 # Utility function for sending envites to team
 def send_invitation_email(to_email, code, team):
     from_email = get_from_email()
-    acceptation_url = settings.WEBSITE_URL
+    # acceptation_url = settings.WEBSITE_URL
     subject = 'Invitation to Team'
     text_content = f'Invitation to {team.title}. Your code is: %s' % code
     html_content = render_to_string('notification/email_invitation.html', {

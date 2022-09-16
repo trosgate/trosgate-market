@@ -122,13 +122,12 @@ class Proposal(models.Model):
         return sum(tracker.minutes for tracker in self.trackings.all())
 
     def save(self, *args, **kwargs):
+        if self.reference is None:
+            try:
+                self.reference = 'P' + str(uuid4()).split('-')[4]
+            except:
+                self.reference = 'P' + str(uuid4()).split('-')[4]
         super(Proposal, self).save(*args, **kwargs)
-        # if self.thumbnail:
-        #     new_thumbnail = Image.open(self.thumbnail.path)
-        #     if new_thumbnail.height > 769 or new_thumbnail.width > 1280:
-        #         output_size = (769, 1280)
-        #         new_thumbnail.thumbnail(output_size)
-        #         new_thumbnail.save(self.thumbnail.path)
 
 
     def percent_progress(self):

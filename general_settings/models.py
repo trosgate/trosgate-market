@@ -1,10 +1,7 @@
-from pickle import FALSE
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.urls import reverse
-from django.core.cache import cache
-import os
 import uuid
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django_cryptography.fields import encrypt
@@ -192,22 +189,39 @@ class PaymentGateway(models.Model):
 
 
 class SubscriptionGateway(models.Model):
-    name = models.CharField(_("Payment Gateway"), null=True, blank=True, max_length=255, help_text=_(
-        "type of payment gateway e.g PayPal"), unique=True)
-    status = models.BooleanField(_("Status"), choices=(
-        (False, 'Inactive'), (True, 'Active')), default=False)
-    processing_fee = models.PositiveIntegerField(_("Processing Fee"), null=True, blank=True, default=0, help_text=_(
-        "discount price must be less than actual price"), validators=[MinValueValidator(0), MaxValueValidator(20000)])
-    ordering = models.PositiveIntegerField(_("Ordering"), default=1, help_text=_(
-        "This determines how each Gateway will appear to user eg, 1 means 1st position"), validators=[MinValueValidator(1), MaxValueValidator(10)])
-    default = models.BooleanField(_("Default"), choices=(
-        (False, 'No'), (True, 'Yes')), blank=True)
-
+    name = models.CharField(
+        _("Preview"), 
+        max_length=255, 
+        help_text=_("This is the switch to show or hide subscription gateway buttons"), 
+        default="This is the switch for controlling the subscriptions appearing to customer"
+    )
+    paypal = models.BooleanField(
+        _("PayPal"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+    stripe = models.BooleanField(
+        _("Stripe"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+    razorpay = models.BooleanField(
+        _("Razorpay"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+    flutterwave = models.BooleanField(
+        _("Flutterwave"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+   
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
     class Meta:
-        ordering = ['ordering']
+        verbose_name = 'Subscription Gateway'
+        verbose_name_plural = 'Subscription Gateways'
 
 
 class Category(models.Model):
@@ -495,20 +509,47 @@ class ExachangeRateAPI(models.Model):
 
 
 class PaymentsControl(models.Model):
-    preview = models.CharField(_("Payment Settings"), max_length=50,
-                               default="All about Transfer and Withdrawal configuration")
-    min_balance = models.PositiveIntegerField(_("Minimum T/W Balance"), default=0, help_text=_(
-        "After making transfer or withdrawal, User account cannot fall below this limit $(0 - 200)"), validators=[MinValueValidator(0), MaxValueValidator(200)])
-    max_receiver_balance = models.PositiveIntegerField(_("Maximum Receiver Balance"), default=2000, help_text=_(
-        "After making transfer, RECEIVER account cannot fall above this limit $(201 - 2000)"), validators=[MinValueValidator(201), MaxValueValidator(2100)])
-    min_transfer = models.PositiveIntegerField(_("Minimum Transfer"), default=20, help_text=_(
-        "Minimum amount Team Owner/Freelancer can transfer per transaction - $(20 - 200)"), validators=[MinValueValidator(20), MaxValueValidator(200)])
-    max_transfer = models.PositiveIntegerField(_("Maximum Transfer"), default=500, help_text=_(
-        "Maximum amount Team Owner/Freelancer can transfer per transaction - $(201 - 2000)"), validators=[MinValueValidator(201), MaxValueValidator(2100)])
-    min_withdrawal = models.PositiveIntegerField(_("Minimum Withdrawal"), default=20, help_text=_(
-        "Minimum Amont freelancer can withdraw per transaction - $(20 - 200)"), validators=[MinValueValidator(20), MaxValueValidator(200)])
-    max_withdrawal = models.PositiveIntegerField(_("Maximum Withdrawal"), default=500, help_text=_(
-        "Maximum Amont freelancer can withdraw per transaction - $(201 - 2000)"), validators=[MinValueValidator(201), MaxValueValidator(2100)])
+    preview = models.CharField(
+        _("Payment Settings"), 
+        max_length=50,
+        default="All about Transfer and Withdrawal configuration"
+    )
+    min_balance = models.PositiveIntegerField(
+        _("Minimum T/W Balance"), 
+        default=0, 
+        help_text=_("After making transfer or withdrawal, User account cannot fall below this limit $(0 - 200)"), 
+        validators=[MinValueValidator(0), MaxValueValidator(200)]
+    )
+    max_receiver_balance = models.PositiveIntegerField(
+        _("Maximum Receiver Balance"), 
+        default=2000, 
+        help_text=_("After making transfer, RECEIVER account cannot fall above this limit $(201 - 2000)"), 
+        validators=[MinValueValidator(201), MaxValueValidator(2100)]
+    )
+    min_transfer = models.PositiveIntegerField(
+        _("Minimum Transfer"), 
+        default=20, 
+        help_text=_("Minimum amount Team Owner/Freelancer can transfer per transaction - $(20 - 200)"), 
+        validators=[MinValueValidator(20), MaxValueValidator(200)]
+    )
+    max_transfer = models.PositiveIntegerField(
+        _("Maximum Transfer"), 
+        default=500, 
+        help_text=_("Maximum amount Team Owner/Freelancer can transfer per transaction - $(201 - 2000)"), 
+        validators=[MinValueValidator(201), MaxValueValidator(2100)]
+    )
+    min_withdrawal = models.PositiveIntegerField(
+        _("Minimum Withdrawal"), 
+        default=20, 
+        help_text=_("Minimum Amont freelancer can withdraw per transaction - $(20 - 200)"), 
+        validators=[MinValueValidator(20), MaxValueValidator(200)]
+    )
+    max_withdrawal = models.PositiveIntegerField(
+        _("Maximum Withdrawal"), 
+        default=500, 
+        help_text=_("Maximum Amont freelancer can withdraw per transaction - $(201 - 2000)"), 
+        validators=[MinValueValidator(201), MaxValueValidator(2100)]
+    )
 
     class Meta:
 
