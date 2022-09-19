@@ -16,7 +16,7 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_p
 from account.fund_exception import FundException
 from teams.models import Team
 from client.models import ClientAccount
-from resolution.models import ProposalResolution, ProjectResolution, ContractResolution
+from resolution.models import ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
 
 
 class OneClickPurchase(models.Model):
@@ -240,11 +240,11 @@ class Purchase(models.Model):
             contract_item = ''
             
             if purchase.category == Purchase.PROPOSAL:
-                for item in ProposalSale.objects.filter(purchase=purchase):
+                for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
             
             if purchase.category == Purchase.PROJECT:
-                for item in ApplicationSale.objects.filter(purchase=purchase):
+                for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
@@ -257,7 +257,7 @@ class Purchase(models.Model):
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.client)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
@@ -277,11 +277,11 @@ class Purchase(models.Model):
             contract_item = ''
 
             if purchase.category == Purchase.PROPOSAL:
-                for item in ProposalSale.objects.filter(purchase=purchase):
+                for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
             
             if purchase.category == Purchase.PROJECT:
-                for item in ApplicationSale.objects.filter(purchase=purchase):
+                for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
@@ -294,7 +294,7 @@ class Purchase(models.Model):
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.client)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
                 
@@ -329,6 +329,13 @@ class Purchase(models.Model):
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
+
+            # if purchase.category == Purchase.EX_CONTRACT:
+            #     contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+            #     contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
+            #     FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+            #     contract.reaction = 'paid'
+            #     contract.save(update_fields=['reaction'])
 
         return purchase, contract_item, contract
 
@@ -613,6 +620,42 @@ class ExtContract(models.Model):
 
     def status_value(self):
         return self.purchase.get_status_display()
+
+
+    @classmethod
+    def contract_refund(cls, pk:int):
+        with db_transaction.atomic():
+            contract_sale = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=contract_sale.purchase.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=contract_sale.team.created_by)
+            
+            try:
+                resolution = ExtContractResolution.objects.select_for_update().get(contract_sale=contract_sale)            
+            except:
+                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
+            
+            if contract_sale.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            if contract_sale.purchase.status != Purchase.SUCCESS:
+                raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == ProjectResolution.COMPLETED:
+                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
+
+            resolution.status = ProjectResolution.CANCELLED
+            resolution.save()
+
+            contract_sale.is_refunded = True
+            contract_sale.save()
+            
+            freelancer.pending_balance -= int(contract_sale.total_earning)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(contract_sale.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+        return contract_sale, client, freelancer, resolution
 
 
 class SubscriptionItem(models.Model):

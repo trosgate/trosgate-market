@@ -64,7 +64,7 @@ class ProposalReviewAdmin(admin.ModelAdmin):
     list_display_links = ['title']
     list_editable = [ 'status', 'rating']
     search_fields = ['title']
-
+    readonly_fields = ['title', 'resolution', 'rating', 'status']
 
 @admin.register(ContractResolution)
 class ContractResolutionAdmin(admin.ModelAdmin):

@@ -10,15 +10,15 @@ class ProposalAdmin(admin.ModelAdmin):
     list_editable = [ 'status','published']
     search_fields = ['team__title', 'title', 'category__name']
     readonly_fields = [
-        'created_by','image_tag','description', 'sample_link', 'skill',
+        'created_by','image_tag', 'sample_link', 'skill',
         'team', 'category','reference', 'published', 'faq_three', 'faq_three_description',
         'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 
-        'salary','service_level', 'revision', 'dura_converter', 'thumbnail',
+        'salary','service_level', 'revision', 'dura_converter', 'progress', 'thumbnail',
     ]
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
         ('Basic Info', {'fields': ('created_by',)}),
-        ('Classification', {'fields': ('team', 'category','reference', 'published',)}),
+        ('Classification', {'fields': ('team', 'category','reference', 'published','progress',)}),
         ('Description', {'fields': ('description', 'sample_link', 'skill',)}),
         ('FAQs', {'fields': ('faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'faq_three', 'faq_three_description',)}),
         ('Attributes', {'fields': ('salary','service_level', 'revision', 'dura_converter', 'thumbnail',)}),   

@@ -399,6 +399,8 @@ class FreelancerAction(models.Model):
     narration = models.CharField(_("Withdrawal Narration"), max_length=100, blank=True, null=True)
     debit_amount = models.PositiveIntegerField(_("Transfer Amount"), default=0, blank=True, null=True)
     withdraw_amount = models.PositiveIntegerField(_("Withdraw Amount"), default=0, blank=True, null=True)
+    reference = models.CharField(_("Ref Number"), max_length=15, blank=True, help_text=_("This is a unique number assigned for audit purposes"),)
+    
     class Meta:
         ordering = ('-id',)
         verbose_name = _("Freelancer Ejournal")
@@ -446,6 +448,21 @@ class FreelancerAction(models.Model):
         if (action_choice == cls.TRANSFER):
             narration= ''
 
-        action = cls.objects.create(account=account, manager=manager, team=team, gateway=gateway, action_choice=action_choice, transfer_status=transfer_status,
-                                    debit_amount=debit_amount, withdraw_amount=withdraw_amount, team_staff=team_staff, position=position, narration=narration)
+        action = cls.objects.create(
+            account=account, 
+            manager=manager, 
+            team=team, 
+            gateway=gateway, 
+            action_choice=action_choice, 
+            transfer_status=transfer_status,
+            debit_amount=debit_amount, 
+            withdraw_amount=withdraw_amount, 
+            team_staff=team_staff, 
+            position=position, 
+            narration=narration
+        )
+        stan = f'{action.pk}'.zfill(8)
+        action.reference = f'EJ-{stan}'
+        action.save()       
+        
         return action

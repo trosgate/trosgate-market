@@ -191,15 +191,15 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
 @admin.register(FreelancerAction)
 class FreelancerActionAdmin(admin.ModelAdmin):
     model = FreelancerAction    
-    list_display = ['account','team', 'manager', 'action_choice', 'debit_amount', 'withdraw_amount']
-    list_display_links = ['account']
+    list_display = ['reference', 'account', 'team', 'manager', 'action_choice', 'debit_amount', 'withdraw_amount']
+    list_display_links = ['reference','account']
     search_fields = ['team__title', 'position']
     list_filter = ['action_choice']
-    readonly_fields = ['account','team', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
+    readonly_fields = ['account','team', 'reference', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
     list_per_page = 20
     
     fieldsets = (
-        ('Background', {'fields': ('account','team', 'manager','action_choice','created_at', 'transfer_status',)}),
+        ('Background', {'fields': ('account','team', 'manager','action_choice','created_at', 'transfer_status', 'reference',)}),
         ('Other Transfer Info', {'fields': ('team_staff', 'debit_amount',)}),
         ('Other Withdrawal Info', {'fields': ('gateway', 'withdraw_amount', 'narration',)}),
     )    

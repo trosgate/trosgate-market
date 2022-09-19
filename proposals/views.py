@@ -20,9 +20,21 @@ from teams.controller import PackageController
 from account.models import Customer
 from client.models import Client
 from django_htmx.http import trigger_client_event
+from resolution.reviews import (
+    proposal_review_average, 
+    contract_review_average,
+    oneclick_proposal_review_average,
+    oneclick_contract_review_average
+)
+from resolution.models import (OneClickReview, ApplicationReview, ProposalReview, ContractReview)
+from analytics.analytic import (
+    proposal_sales_count_by_proposal,
+    proposal_sales_count_by_contract, 
+    proposal_oneclick_count_by_proposal, 
+    proposal_oneclick_count_by_contract,
+)
+from django.db.models import Sum, Avg, Count
 
-
-#this will appear in search results
 def proposal_listing(request):
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
@@ -476,6 +488,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
 
         if proposal.title != '' and proposal.preview != '' and proposal.category != '' and proposal.skill != '' and description != '' and faq_one != '' and faq_one_description != '' and faq_two != '' and faq_two_description != '' and faq_three != '' and faq_three_description != '' and salary != '' and service_level != '' and revision != '' and dura_converter != '':
             proposal.progress = int(100)
+            proposal.status = Proposal.ACTIVE
             proposal.save()
 
         messages.success(request, 'The Changes were saved successfully!')
@@ -582,6 +595,29 @@ def proposal_detail(request, short_name, proposal_slug):
     team_members = proposal.team.members.all()
     guides = ProposalGuides.objects.all()[:4]
 
+    proposal_review_msg = ProposalReview.objects.filter(
+        resolution__proposal_sale__proposal__team=proposal.team, 
+        resolution__proposal_sale__proposal=proposal,
+        status = True
+    )[:30]
+
+    proposal_review_avg = proposal_review_average(proposal.team, proposal)
+    contract_review_avg = contract_review_average(proposal.team, proposal)
+    oneclick_proposal_review_avg = oneclick_proposal_review_average(proposal.team, proposal)
+    oneclick_contract_review_avg = oneclick_contract_review_average(proposal.team, proposal)
+
+    sales_count_by_proposal = proposal_sales_count_by_proposal(proposal.team, proposal)['sales_count']
+    sales_count_by_contract = proposal_sales_count_by_contract(proposal.team, proposal)['sales_count'] 
+    oneclick_count_by_proposal = proposal_oneclick_count_by_proposal(proposal.team, proposal)['sales_count'] 
+    oneclick_count_by_contract = proposal_oneclick_count_by_contract(proposal.team, proposal)['sales_count']
+
+    overal_proposal_sales_count = (
+        sales_count_by_proposal+ 
+        sales_count_by_contract+
+        oneclick_count_by_proposal+
+        oneclick_count_by_contract
+    )
+
     all_viewed_proposals = ''
     proposal_id = proposal.id
     session = request.session
@@ -604,11 +640,22 @@ def proposal_detail(request, short_name, proposal_slug):
     
     request.session.modified = True
     context = {
+        'base_currency':get_base_currency_symbol(),
         "proposal": proposal,
+        "overal_proposal_sales_count": overal_proposal_sales_count,
+        "sales_count_by_proposal": sales_count_by_proposal,
+        "sales_count_by_contract": sales_count_by_contract,
+        "oneclick_count_by_proposal": oneclick_count_by_proposal,
+        "oneclick_count_by_contract": oneclick_count_by_contract,
         "other_proposals": other_proposals,
         "team_members": team_members,
         "profile_view": profile_view,
         "guides": guides,
+        "proposal_review_avg": proposal_review_avg,
+        "contract_review_avg": contract_review_avg,
+        "oneclick_proposal_review_avg": oneclick_proposal_review_avg,
+        "oneclick_contract_review_avg": oneclick_contract_review_avg,
+        "proposal_review_msg":proposal_review_msg,
         "sesion_proposal":sesion_proposal,
         "all_viewed_proposals":all_viewed_proposals,
     }

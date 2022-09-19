@@ -437,12 +437,12 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         if session.payment_status == 'paid':
-            if session.mode == 'payment':# else a subscription
+            if session.mode == 'payment':
                 try:
-                    Purchase.stripe_order_confirmation(session.payment_intent) # Yet to test this with internet                    
+                    Purchase.stripe_order_confirmation(session.payment_intent)                    
                 except Exception as e:
                     print('%s' % (str(e)))
-            else:
+            else:# else a subscription
                 try:                            
                     package = Package.objects.get(is_default=False, type='Team')
                     team = Team.objects.get(pk=session.get('client_reference_id'))
@@ -605,7 +605,7 @@ def razorpay_application_intent(request):
         notes = notes, 
         receipt = purchase.unique_reference
     ))
-    print('razorpay_order', razorpay_order['id'])
+
     purchase.razorpay_order_key = razorpay_order['id']
     purchase.save()
 

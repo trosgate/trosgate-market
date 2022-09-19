@@ -13,7 +13,7 @@
 					<div class="wt-title"><h2>Proposal Search</h2></div>
 					<ol class="wt-breadcrumb">
 						<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-						<li class="wt-active">Job</li>
+						<li class="wt-active">Hire proposal</li>
 					</ol>
 					</div>
 				</div>
@@ -39,7 +39,6 @@
 		</div>
 	</div>
 
-	<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
 		<div class="wt-haslayout wt-main-section">
 			<!-- User Listing Start-->
 			<div class="wt-haslayout">
@@ -206,7 +205,7 @@
 														{% for country in countries %}
 														<span class="wt-checkbox">
 															<input id="{{country.name}}" class="proposal-checked" type="checkbox" data-filter="country" name="{{country.name}}" value="{{country.id}}">
-															<label for="{{country.name}}"><img src="{% if country.flag %} {{country.flag.url}} {% endif %}" alt="img description"> {{country.name}}</label>
+															<label for="{{country.name}}">{{country.name}}</label>
 														</span>
 														{% endfor %}
 													</div>
@@ -238,7 +237,7 @@
 								</aside>
 							</div>
 							<div class="ajaxLoader">Loading...</div>
-							<div id="proposalTotal" class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left text-center"><em>{{totalcount}}</em></div>
+							<div id="proposalTotal" class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left text-center"><em style="color:green;">{{totalcount}}</em></div>
 							<div id="proposalSuccessFilter" class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
 								<div class="wt-userlistingholder wt-haslayout">
 									{% for proposal in proposals %}
@@ -295,7 +294,7 @@
 			</div>
 			<!-- User Listing End-->
 		</div>
-	</main>
+
 
 	{% endblock %}
 

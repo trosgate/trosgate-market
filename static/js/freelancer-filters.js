@@ -20,13 +20,10 @@ $(document).ready(function(){
                 
             },
             success: function (json) {
-                console.log(json)
                 document.getElementById("freelancerTotal").innerHTML = json.totalcount;
                 $('#freelancerSuccessFilter').html(json.freelancer_list);
             },
-            error: function (error) {
-                console.log(error)
-            }
+            error: function (xhr, errmsg, err) {}
         });
     });
 });

@@ -22,37 +22,20 @@
 							<div class="wt-bannercontent">
 								<div class="wt-bannerhead">
 									<div class="wt-title">
-										<h2 style="color:white">Hire expert for {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
+										<h2 style="color:white">Hire Expert, Team</h2>
+										<h2 style="color:white">in {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
 									</div>
 									<div class="wt-description">
 										<p>Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.</p>
 									</div>
 								</div>
-								<form class="wt-formtheme wt-formbanner">
+								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
 									<fieldset>
 										<div class="form-group">
-											<input type="text" name="fullname" class="form-control" placeholder="I’m looking for">
-											<div class="wt-formoptions">
-												<div class="wt-dropdown">
-													<span>In: <em class="selected-search-type">Freelancers </em><i class="lnr lnr-chevron-down"></i></span>
-												</div>
-												<div class="wt-radioholder">
-													<span class="wt-radio">
-														<input id="wt-freelancers" data-title="Freelancers" type="radio" name="searchtype" value="freelancer" checked>
-														<label for="wt-freelancers">Freelancers</label>
-													</span>
-													<span class="wt-radio">
-														<input id="wt-jobs"  data-title="Jobs" type="radio" name="searchtype" value="job">
-														<label for="wt-jobs">Jobs</label>
-													</span>
-													<span class="wt-radio">
-														<input id="wt-company"  data-title="Companies" type="radio" name="searchtype" value="job">
-														<label for="wt-company">Companies</label>
-													</span>
-												</div>
-												<a type="button" href="userlisting.html" class="wt-searchbtn"><i class="lnr lnr-magnifier"></i></a>
-											</div>
+											{{searchform.search_type}}
 										</div>
+										{% comment %} hx-get="/searchtype/" {% endcomment %}
+										{% comment %} <span id="searchtypeId" style="color:green" class="input-group col-lg-12"></span> {% endcomment %}
 									<fieldset>
 								</form>
 								<div class="wt-videoholder">
@@ -529,5 +512,31 @@
 		})
 		
 	</script>
-			
+
+	<script>
+        //Script to add proposal quantity in session             
+        $(document).on('change', '#id_search_type', function (e) {
+        e.preventDefault();
+		mysearchval = $('#id_search_type option:selected').val()
+		//console.log(mysearchval)
+        $.ajax({
+            type: 'POST',
+            url: '{% url "account:searchtype" %}',
+            data: {
+                searchVal: $('#id_search_type option:selected').val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'searching-type'
+            },
+            success: function (json) {
+                if (mysearchval === 'freelancer'){
+					window.location.href = "{% url 'freelancer:freelancer_listing' %}"
+				}
+				else if (mysearchval === 'proposal'){
+					window.location.href = "{% url 'proposals:proposal_list' %}"
+				}
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+        })
+    </script>
 {% endblock %}

@@ -4,7 +4,7 @@ from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
-from .forms import ProposalRefundForm, ApplicationRefundForm, ContractRefundForm
+from .forms import ProposalRefundForm, ApplicationRefundForm, ContractRefundForm, ExtContractRefundForm
 
 
 class OneClickPurchaseAdmin(admin.ModelAdmin):
@@ -298,8 +298,8 @@ class ContractSaleAdmin(admin.ModelAdmin):
 class ExtContractAdmin(admin.ModelAdmin):
     model = ExtContract
     list_display = [
-        'team', 'created_at','total_sales_price', 'status_value', 'is_refunded'
-    ] #, 'admin_action'   
+        'team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action'
+    ]   
     list_filter = ['purchase__status']
     readonly_fields = [
         'team', 'purchase','contract', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged',
@@ -314,71 +314,71 @@ class ExtContractAdmin(admin.ModelAdmin):
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 
-    # def get_urls(self):
-    #     urls = super().get_urls()
-    #     pattern = [
-    #         path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='ext-contract-refund'),
-    #     ]
-    #     return pattern + urls
+    def get_urls(self):
+        urls = super().get_urls()
+        pattern = [
+            path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='ext-contract-refund'),
+        ]
+        return pattern + urls
 
 
-    # def admin_action(self, obj):
-    #     return format_html(
-    #         '<a class="button" href="{}"> Refund</a>',
-    #         reverse('admin:contract-refund', args=[obj.pk]),
-    #     )
+    def admin_action(self, obj):
+        return format_html(
+            '<a class="button" href="{}"> Refund</a>',
+            reverse('admin:ext-contract-refund', args=[obj.pk]),
+        )
     
-    # admin_action.allow_tags = True
-    # admin_action.short_description = 'Admin Action'
+    admin_action.allow_tags = True
+    admin_action.short_description = 'Admin Action'
 
-    # def approve_refund(self, request, pk, *args, **kwargs):
-    #     return self.process_action(
-    #         request=request,
-    #         pk=pk,
-    #         action_form=ContractRefundForm,
-    #         action_title='About to issue refund. Action is irreversible so be sure',
-    #     )
+    def approve_refund(self, request, pk, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            pk=pk,
+            action_form=ExtContractRefundForm,
+            action_title='About to issue refund. Action is irreversible so be sure',
+        )
 
-    # def process_action(self, request, pk, action_form, action_title):
-    #     account = self.get_object(request, pk)
-    #     form = ''
-    #     error_message = ''
-    #     if request.method != 'POST':
-    #         form = action_form()
-    #     else:
-    #         form = action_form(request.POST)
-    #         if form.is_valid():
-    #             try:
-    #                 form.save(pk)
-    #             except Exception as e:
-    #                 error_message = str(e)
-    #                 print(error_message)
-    #                 pass
-    #             else:
-    #                 self.message_user(request, 'Successfully made refund')
-    #                 url = reverse('admin:transactions_contractsale_change', args=[pk], current_app=self.admin_site.name)
-    #                 return HttpResponseRedirect(url)
+    def process_action(self, request, pk, action_form, action_title):
+        account = self.get_object(request, pk)
+        form = ''
+        error_message = ''
+        if request.method != 'POST':
+            form = action_form()
+        else:
+            form = action_form(request.POST)
+            if form.is_valid():
+                try:
+                    form.save(pk)
+                except Exception as e:
+                    error_message = str(e)
+                    print(error_message)
+                    pass
+                else:
+                    self.message_user(request, 'Successfully made refund')
+                    url = reverse('admin:transactions_extcontract_change', args=[pk], current_app=self.admin_site.name)
+                    return HttpResponseRedirect(url)
 
-    #     context = self.admin_site.each_context(request)
-    #     context['opts'] = self.model._meta
-    #     context['form'] = form
-    #     context['account'] = account
-    #     context['title'] = action_title
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        context['form'] = form
+        context['account'] = account
+        context['title'] = action_title
 
-    #     return TemplateResponse(request, 'admin/account/contract_refund.html', context)
+        return TemplateResponse(request, 'admin/account/ext_contract_refund.html', context)
 
-    # def has_add_permission(self, request):        
-    #     return False
+    def has_add_permission(self, request):        
+        return False
 
-    # def has_delete_permission(self, request, obj=None):
-    #     return False
+    def has_delete_permission(self, request, obj=None):
+        return False
 
-    # def get_actions(self, request):
-    #     actions = super().get_actions(request)
+    def get_actions(self, request):
+        actions = super().get_actions(request)
 
-    #     if 'delete_selected' in actions:
-    #         del actions['delete_selected']
-    #     return actions
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 class SubscriptionItemAdmin(admin.ModelAdmin):

@@ -156,9 +156,7 @@ class ClientAccount(models.Model):
             account = cls.objects.select_for_update().get(user=user)
             account.available_balance -= available_balance
             account.save(update_fields=['available_balance'])           
-
             db_transaction.on_commit(lambda: print('client debited:', account, available_balance))
-
         return account
 
 

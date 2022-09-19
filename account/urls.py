@@ -59,6 +59,7 @@ htmx_urlpatterns = [
     path("verify_username/", verify_username, name = "verify_username"), 
     path("verify_team/", verify_team, name = "verify_team"),
     path('user_types/', user_types, name='user_types'),
+    path('searchtype/', user_types, name='searchtype'),
 ]
 
 urlpatterns += htmx_urlpatterns

@@ -22,14 +22,11 @@ $(document).ready(function(){
                 $('.ajaxLoader').show();
             },
             success: function (json) {
-                console.log(json)
                 $('.ajaxLoader').hide();
                 document.getElementById("proposalTotal").innerHTML = json.totalcount;
                 $('#proposalSuccessFilter').html(json.proposals);
             },
-            error: function (error) {
-                console.log(error)
-            }
+            error: function (xhr, errmsg, err) {}
         });
     });
 });

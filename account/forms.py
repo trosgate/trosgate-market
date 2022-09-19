@@ -8,6 +8,23 @@ from django import forms
 from datetime import datetime
 
 
+class SearchTypeForm(forms.Form):
+    WELCOME = 'welcome'
+    FREELANCER = 'freelancer'
+    PROPOSAL = 'proposal'
+    USER_TYPE = (
+        (WELCOME, _('Select search option')),
+        (FREELANCER, _('Search Freelancer')),
+        (PROPOSAL, _('Seaarch Proposal')),
+    )
+    search_type = forms.ChoiceField(choices=USER_TYPE, label="Select Type")
+
+    def __init__(self, *args, **kwargs):
+        super(SearchTypeForm, self).__init__(*args, **kwargs)
+
+        self.fields['search_type'].widget.attrs.update(
+            {'class': 'form-control'})
+
 
 class CustomerRegisterForm(forms.ModelForm):
     FREELANCER = 'freelancer'

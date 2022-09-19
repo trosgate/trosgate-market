@@ -35,7 +35,7 @@
 				</div>
 			</div>
 			<!--Inner Home End-->
-			<!--Main Start-->
+
 
 			<div class="wt-main-section wt-haslayout">
 				<!-- User Listing Start-->
@@ -61,7 +61,7 @@
 												{% for country in countries %}
 												<span class="wt-checkbox">
 													<input id="{{country.name}}" class="freelancer-checked" type="checkbox" data-filter="country" name="{{country.name}}" value="{{country.id}}">
-													<label for="{{country.name}}"><img src="{% if country.flag %} {{country.flag.url}} {% endif %}" alt="img description"> {{country.name}}</label>
+													<label for="{{country.name}}"> {{country.name}}</label>
 												</span>
 												{% endfor %}
 											</div>
@@ -204,7 +204,7 @@
 						</aside>
 					</div>
 					<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
-						<div id="freelancerTotal" class="wt-userlistingtitle text-center"><em>{{totalcount}}</em></div>
+						<div id="freelancerTotal" class="wt-userlistingtitle text-center"><em style="color:green;">{{totalcount}}</em></div>
 						<div id="freelancerSuccessFilter" class="wt-userlistingholder wt-userlisting wt-haslayout">
 							
 							{% for profile in freelancer_list %}

@@ -1,5 +1,4 @@
-from multiprocessing import context
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .tokens import account_activation_token
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -7,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text
 from django.contrib import auth, messages
-from .forms import CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
+from .forms import SearchTypeForm, CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer, Country, TwoFactorAuth
 from proposals.models import Proposal
@@ -40,6 +39,9 @@ from applications.application import ApplicationAddon
 from contract.contract import BaseContract
 from transactions.hiringbox import HiringBox
 import copy
+from django.urls import reverse
+from django_htmx.http import HttpResponseClientRedirect
+
 
 
 def Logout(request):
@@ -100,7 +102,7 @@ def homepage(request):
     users = Freelancer.active.all().distinct()[0:12]
     supported_country = Country.objects.filter(supported=True)    
     regform = CustomerRegisterForm(supported_country, request.POST or None)
-
+    searchform = SearchTypeForm()
     if request.user.is_authenticated:
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('account:dashboard')
@@ -146,8 +148,25 @@ def homepage(request):
         'regform': regform,
         'userregistrationmodal': "userregistrationmodal",
         'base_currency': base_currency,
+        'searchform': searchform,
     }
     return render(request, 'homepage.html', context)
+
+
+def searchtype(request):
+    if request.POST.get('action') == 'searching-type':
+        searchvalue = str(request.POST.get('searchVal'))
+        return JsonResponse({'searchvalue':searchvalue})
+
+# def searchtype(request):
+#     type = request.GET.get('user_type')
+#     if type =="freelancer":
+#     if request.GET.get('search_type') == 'freelancer':
+#         print('printed:', request.GET.get('search_type'))
+#     # if 'freelancer' in request.GET:
+#     #     print('it happened')
+#         return HttpResponseClientRedirect('/freelancer/freelancer_search/')
+
 
 
 # @confirm_recaptcha

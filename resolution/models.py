@@ -777,3 +777,165 @@ class ContractCompletionFiles(models.Model):
         return self.contract.team.title
 
 
+class ExtContractResolution(models.Model):
+    ONE_DAY = "one_day"
+    TWO_DAYS = "two_days"
+    THREE_DAYS = "three_days"
+    FOUR_DAYS = "four_days"
+    FIVE_DAYS = "five_days"
+    SIX_DAYS = "six_days"
+    ONE_WEEK = "one_week"
+    TWO_WEEK = "two_weeks"
+    THREE_WEEK = "three_weeks"
+    ONE_MONTH = "one_month"
+    TWO_MONTH = "two_month"
+    THREE_MONTH = "three_months"
+    FOUR_MONTH = "four_months"
+    FIVE_MONTH = "five_months"
+    SIX_MONTH = "six_months"
+
+    ONGOING = 'ongoing'
+    CANCELLED = 'cancelled'
+    COMPLETED = 'completed'
+    STATUS_CHOICES = (
+        (ONGOING, _("Ongoing")),
+        (CANCELLED, _("Cancelled")),
+        (COMPLETED, _("Completed")),
+    )  
+    # Resolution parameters
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='approvedextcontractteam', on_delete=models.CASCADE)
+    contract_sale = models.ForeignKey("transactions.ExtContract", verbose_name=_("Contract Awarded"), related_name="extcontractaction", on_delete=models.CASCADE)
+    start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
+    end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)   
+    status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=ONGOING)    
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+        
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("Ext-Contract Awarded")
+        verbose_name_plural = _("Ext-Contract Awarded")
+
+    def __str__(self):
+        return f'{self.team.title} vrs. {self.contract_sale.purchase.client.get_full_name()}'
+
+
+    @classmethod
+    def review_and_approve(cls, resolution_pk, team, title:str, message:str, rating:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution_pk)
+            contract_team = Team.objects.select_for_update().get(pk=team.id)
+            team_manager = FreelancerAccount.objects.select_for_update().get(user=team.created_by)
+
+            if title == '':
+                raise ReviewException(_("Title is required"))
+            if message == '':
+                raise ReviewException(_("Message is required"))
+            if rating  == '':
+                raise ReviewException(_("rating is required"))
+
+            review = ExtContractReview.create(
+                resolution=resolution, 
+                title=title, 
+                message=message, 
+                rating=rating, 
+            )
+
+            team_manager.pending_balance -= int(resolution.contract_sale.total_earning)
+            team_manager.save(update_fields=['pending_balance'])
+
+            team_manager.available_balance += int(resolution.contract_sale.total_earning)
+            team_manager.save(update_fields=['available_balance'])
+
+            contract_team.team_balance += int(resolution.contract_sale.total_earning)
+            contract_team.save(update_fields=['team_balance'])
+
+            resolution.status = 'completed'
+            resolution.save(update_fields=['status'])          
+
+            return resolution, contract_team, team_manager, review
+
+
+    @classmethod
+    def start_new_contract(cls, contract_sale, team):
+        with db_transaction.atomic():  
+
+            contract = cls.objects.create(
+                contract_sale=contract_sale, team=team, start_time=timezone.now()
+            )
+
+            if contract.contract_sale.contract.contract_duration == cls.ONE_DAY:
+                contract.end_time = one_day()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.TWO_DAYS:
+                contract.end_time = two_days()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.THREE_DAYS:
+                contract.end_time = three_days()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.FOUR_DAYS:
+                contract.end_time = four_days()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.FIVE_DAYS:
+                contract.end_time = five_days()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.SIX_DAYS:
+                contract.end_time = six_days()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.ONE_WEEK:
+                contract.end_time = one_week()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.TWO_WEEK:
+                contract.end_time = two_weeks()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.THREE_WEEK:
+                contract.end_time = three_weeks()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.ONE_MONTH:
+                contract.end_time =one_month()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.TWO_MONTH:
+                contract.end_time =two_months()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.THREE_MONTH:
+                contract.end_time =three_months()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.FOUR_MONTH:
+                contract.end_time = four_months()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.FIVE_MONTH:
+                contract.end_time = five_months()
+                contract.save()
+            if contract.contract_sale.contract.contract_duration == cls.SIX_MONTH:
+                contract.end_time = six_months()
+                contract.save()
+
+        return contract
+
+
+class ExtContractReview(models.Model):
+    resolution = models.ForeignKey(ExtContractResolution, verbose_name=_("Contract Review"), related_name="reviewextcontract", on_delete=models.CASCADE)
+    title = models.CharField(_("Title"), max_length=100)
+    message = models.TextField(_("Message"), max_length=650)
+    rating = models.PositiveSmallIntegerField(_("Rating"), default=3)
+    status = models.BooleanField(_("Confirm Work"), choices=((False, 'Pending'), (True, 'Completed')), default=True)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _("Contract Review")
+        verbose_name_plural = _("Contract Review")
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def create(cls, resolution, title, message, rating):
+        
+        if title == '':
+            raise ReviewException(_("Title is required"))
+        if message == '':
+            raise ReviewException(_("Message is required"))
+        if rating is None:
+            raise ReviewException(_("rating is required"))   
+
+        return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
