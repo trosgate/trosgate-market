@@ -28,7 +28,7 @@
                         <div class="wt-dashboardbox">
                             <div class="wt-dashboardboxtitle">
                                 <h2>Contract Details</h2>
-                                <a href="{% url 'contract:internal_contract_list' %}" class="text-primary">Take Me Back</a>								
+                                <a href="{% url 'contract:internal_contract_list' %}" class="text-primary">Return to Contracts</a>								
                             </div>
                             
                             <div class="wt-dashboardboxcontent">
@@ -67,8 +67,8 @@
                                             <th scope="col">#</th>
                                             <th scope="col">Line Services</th>
                                             <th scope="col">Quantity</th>
-                                            <th scope="col">Price($)</th>
-                                            <th scope="col">Total($)</th>
+                                            <th scope="col">Price({{base_currency}})</th>
+                                            <th scope="col">Total({{base_currency}})</th>
                                         </tr>
                                     </thead>
                                     
@@ -119,7 +119,7 @@
                                         </tr>
                                         {% endif %}
                                         <tr>
-                                            <td colspan="4"><strong>Grand Total ($)</strong></td>
+                                            <td colspan="4"><strong>Grand Total ({{base_currency}})</strong></td>
                                             <td><strong>{{ contract.grand_total}}</strong></td>
                                         </tr>                                                
                                     </tbody>

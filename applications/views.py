@@ -111,7 +111,7 @@ def application_detail(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
 
     if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id,status=Team.ACTIVE, members__in=[request.user])
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
         applications = Application.objects.filter(project=project, team=team)
     elif request.user.user_type == Customer.CLIENT:
         applications = Application.objects.filter(project=project, project__created_by=request.user)
@@ -333,7 +333,6 @@ def stripe_application_intent(request):
             )
         applicant_box.clean_box()
         return JsonResponse({'session': session, 'order': payment_intent})
-
 
 
 @login_required

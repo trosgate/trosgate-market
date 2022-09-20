@@ -150,6 +150,29 @@
 						</div>
 					</div>
 				</section>
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+							<figure class="wt-mobileimg">
+								<img src="{% static 'images/work/img-03.jpg' %}" alt="img description">
+							</figure>
+						</div>
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+							<div class="wt-experienceholder">
+								<div class="wt-sectionhead">
+									<div class="wt-sectiontitle">
+										<h2>#1 Choice for Businesses</h2>
+										<span>Business on the Go</span>
+									</div>
+									<div class="wt-description">
+										<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce.</p>
+										<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumed perspiciatis.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 				{% if not request.user.is_authenticated %}
 				<section class="wt-haslayout wt-main-section">
 					<div class="container">
@@ -157,8 +180,8 @@
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
 								<div class="wt-sectionhead wt-textcenter">
 									<div class="wt-sectiontitle">
-										<h2>Top Freelancer</h2>
-										<span>Our Freelancer Picks</span>
+										<h2>Published Jobs</h2>
+										<span>Apply and get Hired</span>
 									</div>
 								</div>
 							</div>
@@ -166,24 +189,23 @@
 					</div>		
 					<div class="container">
 						<div class="row justify-content-md-center">
-						{% for user in users %}
+						{% for project in projects %}
 						<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
 							<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
 								<div class="wt-proposalsr wt-box-shadow">
 									<div class="wt-proposalsrcontent">
-									<a href="{% url 'freelancer:freelancer_profile' user.user.short_name %}"> 
-										<figure><img src="{% if user.profile_photo %} {{user.profile_photo.url }}{% endif %}" style="height:60px; width:60px" alt="image"></figure>
+									<a href=""> 
+										<figure><img src="{% firstof project.created_by.clients.company_logo.url project.created_by.clients.profile_photo.url %}" style="height:60px; width:60px" alt="image"></figure>
 									</a>
-									<h4>{{user.user.get_full_name}}</h4>
-									<span>{{user.tagline}}</span>
+									<h4>{% firstof project.created_by.clients.brand_name project.created_by.get_full_name %}</h4>
+									<span>{{project.title}}</span>
 									<div class="wt-title">
 										<div class="wt-proposalhead">
 											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-												<li><span><i class="fa fa-dollar-sign"></i> Worth: {{proposal.get_service_level_display}}</span></li>
-												<li><span>{% if user.user.country.flag %}<img src="{{user.user.country.flag.url}}" alt="img description"> {% else %}{{user.user.country.country_code}} - {% endif %} {{user.user.country.name|truncatechars:50}}</span></li>
-												<li><span><i class="far fa-clock"></i> Sales: {{proposal.get_dura_converter_display }}</span></li>
-												<li><span><i class="far fa-star"></i> Review: {{proposal.get_revision_display}}</span></li>
-												<li><a href="" class="btn btn-danger btn-sm text-white"><i class="far fa-envelope">&nbsp;&nbsp;Chat Me</i></a></li>
+												<li><span>Salary: {{base_currency}}{{project.amount}}</span></li>
+												<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:50}}</span></li>
+												<li><span><i class="fa fa-tag wt-viewjobtag"></i> {{project.category.name|truncatechars:20}}</span></li>
+												<li><a href="{{project.get_project_absolute_url}}" class="btn btn-danger btn-sm text-white"><i class="fa fa-window-restore"></i>&nbsp;Apply</i></a></li>
 											</ul>
 										</div>
 									</div> 
@@ -193,161 +215,7 @@
 						{% endfor %} 
 				</section>
 				{% endif %}
-				<section class="wt-haslayout wt-main-section">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
-								<figure class="wt-mobileimg">
-									<img src="{% static 'images/work/img-03.jpg' %}" alt="img description">
-								</figure>
-							</div>
-							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
-								<div class="wt-experienceholder">
-									<div class="wt-sectionhead">
-										<div class="wt-sectiontitle">
-											<h2>#1 Choice for Businesses</h2>
-											<span>Business on the Go</span>
-										</div>
-										<div class="wt-description">
-											<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce.</p>
-											<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumed perspiciatis.</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
-								<figure class="wt-mobileimg">
-									<a data-rel="prettyPhoto[video]" href="https://www.youtube.com/watch?v=J37W6DjqT3Q"><img src="{% static 'images/video-img.png' %}" alt="video"></a>
-								</figure>
-							</div>
-							<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-right">
-								<div class="wt-experienceholder">
-									<div class="wt-sectionhead">
-										<div class="wt-sectiontitle">
-											<h2>What others Say?</h2>
-											<span>Business on the Go</span>
-										</div>
-										<div class="wt-description">
-											<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce.</p>
-											<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumed perspiciatis.</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>	
-
-				<section class="wt-haslayout wt-main-section"> 
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
-								<div class="wt-sectionhead wt-textcenter">
-									<div class="wt-sectiontitle">
-										<h2>Explore Projects</h2>
-										<span>Verified Projects</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>								
-					{% for project in projects %}
-					<div class="container mt-5 mb-5">
-						<div class="d-flex justify-content-center row">
-							<div class="col-md-12">
-								<div class="row p-2 bg-white border rounded">
-									<div class="col-md-3 mt-1">
-										<img class="img-fluid img-responsive rounded project-image" src="https://i.imgur.com/QpjAiHq.jpg">
-									</div>
-									<div class="col-md-6 mt-1">
-										<h5> {{project.title}}</h5>
-										<p class="text-justify para mb-0" >{{project.preview}}<br><br></p>
-										<div class="wt-tag wt-widgettag">
-										<h5>Skills Required:</h5>
-											{% for skill in project.project_skill.all %}
-												<a href="javascript:void(0);">{{skill}}</a>
-											{% endfor %}
-										</div>
-									</div>
-									<div class="align-items-center align-content-center col-md-3 border-left mt-1">
-										<div class="d-flex flex-row align-items-center">
-											<h4 class="text-success mr-1">Budget: ${{project.amount}}</h4>
-										</div>
-										<h6 class="text-danger">Type: {{project.specification}}</h6>
-										<h6 class="text-info">Spec: {{project.project_type}}</h6>
-										<h6 class="badge bg-success bg-gradient rounded-pill mb-2 text-white">New Jobs</h6>
-										<div class="d-flex flex-column mt-4"><button class="btn btn-primary btn-sm" type="button"><a href="{{project.get_project_absolute_url}}">Details</a></button>
-										<button class="btn btn-outline-primary btn-sm mt-2" type="button"><a href="{{project.get_project_absolute_url}}">Add to wishlist</a></button></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					{% endfor %}
-				</section>
-				{% comment %} <section class="wt-haslayout wt-main-section"> 
-				<div class="demo10">
-					<div class="container">
-						<h2 class="py-4 text-center">Pricing Plan</h2>
-						<div class="row">
-							{% for package in packages %}
-							<div class="col-md-3 col-sm-6">
-								<div class="pricingTable10">
-									<div class="pricingTable-header">
-										<h3 class="heading">{% firstof package.verbose_type package.type %}</h3>
-										<div class="wt-tag wt-widgettag">
-											<a href="javascript:void(0);">{{package.get_status_display}}</a>
-										</div><br><br>
-										<span class="price-value">
-											<span class="currency">Package Price: ${{package.price}}</span> <br><br>
-										</span>
-									</div>
-									<div class="pricing-content">
-										<ul>
-											{% if package.max_member_per_team > 1 %} <i class="ti-check">   Goup Chat Available</i><br><br> {% else %} <i class="ti-na">  No Group Chat </i><br><br>{% endif %}
-											{% if package.max_member_per_team > 0 %} <i class="ti-check">  {{package.max_member_per_team}} Member{{package.max_member_per_team|pluralize}} Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.max_member_per_team}} Max member Per Team </i><br><br>{% endif %}
-											{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">  {{package.monthly_offer_contracts_per_team}} Monthly Offer Contracts Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.monthly_offer_contracts_per_team}} Monthly Offer Contracts Per Team </i><br><br>{% endif %}
-											{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">  {{package.max_proposals_allowable_per_team}} Max Proposals Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}} Max Proposals Per Team </i><br><br>{% endif %}
-											{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check">  {{package.monthly_projects_applicable_per_team}} Monthly Job/Project Applicable Per Team </i><br><br> {% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}} Monthly Job/Project Applicable Per Team </i><br><br>{% endif %}
-											{% if package.daily_Handshake_mails_to_clients > 0 %} <i class="ti-check">  {{package.daily_Handshake_mails_to_clients}} Daily Handshake Mails Per Invoice to client </i><br><br> {% else %} <i class="ti-na">  {{package.daily_Handshake_mails_to_clients}} Daily Handshake Mails Per Invoice to client </i><br><br>{% endif %}
-											{% if package.max_member_per_team > 0 %} <i class="ti-check">  {{package.max_member_per_team}} Max member Per Team</i><br><br> {% else %} <i class="ti-na">  {{package.max_member_per_team}} Max member Per Team </i><br><br>{% endif %}
-										</ul>
-										<a href="#" class="read">sign up</a>
-									</div>
-								</div>
-							</div>
-							{% endfor %}
-							<div class="col-md-3 col-sm-6">
-								<div class="pricingTable10">
-									<div class="pricingTable-header">
-										<h3 class="heading">Extra</h3>
-										<span class="price-value">
-											<span class="currency"></span> Want More?
-										</span>
-									</div>
-									<div class="pricing-content">
-										<ul>
-											<li>needs more members team? </li>
-											<li>needs more projects to Apply?</li>
-											<li>needs more proposals to create?</li>
-											<li>needs online and offline chat alert?</li>
-											<li>needs more team members Invite?</li>
-											<li>and more?</li>
-										</ul>
-										<a href="#" class="read">Contact Us</a>
-									</div>
-								</div>
-							</div> 
-						</div>
-					</div>
-				</div>				 
-				</section>	 {% endcomment %}
-
+			
 				<section class="wt-haslayaout wt-main-section wt-footeraboutus">
 					<div class="container">
 						<div class="row">

@@ -8,7 +8,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from uuid import uuid4
 from django.template.defaultfilters import slugify
-from django.utils import timezone
 from teams.utilities import create_random_code
 from django.template.defaultfilters import truncatechars
 from proposals.utilities import (
@@ -22,35 +21,12 @@ from proposals.utilities import (
     two_weeks,
     three_weeks,
     one_month,
-    two_months,
-    three_months,
-    four_months,
-    five_months,
-    six_months
 )
 
 
-class ProjectLanguageRequired(models.Model):
-    # level_of_proficiency
-    BASIC = 'basic'
-    STANDARD = 'standard'
-    EXPERT = 'expert'
-    USER_SKILL_LEVEL = (
-        (BASIC, _('Basic')),
-        (STANDARD, _('Standard')),
-        (EXPERT, _('expert')),
-    )  
-   
-    project_language = models.CharField(_("Project Language"),max_length=30)
-    language = models.ForeignKey('general_settings.CommunicationLanguage', verbose_name=_("Language"), on_delete=models.CASCADE)
-    level_of_proficiency = models.CharField(max_length=30, choices=USER_SKILL_LEVEL, default=BASIC, help_text=_("Please select as appropriate"))
-
-    class Meta:
-        verbose_name = _("Project Language")
-        verbose_name_plural = _("Project Language")
-
-    def __str__(self):
-        return self.project_language
+class PublishedProjects(models.Manager):
+    def get_queryset(self):
+        return super(PublishedProjects, self).get_queryset().filter(published=True, status='active', duration__gte=timezone.now())
 
 
 class Project(models.Model):
@@ -144,12 +120,15 @@ class Project(models.Model):
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     dura_converter = models.CharField(_("Deadline"), max_length=100, choices=PROJECT_DURATION, default = ONE_DAY)
-    duration = models.DateTimeField(_("Duration"), null=True, blank=True, help_text=_("deadline for project"))
+    duration = models.DateTimeField(_("Duration"), null=True, blank=True, help_text=_("deadline for expiration of project"))
     completion_time = models.CharField(_("Completion In"), max_length=100, choices=PROJECT_COMPLETION, default = ONE_DAY)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Project Author"), related_name="project", on_delete=models.CASCADE)
     published = models.BooleanField(_("Featured"), choices = ((False,'Unfeature'), (True, 'Feature')), default = False)
     status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=REVIEW)
     reference = models.CharField(_('Identifier'), unique=True, null=True, blank=True, max_length=120)
+    action = models.BooleanField(_("Action"), default = False)
+    objects = models.Manager()
+    public = PublishedProjects()
 
     class Meta:
         ordering = ('-created_at',)
@@ -160,6 +139,8 @@ class Project(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        if self.duration is None:
+            self.duration=timezone.now()
         if self.reference is None:
             try:
                 self.reference = 'P' + str(uuid4()).split('-')[4]
@@ -195,24 +176,3 @@ class Project(models.Model):
     def get_reopen_project_absolute_url(self):
         return reverse('projects:reopen_project', args=[self.slug])
 
-
-class ProjectSkillRequired(models.Model):
-    # level_of_proficiency
-    BASIC = 'basic'
-    STANDARD = 'standard'
-    EXPERT = 'expert'
-    USER_SKILL_LEVEL = (
-        (BASIC, _('Basic')),
-        (STANDARD, _('Standard')),
-        (EXPERT, _('expert')),
-    ) 
-    project = models.ForeignKey(Project,  verbose_name=_("Project"), related_name="projectskill", on_delete=models.CASCADE)
-    skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("Skill"))
-    level_of_proficiency = models.CharField(_("Proficiency level"), max_length=30, choices=USER_SKILL_LEVEL, default=BASIC, help_text=_("Please select as appropriate"))
-
-    class Meta:
-        verbose_name = _("Project Skill")
-        verbose_name_plural = _("Project Skills")
-
-    def __str__(self):
-        return self.level_of_proficiency

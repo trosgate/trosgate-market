@@ -34,15 +34,9 @@
                               </div>
                               
                               <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">Processing Fees (F):</div>
-                                <div class="p-2 bd-highlight"><span class="fw-bold h5">{{base_currency}}</span><span id="totalFees"
-                                    class="fw-bold h5 float-right">{{chosen_contract.get_fee_payable}}</span></div>
-                              </div>
-
-                              <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">Total Payable:</div>
                                 <div class="p-2 bd-highlight"><span class="fw-bold h5">{{base_currency}}</span><span 
-                                    class="fw-bold h5">({{contract.grand_total}} + {{base_currency}}F) </span></div>
+                                    class="fw-bold h5">({{contract.grand_total}} + Fee) </span></div>
                               </div>
                               <a id="chosenNow" role="button" href="{% url 'contract:final_external_contract' contract.id contract.slug %}" class="btn btn-primary fw-bold w-100" type="button">
                                 <i class="fa fa-lock" aria-hidden="true"></i> 
@@ -95,13 +89,13 @@
             type: "POST",
             url: '{% url "contract:external_contract_fee_selection" %}',
             data: {
-                contractid: {{contract.id}},
+                contractid: "{{contract.id}}",
                 gatewaytype: $(this).val(),
                 csrfmiddlewaretoken: "{{csrf_token}}",
-                action: "capture-contract",
+                action: "capture-extcontract",
             },
             success: function (json) {
-                document.getElementById("totalFees").innerHTML = json.contract_fee;
+                console.log(json.contract_fee)
             },
             error: function (xhr, errmsg, err) {},
             });

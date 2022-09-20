@@ -12,6 +12,7 @@
 					<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 						<div class="wt-innerbannercontent">
 							<div class="wt-title"><h2>Project Detail</h2></div>
+							{% if request.user.is_authenticated %}
 							<ol class="wt-breadcrumb">
 								<li><a href="{% url 'account:dashboard' %}" class="btn btn-info" >Dashboard</a></li>
 								{% if request.user == project.created_by and project.status == 'active' %}
@@ -38,6 +39,7 @@
 								</li>	
 								{% endif %}
 							</ol>
+							{% endif %}
 							</div>
 						</div>
 					</div>
@@ -51,7 +53,6 @@
 						<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
 							<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
 								<div class="wt-proposalholder">
-									{% if request.user.is_authenticated %}
 									{% if project.status == 'active' %}
 									<div class="row justify-content-md-center">
 										<div class="wt-sectionhead wt-textcenter">
@@ -61,7 +62,6 @@
 											</div>
 										</div>
 									</div>
-									{% endif %}
 									{% endif %}
 									<div class="wt-proposalhead">
 										<h2>{{projectdetail.title}}</h2>
@@ -113,62 +113,55 @@
 											{% endfor %}
 											</div>
 										</div>
-										<div class="wt-attachments">
-											<div class="wt-title">
-												<h3>Attachments</h3>
-											</div>
-											<ul class="wt-attachfile">
-												<li>
-													<span>Documents Attached</span>
-													{% if projectdetail.attachment and request.user.is_authenticated %}
-													<em>File size: 512 kb<a href=" {{projectdetail.attachment.url}}"><i class="lnr lnr-download"></i></a></em>
-													{% endif %}
-												</li>
-											</ul>
-										</div>
+										
 									</div>
 								</div>								
 
 								<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
 									<aside id="wt-sidebar" class="wt-sidebar">
-										<div class="wt-proposalsr">
-											<div class="wt-clicksavearea">
-												<span>Job ID: {{projectdetail.reference}}</span>
+										<div class="wt-dashboardbox">
+											<div class="wt-dashboardboxtitle text-center">
+												<h2>About Employer</h2>
 											</div>
-										</div>
-										<div class="wt-widget wt-companysinfo-jobsingle">
-											<div class="wt-companysdetails">
-												<figure class="wt-companysimg">
-													{% if projectdetail.created_by.clients.banner_photo %}
-													<img src="{{projectdetail.created_by.clients.banner_photo.url}}" alt="img description">
-													{% endif %}
-												</figure>
+											<div class="wt-dashboardboxcontent wt-hiredfreelance">
 												<div class="wt-companysinfo">
-													<figure><img src="{{projectdetail.created_by.clients.profile_photo.url}}" alt="img description"></figure>
-													<div class="wt-title">
-														<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> Verified Company</a>
-														<h2>{% if profile_view.brand_name %}{{profile_view.brand_name}} {% else %} {{profile_view.user.get_full_name}}{% endif %}</h2>
+													<figure class="wt-companyad">
+														<img src="{% firstof project.created_by.clients.company_logo.url project.created_by.clients.profile_photo.url %}" style="height:100px;" alt="img description">
+													</figure>
+													<div class="wt-title"> 
+														<a href="javascript:void(0);">
+															<i class="fa fa-check-circle"> {% if request.user.is_authenticated %} {{project.created_by.get_full_name|capfirst}} {% else %} {{project.created_by.short_name|capfirst}} {% endif %}</i>
+														</a>
 													</div>
 													<ul class="wt-postarticlemeta">
 														<li>
-															<a href="javascript:void(0);">
-																<span>Open Jobs</span>
-															</a>
+															<span style="color:green">{{employees_count}} Hired</span>
 														</li>
 														<li>
 															<a href="{{profile_view.client_profile_get_absolute_url}}">
-																<span>Full Profile</span>
+																<span>Profile</span>
 															</a>
 														</li>
 														<li class="wt-following">
 															<a href="javascript:void(0);">
-																<span>Following</span>
+																<span>Open</span>
 															</a>
 														</li>
 													</ul>
 												</div>
 											</div>
 										</div>
+											
+										<div class="wt-proposalsr"></div>
+										<div class="wt-dashboardbox text-center">
+											<span>Advertisement</span>
+											<div class="wt-companyad">
+												<figure class="wt-companyadimg">
+													<img src="{{profile_view.banner_photo.url}}" style="height:270px; width:350px;" alt="img description">
+												</figure>
+											</div>
+										</div>
+
 									</aside>
 								</div>
 							</div>
@@ -181,6 +174,8 @@
 		{% include 'dashboard/main_footer.html' %}
 		{% endif %}
 	</div>
+	
+	{% endblock content %}
+	{% block scripts %}
 	<script src={% static 'js/projecttimer.js' %} ></script>
-
-{% endblock content %}
+	{% endblock scripts %}

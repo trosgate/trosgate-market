@@ -22,7 +22,6 @@
                 </div>
             </div>
             <!--Inner Home End-->
-            <main id="wt-main" class="wt-main wt-haslayout">
 
 			<div class="wt-haslayout wt-main-section">
 			<div class="container">
@@ -31,47 +30,48 @@
                         <div class="wt-dashboardbox">
                             <div class="wt-dashboardboxtitle">
                                 <h2>Contract Details</h2>
-                                <a href="{% url 'contract:external_contract_list' %}" class="text-primary">Go Back to Contracts</a>								
+                                <a href="{% url 'contract:external_contract_list' %}" class="text-primary">Return to Contracts</a>								
                             </div>
                             
                             <div class="wt-dashboardboxcontent">
-                                <div class="wt-companysinfo">
-                                    <ul class="wt-postarticlemeta">
-                                        {{website.site_logo_tag}}
-                                    </ul><br><br><br>
-                                    <h5>{{contract.line_one}}</h5>
+                            <div class="wt-companysinfo">
+                                <ul class="wt-postarticlemeta">
+                                    {{website.site_logo_tag}}
+                                </ul><br><br><br>
+                                <h5>{{contract.line_one}}</h5>
                             </div>
-                                
+                            
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
                             </div>	
-                                <div class="wt-jobdescription wt-tabsinfo">
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Contract Terms</h2>
-                                    </div>	
-                                    <div class="form-row">
-                                        
-                                        <div class="form-group col-md-6">
-                                            <span><i class="fa fa-group"> Freelancer: {{contract.created_by.get_full_name}}</i></span><br><br>
-                                            <span><i class="fa fa-group"> Team: {{contract.team.title}}</i></span><br><br>
-                                            <span><i class="fa fa-arrow-up"> Contract Status: {{contract.get_reaction_display}}</i></span><br><br>
-                                            <span><i class="far fa-calendar"> Duration: {{contract.get_contract_duration_display}}</i></span><br><br>
-                                            <span><i class="far fa-calendar"> Reference: {{contract.reference}}</i></span><br><br>
-                                            <span><i class="far fa-calendar"> Time Created: {{contract.date_created}}</i></span><br><br>
-                                        </div>
-                                          
+                            <div class="wt-jobdescription wt-tabsinfo">
+                                <div class="wt-tabscontenttitle">
+                                    <h2>Contract Terms</h2>
+                                </div>	
+                                <div class="form-row">
+                                    
+                                    <div class="form-group col-md-6">
+                                        <span><i class="fa fa-group"> Freelancer: {{contract.created_by.get_full_name}}</i></span><br><br>
+                                        <span><i class="fa fa-group"> Team: {{contract.team.title}}</i></span><br><br>
+                                        <span><i class="fa fa-arrow-up"> Contract Status: {{contract.get_reaction_display}}</i></span><br><br>
+                                        <span><i class="far fa-calendar"> Duration: {{contract.get_contract_duration_display}}</i></span><br><br>
+                                        <span><i class="far fa-calendar"> Reference: {{contract.reference}}</i></span><br><br>
+                                        <span><i class="far fa-calendar"> Time Created: {{contract.date_created}}</i></span><br><br>
                                     </div>
+                                        
+                                </div>
                             <div class="wt-jobdetails wt-tabsinfo">
                                 <div class="wt-tabscontenttitle">
                                     <h2>Services</h2>
                                 </div> 
-                                <table class="table table-borderless">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">Line Services</th>
                                             <th scope="col">Quantity</th>
-                                            <th scope="col">Price($)</th>
-                                            <th scope="col">Total($)</th>
+                                            <th scope="col">Price({{base_currency}})</th>
+                                            <th scope="col">Total({{base_currency}})</th>
                                         </tr>
                                     </thead>
                                     
@@ -122,12 +122,12 @@
                                         </tr>
                                         {% endif %}
                                         <tr>
-                                            <td colspan="4"><strong>Grand Total ($)</strong></td>
+                                            <td colspan="4"><strong>Grand Total ({{base_currency}})</strong></td>
                                             <td><strong>{{ contract.grand_total}}</strong></td>
                                         </tr>                                                
                                     </tbody>
                                 </table>
-
+                            </div>
                                 {% if contract.notes %}                                             
                                 <div class="wt-jobdetails wt-tabsinfo">
                                     <div class="wt-tabscontenttitle">
@@ -168,7 +168,7 @@
                 </div>
             </div>
         </div>
-        </main>
+        {% comment %} </main> {% endcomment %}
         {% include 'client/partials/one_click_contract_modal.html' %}
 
 {% endblock %}

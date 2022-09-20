@@ -86,8 +86,11 @@ def internal_contract_detail(request, contract_id, contract_slug):
     elif request.user.user_type == Customer.CLIENT:
         contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, created_by=request.user)
 
+    base_currency = get_base_currency_symbol()
+
     context = {
         "contract": contract,
+        "base_currency": base_currency,
     }
     return render(request, 'contract/internal_contract_detail.html', context)
 
@@ -119,13 +122,15 @@ def internal_contract_fee_structure(request, contract_id, contract_slug):
     discount = base_contract.get_discount_value(contract)
     multiplier = base_contract.get_discount_multiplier(contract)
     start_discount = base_contract.get_start_discount_value()
-
+    base_currency = get_base_currency_symbol()
     context = {
         "contract": contract,
         "payment_gateways": payment_gateways,
         "discount": discount,
         "multiplier": multiplier,
         "start_discount": start_discount,
+        "base_currency": base_currency,
+
     }
     return render(request, 'contract/payment_fee_structure.html', context)
 
@@ -746,10 +751,12 @@ def external_contract_detail(request, contract_id, contract_slug):
     elif request.user.user_type == Customer.CLIENT:
         contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, client__email=request.user.email)
         client = get_object_or_404(Client, user=request.user, user__is_active=True)
-
+    
+    base_currency = get_base_currency_symbol()
     context = {
         "contract": contract,
         "client": client,
+        'base_currency': base_currency,
     }
     return render(request, 'contract/external_contract_detail.html', context)
 
@@ -771,14 +778,12 @@ def external_contract_fee_structure(request, contract_id, contract_slug):
 @login_required
 @user_is_client
 def external_contract_fee_selection(request):
-    chosen_contract = BaseContract(request)
     session = request.session
-    if request.POST.get('action') == 'capture-contract':
+    gateway = None
+    if request.POST.get('action') == 'capture-extcontract':
         contract_id = int(request.POST.get('contractid'))
         gateway_type = int(request.POST.get('gatewaytype'))
         contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED, client__email=request.user.email)
-
-        chosen_contract.capture(contract=contract)
 
         if "externcontractchosen" not in request.session:
             session["externcontractchosen"] = {"contract_id": contract.id}
@@ -941,10 +946,9 @@ def extern_paypal_contract_intent(request):
     contract_id = request.session["externcontractchosen"]["contract_id"]
     gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
     contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED, client__email=request.user.email)
-    
+
     total_gateway_fee = int(gateway_type.processing_fee)
-    subtotal = int(contract.grand_total)
-    grand_total = subtotal + total_gateway_fee
+    purchase = None
         
     PayPalClient = PayPalClientConfig()
     body = json.loads(request.body)
@@ -960,14 +964,14 @@ def extern_paypal_contract_intent(request):
                 client=request.user,
                 full_name=response.result.purchase_units[0].shipping.name.full_name,
                 email=response.result.payer.email_address,
-                country = request.user.country,
-                payment_method=str(gateway_type),
+                country=str(request.user.country),
+                payment_method=str(gateway_type.name),
                 client_fee = int(total_gateway_fee),
-                category = Purchase.CONTRACT,
+                category = Purchase.EX_CONTRACT,
                 salary_paid=round(float(response.result.purchase_units[0].amount.value)),
-                paypal_order_key=response.result.id,
                 unique_reference=PayPalClient.paypal_unique_reference(),
-                status = Purchase.FAILED           
+                status=Purchase.FAILED,
+                paypal_order_key=response.result.id,           
             )           
         except Exception as e:
             print('%s' % (str(e)))
@@ -998,25 +1002,20 @@ def extern_paypal_contract_intent(request):
         return JsonResponse({'Perfect':'All was successful',})
 
     else:
-        purchase.status = Purchase.FAILED
-        purchase.save()
         return JsonResponse({'failed':'Transaction failed, Razorpay will refund your money if you are already debited',})
                 
 
 @login_required
 @user_is_client
 def extern_razorpay_contract_intent(request):
+    contract_id = request.session["externcontractchosen"]["contract_id"]
+    gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
     contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED, client__email=request.user.email)
-    try:
-        contract_id = request.session["externcontractgateway"]["contract_id"]
-        gateway_type = PaymentGateway.objects.get(pk=request.session["externcontractgateway"]["gateway_id"])
-    except:
-        pass
-    
+
     total_gateway_fee = int(gateway_type.processing_fee)
     subtotal = int(contract.grand_total)
     grand_total = subtotal + total_gateway_fee
-    purchase = None    
+    purchase = None  
 
     razorpay_api = RazorpayClientConfig()
     unique_reference = razorpay_api.razorpay_unique_reference()
@@ -1029,17 +1028,16 @@ def extern_razorpay_contract_intent(request):
             country=str(request.user.country),
             payment_method=str(gateway_type.name),
             client_fee = int(total_gateway_fee),
-            category = Purchase.CONTRACT,
+            category = Purchase.EX_CONTRACT,
             salary_paid=contract.grand_total,
             unique_reference=unique_reference,
-            status=Purchase.FAILED,           
+            status=Purchase.FAILED
         )           
-
     except Exception as e:
         print('%s' % (str(e)))
 
     try:
-        ContractSale.objects.create(
+        ExtContract.objects.create(
             team=contract.team, 
             purchase=purchase,  
             contract=contract, 
@@ -1047,8 +1045,6 @@ def extern_razorpay_contract_intent(request):
             staff_hired=int(1),
             earning_fee_charged=int(get_external_contract_fee_calculator(contract.grand_total)),                   
             total_earning_fee_charged=int(get_external_contract_fee_calculator(contract.grand_total)),                   
-            discount_offered=0,
-            total_discount_offered=0,
             disc_sales_price=int(contract.grand_total),
             total_sales_price=int(contract.grand_total),
             earning=round(get_external_contract_gross_earning(contract.grand_total)), 
@@ -1076,9 +1072,9 @@ def extern_razorpay_contract_intent(request):
 
 @login_required
 @user_is_client
-def razorpay_webhook(request):
+def extern_razorpay(request):
     razorpay_client = RazorpayClientConfig().get_razorpay_client()
-    if request.POST.get('action') == 'razorpay-contract':   
+    if request.POST.get('action') == 'razorpay-extcontract':   
         razorpay_order_key = str(request.POST.get('orderid'))
         razorpay_payment_id = str(request.POST.get('paymentid'))
         razorpay_signature = str(request.POST.get('signature'))
@@ -1198,7 +1194,6 @@ def get_flutterwave_verification(unique_reference, flutterwave_order_key):
     ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
 
 
-
 @login_required
 @user_is_client
 def contract_success(request):
@@ -1207,7 +1202,6 @@ def contract_success(request):
         "good": "All good"
     }
     return render(request, "contract/payment_success.html", context)
-
 
 
 @login_required

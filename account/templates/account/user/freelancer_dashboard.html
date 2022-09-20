@@ -274,7 +274,7 @@
 						<td>{% if project.created_by.clients.brand_name %}{{project.created_by.clients.brand_name}} {% else %}{{project.created_by.get_full_name}}{% endif %}</td>
 						<td><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} &nbsp; &nbsp; {{project.created_by.country.name|truncatechars:40}}</span></td>
 						<td class='text-left'><a class="text-info" href="{% url 'projects:project_detail' project.slug %}">{{project.title}}</a></td>
-						<td><class="wt-hireduserstatus">${{ project.amount }}</td>
+						<td><class="wt-hireduserstatus">{{base_currency}} {{ project.amount }}</td>
 						<td><class="wt-hireduserstatus">{{ project.applications.count }}</td>
 						<td><a class="btn btn-outline-success btn-sm" href="{% url 'applications:application_detail' project.slug %}">View</a> </td>
 						<td><a class="btn btn-outline-danger btn-sm" href="{% url 'applications:apply_for_project' project.slug %}"><i class="far fa-envelope"> Apply</i></a> </td>

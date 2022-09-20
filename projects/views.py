@@ -22,7 +22,7 @@ from notification.utilities import create_notification
 @user_is_client
 def create_project(request):
     if request.method == 'POST':
-        projectform = ProjectCreationForm(request.POST, request.FILES)
+        projectform = ProjectCreationForm(request.POST)
 
         if projectform.is_valid():
             project = projectform.save(commit=False)
@@ -47,11 +47,13 @@ def project_single(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug)
     profile_view = get_object_or_404(Client, user=project.created_by, user__is_active=True)
     applications = Application.objects.filter(project = project)
+    employees_count = profile_view.employees.all().count()
 
     context = {
         "projectdetail": project,
         'project':project,  
         'profile_view':profile_view,  
+        'employees_count':employees_count,  
         'applications':applications,  
   
     }
@@ -64,7 +66,7 @@ def update_project(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, created_by=request.user)
 
     if request.method == 'POST':
-        projectform = ProjectmodifyForm(request.POST, request.FILES, instance=project)
+        projectform = ProjectmodifyForm(request.POST or None, instance=project)
 
         if projectform.is_valid():
             projectform.save()
@@ -85,14 +87,20 @@ def update_project(request, project_slug):
 @login_required
 @user_is_client
 def reopen_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug, created_by=request.user)
+    project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE, created_by=request.user)
 
     if request.method == 'POST':
-        projectform = ProjectReopenForm(request.POST, instance=project)
+        projectform = ProjectReopenForm(request.POST or None, instance=project)
 
         if projectform.is_valid():
+            project = projectform.save(commit=False)
+            project.action = True
             projectform.save()
 
+            try:
+                Project.update_reopen_time(pk=project.pk)
+            except Exception as e:
+                print(str(e))
             messages.success(request, 'The project was extended successfully!')
 
             return redirect('account:dashboard')

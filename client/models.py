@@ -13,7 +13,7 @@ from general_settings.currency import get_base_currency_symbol, get_base_currenc
 
 
 class Client(models.Model):
-    STORAGE = activate_storage_type()
+    # STORAGE = activate_storage_type()
     MALE = 'male'
     FEMALE = 'female'
     GENDER = (

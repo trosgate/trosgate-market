@@ -45,6 +45,7 @@ def client_profile(request, short_name):
 
 
 @login_required
+@user_is_client
 def create_notice(request):
     client = get_object_or_404(Client, user=request.user)
 

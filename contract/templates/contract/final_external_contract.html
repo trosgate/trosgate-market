@@ -191,8 +191,7 @@
                 },                
                 onApprove: function (data, actions) {
                     return actions.order.capture().then(function(){
-                        let url = "{% url 'contract:extern_paypal_intent' %}"
-                        return fetch(url, {
+                        return fetch("/paypal/external/", {
                             method: 'POST',
                             headers: {
                                 'content-type': 'application/json',
@@ -312,7 +311,7 @@
         e.preventDefault();
         $.ajax({
             method: 'GET',
-            url: '{% url "contract:razorpay_contract_intent" %}',
+            url: "{% url 'contract:extern_razorpay_contract_intent' %}",
             beforeSend:function(){
                 $("#rzp-button1").attr("disabled", true);
                 $("#convert-currency").attr("disabled", true);
@@ -330,13 +329,13 @@
                     "handler": function (responseOne) {
                         $.ajax({
                             type: "POST",
-                            url: '{% url "contract:razorpay_webhook" %}',
+                            url: '{% url "contract:extern_razorpay" %}',
                             data: {
                                 orderid: responseOne.razorpay_order_id,
                                 paymentid: responseOne.razorpay_payment_id,
                                 signature: responseOne.razorpay_signature,
                                 csrfmiddlewaretoken: "{{csrf_token}}",
-                                action: "razorpay-contract",
+                                action: "razorpay-extcontract",
                             },
                             success: function (responseTwo) {
                                 $("#rzp-button1").attr("disabled", true);

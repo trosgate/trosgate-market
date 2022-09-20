@@ -43,7 +43,6 @@ from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 
 
-
 def Logout(request):
     '''
     This is manual method for user to logout.
@@ -98,12 +97,13 @@ def homepage(request):
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
     proposals = Proposal.active.filter(published=True).distinct()[0:12]
-    projects = Project.objects.filter(status=Project.ACTIVE, published=True).distinct()[0:6]
+    projects = Project.public.all().distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
     supported_country = Country.objects.filter(supported=True)    
     regform = CustomerRegisterForm(supported_country, request.POST or None)
     searchform = SearchTypeForm()
-    if request.user.is_authenticated:
+
+    if request.user.is_authenticated and not user.user_type == Customer.ADMIN:
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('account:dashboard')
 
@@ -158,18 +158,7 @@ def searchtype(request):
         searchvalue = str(request.POST.get('searchVal'))
         return JsonResponse({'searchvalue':searchvalue})
 
-# def searchtype(request):
-#     type = request.GET.get('user_type')
-#     if type =="freelancer":
-#     if request.GET.get('search_type') == 'freelancer':
-#         print('printed:', request.GET.get('search_type'))
-#     # if 'freelancer' in request.GET:
-#     #     print('it happened')
-#         return HttpResponseClientRedirect('/freelancer/freelancer_search/')
 
-
-
-# @confirm_recaptcha
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def loginView(request):
 
@@ -363,7 +352,7 @@ def user_dashboard(request):
             freelancer_profile = Freelancer.active.get(user__id=request.user.id)
         except:
             freelancer_profile = None
-        open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gt=timezone.now())[:10]
+        open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gte=timezone.now())[:10]
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
@@ -371,6 +360,8 @@ def user_dashboard(request):
             package=Package.objects.get(id=1)
         except:
             package = None
+
+        base_currency = get_base_currency_symbol()
 
         if request.method == 'POST' and get_more_team_per_user_feature():
             teamform = TeamCreationForm(request.POST or None)
@@ -397,6 +388,7 @@ def user_dashboard(request):
                         
         else:
             teamform = TeamCreationForm()
+
         context = {
             'proposals': proposals,
             'open_projects': open_projects,
@@ -406,6 +398,7 @@ def user_dashboard(request):
             'contracts': contracts,
             'belong_to_more_than_one_team': belong_to_more_than_one_team,
             'teams': teams,
+            'base_currency': base_currency,
         }
         return render(request, 'account/user/freelancer_dashboard.html', context)
 
@@ -415,13 +408,14 @@ def user_dashboard(request):
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
-
+        base_currency = get_base_currency_symbol()
         context = {
             'open_projects': open_projects,
             'closed_projects': closed_projects,
             'proposals': proposals,
             'contracts': contracts,
             'client_profile': client_profile,
+            'base_currency': base_currency,
         }
         return render(request, 'account/user/client_dashboard.html', context)
     

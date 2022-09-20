@@ -330,12 +330,12 @@ class Purchase(models.Model):
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
-            # if purchase.category == Purchase.EX_CONTRACT:
-            #     contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-            #     contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-            #     FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
-            #     contract.reaction = 'paid'
-            #     contract.save(update_fields=['reaction'])
+            if purchase.category == Purchase.EX_CONTRACT:
+                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
 
         return purchase, contract_item, contract
 
