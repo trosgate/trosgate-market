@@ -143,7 +143,7 @@ class FreelancerAccount(models.Model):
 
    
     @classmethod
-    def lock_freelancer_fund(cls, pk:int, message):
+    def lock_freelancer_fund(cls, pk:int, message:str):
         with db_transaction.atomic():
             account = cls.objects.select_for_update().get(pk=pk)
             if account.lock_fund != False:
@@ -157,14 +157,14 @@ class FreelancerAccount(models.Model):
 
 
     @classmethod
-    def credit_pending_balance(cls, user, pending_balance, paid_amount, purchase):
+    def credit_pending_balance(cls, user, pending_balance, purchase):
         with db_transaction.atomic():
             account = cls.objects.select_for_update().get(user=user)
             account.pending_balance += pending_balance
             account.save(update_fields=['pending_balance'])           
 
-            db_transaction.on_commit(lambda: credit_pending_balance_email(account, paid_amount, purchase))
-
+            db_transaction.on_commit(lambda: credit_pending_balance_email(account, pending_balance, purchase))
+            
         return account
  
 

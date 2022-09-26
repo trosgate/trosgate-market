@@ -1,5 +1,3 @@
-from email.mime import application
-from turtle import title
 from django.db import models, transaction as db_transaction
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
@@ -7,14 +5,15 @@ from django.template.defaultfilters import truncatechars
 from django.utils.safestring import mark_safe
 from account.fund_exception import ReviewException, ContractException
 from teams.models import Team
+from notification.mailer import application_cancel_email, approve_application_cancel_email
 from freelancer.models import FreelancerAccount
+from client.models import ClientAccount
 from django.utils import timezone
 from proposals.utilities import (
     one_day, two_days, three_days, four_days, 
     five_days, six_days, one_week, two_weeks,
-    three_weeks, one_month,
-    #Below additional times apply to contract
-    two_months, three_months, four_months, five_months, six_months
+    three_weeks, one_month,two_months, three_months, 
+    four_months, five_months, six_months
 )
 
 
@@ -223,8 +222,8 @@ class OneClickResolution(models.Model):
                 message=message, 
                 rating=rating, 
             )
-            # ........Add a status choice to contract to CLOSE A CONTRACT and hide chat....
-            team_manager.pending_balance -= int(resolution.oneclick_sale.total_earning)
+
+            team_manager.pending_balance -= int(resolution.oneclick_sale.salary_paid)
             team_manager.save(update_fields=['pending_balance'])
 
             team_manager.available_balance += int(resolution.oneclick_sale.total_earning)
@@ -270,7 +269,7 @@ class OneClickReview(models.Model):
 
 class ProjectResolution(models.Model):
     '''
-    We used signal to compare the project completion time and the default values below to obtain end_time
+    We compare the project completion time and the default values below to obtain end_time
     '''
     ONE_DAY = "one_day"
     TWO_DAYS = "two_days"
@@ -284,10 +283,12 @@ class ProjectResolution(models.Model):
     ONE_MONTH = "one_month"
 
     ONGOING = 'ongoing'
+    DISPUTED = 'disputed'
     CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (DISPUTED, _("Disputed")),
         (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
     ) 
@@ -297,7 +298,7 @@ class ProjectResolution(models.Model):
     application = models.ForeignKey("transactions.ApplicationSale", verbose_name=_("Application Accepted"), related_name="projectapplicantsaction", on_delete=models.CASCADE)
     start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
     end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
-    status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=ONGOING)
+    status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES, default=ONGOING)
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
         
     class Meta:
@@ -330,7 +331,7 @@ class ProjectResolution(models.Model):
                 rating=rating, 
             )
 
-            team_manager.pending_balance -= int(resolution.application.total_earnings)
+            team_manager.pending_balance -= int(resolution.application.total_sales_price)
             team_manager.save(update_fields=['pending_balance'])
 
             team_manager.available_balance += int(resolution.application.total_earnings)
@@ -340,7 +341,7 @@ class ProjectResolution(models.Model):
             applicant_team.save(update_fields=['team_balance'])
 
             resolution.status = 'completed'
-            resolution.save(update_fields=['status'])          
+            resolution.save()          
 
             return resolution, applicant_team, team_manager, review
 
@@ -387,6 +388,56 @@ class ProjectResolution(models.Model):
         return project
 
 
+    @classmethod
+    def cancel_project(cls, resolution:int, cancel_type:str, message:str):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            if resolution.status != 'ongoing':
+                raise Exception(_("You cannot cancel at this stage"))
+            resolution.status = 'disputed'
+            resolution.save()
+
+            message = ApplicationCancellation.create(
+                resolution=resolution,
+                cancel_type=cancel_type,
+                message=message
+            )
+            db_transaction.on_commit(lambda: application_cancel_email(message))
+
+        return resolution, message
+
+
+    @classmethod
+    def approve_and_cancel_project(cls, resolution:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            message = ApplicationCancellation.objects.select_for_update().get(resolution=resolution)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=resolution.application.team.created_by)
+            client = ClientAccount.objects.select_for_update().get(user=resolution.application.purchase.client)            
+
+            if resolution.status != 'disputed':
+                raise Exception(_("You cannot approve at this stage"))
+            resolution.status = 'cancelled'
+            resolution.save()
+
+            if message.status != 'initiated':
+                raise Exception(_("You cannot approve at this stage"))
+            message.status = 'approved'
+            message.save()
+
+            print('Reversal:', resolution.application.total_sales_price)
+
+            freelancer.pending_balance -= int(resolution.application.total_sales_price)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(resolution.application.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+            db_transaction.on_commit(lambda: approve_application_cancel_email(resolution))
+
+        return resolution, message, freelancer, client
+
+
 class ProjectCompletionFiles(models.Model):
     application = models.ForeignKey(ProjectResolution, verbose_name=_("Project File"), related_name="applicantcompletionfiles", on_delete=models.CASCADE)
     attachment = models.FileField(_("Attachment"), help_text=_("image must be any of these 'jpeg','pdf','jpg','png','psd',"), upload_to=application_file_directory, blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])])
@@ -430,10 +481,46 @@ class ApplicationReview(models.Model):
         return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
 
 
+class ApplicationCancellation(models.Model):
+    TEAM_EXCEEDED_DEADLINE = 'team_exceeded_deadline'
+    TEAM_ABANDONED_WORK = 'team_abandoned_work'
+    TEAM_NOT_RESPONDING = 'team_not_responding'
+    TEAM_IS_ABUSIVE = 'team_is_abusive'
+    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
+    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
+    CANCELLATION_TYPE = (
+        (TEAM_EXCEEDED_DEADLINE, 'Team Exceeded Deadline'),
+        (TEAM_ABANDONED_WORK, 'Team Abandoned Work'),
+        (TEAM_NOT_RESPONDING, 'Team not Responding to Chat'),
+        (TEAM_IS_ABUSIVE, 'Team is Abusive'),
+        (ORDERED_WRONG_PRODUCT, 'I Ordered Wrong Product'),
+        (DIFFERENT_PRODUCT_DELIVERED, 'A different product delivered')
+    )
 
-# class ProjectCancelation(models.Model):
-    #will have types choices 
-    #eg.. team abandoned, team is rude 
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    STATUS_CHOICES = (
+        (INITIATED, 'Initiated'),
+        (APPROVED, 'Approved')
+    )    
+    resolution = models.ForeignKey(ProjectResolution, verbose_name=_("Application"), related_name="cancelapplication", on_delete=models.CASCADE)
+    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, default=TEAM_EXCEEDED_DEADLINE)
+    status = models.CharField(_("Status"), max_length=100, choices=STATUS_CHOICES, default=INITIATED)
+    message = models.TextField(_("Additional Message"), max_length=500)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+    modified_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("Application Cancelled")
+        verbose_name_plural = _("Application Cancelled")
+
+    def __str__(self):
+        return f'{self.resolution}'
+
+    @classmethod
+    def create(cls, resolution, cancel_type, message):
+        return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
 
 
 class ProposalResolution(models.Model):
@@ -452,10 +539,12 @@ class ProposalResolution(models.Model):
     ONE_MONTH = "one_month"
 
     ONGOING = 'ongoing'
+    DISPUTED = 'disputed'
     CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (DISPUTED, _("Disputed")),
         (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
     ) 
@@ -497,7 +586,7 @@ class ProposalResolution(models.Model):
                 rating=rating, 
             )
 
-            team_manager.pending_balance -= int(resolution.proposal_sale.total_earning)
+            team_manager.pending_balance -= int(resolution.proposal_sale.total_sales_price)
             team_manager.save(update_fields=['pending_balance'])
 
             team_manager.available_balance += int(resolution.proposal_sale.total_earning)
@@ -552,6 +641,54 @@ class ProposalResolution(models.Model):
                 proposal.save()
 
         return proposal
+
+
+    @classmethod
+    def cancel_proposal(cls, resolution:int, cancel_type:str, message:str):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            if resolution.status != 'ongoing':
+                raise Exception(_("You cannot cancel at this stage"))
+            resolution.status = 'disputed'
+            resolution.save()
+
+            message = ProposalCancellation.create(
+                resolution=resolution,
+                cancel_type=cancel_type,
+                message=message
+            )
+            # db_transaction.on_commit(lambda: application_cancel_email(message))
+
+        return resolution, message
+
+
+    @classmethod
+    def approve_and_cancel_proposal(cls, resolution:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            message = ProposalCancellation.objects.select_for_update().get(resolution=resolution)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=resolution.proposal_sale.team.created_by)
+            client = ClientAccount.objects.select_for_update().get(user=resolution.proposal_sale.purchase.client)            
+
+            if resolution.status != 'disputed':
+                raise Exception(_("You cannot approve at this stage"))
+            resolution.status = 'cancelled'
+            resolution.save()
+
+            if message.status != 'initiated':
+                raise Exception(_("You cannot approve at this stage"))
+            message.status = 'approved'
+            message.save()
+
+            freelancer.pending_balance -= int(resolution.proposal_sale.total_sales_price)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(resolution.proposal_sale.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+            # db_transaction.on_commit(lambda: approve_application_cancel_email(resolution))
+
+        return resolution, message, freelancer, client
 
 
 class ProposalCompletionFiles(models.Model):
@@ -661,7 +798,7 @@ class ContractResolution(models.Model):
                 rating=rating, 
             )
 
-            team_manager.pending_balance -= int(resolution.contract_sale.total_earning)
+            team_manager.pending_balance -= int(resolution.contract_sale.total_sales_price)
             team_manager.save(update_fields=['pending_balance'])
 
             team_manager.available_balance += int(resolution.contract_sale.total_earning)
@@ -731,6 +868,48 @@ class ContractResolution(models.Model):
                 contract.save()
 
         return contract
+
+
+class ProposalCancellation(models.Model):
+    TEAM_EXCEEDED_DEADLINE = 'team_exceeded_deadline'
+    TEAM_ABANDONED_WORK = 'team_abandoned_work'
+    TEAM_NOT_RESPONDING = 'team_not_responding'
+    TEAM_IS_ABUSIVE = 'team_is_abusive'
+    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
+    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
+    CANCELLATION_TYPE = (
+        (TEAM_EXCEEDED_DEADLINE, 'Team Exceeded Deadline'),
+        (TEAM_ABANDONED_WORK, 'Team Abandoned Work'),
+        (TEAM_NOT_RESPONDING, 'Team not Responding to Chat'),
+        (TEAM_IS_ABUSIVE, 'Team is Abusive'),
+        (ORDERED_WRONG_PRODUCT, 'I Ordered Wrong Product'),
+        (DIFFERENT_PRODUCT_DELIVERED, 'A different product delivered')
+    )
+
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    STATUS_CHOICES = (
+        (INITIATED, 'Initiated'),
+        (APPROVED, 'Approved')
+    )    
+    resolution = models.ForeignKey(ProposalResolution, verbose_name=_("Proposal"), related_name="cancelproposal", on_delete=models.CASCADE)
+    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, default=TEAM_EXCEEDED_DEADLINE)
+    status = models.CharField(_("Status"), max_length=100, choices=STATUS_CHOICES, default=INITIATED)
+    message = models.TextField(_("Additional Message"), max_length=500)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+    modified_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("Proposal Cancelled")
+        verbose_name_plural = _("Proposal Cancelled")
+
+    def __str__(self):
+        return f'{self.resolution}'
+
+    @classmethod
+    def create(cls, resolution, cancel_type, message):
+        return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
 
 
 class ContractReview(models.Model):
@@ -840,7 +1019,7 @@ class ExtContractResolution(models.Model):
                 rating=rating, 
             )
 
-            team_manager.pending_balance -= int(resolution.contract_sale.total_earning)
+            team_manager.pending_balance -= int(resolution.contract_sale.total_sales_price)
             team_manager.save(update_fields=['pending_balance'])
 
             team_manager.available_balance += int(resolution.contract_sale.total_earning)
@@ -852,7 +1031,7 @@ class ExtContractResolution(models.Model):
             resolution.status = 'completed'
             resolution.save(update_fields=['status'])          
 
-            return resolution, contract_team, team_manager, review
+        return resolution, contract_team, team_manager, review
 
 
     @classmethod

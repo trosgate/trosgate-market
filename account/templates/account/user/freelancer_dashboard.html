@@ -77,7 +77,7 @@
 				</div>																	
 			</div>
 		</section>
-
+		{% if active_team.status == 'active' %}
 		<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder" role="dialog" id="profileexperiencemodal">
 				<div class="row">
 					<div class="col-12 col-sm-12 col-md-12 col-lg-12">
@@ -103,17 +103,16 @@
 					</div>
 				</div>
 		</section>
-		
-		{% comment %} {% if belong_to_more_than_one_team == True or active_team.package.type == 'Team' %} {% endcomment %}
+		{% endif %}
 		<!--More Details Start-->
 		<div class="wt-proposalholder">
 			<div class="container">
 				<div class="row justify-content-md-center">
 					<div class="col-12">
 						<div class="wt-sectionhead wt-textcenter">
-							<h2>Your Teams</h2>
+							<h3>Your Teams</h3>
 							<div class="alert alert-info" role="alert">
-								<span style="color: green; font-weight: bold;"> If you have more than one team, Use "Activate button" to switch teams</span>
+								<span style="color: green; font-weight: bold;"> If you have more than one team, Use "Activate" button to switch teams</span>
 							</div>
 						</div>
 					</div>
@@ -129,24 +128,27 @@
 						<figure class="wt-userlistingimg">
 							<img src="{% static 'images/thumbnail/group-02.jpg' %}" alt="image description" class="mCS_img_loaded">
 						</figure>
-							<h4>{{active_team.title}}</h4>
-								<h4>{{team.title}}</h4>
-								<ul class="wt-userlisting-breadcrumb">
-									<li><span><i class="fas fa-spinner fa-spin"></i> {{active_team.package}} Plan</span></li>
-								</ul>
-								
-								<h6>{% if active_team.created_by == request.user %}(Owner){% else %}(Member){% endif %}</h6>
+						<h4 style="color:green;">{{active_team.title|truncatechars:30}}</h4>
+						<ul class="wt-userlisting-breadcrumb">
+							<li><span><i class="fas fa-spinner fa-spin"></i> {{active_team.package}} Plan</span></li>
+						</ul>
+						
+						<h6>{% if active_team.created_by == request.user %}(Owner){% else %}(Member){% endif %}</h6>
 
 						<div class="wt-insightdetails">
 							<div class="wt-title">
-							{% if active_team.created_by == request.user %} 
-								<a href="{{active_team.get_team_detail_absolute_url}}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
-								<a href="{% url 'teams:invitation' %}"><button type="button" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite User</button></a>
-								{% if active_team.package.type == "Team" %}
+							{% if active_team.status == 'active' %}
+							<a href="{{active_team.get_team_detail_absolute_url}}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
+							{% elif active_team.status == 'inactive'%}	
+							<a href="{{active_team.get_team_preview_url}}"><button type="button" class="btn btn-success  btn-sm" target="_blank"><i class="fa fa-folder-open" aria-hidden="true"></i> Preview</button></a> 
+							{% endif %}	
+							{% if active_team.created_by == request.user and active_team.status == 'active' and active_team.package.type == "Team" %}
+								<a href="{% url 'teams:invitation' %}"><button type="button" class="btn btn-primary btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite User</button></a>
 								<a href="{% url 'teams:teamchatroom' %}"><button type="button" class="btn btn-danger btn-sm"><i class="far fa-envelope" aria-hidden="true"></i> Chat</button></a>
-								{% endif %}
-								{% else %}
-								<a href="{{active_team.get_team_detail_absolute_url}}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
+							{% elif active_team.created_by == request.user and active_team.status == 'active' and active_team.package.type == "Basic" %}
+								<button type="button" class="btn btn-primary btn-sm" disabled><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite User</button>
+								<button type="button" class="btn btn-danger btn-sm" disabled><i class="far fa-envelope" aria-hidden="true"></i> Chat</button>
+							{% elif active_team.created_by != request.user and active_team.status == 'active' and active_team.package.type == "Team" %}
 								<a href="{% url 'teams:teamchatroom' %}"><button type="button" class="btn btn-danger btn-sm"><i class="far fa-envelope" aria-hidden="true"></i> Chat</button></a>
 							{% endif %}
 							</div>													
@@ -160,13 +162,13 @@
 						<figure class="wt-userlistingimg">
 							<img src="{% static 'images/thumbnail/group-02.jpg' %}" alt="image description" class="mCS_img_loaded">
 						</figure>
-							<h4>{{team.title}}</h4>
-							{{team.package}} Plan
-							<h6>{% if team.created_by == request.user %}(Owner){% else %}(Member){% endif %}</h6>
+						<h4 style="color:red;">{{team.title|truncatechars:30}}</h4>
+						{{team.package}} Plan
+						<h6>{% if team.created_by == request.user %}(Owner){% else %}(Member){% endif %}</h6>
 						<div class="wt-insightdetails">
 							<div class="wt-title">
 								<a href="{{team.get_team_preview_url}}"><button type="button" class="btn btn-success  btn-sm" target="_blank"><i class="fa fa-folder-open" aria-hidden="true"></i> Preview</button></a>
-								<a href="{{team.get_team_activated_url}}"><button type="button" class="btn btn-warning btn-sm" {% if team.status == "inactive" %} disabled=true {% endif %}><i class="fa fa-free-code-camp" aria-hidden="true"></i> {% if team.status == "active" %}Activate {% elif team.status == "inactive" %} Inactive {% endif %}</button></a>
+								<a href="{{team.get_team_activated_url}}"><button type="button" class="btn btn-warning btn-sm"><i class="fa fa-free-code-camp" aria-hidden="true"></i> {% if team.status == "active" %}Activate {% elif team.status == "inactive" %} Inactive {% endif %}</button></a>
 							</div>													
 						</div>
 					</div>
@@ -174,8 +176,7 @@
 				{% endfor %} 
 			</div>						 
 		</section>
-		{% comment %} {% endif %}	 {% endcomment %}
-
+		{% if active_team.status == 'active' %}
 		{% if quizz|length > 0 %}
 		<div class="wt-proposalholder">
 			<div class="container">
@@ -183,7 +184,7 @@
 					<div class="col-12">
 						<div class="wt-sectionhead wt-textcenter">
 							<div class="wt-sectiontitle">
-								<h2>Aptitude Test</h2>
+								<h3>Aptitude Test</h3>
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> Take tests and stand a chance at wining bigger projects</span>
 								</div>
@@ -219,11 +220,6 @@
 					</tbody>
 				</table>
 			</div>
-			{% if quizz.count > 10 %}
-			<div class="wt-commentsbtn">
-				<button class="wt-btn" type="button">Load More</button>
-			</div>
-			{% endif %}
 		</div>
 		{% endif %}	
 				
@@ -235,7 +231,7 @@
 					<div class="col-12">
 						<div class="wt-sectionhead wt-textcenter">
 							<div class="wt-sectiontitle">
-								<h2>Open Projects</h2>
+								<h3>Open Projects</h3>
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> Verified Open Jobs</span>
 								</div>
@@ -306,7 +302,7 @@
 					<div class="col-12">
 						<div class="wt-sectionhead wt-textcenter">
 							<div class="wt-sectiontitle">
-								<h2>Contracts</h2>
+								<h3>Contracts</h3>
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> All Your Internal contracts Received</span>
 								</div>
@@ -375,7 +371,7 @@
 					<div class="col-12">
 						<div class="wt-sectionhead wt-textcenter">
 							<div class="wt-sectiontitle">
-								<h2>Proposals</h2>
+								<h3>Proposals</h3>
 								<div class="alert alert-info" role="alert">
 									<span style="color: green; font-weight: bold;"> All Your Proposals created by this team</span>
 								</div>
@@ -420,7 +416,7 @@
 			</div>
 		</div>
 		{% endif %}
-
+		{% endif %}	
 		<div class="wt-proposalholder mt-6">
 			<div class="row justify-content-md-center">
 				<div class="wt-sectionhead wt-textcenter">

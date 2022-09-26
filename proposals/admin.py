@@ -10,7 +10,7 @@ class ProposalAdmin(admin.ModelAdmin):
     list_editable = [ 'status','published']
     search_fields = ['team__title', 'title', 'category__name']
     readonly_fields = [
-        'created_by','image_tag', 'sample_link', 'skill',
+        'created_by','image_tag', 'sample_link', 'skill','description',
         'team', 'category','reference', 'published', 'faq_three', 'faq_three_description',
         'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 
         'salary','service_level', 'revision', 'dura_converter', 'progress', 'thumbnail',

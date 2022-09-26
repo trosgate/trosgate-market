@@ -354,7 +354,7 @@ def user_dashboard(request):
             freelancer_profile = None
         open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gte=timezone.now())[:10]
         quizz = Quizes.objects.filter(is_published=True)[:10]
-        teams = request.user.team_member.filter(status=Team.ACTIVE).exclude(pk=request.user.freelancer.active_team_id)
+        teams = request.user.team_member.all().exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
         try:
             package=Package.objects.get(id=1)
@@ -405,7 +405,7 @@ def user_dashboard(request):
     elif request.user.user_type == Customer.CLIENT and request.user.is_active == True:
         client_profile = Client.objects.get(user=request.user)
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
-        open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gt=timezone.now())
+        open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
         base_currency = get_base_currency_symbol()

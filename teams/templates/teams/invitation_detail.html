@@ -25,16 +25,6 @@
 						<div class="wt-hireduserstatus">
 							<h4>Invitation to "{{ teams.title }}"</h4>
 							<em>There are two options available to invite users. (1) Internal Users & (2) External Freelancers</em>
-							{% if not max_team_members %}
-							<div class="alert alert-warning" role="alert">
-								<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-									Alert: You have reached the application limit for this month 
-									{% if teams.created_by == request.user %}
-									<a href="{% url 'teams:packages' %}"> Upgrade Package</a>
-									{% endif %}
-								</span>
-							</div>
-							{% endif %}
 						</div>											
 					</div>
 				</div>

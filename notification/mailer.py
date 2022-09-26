@@ -342,6 +342,50 @@ def ticket_reply_email(ticketreply):
     msg.send()
 
 
+def application_cancel_email(message):
+    # Blueprint for sending mail when application is cancelled
+    from_email = get_from_email()
+    subject = f'Job cancellation request'
+    preview = f'A dispute has been raised. Take action'
+    text_content = f'A New Checkout was paid_amount.'
+    html_content = render_to_string('notification/application_cancel_email.html', {
+        'message': message,
+        'preview': preview,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [message.resolution.application.team.created_by.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def approve_application_cancel_email(resolution):
+    # Blueprint for sending mail when application is cancelled
+    from_email = get_from_email()
+    subject = f'Your Cancellation Request Approved'
+    preview = f'Payment reversed to your Account'
+    text_content = f'A New Checkout was paid_amount.'
+    html_content = render_to_string('notification/approve_application_cancel_email.html', {
+        'resolution': resolution,
+        'preview': preview,
+        'website_name': website_name(),
+        'protocol_with_domain': get_protocol_with_domain_path(),
+        'instagram_path': get_instagram_path(),
+        'facebook_path': get_facebook_path(),
+        'youtube_path': get_youtube_path(),
+        'twitter_path': get_twitter_path(),
+    })
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [resolution.application.purchase.client.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
 
 # To be continued
 # To be continued

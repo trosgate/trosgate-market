@@ -35,8 +35,6 @@
 							<th>Project Applied</th>
 							<th>Base Price</th>
 							<th>Sales ({{base_currency}}) </th>
-							<th>Fees </th>
-							<th>Est. Earning</th>
 							{% if active_team.created_by == request.user %}
 							<th>Manager</th>
 							{% endif %}
@@ -50,11 +48,9 @@
 							<td>{{application.purchase.client.get_full_name|capfirst}}</td>
 							<td>{{application.created_at}}</td>
 							<td>{{application.purchase.payment_method}}</td>
-							<td class="text-left">{{application.project}}</td>
+							<td class="text-left">{{application.project.title|truncatechars:60}}</td>
 							<td>{{application.sales_price}}</td>
 							<td>{{application.total_sales_price}} ({{application.disc_sales_price}} px @ {{application.staff_hired}} staff)</td> 
-							<td>{{application.total_earning_fee_charged}}</td>
-							<td>{{application.total_earning}}</td>
 							{% if active_team.created_by == request.user %}
 							<td><a href="{% url 'resolution:application_resolution' application.id application.project.slug %} "><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
 							{% endif %}

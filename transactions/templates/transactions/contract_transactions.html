@@ -35,10 +35,7 @@
 							<th>Payment Type</th>
 							<th>Contract Proposal</th>
 							<th>Base Price</th>
-							{% comment %} <th>Disc. Price ({{base_currency}}) @ Qty </th> {% endcomment %}
 							<th>Sales ({{base_currency}})</th>
-							<th>Fees </th>
-							<th>Est. Earning</th>
 							<th>Manager</th>
 						</tr>
 					</thead>
@@ -51,15 +48,11 @@
 							<td>{{contract.purchase.client.get_full_name|capfirst}}</td>
 							<td>{{contract.created_at}}</td>
 							<td>{{contract.purchase.payment_method}}</td>
-							<td>{{contract.contract.proposal.title|truncatechars:100}}</td>
+							<td class="text-left">{{contract.contract.proposal.title|truncatechars:60}}</td>
 							<td>{{contract.sales_price}}</td>
 							<td>{{contract.total_sales_price}} ({{contract.disc_sales_price}}px @ {{contract.staff_hired}}staff)</td>     
-							<td>{{contract.total_earning_fee_charged}}</td>
-							<td>{{contract.total_earning}}</td>
-							{% comment %} <td><a href=""><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td> {% endcomment %}
 							<td><a href="{% url 'resolution:contract_resolution' contract.id contract.contract.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Start Work</button></a></td>
 						</tr>
-						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
 						{% endfor %}
 					</tbody>
 				</table>

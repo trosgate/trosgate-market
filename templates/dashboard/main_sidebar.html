@@ -1,7 +1,7 @@
 {% load static %}
 
-		{% if request.user.is_authenticated %}
 		<div id="wt-sidebarwrapper" class="wt-sidebarwrapper">
+			{% if request.user.is_authenticated %}
 			<div id="wt-btnmenutoggle" class="wt-btnmenutoggle">
 				<span class="menu-icon">
 					<em></em>
@@ -283,5 +283,5 @@
 					<span>{{website.site_name}} © 2022 All Rights Reserved.</span>
 				</div>
 			</div>
+			{% endif %}
 		</div>
-		{% endif %}

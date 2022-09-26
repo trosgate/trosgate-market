@@ -1,5 +1,4 @@
 {% extends "dashboard/main_base.html" %}
-
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
@@ -34,8 +33,6 @@
 										<div class="form-group">
 											{{searchform.search_type}}
 										</div>
-										{% comment %} hx-get="/searchtype/" {% endcomment %}
-										{% comment %} <span id="searchtypeId" style="color:green" class="input-group col-lg-12"></span> {% endcomment %}
 									<fieldset>
 								</form>
 								<div class="wt-videoholder">
@@ -173,7 +170,6 @@
 						</div>
 					</div>
 				</div>
-				{% if not request.user.is_authenticated %}
 				<section class="wt-haslayout wt-main-section">
 					<div class="container">
 						<div class="row justify-content-md-center">
@@ -214,7 +210,6 @@
 						</div>
 						{% endfor %} 
 				</section>
-				{% endif %}
 			
 				<section class="wt-haslayaout wt-main-section wt-footeraboutus">
 					<div class="container">

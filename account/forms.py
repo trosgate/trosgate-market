@@ -87,8 +87,10 @@ class CustomerRegisterForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data['email']
         if Customer.objects.filter(email=email).exists():
-            raise forms.ValidationError(
-                _('Oops! Email taken. Please try another Email'))
+            raise forms.ValidationError(_("Oops! Email taken. Please try another Email"))
+
+        if not email.islower():
+            raise forms.ValidationError(_("Email characters must all be in lowercase"))
         return email
 
     def clean_password2(self):

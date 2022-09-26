@@ -73,7 +73,7 @@ def activate_team(request, team_id):
     User can switch from current active team 
     User will activate an inactive team and operate in that team
     '''
-    team = get_object_or_404(Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=team_id, members__in=[request.user])
 
     freelancer = request.user.freelancer
     freelancer.active_team_id = team.id
@@ -264,7 +264,7 @@ def accept_team_invitation(request):
 @login_required
 @user_is_freelancer
 def teamchat(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, package__type='Team', status=Team.ACTIVE, members__in=[request.user])
     content = request.POST.get('content', '')
 
     if content != '':
@@ -277,7 +277,7 @@ def teamchat(request):
 @login_required
 @user_is_freelancer
 def teamchatroom(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, package__type='Team', status=Team.ACTIVE)
     chats = team.teamchats.all()
     admin = Customer.objects.filter(user_type=Customer.ADMIN, is_active=True, is_staff=True).first()
     if request.htmx:

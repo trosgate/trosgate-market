@@ -63,7 +63,7 @@ class OneClickPurchase(models.Model):
     @classmethod
     def one_click_proposal(cls, user, proposal):
         with db_transaction.atomic():
-            account = ClientAccount.objects.select_for_update().get(user = user)
+            account = ClientAccount.objects.select_for_update().get(user=user)
             if account.available_balance < proposal.salary:
                 raise FundException('Insufficuent Balance')
 
@@ -87,7 +87,7 @@ class OneClickPurchase(models.Model):
 
             ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
 
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, paid_amount=purchass.salary_paid, purchase=purchass.proposal)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.salary_paid, purchase=purchass.proposal)
         
         return account, purchass
 
@@ -241,23 +241,23 @@ class Purchase(models.Model):
             
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
             
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
@@ -278,23 +278,23 @@ class Purchase(models.Model):
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
                 
@@ -317,23 +317,23 @@ class Purchase(models.Model):
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earning, paid_amount=item.total_sales_price, purchase=item.proposal)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_earnings, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_earning, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
@@ -346,15 +346,15 @@ class ApplicationSale(models.Model):
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="applicantionsales", on_delete=models.CASCADE)
     project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Applicant Budget"), blank=True, null=True)
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), blank=True, null=True)
+    total_sales_price = models.PositiveIntegerField(_("Applicant Budget"))
+    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
     staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
     earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"), blank=True, null=True)
-    discount_offered = models.PositiveIntegerField(_("Discount Offered"))
-    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), blank=True, null=True)
+    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
+    discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
+    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
     earning = models.PositiveIntegerField(_("Earning"))
-    total_earnings = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
+    total_earnings = models.PositiveIntegerField(_("Total Earning"))
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
@@ -404,7 +404,7 @@ class ApplicationSale(models.Model):
             application.is_refunded = True
             application.save()
             
-            freelancer.pending_balance -= int(application.total_earnings)
+            freelancer.pending_balance -= int(application.total_sales_price)
             freelancer.save(update_fields=['pending_balance'])
             
             client.available_balance += int(application.total_sales_price)
@@ -419,15 +419,15 @@ class ProposalSale(models.Model):
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="proposalsales", on_delete=models.CASCADE)
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal Hired"), related_name="proposalhired", on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Total Salary"), blank=True, null=True)
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), blank=True, null=True)
+    total_sales_price = models.PositiveIntegerField(_("Total Salary"))
+    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
     staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
     earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"), blank=True, null=True)
-    discount_offered = models.PositiveIntegerField(_("Discount Offered"))
-    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), blank=True, null=True)
+    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
+    discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
+    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
     earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
+    total_earning = models.PositiveIntegerField(_("Total Earning"))
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
@@ -486,7 +486,7 @@ class ProposalSale(models.Model):
             proposal_sale.is_refunded = True
             proposal_sale.save()
             
-            freelancer.pending_balance -= int(proposal_sale.total_earning)
+            freelancer.pending_balance -= int(proposal_sale.total_sales_price)
             freelancer.save(update_fields=['pending_balance'])
 
             client.available_balance += int(proposal_sale.total_sales_price)
@@ -501,15 +501,15 @@ class ContractSale(models.Model):
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="contractsales", on_delete=models.CASCADE)
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Contract Total"), blank=True, null=True)
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), blank=True, null=True)
+    total_sales_price = models.PositiveIntegerField(_("Contract Total"))
+    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
     staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
     earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"), blank=True, null=True)
-    discount_offered = models.PositiveIntegerField(_("Discount Offered"))
-    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), blank=True, null=True)
+    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
+    discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
+    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
     earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
+    total_earning = models.PositiveIntegerField(_("Total Earning"))
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
@@ -583,13 +583,13 @@ class ExtContract(models.Model):
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="extcontractsales", on_delete=models.CASCADE)
     contract = models.ForeignKey("contract.Contract", verbose_name=_("Contract Hired"), related_name="extcontracthired", on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Contract Total"), blank=True, null=True)
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), blank=True, null=True)
+    total_sales_price = models.PositiveIntegerField(_("Contract Total"))
+    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
     staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
     earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"), blank=True, null=True)
+    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
     earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"), blank=True, null=True)
+    total_earning = models.PositiveIntegerField(_("Total Earning"))
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
@@ -649,7 +649,7 @@ class ExtContract(models.Model):
             contract_sale.is_refunded = True
             contract_sale.save()
             
-            freelancer.pending_balance -= int(contract_sale.total_earning)
+            freelancer.pending_balance -= int(contract_sale.total_sales_price)
             freelancer.save(update_fields=['pending_balance'])
             
             client.available_balance += int(contract_sale.total_sales_price)

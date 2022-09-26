@@ -7,12 +7,18 @@ from applications.models import Application
 from proposals.models import Proposal
 from account.models import Customer
 from django.http import JsonResponse
-from . forms import ProjectCompletionForm, ProposalCompletionForm, ContractCompletionForm
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from account.permission import user_is_freelancer, user_is_client
-import mimetypes
+from django.http import HttpResponse
 from django.utils import timezone
 from account.fund_exception import ReviewException
+from . forms import (
+    ProjectCompletionForm, 
+    ProposalCompletionForm, 
+    ContractCompletionForm,
+    ApplicationCancellationForm,
+    ProposalCancellationForm
+)
 from transactions.models import (
     OneClickPurchase,
     Purchase, 
@@ -29,6 +35,8 @@ from . models import (
     ProposalReview,
     ContractResolution,
     ContractReview,
+    ApplicationCancellation,
+    ProposalCancellation,
     ContractCompletionFiles,
     ProjectCompletionFiles, 
     ProposalCompletionFiles 
@@ -38,12 +46,14 @@ from teams.models import Team
 
 @login_required
 def application_manager(request, application_id, project_slug):
-    resolution = ''
+    resolution = None
     duration_end_time = ''
+    cancellation_message = None
     application = get_object_or_404(ApplicationSale, pk=application_id, project__slug=project_slug)
     client_review = ApplicationReview.objects.filter(resolution__application=application)
 
-    completion_form = ProjectCompletionForm(request.POST, request.FILES)
+    completion_form = ProjectCompletionForm(request.POST or None, request.FILES or None)
+    cancellation_form = ApplicationCancellationForm(request.POST or None)
     if request.user.user_type == Customer.FREELANCER:
         if request.user != application.team.created_by:
             return redirect('transactions:one_click_transaction')
@@ -72,17 +82,69 @@ def application_manager(request, application_id, project_slug):
         if project_resolution.count() > 0:
             resolution = project_resolution.first()
             duration_end_time = resolution.end_time            
+    
+    cancel_message = ApplicationCancellation.objects.filter(resolution=resolution)
+    if cancel_message.count() > 0:
+        cancellation_message = cancel_message.first()
 
     context = {
         "application": application,
         "client_review": client_review,
         "completion_form": completion_form,
         "duration_end_time": duration_end_time,
+        "cancellation_form": cancellation_form,
+        "cancellation_message": cancellation_message,
         "resolution": resolution,
         "currency": get_base_currency_code,
 
     }
     return render(request, "resolution/application_resolution.html", context)
+
+
+@login_required
+@user_is_client
+def application_cancelled(request):
+    resolution_id = request.POST.get('resolution')
+    cancel_type = request.POST.get('cancel_type', '')
+    message = request.POST.get('message', '')
+    cancellation_message = None
+    error = ''
+    resolution = get_object_or_404(ProjectResolution, pk=resolution_id, status = 'ongoing', application__purchase__client = request.user)
+    
+    message_length = len(message) <= 500
+    if cancel_type != '' and message != '' and message_length:
+        if ApplicationCancellation.objects.filter(resolution=resolution).exists():
+            pass
+        else:
+            try:
+                ProjectResolution.cancel_project(
+                    resolution=resolution.id, 
+                    cancel_type=cancel_type,
+                    message=message
+                )
+            except Exception as e:
+                print(str(e))
+
+    cancel_message = ApplicationCancellation.objects.filter(resolution=resolution, status = 'initiated')
+    if cancel_message.count() > 0:
+        cancellation_message = cancel_message.first()    
+    context = {
+        'cancellation_message':cancellation_message
+    }       
+    return render(request, 'resolution/component/application_cancelled.html', context)
+
+
+@login_required
+@user_is_freelancer
+def confirm_application_cancel(request):
+    resolution_id = request.POST.get('confirm_cancel')
+    resolution = get_object_or_404(ProjectResolution, pk=resolution_id, application__team__created_by = request.user)    
+    try:
+        ProjectResolution.approve_and_cancel_project(resolution=resolution.id)
+        return HttpResponse("<div style='color:green;'> Successfully approved cancellation request </div>")
+    except Exception as e:
+        errors = (str(e))
+        return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
 
 
 @login_required
@@ -108,7 +170,7 @@ def applicant_start_work(request):
         return response
 
 
-login_required
+@login_required
 @user_is_client
 def applicant_review(request):
     success_or_error_message = ''
@@ -152,12 +214,13 @@ def applicant_review(request):
 
 @login_required
 def proposal_manager(request, proposalsale_id, proposal_slug):
-    resolution = ''
+    resolution = None
     duration_end_time = ''
+    cancellation_message = None
     proposal_sold = get_object_or_404(ProposalSale, pk=proposalsale_id, proposal__slug=proposal_slug)
     client_review = ProposalReview.objects.filter(resolution__proposal_sale=proposal_sold)
     completion_form = ProposalCompletionForm(request.POST, request.FILES)
-    
+    cancellation_form = ProposalCancellationForm(request.POST or None)
     if request.user.user_type == Customer.FREELANCER:
         if request.user != proposal_sold.team.created_by:
             return redirect('transactions:proposal_transaction') 
@@ -181,11 +244,17 @@ def proposal_manager(request, proposalsale_id, proposal_slug):
             resolution = proposal_resolution.first()
             duration_end_time = resolution.end_time  
 
+    cancel_message = ProposalCancellation.objects.filter(resolution=resolution)
+    if cancel_message.count() > 0:
+        cancellation_message = cancel_message.first()
+
     context = {
         "proposal_sold": proposal_sold,
         "client_review": client_review,
         "completion_form": completion_form,
         "duration_end_time": duration_end_time,
+        "cancellation_form": cancellation_form,
+        "cancellation_message": cancellation_message,        
         "resolution": resolution,
         "currency": get_base_currency_code,
     }
@@ -254,6 +323,51 @@ def proposal_review(request):
 
         response = JsonResponse({'success_or_error_message': success_or_error_message})
         return response
+
+
+@login_required
+@user_is_client
+def proposal_cancelled(request):
+    resolution_id = request.POST.get('resolution')
+    cancel_type = request.POST.get('cancel_type', '')
+    message = request.POST.get('message', '')
+    cancellation_message = None
+    resolution = get_object_or_404(ProposalResolution, pk=resolution_id, status = 'ongoing', proposal_sale__purchase__client = request.user)
+    
+    message_length = len(message) <= 500
+    if cancel_type != '' and message != '' and message_length:
+        if ProposalCancellation.objects.filter(resolution=resolution).exists():
+            pass
+        else:
+            try:
+                ProposalResolution.cancel_proposal(
+                    resolution=resolution.id, 
+                    cancel_type=cancel_type,
+                    message=message
+                )
+            except Exception as e:
+                print(str(e))
+
+    cancel_message = ProposalCancellation.objects.filter(resolution=resolution, status = 'initiated')
+    if cancel_message.count() > 0:
+        cancellation_message = cancel_message.first()    
+    context = {
+        'cancellation_message':cancellation_message
+    }       
+    return render(request, 'resolution/component/proposal_cancelled.html', context)
+
+
+@login_required
+@user_is_freelancer
+def confirm_proposal_cancel(request):
+    resolution_id = request.POST.get('confirmcancelproposal')
+    resolution = get_object_or_404(ProposalResolution, pk=resolution_id, proposal_sale__team__created_by = request.user)    
+    try:
+        ProposalResolution.approve_and_cancel_proposal(resolution=resolution.id)
+        return HttpResponse("<div style='color:green;'> Successfully approved cancellation request </div>")
+    except Exception as e:
+        errors = (str(e))
+        return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
 
 
 @login_required

@@ -191,7 +191,7 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
 @admin.register(FreelancerAction)
 class FreelancerActionAdmin(admin.ModelAdmin):
     model = FreelancerAction    
-    list_display = ['reference', 'account', 'team', 'manager', 'action_choice', 'debit_amount', 'withdraw_amount']
+    list_display = ['reference', 'account', 'team', 'action_choice', 'debit_amount', 'withdraw_amount']
     list_display_links = ['reference','account']
     search_fields = ['team__title', 'position']
     list_filter = ['action_choice']

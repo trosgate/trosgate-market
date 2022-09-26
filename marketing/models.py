@@ -214,7 +214,6 @@ class Ticket(models.Model):
     query_type = models.CharField(_("Query Type"), max_length=100, choices=QUERY_TYPE, default=GENERAL_ENQUIRY)
     product_type = models.CharField(_("Product Type"), max_length=100, choices=PRODUCT_TYPE, default=NOT_APPLICABLE)
     product_type_reference = models.CharField(_("Product Reference"), max_length=100, null=True, blank=True, help_text=_("Reference for the product type selected"))
-    
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="reporterteam", on_delete=models.SET_NULL, blank=True, null=True, help_text=_("Only Applicable to Freelancer Queries"))
     support = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Current Support"), related_name="firstticketsupport", blank=True, null=True, on_delete=models.SET_NULL)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Customer"), related_name="reportersupport", on_delete=models.CASCADE)

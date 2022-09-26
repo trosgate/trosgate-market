@@ -24,3 +24,11 @@ urlpatterns = [
     path('oneclick_review/',views.oneclick_review, name='oneclick_review'),
     path('one/<int:purchase_pk>/<str:reference>/',views.oneclick_manager, name='oneclick_manager'),
 ]
+htmx_urlpatterns = [
+    path('application_cancelled/', views.application_cancelled, name='application_cancelled'),
+    path('confirm_application_cancel/', views.confirm_application_cancel, name='confirm_application_cancel'),
+    path('proposal_cancelled/', views.proposal_cancelled, name='proposal_cancelled'),
+    path('confirm_proposal_cancel/', views.confirm_proposal_cancel, name='confirm_proposal_cancel'),
+]
+
+urlpatterns += htmx_urlpatterns

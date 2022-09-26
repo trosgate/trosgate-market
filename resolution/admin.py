@@ -1,8 +1,8 @@
 from django.contrib import admin
 from . models import (
-    OneClickResolution, ProjectResolution, ApplicationReview, 
+    OneClickResolution, ProjectResolution, ApplicationReview,ApplicationCancellation, 
     ProjectCompletionFiles, ProposalResolution,OneClickReview, 
-    ProposalCompletionFiles, ProposalReview, ContractResolution, ContractReview
+    ProposalCompletionFiles, ProposalReview, ContractResolution, ContractReview, ProposalCancellation
 )
 
 
@@ -35,6 +35,18 @@ class ProjectResolutionFilesAdmin(admin.ModelAdmin):
     list_display = ['application', 'attachment',]
 
 
+@admin.register(ApplicationCancellation)
+class ApplicationCancellationAdmin(admin.ModelAdmin):
+    model = ApplicationCancellation
+    list_display = ['cancel_type', 'status', 'created_at']
+
+
+@admin.register(ProposalCancellation)
+class ProposalCancellationAdmin(admin.ModelAdmin):
+    model = ProposalCancellation
+    list_display = ['cancel_type', 'status', 'created_at']
+
+
 @admin.register(ApplicationReview)
 class ApplicationReviewAdmin(admin.ModelAdmin):
     model = ApplicationReview
@@ -48,7 +60,7 @@ class ApplicationReviewAdmin(admin.ModelAdmin):
 class ProposalResolutionAdmin(admin.ModelAdmin):
     model = ProposalResolution
     list_display = ['team','start_time', 'end_time', 'status']
-    readonly_fields = ['team','start_time', 'end_time', 'status', 'proposal_sale']    
+    readonly_fields = ['team','start_time', 'end_time', 'proposal_sale']    
 
 
 @admin.register(ProposalCompletionFiles)

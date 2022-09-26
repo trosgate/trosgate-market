@@ -160,6 +160,8 @@ DATABASES = {
         'NAME': 'trosgate',
         'USER': 'katey',
         'PASSWORD': 'Prof2ike.y2ky2k',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 

@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from notification.utilities import create_notification
+from django.utils import timezone
 
 
 @login_required
@@ -87,7 +88,7 @@ def update_project(request, project_slug):
 @login_required
 @user_is_client
 def reopen_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE, created_by=request.user)
+    project = get_object_or_404(Project, slug=project_slug, duration__lt=timezone.now(), status=Project.ACTIVE, created_by=request.user)
 
     if request.method == 'POST':
         projectform = ProjectReopenForm(request.POST or None, instance=project)

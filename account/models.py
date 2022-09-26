@@ -43,20 +43,6 @@ class Country(models.Model):
     flag_tag.short_description = 'flag'
 
 
-class State(models.Model):
-    name = models.CharField(_("State/City"), max_length=100, null=True, blank=True)
-    country = models.ForeignKey(Country, verbose_name=_(
-        "Country"), null=True, blank=True, related_name='states', on_delete=models.CASCADE)
-
-    class Meta:
-        ordering = ["country"]
-        verbose_name = _("State")
-        verbose_name_plural = _("States")
-
-    def __str__(self):
-        return self.name
-
-
 class Customer(AbstractBaseUser, PermissionsMixin):
 
     ADMIN = 'admin'
@@ -96,9 +82,9 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['short_name', 'user_type']
     objects = UserManager()
 
-    # def save(self, *args, **kwargs):
-    #     self.email = self.email.lower()
-    #     super(Customer, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.email = self.email.lower()
+        super(Customer, self).save(*args, **kwargs)
 
 
     def __str__(self):
