@@ -148,22 +148,22 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 
 
 # Database
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-DATABASES = {
-    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-}
+# DATABASE_URL = os.getenv("DATABASE_URL")
 
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'railway',
-#         'USER': 'postgres',
-#         'PASSWORD': '9vr1lrTivVSgmRxMa10I',
-#         'HOST': 'containers-us-west-77.railway.app',
-#         'PORT': '5718',
-#     }
+#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'wqbcpYtK1fUYgfa3Q1ts',
+        'HOST': 'containers-us-west-56.railway.app',
+        'PORT': '6673',
+    }
+}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
