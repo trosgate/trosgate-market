@@ -1,1 +1,1 @@
-web: gunicorn trosgate.wsgi
+web: gunicorn trosgate.wsgi --log-file -
