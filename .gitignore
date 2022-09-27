@@ -1,8 +1,16 @@
 .useful_commands.txt
-.env
 .flutterwave.txt
 .paypal.txt
 .razorpay.txt
 .secret.txt
 .twilio.txt
 .strioe.txt
+.env/
+.venv/
+env/
+venv/
+*.env
+
+*.pyc
+db.sqlite3
+staticfiles/
