@@ -1,0 +1,11 @@
+
+.shortnamesuccess{
+    color: green;
+    transition: all ease-in .5s;
+}
+
+.shortnameerrors{
+    color: red;
+    font-size: 25px;
+    transition: all ease-in .5s;
+}

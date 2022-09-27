@@ -1,6 +1,8 @@
 //this will dumpdata
 python manage.py dumpdata teams.Team > new.json
 
+python manage.py dumpdata > railway.json
+
 //this will indent dumpdata
 python manage.py dumpdata teams.Team --indent 4 > new.json
 

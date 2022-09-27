@@ -42,6 +42,7 @@ django-timezone-field==4.2.1
 django-widget-tweaks==1.4.12
 easy-thumbnails==2.8
 greenlet==1.1.2
+gunicorn==20.1.0
 hiredis==2.0.0
 hyperlink==21.0.0
 idna==3.3
@@ -89,4 +90,5 @@ urllib3==1.26.7
 vine==5.0.0
 wcwidth==0.2.5
 webencodings==0.5.1
+whitenoise==6.2.0
 zope.interface==5.4.0

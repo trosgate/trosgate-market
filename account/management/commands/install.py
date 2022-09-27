@@ -14,8 +14,9 @@ class Command(BaseCommand):
     help = "this creates default values via commands for the entire system"
 
     def handle(self, *args, **kwargs):
-        call_command("makemigrations")
-        call_command("migrate")
+        # call_command("makemigrations")
+        # call_command("migrate")
+        # call_command("loaddata", "railway.json")
 
         if not Country.objects.count():
             call_command("loaddata", "db_countries.json")
