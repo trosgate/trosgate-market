@@ -154,26 +154,26 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 #     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'wqbcpYtK1fUYgfa3Q1ts',
-        'HOST': 'containers-us-west-56.railway.app',
-        'PORT': '6673',
-    }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgate',
-#         'USER': 'katey',
-#         'PASSWORD': 'Prof2ike.y2ky2k',
-#         'HOST': 'localhost',
-#         'PORT': '',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': 'wqbcpYtK1fUYgfa3Q1ts',
+#         'HOST': 'containers-us-west-56.railway.app',
+#         'PORT': '6673',
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trosgate',
+        'USER': 'katey',
+        'PASSWORD': 'Prof2ike.y2ky2k',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
