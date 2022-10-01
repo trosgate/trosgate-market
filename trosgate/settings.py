@@ -32,7 +32,7 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['trosgate.com', '165.227.86.51', '.trosgate.com'] 
+ALLOWED_HOSTS = ['trosgate.com', '67.207.85.168', '.trosgate.com'] 
 # '127.0.0.1', 'localhost'
 
 AUTH_USER_MODEL = 'account.Customer'
