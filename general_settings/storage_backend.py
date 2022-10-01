@@ -83,11 +83,12 @@ class DynamicStorageField(models.FileField):
 
 
 def general_file_directory():
-    if activate_s3_bucket() == True:
-        return S3BotoStorage(s3_storage(
-            backet_name=get_bucket_name(), 
-            access_key=get_access_key(), 
-            secret_key=get_secret_key()
-        ))
-    else:
-        return local_file_storage()
+    print('boto')
+    # if activate_s3_bucket() == True:
+    #     return S3BotoStorage(s3_storage(
+    #         backet_name=get_bucket_name(), 
+    #         access_key=get_access_key(), 
+    #         secret_key=get_secret_key()
+    #     ))
+    # else:
+    #     return local_file_storage()
