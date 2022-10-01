@@ -176,7 +176,7 @@
 						</div>
 					</div>
 				</section>
-				{% if resolution %}	
+				{% if resolution.status != 'cancelled' %}	
 				<section class="wt-haslayout wt-dbsectionspace">
 					<div class="row justify-content-md-center">				
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
@@ -212,22 +212,18 @@
 										<div class="wt-rightarea text-center">
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-dollar" style='color:green;'></i>
-												{% if active_team.created_by == request.user %}
-												<span>{{currency}}{{contract_sold.total_earning}}</span>
-												{% elif request.user == contract_sold.purchase.client %}
 												<span>{{currency}}{{contract_sold.total_sales_price}}</span>
-												{% endif %}
 											</div>
+
 											{% if request.user == contract_sold.purchase.client %}
+											{% if resolution and resolution.status != 'cancelled' %} 
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-star fill" style='color:orange'></i>
 												<span><button type='button' class='btn btn-success btn-sm' data-toggle="modal" data-target="#projectreviewmodalbox">Approve</button></span>
 											</div>														
-											<div class="wt-hireduserstatus">
-												<i class="ti-na" style='color:green;'></i>
-												<span><button type='button' class='btn btn-danger btn-sm' data-toggle="modal" data-target="#projectcancelmodalbox">Cancel</button></span>
-											</div>														
 											{% endif %}														
+											{% endif %}	
+
 											<div class="wt-hireduserstatus">
 												<i class="far fa-envelope" style='color:green;'></i>
 												<span>Cover Letter</span>
@@ -235,11 +231,13 @@
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-paperclip" style='color:green;'><a href=""></a></i>
 												<span>0 Files</span>
-											</div>														
+											</div>
+											{% if resolution %}														
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-list-alt" style='color:green;'></i>
 												<span>{{resolution.get_status_display}}</span>
-											</div>														
+											</div>
+											{% endif %}														
 										</div>
 									</div>
 								</div>											                  														
@@ -256,14 +254,14 @@
 					<div class="wt-dashboardbox">
 						<div class="wt-dashboardboxcontent wt-rcvproposala">
 								<div class="wt-sectiontitle">
-									<span>Proposal Review </span>
+									<span>Contract Review </span>
 								</div>
 								<div id="refreshContract" class="table-responsive"><button class="btn btn-success btn-sm mb-4 text-white float-left"><i class="fas fa-sync fa-spin"></i>Refresh</button>
 
 									{% for review in client_review %}
 								<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
 									<figure class="wt-userlistingimg">
-										<img src="{% if review.resolution.team.created_by.freelancer.profile_photo %} {{review.resolution.team.created_by.freelancer.profile_photo.url }} {% endif %}" alt="image description">
+										<img src="{% firstof review.resolution.contract_sale.purchase.client.clients.profile_photo.url review.resolution.contract_sale.purchase.client.clients.company_logo.url %} " alt="image description">
 									</figure>
 									<div class="wt-userlistingcontent">
 										<div class="wt-contenthead">
@@ -292,7 +290,60 @@
 						</div>	
 					</div>	
 				</div>	
+			</section>
+			
+			{% if resolution.status != 'completed' %}
+			<section class="wt-proposalholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-12">
+							<div class="wt-sectionhead wt-textcenter">
+								<div class="wt-sectiontitle">
+									<h3>cancellation Request</h3>
+									<span style="color: green; font-weight: bold;"> We hope both parties could come to terms. <a href="{% url 'contract:contract_discord' contract_sold.contract.pk contract_sold.contract.slug %}" class="btn btn-outline-danger btn-sm"><i class="fa fa-envelope"> Let us Chat</i></a></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="confirm-cancelled" class='col-md-6'></div>		
+				<div class="row">
+					<div id="contract-cancelled" class='col-md-6'>
+						{% include 'resolution/component/contract_cancelled.html' %}
+					</div>
+					<div class='col-md-6'>
+						<form id="cancelandclose" class="wt-formtheme wt-formfeedback">
+							{% csrf_token %}
+
+							{% if request.user == contract_sold.purchase.client and resolution.status == 'ongoing' %}
+							<input type='hidden' name='resolution' value='{{resolution.id}}'/>
+							<div class="form-group">
+								{{cancellation_form.cancel_type.label}}
+								{{cancellation_form.cancel_type}}
+							</div>
+							<div class="form-group">
+								{{cancellation_form.message.label}}
+								{{cancellation_form.message}}
+							</div>
+							<button id="newCancellation" 
+								hx-post="{% url 'resolution:internal_contract_cancelled' %}" 
+								hx-target="#contract-cancelled"
+								hx-confirm="Are you sure you want to cancel?" 
+								type="submit" class="btn btn-danger"><i class="fa fa-ban"> Cancel Now</i>
+							</button>
+							</div>
+
+							{% else %}
+							<label>Admin Message</label>
+							<textarea type="text" name="donothing" class="form-control" placeholder="Space reserved for Administrator..." readonly></textarea>
+							{% endif %}
+
+						</form>
+					</div>
+				</div>
 			</section>	 
+			{% endif %}
+			
 			{% endif %}
 			<div class="wt-proposalholder">
 				<div class="row justify-content-md-center">
@@ -304,7 +355,7 @@
 
 		</main>
 			<!--Main End-->	
-
+		{% if resolution %}
 		{% comment %} Modal section for Approval and Review {% endcomment %}
 		<div class="wt-uploadimages modal fade" id="projectreviewmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
 			<div class="wt-modaldialog modal-dialog" role="document">
@@ -407,30 +458,19 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 
-		{% comment %} Modal section for Approval and Review {% endcomment %}
-		<div class="wt-uploadimages modal fade" id="projectcancelmodalbox" tabindex="-1" role="dialog" aria-hidden="true">
-			<div class="wt-modaldialog modal-dialog" role="document">
-				<div class="wt-modalcontent modal-content">
-					<div class="wt-boxtitle">
-						<h2>Cancelation<i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
-					</div>
-					<div class="wt-boxtitle">
-						<span id="rcancellerror-message" style="color:green; text-align:right;"></span>
-					</div>
-					<div class="wt-modalbody modal-body">
-						<form id="reviewandclose" class="wt-formtheme wt-formfeedback">
-								<div class="form-group">
-									<textarea class="form-control" id="contractfeedback" name="reviewmessage" value="" placeholder="Add Your Feedback*"></textarea>
-								</div>
-								<div class="form-group wt-btnarea">
-									<button id="proposal-cancelled" type="submit" class="wt-btn" href="javascript:void(0);">Send Feedback</button>
-								</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+		<script>
+			document.body.addEventListener('htmx:configRequest', (event) =>{
+				event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+			});
+		
+		</script>
+		<script>
+			$(document).on("click", "#newCancellation", function(){
+				$("#id_message").val('');
+			})
+		</script>
 
 {% endblock %}
 

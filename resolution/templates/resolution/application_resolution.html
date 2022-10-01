@@ -244,10 +244,12 @@
 											</div>
 
 											{% if request.user == application.purchase.client %}
+											{% if resolution and resolution.status != 'cancelled' %}
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-star fill" style='color:orange'></i>
 												<span><button type='button' class='btn btn-success btn-sm' data-toggle="modal" data-target="#projectreviewmodalbox">Approve</button></span>
 											</div>																					
+											{% endif %}	
 											{% endif %}	
 
 											<div class="wt-hireduserstatus">
@@ -257,11 +259,13 @@
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-paperclip" style='color:green;'><a href=""></a></i>
 												<span>0 Files</span>
-											</div>														
+											</div>
+											{% if resolution %}														
 											<div class="wt-hireduserstatus">
 												<i class="fa fa-list-alt" style='color:green;'></i>
 												<span>{{resolution.get_status_display}}</span>
-											</div>														
+											</div>
+											{% endif %}														
 										</div>
 									</div>
 								</div>											                  														

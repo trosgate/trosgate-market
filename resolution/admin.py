@@ -2,7 +2,8 @@ from django.contrib import admin
 from . models import (
     OneClickResolution, ProjectResolution, ApplicationReview,ApplicationCancellation, 
     ProjectCompletionFiles, ProposalResolution,OneClickReview, 
-    ProposalCompletionFiles, ProposalReview, ContractResolution, ContractReview, ProposalCancellation
+    ProposalCompletionFiles, ProposalReview, ContractResolution,ContractCancellation, 
+    ContractReview, ProposalCancellation,ApplicationCancellation
 )
 
 
@@ -47,6 +48,12 @@ class ProposalCancellationAdmin(admin.ModelAdmin):
     list_display = ['cancel_type', 'status', 'created_at']
 
 
+@admin.register(ContractCancellation)
+class ContractCancellationAdmin(admin.ModelAdmin):
+    model = ContractCancellation
+    list_display = ['cancel_type', 'status', 'created_at']
+
+    
 @admin.register(ApplicationReview)
 class ApplicationReviewAdmin(admin.ModelAdmin):
     model = ApplicationReview

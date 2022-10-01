@@ -38,6 +38,12 @@ class ProposalStepOneForm(forms.ModelForm):
         for field in self.Meta.required:
             self.fields[field].required = True
 
+    def clean_skill(self):
+        skill_count = self.cleaned_data['skill']
+        if len(skill_count) > 3:
+            raise forms.ValidationError(_("Skill selected must not be more than three"))
+        return skill_count
+
 
 class ProposalStepTwoForm(forms.ModelForm):
 
@@ -128,6 +134,12 @@ class ModifyProposalStepOneForm(forms.ModelForm):
 
         for field in self.Meta.required:
             self.fields[field].required = True
+
+    def clean_skill(self):
+        skill_count = self.cleaned_data['skill']
+        if len(skill_count) > 3:
+            raise forms.ValidationError(_("Skill selected must not be more than three"))
+        return skill_count
 
 
 class ProposalChatForm(forms.ModelForm):

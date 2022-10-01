@@ -1,0 +1,54 @@
+
+{% if cancellation_message %}	
+<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">
+    <div class="wt-userlistingcontent">
+        <div class="wt-contenthead">
+            <ul class="wt-userlisting-breadcrumb">
+                <li><span><strong>Type:</strong> {{cancellation_message.get_cancel_type_display}}</span></li>
+                <li><span><strong>Status:</strong> {{cancellation_message.get_status_display}}</span></li>
+                <li><span><strong>Date:</strong> {{cancellation_message.created_at|date:'d-m-Y'}}</span></li>
+            </ul>
+        </div>
+    </div>
+    <br>
+    <div> 
+        {{cancellation_message.message|linebreaksbr}}
+    </div>
+    <br>
+    <br>  
+    {% if active_team.created_by == request.user and resolution.status == 'disputed' %}
+    <form> {% csrf_token %}
+    <input type='hidden' name='confirmcancelcontract' value='{{resolution.id}}'/>  
+    <button id="confirmCancellation" 
+        hx-post="{% url 'resolution:confirm_internal_contract' %}" 
+        hx-target="#confirm-cancelled"
+        hx-swap='outerhtml'
+        hx-trigger='click' 
+        hx-confirm="Are you sure you want to approve? In that case payment will reverse to client"
+        type="submit" 
+        class="btn btn-success"><i class="fa fa-check"> Approve Now</i>
+    </button>
+    <form> 
+    {% endif %}
+</div>
+{% else %}
+
+<div class="row justify-content-md-center">				
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+        <div class="wt-dashboardbox">
+            <div class="wt-dashboardboxcontent wt-rcvproposala">
+                <div class="wt-freelancerholder wt-rcvproposalholder">												
+                    <div class="wt-tabscontenttitle">
+                        <h4 class="mb-4">Keep it Going</h4>
+                        <div class="alert alert-info" role="alert">
+                            <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                Info: This product is not cancelled. Keep doing great
+                            </span>
+                        </div>
+                    </div>									 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

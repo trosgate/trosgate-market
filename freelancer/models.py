@@ -87,8 +87,8 @@ class Freelancer(models.Model):
     def save(self, *args, **kwargs):
         super(Freelancer, self).save(*args, **kwargs)
         new_profile_photo = Image.open(self.profile_photo.path)
-        if new_profile_photo.height > 255 or new_profile_photo.width > 255:
-            output_size = (255, 255)
+        if new_profile_photo.height > 300 or new_profile_photo.width > 300:
+            output_size = (300, 300)
             new_profile_photo.thumbnail(output_size)
             new_profile_photo.save(self.profile_photo.path)
 

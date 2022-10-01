@@ -72,6 +72,10 @@ def get_level_four_start_amount():
         return 0
 
 
+def get_discount_value(amount, rate):
+    return round(amount * (rate/100))
+
+
 def get_discount_calculator(price_before_discount, total_before_discount, discount):
     return round(price_before_discount/total_before_discount * discount)
 

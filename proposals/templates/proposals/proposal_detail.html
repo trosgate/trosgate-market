@@ -174,7 +174,6 @@
 															<div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
 																<a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Summary</a>
 																<a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">FAQs</a>
-																<a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Notice</a>
 																<a class="nav-item nav-link" id="nav-review-tab" data-toggle="tab" href="#nav-review" role="tab" aria-controls="nav-review" aria-selected="false">Review</a>
 															</div>
 														</nav>
@@ -182,11 +181,21 @@
 															<div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
 																<section class="wt-haslayout wt-dbsectionspace">
 																	<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-																		<h4>Proposal Performance</h4>
+																		<h4>Analytics</h4>
 																		<div class="wt-freelancerholder wt-rcvproposalholder">												
+																		{% if not request.user.is_authenticated %}
 																			<div class="wt-tabscontenttitle">
-																				<div class="alert alert-warning" role="alert">
-																					<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+																				<div class="text-center">
+																					<span style="color:green; font-weight:bold;"><i class="fa fa-exclamation-triangle"></i> 
+																						Please login to view the statistics for the proposal. 
+																					</span>
+																				</div>
+																			</div>
+																		{% endif %}
+																		{% if request.user.is_authenticated %}
+																			<div class="wt-tabscontenttitle">
+																				<div class="text-left">
+																					<span style="color:green; font-weight:bold;"><i class="fa fa-exclamation-triangle"></i> 
 																						Info: Same proposal can be bought directly, bought via internal contract, through 1CC and more. 
 																					</span>
 																				</div>
@@ -267,6 +276,7 @@
 																			<span><i class="ti-check" style='color:green'> 1C-Con</i> Data representing this proposal linked to contract and bought via ICC</span><br>
 																		</div>
 																	</div>
+																	{% endif %}
 																</section>
 																<!-- sharethis button begins-->	
 																<div class="sharethis-inline-share-buttons"></div>
@@ -325,16 +335,6 @@
 																	{% endif %}
 																</ul>
 															</div>
-															<div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
-																<ul class="wt-projectliststyle">
-																	<div class="wt-title">
-																		<h5>Caution</h5>
-																	</div>	
-																	{% for instruction in guides %}
-																	<li><span><i class="fa fa-check"></i>{{instruction.guide}}</span></li>
-																	{% endfor %}
-																</ul>
-															</div>
 															<div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab">
 																<ul class="wt-projectliststyle">
 																	<div class="wt-title">
@@ -342,6 +342,16 @@
 																	</div>	
 																</ul>
 																<div class="wt-clientfeedback">
+																{% if not request.user.is_authenticated %}
+																<div class="wt-tabscontenttitle">
+																	<div class="text-center">
+																		<span style="color:green; font-weight:bold;"><i class="fa fa-exclamation-triangle"></i> 
+																			Please login to view reviews connected to this proposal. 
+																		</span>
+																	</div>
+																</div>
+																{% endif %}
+																{% if request.user.is_authenticated %}
 																{% if proposal_review_msg|length > 0 %}
 																	{% for review_msg in proposal_review_msg %}	
 																	<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
@@ -369,8 +379,8 @@
 																{% else %}
 																<p class='text-center'><strong style="color:blue;" role="alert">This proposal has no reviews at the moment</strong></p>
 																{% endif %}	
+																{% endif %}	
 																</div>
-
 															</div>
 														</div>
 													</div>

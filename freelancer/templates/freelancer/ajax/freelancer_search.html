@@ -30,7 +30,7 @@
         <p>{{profile.description|truncatechars:290}}...</p>
     </div>
     <div class="wt-tag wt-widgettag">
-    {% for skill in profile.my_skill.all %}
+    {% for skill in profile.skill.all %}
         <a href="javascript:void(0);">{{skill}}</a>
     {% endfor %}
     </div>

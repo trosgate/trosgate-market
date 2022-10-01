@@ -15,7 +15,7 @@ from general_settings.discount import (
     get_level_three_delta_amount, 
     get_level_four_start_amount,
     get_discount_calculator,
-    get_earning_calculator
+    get_discount_value
 )
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.fees_and_charges import (
@@ -64,11 +64,13 @@ def how_it_works(request):
     level_three_delta_amount = get_level_three_delta_amount()
     level_four_rate = get_level_four_rate()
     level_four_start_amount = get_level_four_start_amount()
+
     # Discount Value
-    l1_discount_amount = get_discount_calculator(level_one_delta_amount, level_one_delta_amount, level_one_rate)
-    l2_discount_amount = get_discount_calculator(level_two_start_amount, level_two_start_amount, level_two_rate)
-    l3_discount_amount = get_discount_calculator(level_three_start_amount, level_three_start_amount, level_three_rate)
-    l4_discount_amount = get_discount_calculator(level_four_start_amount, level_four_start_amount, level_four_rate)
+    l1_discount_amount = get_discount_value(level_one_delta_amount, level_one_rate)
+    l2_discount_amount = get_discount_value(level_two_start_amount, level_two_rate)
+    l3_discount_amount = get_discount_value(level_three_start_amount, level_three_rate)
+    l4_discount_amount = get_discount_value(level_four_start_amount, level_four_rate)
+    
     # Gross Sales
     l1_disc_sales_price=level_one_delta_amount - l1_discount_amount
     l2_disc_sales_price=level_two_start_amount - l2_discount_amount

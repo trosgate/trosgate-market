@@ -17,7 +17,6 @@ urlpatterns = [
     path('archive/<slug:project_slug>',views.archive_project, name='archive_project'),
     path('restore/<slug:project_slug>',views.restore_archive_project, name='restore_archive_project'),
     path('detail/<slug:project_slug>',views.project_single, name='project_detail'),
-    path('modify-project/<slug:project_slug>', views.update_project, name='update_project'),
     path('<slug:project_slug>/reopen/', views.reopen_project, name='reopen_project'),
     path('delete-project/<int:pk>/',views.delete_project, name='delete_project'),
 

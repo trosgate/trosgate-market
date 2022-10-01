@@ -3,7 +3,8 @@ from .models import (
     ProjectCompletionFiles, 
     ProposalCompletionFiles, 
     ApplicationCancellation,
-    ProposalCancellation
+    ProposalCancellation,
+    ContractCancellation
 )
 
 class ProjectCompletionForm(forms.ModelForm):
@@ -26,6 +27,21 @@ class ApplicationCancellationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ApplicationCancellationForm, self).__init__(*args, **kwargs)
+        
+        self.fields['cancel_type'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['message'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class ContractCancellationForm(forms.ModelForm):
+
+    class Meta:
+        model = ContractCancellation
+        fields = ['cancel_type', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super(ContractCancellationForm, self).__init__(*args, **kwargs)
         
         self.fields['cancel_type'].widget.attrs.update(
             {'class': 'form-control'})

@@ -42,7 +42,6 @@
 											{% comment %} <div class="wt-btnarea"> {% endcomment %}
 											{% if request.user == project.created_by and project.status == 'active' %}
 											<div class="wt-btnarea"><a href="{{project.get_project_absolute_url}}" class="btn btn-success"><i class="fa fa-info"></i> Details</a></div>
-											<div class="wt-btnarea"><a href="{{project.get_project_update_absolute_url}}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a></div>
 											{% elif request.user == project.created_by and project.status == 'review' %}
 											<div class="wt-btnarea"><a href="{{project.get_project_absolute_url}}" class="btn btn-success"><i class="fas fa-spinner fa-spin"></i> Details</a></div>
 											{% elif request.user == project.created_by and project.status == 'archived' %}

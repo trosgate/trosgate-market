@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from freelancer.models import Freelancer
 from account.permission import user_is_freelancer
-from general_settings.models import Category, ProposalGuides, Skill
+from general_settings.models import Category, Skill
 from django.contrib import auth, messages
 from django.views.decorators.cache import cache_control #prevent back button on browser after form submission
 from account.models import Country
@@ -593,7 +593,6 @@ def proposal_detail(request, short_name, proposal_slug):
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)   
     other_proposals = Proposal.active.exclude(pk=proposal.id)[:4]    
     team_members = proposal.team.members.all()
-    guides = ProposalGuides.objects.all()[:4]
 
     proposal_review_msg = ProposalReview.objects.filter(
         resolution__proposal_sale__proposal__team=proposal.team, 
@@ -650,7 +649,6 @@ def proposal_detail(request, short_name, proposal_slug):
         "other_proposals": other_proposals,
         "team_members": team_members,
         "profile_view": profile_view,
-        "guides": guides,
         "proposal_review_avg": proposal_review_avg,
         "contract_review_avg": contract_review_avg,
         "oneclick_proposal_review_avg": oneclick_proposal_review_avg,

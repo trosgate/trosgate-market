@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Project
 from django.contrib.auth.decorators import login_required
-from .forms import ProjectCreationForm, ProjectmodifyForm, ProjectReopenForm
+from .forms import ProjectCreationForm, ProjectReopenForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.urls import reverse
 from django.contrib import messages
@@ -17,6 +17,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from notification.utilities import create_notification
 from django.utils import timezone
+from general_settings.models import ProposalGuides
 
 
 @login_required
@@ -30,7 +31,7 @@ def create_project(request):
             project.created_by = request.user
             project.slug = slugify(project.title)
             project.save()
-            projectform.save_m2m()  # for saving many-to-many items in forms
+            projectform.save_m2m()
 
             messages.info(request, 'Project received. Hold on as we review')
 
@@ -49,10 +50,12 @@ def project_single(request, project_slug):
     profile_view = get_object_or_404(Client, user=project.created_by, user__is_active=True)
     applications = Application.objects.filter(project = project)
     employees_count = profile_view.employees.all().count()
+    guides = ProposalGuides.objects.all()[:4]
 
     context = {
         "projectdetail": project,
-        'project':project,  
+        'project':project,
+        "guides": guides,  
         'profile_view':profile_view,  
         'employees_count':employees_count,  
         'applications':applications,  
@@ -63,32 +66,8 @@ def project_single(request, project_slug):
 
 @login_required
 @user_is_client
-def update_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug, created_by=request.user)
-
-    if request.method == 'POST':
-        projectform = ProjectmodifyForm(request.POST or None, instance=project)
-
-        if projectform.is_valid():
-            projectform.save()
-
-            messages.success(request, 'The Changes were saved successfully!')
-
-            return redirect('account:dashboard')
-
-    else:
-        projectform = ProjectmodifyForm(instance=project)
-    context = {
-        "projectform": projectform,
-        "project": project,
-    }
-    return render(request, 'projects/update_project.html', context)
-
-
-@login_required
-@user_is_client
 def reopen_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug, duration__lt=timezone.now(), status=Project.ACTIVE, created_by=request.user)
+    project = get_object_or_404(Project, slug=project_slug, duration__lt=timezone.now(), reopen_count=0, status=Project.ACTIVE, created_by=request.user)
 
     if request.method == 'POST':
         projectform = ProjectReopenForm(request.POST or None, instance=project)
@@ -96,12 +75,9 @@ def reopen_project(request, project_slug):
         if projectform.is_valid():
             project = projectform.save(commit=False)
             project.action = True
+            project.reopen_count = 1
             projectform.save()
 
-            try:
-                Project.update_reopen_time(pk=project.pk)
-            except Exception as e:
-                print(str(e))
             messages.success(request, 'The project was extended successfully!')
 
             return redirect('account:dashboard')
@@ -129,7 +105,6 @@ def active_project(request):
 @user_is_client
 def review_project(request):
     review_projects = Project.objects.filter(created_by=request.user, status=Project.REVIEW)
-
     context = {
         'review_projects':review_projects,
     }
@@ -140,7 +115,6 @@ def review_project(request):
 @user_is_client
 def archived_project_view(request):
     archived_projects = Project.objects.filter(created_by=request.user, status=Project.ARCHIVED)
-
     context = {
         'archived_projects':archived_projects,
     }
@@ -194,4 +168,3 @@ def delete_project(request, pk=None):
     project_delete = Project.objects.get(pk=pk, created_by=request.user)
     project_delete.delete()
     return redirect('projects:my_projects')
-

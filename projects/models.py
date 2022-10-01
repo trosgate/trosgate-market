@@ -127,6 +127,7 @@ class Project(models.Model):
     status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=REVIEW)
     reference = models.CharField(_('Identifier'), unique=True, null=True, blank=True, max_length=120)
     action = models.BooleanField(_("Action"), default = False)
+    reopen_count = models.PositiveSmallIntegerField(_("Reopen Count"), default=0, validators=[MinValueValidator(0), MaxValueValidator(1)],)
     objects = models.Manager()
     public = PublishedProjects()
 
@@ -152,10 +153,6 @@ class Project(models.Model):
     #a url route for the project detail page
     def get_project_absolute_url(self):
           return reverse('projects:project_detail', args=[self.slug])
-
-    #a url route for the project update page
-    def get_project_update_absolute_url(self):
-        return reverse('projects:update_project', args=[self.slug])
 
     #a url route for the project update page
     def get_project_review_absolute_url(self):

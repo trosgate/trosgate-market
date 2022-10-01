@@ -10,12 +10,12 @@ class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = [
         'category', 'preview', 'amount','rating',
         'service_level', 'project_skill','reference','created_by',
-        'description','sample_link','dura_converter','duration','completion_time'
+        'description','sample_link','dura_converter','duration','reopen_count', 'completion_time'
     ]
     actions = ['Feature_on_home', 'Unfeature_from_home']
     fieldsets = (
-        ('Introduction', {'fields': ('category', 'preview', 'amount','rating',)}),
-        ('Specialties', {'fields': ('service_level', 'project_skill',)}),
+        ('Introduction', {'fields': ('category', 'preview', 'amount',)}),
+        ('Specialties', {'fields': ('service_level', 'project_skill','rating','reopen_count', )}),
         ('Details', {'fields': ('description','sample_link','dura_converter','duration', 'completion_time',)}),
         ('Project Creator', {'fields': ('reference','created_by',)}),   
     )

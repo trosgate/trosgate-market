@@ -33,7 +33,7 @@ from django.core.paginator import Paginator
 
 # this will appear in search results
 def freelancer_listing(request):
-    freelancer_list = Freelancer.active.all()
+    freelancer_list = Freelancer.active.all().exclude(description = "", skill = None)
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
     skills = Skill.objects.all().distinct()
@@ -76,7 +76,7 @@ def freelancer_search(request):
     join_four_year = request.GET.get('join_four_year[]', '')
     join_over_five_year = request.GET.get('join_over_five_year[]', '')
 
-    freelancers = Freelancer.active.all()
+    freelancers = Freelancer.active.all().exclude(description = "", skill = None)
     all_freelancers = freelancers.count()
 
     # Country

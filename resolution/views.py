@@ -17,7 +17,8 @@ from . forms import (
     ProposalCompletionForm, 
     ContractCompletionForm,
     ApplicationCancellationForm,
-    ProposalCancellationForm
+    ProposalCancellationForm,
+    ContractCancellationForm
 )
 from transactions.models import (
     OneClickPurchase,
@@ -37,6 +38,7 @@ from . models import (
     ContractReview,
     ApplicationCancellation,
     ProposalCancellation,
+    ContractCancellation,
     ContractCompletionFiles,
     ProjectCompletionFiles, 
     ProposalCompletionFiles 
@@ -54,6 +56,7 @@ def application_manager(request, application_id, project_slug):
 
     completion_form = ProjectCompletionForm(request.POST or None, request.FILES or None)
     cancellation_form = ApplicationCancellationForm(request.POST or None)
+        
     if request.user.user_type == Customer.FREELANCER:
         if request.user != application.team.created_by:
             return redirect('transactions:one_click_transaction')
@@ -67,12 +70,10 @@ def application_manager(request, application_id, project_slug):
             resolution = project_resolution.first()
             duration_end_time = resolution.end_time
             
-
         if resolution and completion_form.is_valid():
             completed_file = completion_form.save(commit=False)
             completed_file.application = resolution
             completed_file.save()
-
 
     elif request.user.user_type == Customer.CLIENT:
         if request.user != application.purchase.client:
@@ -108,7 +109,7 @@ def application_cancelled(request):
     cancel_type = request.POST.get('cancel_type', '')
     message = request.POST.get('message', '')
     cancellation_message = None
-    error = ''
+
     resolution = get_object_or_404(ProjectResolution, pk=resolution_id, status = 'ongoing', application__purchase__client = request.user)
     
     message_length = len(message) <= 500
@@ -130,7 +131,7 @@ def application_cancelled(request):
         cancellation_message = cancel_message.first()    
     context = {
         'cancellation_message':cancellation_message
-    }       
+    }
     return render(request, 'resolution/component/application_cancelled.html', context)
 
 
@@ -374,10 +375,11 @@ def confirm_proposal_cancel(request):
 def contract_manager(request, contractsale_id, contract_slug):
     resolution = ''
     duration_end_time = ''
+    cancellation_message = None
     contract_sold = get_object_or_404(ContractSale, pk=contractsale_id, contract__slug=contract_slug)
     client_review = ContractReview.objects.filter(resolution__contract_sale=contract_sold)
     completion_form = ContractCompletionForm(request.POST or None, request.FILES or None)
-    
+    cancellation_form = ContractCancellationForm(request.POST or None)
     if request.user.user_type == Customer.FREELANCER:
         if request.user != contract_sold.team.created_by:
             return redirect('transactions:contract_transaction') 
@@ -401,8 +403,14 @@ def contract_manager(request, contractsale_id, contract_slug):
             resolution = contract_resolution.first()
             duration_end_time = resolution.end_time  
 
+    cancel_message = ContractCancellation.objects.filter(resolution=resolution)
+    if cancel_message.count() > 0:
+        cancellation_message = cancel_message.first()
+
     context = {
         "contract_sold": contract_sold,
+        "cancellation_form": cancellation_form,
+        "cancellation_message": cancellation_message,
         "client_review": client_review,
         "completion_form": completion_form,
         "duration_end_time": duration_end_time,
@@ -517,6 +525,49 @@ def oneclick_manager(request, purchase_pk, reference):
         "currency": get_base_currency_code,
     }
     return render(request, "resolution/oneclick_resolution.html", context)
+
+
+@login_required
+@user_is_client
+def internal_contract_cancelled(request):
+    resolution_id = request.POST.get('resolution')
+    cancel_type = request.POST.get('cancel_type', '')
+    message = request.POST.get('message', '')
+    cancellation_message = None
+    resolution = get_object_or_404(ContractResolution, pk=resolution_id, status = 'ongoing', contract_sale__purchase__client = request.user)
+    
+    message_length = len(message) <= 500
+    if cancel_type != '' and message != '' and message_length:
+        if ContractCancellation.objects.filter(resolution=resolution).exists():
+            pass
+        else:
+            try:
+                ContractResolution.cancel_internal_contract(
+                    resolution=resolution.id, cancel_type=cancel_type,message=message
+                )
+            except Exception as e:
+                print(str(e))
+
+    cancel_message = ContractCancellation.objects.filter(resolution=resolution, status = 'initiated')
+    if cancel_message.count() > 0:
+        cancellation_message = cancel_message.first()    
+    context = {
+        'cancellation_message':cancellation_message
+    }       
+    return render(request, 'resolution/component/contract_cancelled.html', context)
+
+
+@login_required
+@user_is_freelancer
+def confirm_internal_contract(request):
+    resolution_id = request.POST.get('confirmcancelcontract')
+    resolution = get_object_or_404(ContractResolution, pk=resolution_id, contract_sale__team__created_by = request.user)    
+    try:
+        ContractResolution.approve_and_cancel_internal_contract(resolution=resolution.id)
+        return HttpResponse("<div style='color:green;'> Successfully approved cancellation request </div>")
+    except Exception as e:
+        errors = (str(e))
+        return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
 
 
 @login_required

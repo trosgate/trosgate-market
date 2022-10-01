@@ -72,10 +72,8 @@ class CustomerRegisterForm(forms.ModelForm):
         self.fields['password2'].widget.attrs.update(
             {'class': 'input-group col-lg-12',})
 
-
         for field in self.Meta.required:
             self.fields[field].required = True
-
 
     def clean_short_name(self):
         short_name = self.cleaned_data['short_name'].lower()
@@ -133,7 +131,6 @@ class PasswordResetConfirmForm(SetPasswordForm):
             attrs={'class': 'form-control mb-3', 'placeholder': 'New Password', 'id': 'form-newpass'}))
     new_password2 = forms.CharField(label='Repeat password', widget=forms.PasswordInput(
             attrs={'class': 'form-control mb-3', 'placeholder': 'New Password', 'id': 'form-new-pass2'}))
-
 
 
 class TwoFactorAuthForm(forms.ModelForm): 

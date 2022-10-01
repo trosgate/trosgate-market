@@ -28,8 +28,8 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['*'] 
@@ -87,7 +87,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -133,26 +133,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
-# ASGI_APPLICATION = 'trosgate.asgi.application'
-
-
-# in place of redis while on windows in development environment
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("127.0.0.1", 6379)],
-#         },
-#     },
-# }
-
-
-# Database
-# DATABASE_URL = os.getenv("DATABASE_URL")
-
-# DATABASES = {
-#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-# }
 
 # DATABASES = {
 #     'default': {
@@ -164,6 +144,7 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 #         'PORT': '6673',
 #     }
 # }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -193,7 +174,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -220,7 +200,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # this will keep files on server
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 MEDIA_URL = '/media/'
@@ -247,26 +227,22 @@ EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 ####option one for email setup in development mode###
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-####option two for email setup in development mode###
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 # EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'myvoistudio@gmail.com'
+# EMAIL_HOST_USER = 'example@gmail.com'
 # EMAIL_HOST_PASSWORD = 'kadjbfgubatoipur'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 # DEFAULT_EMAIL_FROM = 'Trosgate <myvoistudio@gmail.com>'
 
 
-
 ADMINS = (
-    ('Trosgate', 'voistudio@gmail.com'),
+    ('Trosgate', 'example@gmail.com'),
 )
 MANAGERS = ADMINS
 
 # CKeditor Config
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
-# CKEDITOR_BASEPATH = "/static/static_root/ckeditor/ckeditor/"
+# CKEDITOR_BASEPATH = "/static/staticfiles/ckeditor/ckeditor/"
 
 CKEDITOR_CONFIGS = {
     'default': {
@@ -298,8 +274,7 @@ timezone = 'UTC'
 # CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
-# CUSTOM SESSIONS
-
+# CUSTOM SESSION OBJECTS
 HIRINGBOX_SESSION_ID = "proposal_box"
 PROPOSALGATEWAY_SESSION_ID = "proposalgateway"
 APPLICATION_SESSION_ID = "application"
@@ -307,14 +282,14 @@ APPLICATION_GATEWAY_SESSION_ID = "applicationgateway"
 CONTRACT_SESSION_ID = "contract"
 CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
-
-# SECURE HEADERS - below are required in production
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
-# SESSION_COOKIE_SECURE = True
-# SECURE_BROWSER_XSS_FILTER = True
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
-# SECURE_CONTENT_TYPE_NOSNIFF = True
-# CSRF_COOKIE_SECURE = True
+# SECURITY HEADERS - below are required in production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
+    SESSION_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    CSRF_COOKIE_SECURE = True

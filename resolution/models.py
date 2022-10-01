@@ -735,6 +735,48 @@ class ProposalReview(models.Model):
         return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
 
 
+class ProposalCancellation(models.Model):
+    TEAM_EXCEEDED_DEADLINE = 'team_exceeded_deadline'
+    TEAM_ABANDONED_WORK = 'team_abandoned_work'
+    TEAM_NOT_RESPONDING = 'team_not_responding'
+    TEAM_IS_ABUSIVE = 'team_is_abusive'
+    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
+    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
+    CANCELLATION_TYPE = (
+        (TEAM_EXCEEDED_DEADLINE, 'Team Exceeded Deadline'),
+        (TEAM_ABANDONED_WORK, 'Team Abandoned Work'),
+        (TEAM_NOT_RESPONDING, 'Team not Responding to Chat'),
+        (TEAM_IS_ABUSIVE, 'Team is Abusive'),
+        (ORDERED_WRONG_PRODUCT, 'I Ordered Wrong Product'),
+        (DIFFERENT_PRODUCT_DELIVERED, 'A different product delivered')
+    )
+
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    STATUS_CHOICES = (
+        (INITIATED, 'Initiated'),
+        (APPROVED, 'Approved')
+    )    
+    resolution = models.ForeignKey(ProposalResolution, verbose_name=_("Proposal"), related_name="cancelproposal", on_delete=models.CASCADE)
+    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, default=TEAM_EXCEEDED_DEADLINE)
+    status = models.CharField(_("Status"), max_length=100, choices=STATUS_CHOICES, default=INITIATED)
+    message = models.TextField(_("Additional Message"), max_length=500)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+    modified_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("Proposal Cancelled")
+        verbose_name_plural = _("Proposal Cancelled")
+
+    def __str__(self):
+        return f'{self.resolution}'
+
+    @classmethod
+    def create(cls, resolution, cancel_type, message):
+        return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
+
+
 class ContractResolution(models.Model):
     ONE_DAY = "one_day"
     TWO_DAYS = "two_days"
@@ -753,13 +795,15 @@ class ContractResolution(models.Model):
     SIX_MONTH = "six_months"
 
     ONGOING = 'ongoing'
+    DISPUTED = 'disputed'
     CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (DISPUTED, _("Disputed")),
         (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
-    )  
+    ) 
     # Resolution parameters
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='approvedcontractteam', on_delete=models.CASCADE)
     contract_sale = models.ForeignKey("transactions.ContractSale", verbose_name=_("Contract Awarded"), related_name="contractaction", on_delete=models.CASCADE)
@@ -870,46 +914,52 @@ class ContractResolution(models.Model):
         return contract
 
 
-class ProposalCancellation(models.Model):
-    TEAM_EXCEEDED_DEADLINE = 'team_exceeded_deadline'
-    TEAM_ABANDONED_WORK = 'team_abandoned_work'
-    TEAM_NOT_RESPONDING = 'team_not_responding'
-    TEAM_IS_ABUSIVE = 'team_is_abusive'
-    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
-    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
-    CANCELLATION_TYPE = (
-        (TEAM_EXCEEDED_DEADLINE, 'Team Exceeded Deadline'),
-        (TEAM_ABANDONED_WORK, 'Team Abandoned Work'),
-        (TEAM_NOT_RESPONDING, 'Team not Responding to Chat'),
-        (TEAM_IS_ABUSIVE, 'Team is Abusive'),
-        (ORDERED_WRONG_PRODUCT, 'I Ordered Wrong Product'),
-        (DIFFERENT_PRODUCT_DELIVERED, 'A different product delivered')
-    )
+    @classmethod
+    def cancel_internal_contract(cls, resolution:int, cancel_type:str, message:str):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            if resolution.status != 'ongoing':
+                raise Exception(_("You cannot cancel at this stage"))
+            resolution.status = 'disputed'
+            resolution.save()
 
-    INITIATED = 'initiated'
-    APPROVED = 'approved'
-    STATUS_CHOICES = (
-        (INITIATED, 'Initiated'),
-        (APPROVED, 'Approved')
-    )    
-    resolution = models.ForeignKey(ProposalResolution, verbose_name=_("Proposal"), related_name="cancelproposal", on_delete=models.CASCADE)
-    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, default=TEAM_EXCEEDED_DEADLINE)
-    status = models.CharField(_("Status"), max_length=100, choices=STATUS_CHOICES, default=INITIATED)
-    message = models.TextField(_("Additional Message"), max_length=500)
-    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
-    modified_at = models.DateTimeField(_("Modified On"), auto_now=True)
+            message = ContractCancellation.create(
+                resolution=resolution,
+                cancel_type=cancel_type,
+                message=message
+            )
+            # db_transaction.on_commit(lambda: application_cancel_email(message))
 
-    class Meta:
-        ordering = ("-created_at",) 
-        verbose_name = _("Proposal Cancelled")
-        verbose_name_plural = _("Proposal Cancelled")
+        return resolution, message
 
-    def __str__(self):
-        return f'{self.resolution}'
 
     @classmethod
-    def create(cls, resolution, cancel_type, message):
-        return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
+    def approve_and_cancel_internal_contract(cls, resolution:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            message = ContractCancellation.objects.select_for_update().get(resolution=resolution)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=resolution.contract_sale.team.created_by)
+            client = ClientAccount.objects.select_for_update().get(user=resolution.contract_sale.purchase.client)            
+
+            if resolution.status != 'disputed':
+                raise Exception(_("You cannot approve at this stage"))
+            resolution.status = 'cancelled'
+            resolution.save()
+
+            if message.status != 'initiated':
+                raise Exception(_("You cannot approve at this stage"))
+            message.status = 'approved'
+            message.save()
+
+            freelancer.pending_balance -= int(resolution.contract_sale.total_sales_price)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(resolution.contract_sale.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+            # db_transaction.on_commit(lambda: approve_application_cancel_email(resolution))
+
+        return resolution, message, freelancer, client
 
 
 class ContractReview(models.Model):
@@ -954,6 +1004,49 @@ class ContractCompletionFiles(models.Model):
 
     def __str__(self):
         return self.contract.team.title
+
+
+class ContractCancellation(models.Model):
+    TEAM_EXCEEDED_DEADLINE = 'team_exceeded_deadline'
+    TEAM_ABANDONED_WORK = 'team_abandoned_work'
+    TEAM_NOT_RESPONDING = 'team_not_responding'
+    TEAM_IS_ABUSIVE = 'team_is_abusive'
+    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
+    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
+    CANCELLATION_TYPE = (
+        (TEAM_EXCEEDED_DEADLINE, 'Team Exceeded Deadline'),
+        (TEAM_ABANDONED_WORK, 'Team Abandoned Work'),
+        (TEAM_NOT_RESPONDING, 'Team not Responding to Chat'),
+        (TEAM_IS_ABUSIVE, 'Team is Abusive'),
+        (ORDERED_WRONG_PRODUCT, 'I Ordered Wrong Product'),
+        (DIFFERENT_PRODUCT_DELIVERED, 'A different product delivered')
+    )
+
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    STATUS_CHOICES = (
+        (INITIATED, 'Initiated'),
+        (APPROVED, 'Approved')
+    )    
+    resolution = models.ForeignKey(ContractResolution, verbose_name=_("Contract"), related_name="cancelcontract", on_delete=models.CASCADE)
+    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, default=TEAM_EXCEEDED_DEADLINE)
+    status = models.CharField(_("Status"), max_length=100, choices=STATUS_CHOICES, default=INITIATED)
+    message = models.TextField(_("Additional Message"), max_length=500)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+    modified_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("Contract Cancelled")
+        verbose_name_plural = _("Contract Cancelled")
+
+    def __str__(self):
+        return f'{self.resolution}'
+
+    @classmethod
+    def create(cls, resolution, cancel_type, message):
+        return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
+
 
 
 class ExtContractResolution(models.Model):

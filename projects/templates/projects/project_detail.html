@@ -19,9 +19,6 @@
 								<li class="wt-btnarea">
 									<a href="{{project.get_project_archive_absolute_url}}" class="btn btn-danger"><i class="fa fa-window-restore"></i> Archive</a>
 								</li>
-								<li class="wt-active">
-									<a href="{{project.get_project_update_absolute_url}}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a>
-								</li>
 								{% elif request.user == project.created_by and project.status == 'review' %}
 								<li class="wt-active">
 									<a href="javascript:void(0);" class="btn btn-success"><i class="fas fa-spinner fa-spin"></i> Under Review</a>
@@ -33,9 +30,6 @@
 								{% elif request.user == project.created_by and project.status == 'ongoing' %}	
 								<li class="wt-active">
 									<a href="{{project.get_project_absolute_url}}" class="btn btn-success"><i class="fa fa-info"></i> Details</a>
-								</li>	
-								<li class="wt-active">
-									<a href="{{project.get_project_update_absolute_url}}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a>
 								</li>	
 								{% endif %}
 							</ol>
@@ -96,10 +90,12 @@
 											<div class="wt-description">
 												<p> {{projectdetail.description|safe}}</p>
 												<ul class="wt-projectliststyle">
-													<li><span><i class="fa fa-check"></i>Nemo enim ipsam voluptatem quia</span></li>
-													<li><span><i class="fa fa-check"></i>Adipisci velit, sed quia non numquam eius modi tempora</span></li>
-													<li><span><i class="fa fa-check"></i>Eaque ipsa quae ab illo inve et quasi architecto</span></li>
-													<li><span><i class="fa fa-check"></i>qui dolorem ipsum quia dolor sit amet</span></li>
+													<div class="wt-title">
+														<h3>Warning</h3>
+													</div>
+													{% for instruction in guides %}
+													<li><span><i class="fa fa-check"></i>{{instruction.guide}}</span></li>
+													{% endfor %}
 												</ul>
 											</div>
 										</div>
@@ -113,7 +109,6 @@
 											{% endfor %}
 											</div>
 										</div>
-										
 									</div>
 								</div>								
 
@@ -161,7 +156,6 @@
 												</figure>
 											</div>
 										</div>
-
 									</aside>
 								</div>
 							</div>
@@ -170,7 +164,7 @@
 				</div>
 			</div>
 		<!--Content Wrapper End-->
-		{% if not request.user.is_authenticated%}
+		{% if not request.user.is_authenticated %}
 		{% include 'dashboard/main_footer.html' %}
 		{% endif %}
 	</div>
