@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from account.fund_exception import FundException
 from general_settings.fund_control import get_max_deposit, get_min_deposit, get_max_depositor_balance, get_min_depositor_balance
-from general_settings.storage_backend import activate_storage_type, DynamicStorageField
+# from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
 

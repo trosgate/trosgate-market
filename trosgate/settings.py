@@ -32,7 +32,7 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['trosgate.com', '67.207.85.168', '.trosgate.com'] 
+ALLOWED_HOSTS = ['trosgate.com', '161.35.127.122', '.trosgate.com'] 
 # '127.0.0.1', 'localhost'
 
 AUTH_USER_MODEL = 'account.Customer'
@@ -82,7 +82,7 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_totp',
     # 'django_otp.plugins.otp_static',
-    'storages',
+    # 'storages',
 ]
 
 MIDDLEWARE = [

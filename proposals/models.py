@@ -13,7 +13,7 @@ from embed_video.fields import EmbedVideoField
 from uuid import uuid4
 from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta
-from general_settings.storage_backend import activate_storage_type, DynamicStorageField
+# from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 
 
 def proposal_images_path(instance, filename):
@@ -26,7 +26,7 @@ class ActiveProposals(models.Manager):
 
 
 class Proposal(models.Model):
-    STORAGE = activate_storage_type()
+    # STORAGE = activate_storage_type()
     # proposal Duration converter
     ONE_DAY = "one_day"
     TWO_DAYS = "two_days"

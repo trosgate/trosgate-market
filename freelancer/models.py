@@ -19,7 +19,7 @@ from general_settings.fund_control import (
     get_max_deposit, get_max_depositor_balance,
 )
 from payments.models import PaymentRequest, AdminCredit
-from general_settings.storage_backend import activate_storage_type, DynamicStorageField
+# from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email, lock_fund_email
 from PIL import Image
 
@@ -31,7 +31,7 @@ class ActiveFreelancer(models.Manager):
 
 
 class Freelancer(models.Model):
-    STORAGE = activate_storage_type()
+    # STORAGE = activate_storage_type()
     MALE = 'male'
     FEMALE = 'female'
     GENDER = (
