@@ -32,8 +32,8 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['trosgate.com', '161.35.127.122', '.trosgate.com'] 
-# '127.0.0.1', 'localhost'
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+ALLOWED_HOSTS = ['trosgate.com', '147.182.218.110', '.trosgate.com'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 
@@ -134,27 +134,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'railway',
-#         'USER': 'postgres',
-#         'PASSWORD': 'wqbcpYtK1fUYgfa3Q1ts',
-#         'HOST': 'containers-us-west-56.railway.app',
-#         'PORT': '6673',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgate',
+        'NAME': 'trosgates',
         'USER': 'katey',
         'PASSWORD': 'Prof2ike.y2ky2k',
         'HOST': 'localhost',
         'PORT': '',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'trosgate',
+#         'USER': 'katey',
+#         'PASSWORD': 'Prof2ike.y2ky2k',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

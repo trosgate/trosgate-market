@@ -32,3 +32,7 @@ b660e-6daf7
 c5333-fa8f7
 
 git access_token: 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
+
+
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc"  -delete

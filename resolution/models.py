@@ -45,9 +45,13 @@ class OneClickResolution(models.Model):
     SIX_MONTH = "six_months"
 
     ONGOING = 'ongoing'
+    DISPUTED = 'disputed'
+    CANCELLED = 'cancelled'
     COMPLETED = 'completed'
     STATUS_CHOICES = (
         (ONGOING, _("Ongoing")),
+        (DISPUTED, _("Disputed")),
+        (CANCELLED, _("Cancelled")),
         (COMPLETED, _("Completed")),
     ) 
     # Resolution parameters
@@ -216,6 +220,9 @@ class OneClickResolution(models.Model):
             if rating is None:
                 raise ReviewException(_("rating is required"))
 
+            if resolution.status == 'cancelled':
+                raise ReviewException(_("Already cancelled and cannot be reviewed"))
+
             review = OneClickReview.create(
                 resolution=resolution, 
                 title=title, 
@@ -233,9 +240,109 @@ class OneClickResolution(models.Model):
             oneclick_team.save(update_fields=['team_balance'])
 
             resolution.status = 'completed'
-            resolution.save(update_fields=['status'])          
+            resolution.save()          
+
+            if OneClickCancellation.objects.filter(resolution=resolution, status='initiated').exists():
+                OneClickCancellation.objects.get(resolution=resolution, status='initiated').delete()
 
             return resolution, oneclick_team, team_manager, review
+
+
+    @classmethod
+    def cancel_oneclick(cls, resolution:int, cancel_type:str, message:str):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+
+            if resolution.status != 'ongoing':
+                raise Exception(_("You cannot cancel at this stage"))
+
+            if resolution.oneclick_sale.category == 'externalcontract':
+                raise Exception(_("Bad request. Please check and try again"))
+
+            resolution.status = 'disputed'
+            resolution.save()
+
+            message = OneClickCancellation.create(
+                resolution=resolution,
+                cancel_type=cancel_type,
+                message=message
+            )
+            # db_transaction.on_commit(lambda: application_cancel_email(message))
+            print("cancelled requested")
+        return resolution, message
+
+
+    @classmethod
+    def approve_and_cancel_oneclick(cls, resolution:int):
+        with db_transaction.atomic():  
+            resolution = cls.objects.select_for_update().get(pk=resolution)
+            message = OneClickCancellation.objects.select_for_update().get(resolution=resolution)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=resolution.oneclick_sale.team.created_by)
+            client = ClientAccount.objects.select_for_update().get(user=resolution.oneclick_sale.client)            
+
+            if resolution.status != 'disputed':
+                raise Exception(_("You cannot approve at this stage"))
+            resolution.status = 'cancelled'
+            resolution.save()
+
+            if message.status != 'initiated':
+                raise Exception(_("You cannot approve at this stage"))
+            message.status = 'approved'
+            message.save()
+
+            print('Reversal of:', resolution.oneclick_sale.salary_paid)
+
+            freelancer.pending_balance -= int(resolution.oneclick_sale.salary_paid)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(resolution.oneclick_sale.salary_paid)
+            client.save(update_fields=['available_balance'])
+
+            # db_transaction.on_commit(lambda: approve_application_cancel_email(resolution))
+            print("successfully cancelled")
+        return resolution, message, freelancer, client
+
+
+class OneClickCancellation(models.Model):
+    TEAM_EXCEEDED_DEADLINE = 'team_exceeded_deadline'
+    TEAM_ABANDONED_WORK = 'team_abandoned_work'
+    TEAM_NOT_RESPONDING = 'team_not_responding'
+    TEAM_IS_ABUSIVE = 'team_is_abusive'
+    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
+    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
+    CANCELLATION_TYPE = (
+        (TEAM_EXCEEDED_DEADLINE, 'Team Exceeded Deadline'),
+        (TEAM_ABANDONED_WORK, 'Team Abandoned Work'),
+        (TEAM_NOT_RESPONDING, 'Team not Responding to Chat'),
+        (TEAM_IS_ABUSIVE, 'Team is Abusive'),
+        (ORDERED_WRONG_PRODUCT, 'I Ordered Wrong Product'),
+        (DIFFERENT_PRODUCT_DELIVERED, 'A different product delivered')
+    )
+
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    STATUS_CHOICES = (
+        (INITIATED, 'Initiated'),
+        (APPROVED, 'Approved')
+    )    
+    resolution = models.ForeignKey(OneClickResolution, verbose_name=_("Oneclick"), related_name="canceloneclick", on_delete=models.CASCADE)
+    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, default=TEAM_EXCEEDED_DEADLINE)
+    status = models.CharField(_("Status"), max_length=100, choices=STATUS_CHOICES, default=INITIATED)
+    message = models.TextField(_("Additional Message"), max_length=500)
+    created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
+    modified_at = models.DateTimeField(_("Modified On"), auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",) 
+        verbose_name = _("OneClick Cancelled")
+        verbose_name_plural = _("OneClick Cancelled")
+
+    def __str__(self):
+        return f'{self.resolution}'
+
+    @classmethod
+    def create(cls, resolution, cancel_type, message):
+        return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
 
 
 class OneClickReview(models.Model):
@@ -324,6 +431,9 @@ class ProjectResolution(models.Model):
             if rating is None:
                 raise ReviewException(_("rating is required"))
 
+            if resolution.status == 'cancelled':
+                raise ReviewException(_("Already cancelled and cannot be reviewed"))
+
             review = ApplicationReview.create(
                 resolution=resolution, 
                 title=title, 
@@ -342,6 +452,9 @@ class ProjectResolution(models.Model):
 
             resolution.status = 'completed'
             resolution.save()          
+
+            if ApplicationCancellation.objects.filter(resolution=resolution, status='initiated').exists():
+                ApplicationCancellation.objects.get(resolution=resolution, status='initiated').delete()
 
             return resolution, applicant_team, team_manager, review
 
@@ -579,6 +692,9 @@ class ProposalResolution(models.Model):
             if rating is None:
                 raise ReviewException(_("rating is required"))
 
+            if resolution.status == 'cancelled':
+                raise ReviewException(_("Already cancelled and cannot be reviewed"))
+
             review = ProposalReview.create(
                 resolution=resolution, 
                 title=title, 
@@ -597,6 +713,9 @@ class ProposalResolution(models.Model):
 
             resolution.status = 'completed'
             resolution.save(update_fields=['status'])          
+
+            if ProposalCancellation.objects.filter(resolution=resolution, status='initiated').exists():
+                ProposalCancellation.objects.get(resolution=resolution, status='initiated').delete()
 
             return resolution, proposal_team, team_manager, review
 
@@ -835,6 +954,9 @@ class ContractResolution(models.Model):
             if rating is None:
                 raise ReviewException(_("rating is required"))
 
+            if resolution.status == 'cancelled':
+                raise ReviewException(_("Already cancelled and cannot be reviewed"))
+                
             review = ContractReview.create(
                 resolution=resolution, 
                 title=title, 
@@ -853,6 +975,9 @@ class ContractResolution(models.Model):
 
             resolution.status = 'completed'
             resolution.save(update_fields=['status'])          
+
+            if ContractCancellation.objects.filter(resolution=resolution, status='initiated').exists():
+                ContractCancellation.objects.get(resolution=resolution, status='initiated').delete()
 
             return resolution, contract_team, team_manager, review
 
@@ -1048,7 +1173,6 @@ class ContractCancellation(models.Model):
         return cls.objects.create(resolution=resolution,cancel_type=cancel_type,message=message) 
 
 
-
 class ExtContractResolution(models.Model):
     ONE_DAY = "one_day"
     TWO_DAYS = "two_days"
@@ -1105,6 +1229,9 @@ class ExtContractResolution(models.Model):
             if rating  == '':
                 raise ReviewException(_("rating is required"))
 
+            if resolution.status == 'cancelled':
+                raise ReviewException(_("Already cancelled and cannot be reviewed"))
+                
             review = ExtContractReview.create(
                 resolution=resolution, 
                 title=title, 

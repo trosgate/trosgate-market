@@ -31,6 +31,8 @@ htmx_urlpatterns = [
     path('confirm_proposal_cancel/', views.confirm_proposal_cancel, name='confirm_proposal_cancel'),
     path('contract_cancelled/', views.internal_contract_cancelled, name='internal_contract_cancelled'),
     path('confirm_internal_contract/', views.confirm_internal_contract, name='confirm_internal_contract'),
+    path('oneclick_cancelled/', views.oneclick_cancelled, name='oneclick_cancelled'),
+    path('oneclick_confirm/', views.confirm_oneclick_contract, name='oneclick_confirm'),
 ]
 
 urlpatterns += htmx_urlpatterns

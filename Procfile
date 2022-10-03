@@ -1,1 +1,0 @@
-web: gunicorn trosgate.wsgi --log-file -

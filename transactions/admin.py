@@ -22,12 +22,29 @@ class OneClickPurchaseAdmin(admin.ModelAdmin):
         
     )
 
+    def has_add_permission(self, request):        
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
 
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
     list_display = ['client', 'category', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
     list_filter = ['status']
-    readonly_fields = ['client', 'payment_method','salary_paid','created_at'] # 'status',
+    readonly_fields = [
+        'client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',
+        'paypal_order_key', 'stripe_order_key', 'flutterwave_order_key','razorpay_order_key', 
+        'razorpay_payment_id', 'razorpay_signature'
+        ]  
     fieldsets = (
         ('Transaction Details', {'fields': ('client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',)}),
         ('PayPal Payment Mode (If PayPal was used)', {'fields': ('paypal_order_key',)}),
@@ -37,13 +54,27 @@ class PurchaseAdmin(admin.ModelAdmin):
     )
 
 
+    def has_add_permission(self, request):        
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
 class ApplicationSaleAdmin(admin.ModelAdmin):
     model = ApplicationSale
     list_display = ['team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action']    
     list_filter = ['purchase__status']
     readonly_fields = [
-         'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earnings', 'total_sales_price', 'discount_offered',
-        'staff_hired','earning','created_at','updated_at','status_value',
+         'team', 'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earnings', 'total_sales_price', 'discount_offered',
+        'staff_hired','earning','created_at','updated_at','status_value', 'is_refunded'
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','project',)}),
@@ -384,13 +415,15 @@ class ExtContractAdmin(admin.ModelAdmin):
 class SubscriptionItemAdmin(admin.ModelAdmin):
     model = SubscriptionItem
     list_display = ['team', 'subscription_id', 'payment_method', 'price', 'status', 'activation_time','expired_time']
-    readonly_fields = ['created_at']
+    readonly_fields = [
+        'team', 'customer_id', 'subscription_id','created_at',
+        'price', 'status','payment_method', 'activation_time','expired_time'
+        ]
     fieldsets = (
         ('Customer', {'fields': ('team', 'customer_id', 'subscription_id',)}),
         ('State and Attributes', {'fields': ('price', 'status','payment_method',)}),
         ('Timestamp', {'fields': ('created_at', 'activation_time','expired_time',)}),
     )
-
 
     def has_add_permission(self, request):        
         return False

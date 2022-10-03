@@ -4,7 +4,8 @@ from .models import (
     ProposalCompletionFiles, 
     ApplicationCancellation,
     ProposalCancellation,
-    ContractCancellation
+    ContractCancellation,
+    OneClickCancellation
 )
 
 class ProjectCompletionForm(forms.ModelForm):
@@ -27,21 +28,6 @@ class ApplicationCancellationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ApplicationCancellationForm, self).__init__(*args, **kwargs)
-        
-        self.fields['cancel_type'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['message'].widget.attrs.update(
-            {'class': 'form-control'})
-
-
-class ContractCancellationForm(forms.ModelForm):
-
-    class Meta:
-        model = ContractCancellation
-        fields = ['cancel_type', 'message']
-
-    def __init__(self, *args, **kwargs):
-        super(ContractCancellationForm, self).__init__(*args, **kwargs)
         
         self.fields['cancel_type'].widget.attrs.update(
             {'class': 'form-control'})
@@ -89,4 +75,34 @@ class ContractCompletionForm(forms.ModelForm):
         
         # 'Basic Info'
         self.fields['attachment'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class ContractCancellationForm(forms.ModelForm):
+
+    class Meta:
+        model = ContractCancellation
+        fields = ['cancel_type', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super(ContractCancellationForm, self).__init__(*args, **kwargs)
+        
+        self.fields['cancel_type'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['message'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class OneClickCancellationForm(forms.ModelForm):
+
+    class Meta:
+        model = OneClickCancellation
+        fields = ['cancel_type', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super(OneClickCancellationForm, self).__init__(*args, **kwargs)
+        
+        self.fields['cancel_type'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['message'].widget.attrs.update(
             {'class': 'form-control'})

@@ -54,7 +54,11 @@
 							<td>{{oneclick.earning_fee}}</td>
 							<td>{{oneclick.total_earning}}</td>
 							{% if active_team.created_by == request.user %}
-							<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Start Work</button></a></td>
+								{% if oneclick.category == 'externalcontract' %}
+								<td><button type="button" class="btn btn-danger btn-sm" disabled><strike> Start Work</strike></button></td>
+								{% else %}
+								<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Start Work</button></a></td>
+								{% endif %}
 							{% endif %}
 						</tr>
 						{% endfor %}
@@ -92,9 +96,12 @@
 							<td class="text-left">{% if oneclick.category == 'proposal' %}{{oneclick.proposal.title|truncatechars:60}}{% elif oneclick.category == 'contract' %}{{oneclick.contract.proposal.title|truncatechars:60}} {% elif oneclick.category == 'externalcontract' %}{{oneclick.extcontract.line_one|truncatechars:60}} {% endif %}</td>
 							<td>{{oneclick.created_at}}</td>
 							<td>{{oneclick.salary_paid}}</td>
-							<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+							{% if oneclick.category == 'externalcontract' %}
+								<td><button type="button" class="btn btn-danger btn-sm" disabled><strike> Manage</strike></button></td>
+								{% else %}
+								<td><a href="{% url 'resolution:oneclick_manager' oneclick.id oneclick.reference %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+							{% endif %}
 						</tr>
-						{% comment %} {% url 'proposals:create_proposal' %} {% endcomment %}
 						{% endfor %}
 					</tbody>
 				</table>

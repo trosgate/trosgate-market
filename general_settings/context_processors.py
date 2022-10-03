@@ -8,16 +8,30 @@ def categories(request):
 
 
 def website(request):
-    try:
-        return {'website': WebsiteSetting.objects.get(id=1)}
-    except:
-         return {'website':None}
+    if WebsiteSetting.objects.filter(pk=1).exists():
+        website = WebsiteSetting.objects.get(pk=1)
+        return {'website': website}
+        
+    else:
+        website = WebsiteSetting.objects.create(
+            pk=1, site_name='Trosgate',
+            tagline='Freelance marketplace saas',
+            site_description='Freelance marketplace saas',
+            protocol='https://',
+            site_domain='trosgate.com',
+            twitter_url='https://trosgate.com',
+            instagram_url='https://trosgate.com',
+            youtube_url='https://trosgate.com',
+            facebook_url='https://trosgate.com'
+        )
+        return {'website': website}
 
 
 def autoLogoutSystem(request):
-    try:
-        return {'autoLogoutSystem': AutoLogoutSystem.objects.get(id=1)}
-    except:
+    if WebsiteSetting.objects.filter(pk=1).exists():
+        autoLogoutSystem = AutoLogoutSystem.objects.get(pk=1)
+        return {'autoLogoutSystem': autoLogoutSystem}
+    else:
          return {'autoLogoutSystem':None}    
 
    

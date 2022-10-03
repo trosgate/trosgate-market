@@ -8,11 +8,11 @@ from transactions.models import ApplicationSale, Purchase, ProposalSale, Contrac
 
 class NewStats(models.Model):
     description = models.CharField( _("NewStats"), default="Statistics data on website visitors", max_length=100, null=True, blank=True)
-    win = models.PositiveIntegerField(help_text=_("To track, resolve all the values to zero to start tracking visitors"))
-    mac = models.PositiveIntegerField(help_text=_("To track, resolve all the values to zero to start tracking visitors"))
-    iph = models.PositiveIntegerField(help_text=_("To track, resolve all the values to zero to start tracking visitors"))
-    android = models.PositiveIntegerField(help_text=_("To track, resolve all the values to zero to start tracking visitors"))
-    oth = models.PositiveIntegerField(help_text=_("To track, resolve all the values to zero to start tracking visitors"))
+    win = models.PositiveIntegerField(default=0, help_text=_("To track, resolve all the values to zero to start tracking visitors"))
+    mac = models.PositiveIntegerField(default=0, help_text=_("To track, resolve all the values to zero to start tracking visitors"))
+    iph = models.PositiveIntegerField(default=0, help_text=_("To track, resolve all the values to zero to start tracking visitors"))
+    android = models.PositiveIntegerField(default=0, help_text=_("To track, resolve all the values to zero to start tracking visitors"))
+    oth = models.PositiveIntegerField(default=0, help_text=_("To track, resolve all the values to zero to start tracking visitors"))
 
 
     class Meta:

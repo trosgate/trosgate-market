@@ -8,18 +8,22 @@ from general_settings . models import (
 from teams . models import Package, Team
 from proposals . models import Proposal
 from projects.models import Project
+from analytics.models import NewStats
 
 
 class Command(BaseCommand):
     help = "this creates default values via commands for the entire system"
 
     def handle(self, *args, **kwargs):
-        # call_command("makemigrations")
-        # call_command("migrate")
-        # call_command("loaddata", "railway.json")
+        call_command("makemigrations")
+        call_command("migrate")
+
 
         if not Country.objects.count():
             call_command("loaddata", "db_countries.json")
+
+        if not NewStats.objects.count():
+            NewStats.objects.create(pk=1)
 
         if not Customer.objects.count():
             call_command("loaddata", "db_admin_auth.json")
