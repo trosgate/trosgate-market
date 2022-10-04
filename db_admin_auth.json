@@ -4,7 +4,6 @@
         "pk": 1,
         "fields": {
             "password": "pbkdf2_sha256$260000$So10snAigEADr6KHj7XVcF$VkQSJmaVYMueg8hiki2pLlWq7DpQDQx2menI12yD2aI=",
-            "is_superuser": true,
             "email": "katey@gmail.com",
             "short_name": "admin1",
             "first_name": "Katey",
@@ -15,7 +14,7 @@
             "country": 4,
             "is_active": true,
             "is_staff": true,
-            "is_admin": true,
+            "is_superuser": true,
             "user_type": "admin",
             "groups": [],
             "user_permissions": []

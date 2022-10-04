@@ -1,0 +1,11 @@
+[
+    {
+        "model": "marketing.autotypist",
+        "pk": 1,
+        "fields": {
+            "title": "proposal",
+            "is_active": true,
+            "ordering": 1
+        }
+    }
+]

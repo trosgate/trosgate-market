@@ -28,7 +28,7 @@ def website(request):
 
 
 def autoLogoutSystem(request):
-    if WebsiteSetting.objects.filter(pk=1).exists():
+    if AutoLogoutSystem.objects.filter(pk=1).exists():
         autoLogoutSystem = AutoLogoutSystem.objects.get(pk=1)
         return {'autoLogoutSystem': autoLogoutSystem}
     else:

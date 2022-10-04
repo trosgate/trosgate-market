@@ -2,17 +2,8 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
-from django_otp.admin import OTPAdminSite
-from django_otp.plugins.otp_totp.models import TOTPDevice
-from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
 from account.models import Customer
 
-class OTPAdmin(OTPAdminSite):
-    pass
-
-admin_site = OTPAdmin(name='OTPAdmin')
-admin_site.register(Customer)
-admin_site.register(TOTPDevice, TOTPDeviceAdmin)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

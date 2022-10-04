@@ -9,7 +9,7 @@ from teams . models import Package, Team
 from proposals . models import Proposal
 from projects.models import Project
 from analytics.models import NewStats
-
+from marketing.models import AutoTyPist
 
 class Command(BaseCommand):
     help = "this creates default values via commands for the entire system"
@@ -21,6 +21,9 @@ class Command(BaseCommand):
 
         if not Country.objects.count():
             call_command("loaddata", "db_countries.json")
+
+        if not AutoTyPist.objects.count():
+            call_command("loaddata", "db_autotypist.json")
 
         if not NewStats.objects.count():
             NewStats.objects.create(pk=1)

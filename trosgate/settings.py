@@ -32,8 +32,8 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-ALLOWED_HOSTS = ['trosgate.com', '147.182.218.110', '.trosgate.com'] 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+# ALLOWED_HOSTS = ['trosgate.com', '147.182.218.110', '.trosgate.com'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 
@@ -79,8 +79,8 @@ INSTALLED_APPS = [
     # 'django_celery_beat',
     # Two factor Authentication
     
-    'django_otp',
-    'django_otp.plugins.otp_totp',
+    # 'django_otp',
+    # 'django_otp.plugins.otp_totp',
     # 'django_otp.plugins.otp_static',
     # 'storages',
 ]
@@ -93,13 +93,13 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # Two factor Authentication middleware
-    'django_otp.middleware.OTPMiddleware',
+    # 'django_otp.middleware.OTPMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'analytics.middleware.Middleware',
+    # 'analytics.middleware.Middleware',
 ]
 
 ROOT_URLCONF = 'trosgate.urls'
@@ -137,13 +137,14 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgates',
+        'NAME': 'trosgate1',
         'USER': 'katey',
         'PASSWORD': 'Prof2ike.y2ky2k',
         'HOST': 'localhost',
         'PORT': '',
     }
 }
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
