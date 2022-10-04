@@ -2,9 +2,10 @@ from .models import Category, WebsiteSetting, AutoLogoutSystem
 
 
 def categories(request):
-    return {
-        'categories': Category.objects.filter(visible=True)
-    }
+    if Category.objects.count():
+        categories = Category.objects.filter(visible=True)
+        return {'categories': categories}
+    return {'categories':None}
 
 
 def website(request):
@@ -31,7 +32,6 @@ def autoLogoutSystem(request):
     if AutoLogoutSystem.objects.filter(pk=1).exists():
         autoLogoutSystem = AutoLogoutSystem.objects.get(pk=1)
         return {'autoLogoutSystem': autoLogoutSystem}
-    else:
-         return {'autoLogoutSystem':None}    
+    return {'autoLogoutSystem':None}    
 
    

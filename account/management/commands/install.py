@@ -18,7 +18,6 @@ class Command(BaseCommand):
         call_command("makemigrations")
         call_command("migrate")
 
-
         if not Country.objects.count():
             call_command("loaddata", "db_countries.json")
 

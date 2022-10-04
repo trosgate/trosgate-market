@@ -28,8 +28,8 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
@@ -134,27 +134,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgate1',
-        'USER': 'katey',
-        'PASSWORD': 'Prof2ike.y2ky2k',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgate',
+#         'NAME': 'trosgate1',
 #         'USER': 'katey',
 #         'PASSWORD': 'Prof2ike.y2ky2k',
 #         'HOST': 'localhost',
 #         'PORT': '',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trosgater',
+        'USER': 'katey',
+        'PASSWORD': 'Prof2ike.y2ky2k',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
