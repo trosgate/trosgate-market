@@ -137,7 +137,7 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgate',
+        'NAME': 'trosgates',
         'USER': 'katey',
         'PASSWORD': 'Prof2ike.y2ky2k',
         'HOST': 'localhost',
