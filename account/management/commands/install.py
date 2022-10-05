@@ -21,11 +21,11 @@ class Command(BaseCommand):
         if not Country.objects.count():
             call_command("loaddata", "db_countries.json")
 
+        if not NewStats.objects.count():
+            call_command("loaddata", "db_statistics.json")
+
         if not AutoTyPist.objects.count():
             call_command("loaddata", "db_autotypist.json")
-
-        if not NewStats.objects.count():
-            NewStats.objects.create(pk=1)
 
         if not Customer.objects.count():
             call_command("loaddata", "db_admin_auth.json")
