@@ -30,6 +30,7 @@ def create_project(request):
             project = projectform.save(commit=False)
             project.created_by = request.user
             project.slug = slugify(project.title)
+            project.status= 'active'
             project.save()
             projectform.save_m2m()
 

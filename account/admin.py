@@ -12,14 +12,14 @@ import sys
 MAX_OBJECTS = 0
 
 class CustomerCreationForm(forms.ModelForm):
- 
+    short_name = forms.CharField(label='Username', min_length=4, max_length=30)
+    country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label='Select Country')
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
-    # user_type = forms.ChoiceField(required=True, choices=USER_TYPE, label="Select Type")
-
+    
     class Meta:
         model = Customer
-        fields = ('email', 'user_type', 'short_name',)
+        fields = ('email', 'user_type', 'short_name','first_name', 'last_name')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -29,7 +29,6 @@ class CustomerCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        # Save the provided password in hashed format
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
@@ -53,7 +52,7 @@ class CustomerAdmin(BaseUserAdmin,):
     form = CustomerChangeForm
     add_form = CustomerCreationForm
 
-    list_display = ['short_name', 'email', 'country','user_type', 'is_active', 'last_login']
+    list_display = ['id', 'short_name', 'email', 'country','user_type', 'is_active', 'last_login']
     readonly_fields = ['date_joined', 'user_type', 'last_login']
     list_display_links = ['short_name']
     list_filter = ['user_type', 'is_superuser', 'is_assistant',]
@@ -66,13 +65,13 @@ class CustomerAdmin(BaseUserAdmin,):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2',) #'user_type', 
+            'fields': ('email', 'short_name', 'country', 'password1', 'password2',)
         }),
     )
     search_fields = ('pk', 'email', 'first_name', 'last_name',)
     ordering = ('email',)
     filter_horizontal = ()
-    list_per_page = 10
+    list_per_page = 50
     is_superuser = False
 
     def get_queryset(self, request):
@@ -81,7 +80,6 @@ class CustomerAdmin(BaseUserAdmin,):
             return qs.all()  
         else:
             return qs.filter(pk=request.user.id)  
-
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -102,7 +100,7 @@ class CustomerAdmin(BaseUserAdmin,):
         is_superuser = request.user.is_superuser
         disabled_fields = set() 
 
-        if is_superuser:            
+        if Customer.objects.filter(is_superuser=True).count() > 0:
             disabled_fields |= {
                 'is_superuser',
             }
@@ -143,7 +141,7 @@ class CustomerAdmin(BaseUserAdmin,):
                 'is_assistant',               
             }
 
-        if (obj is not None and obj.user_type == Customer.FREELANCER or obj.user_type == Customer.CLIENT):
+        if obj is not None and not obj.is_staff: # Means object is freelancer or client
             disabled_fields |= {                
                 'is_superuser',
                 'is_staff',

@@ -67,7 +67,7 @@
                                                 {% comment %} <div id="paypal-button-container"></div> {% endcomment %}
                                                 <div id = 'paypal-deposit-nextstep' class="wt-updatall">
                                                     <span>Step 2: I understand that after successful deposit, its Irreversible</span>
-                                                    <button onclick='hiringPayPalButton(event)' class="wt-btn"> Yes, Make Deposit </button>
+                                                    <button onclick="depositPayPalButton(event)" class="wt-btn"> Yes, Make Deposit </button>
                                                 </div>	
                                                 
                                                 <ul class="wt-projectliststyle">
@@ -247,8 +247,8 @@
         }
         let csrftoken = getCookie('csrftoken');
 
-        function hiringPayPalButton(event) {
-            event.preventDefault();
+        function depositPayPalButton(event) {
+            e.preventDefault();
             
             let paypalAmount = $('[name="paypaldepositAmount"]').val();
             let paypalNarration = $('[name="depositdepositNarration"]').val();
@@ -260,11 +260,9 @@
                 displayError.textContent = 'Ooops! All fields are required';
                 $('#paypal-error-message').addClass('alert alert-danger');
                 
-                console.log('Nothing to display');
                 return false;
             }
             else {
-                console.log('All looks good');
                 displayError.textContent = '';
                 $('#stripe-error-message').removeClass('alert alert-danger');
     
@@ -313,7 +311,7 @@
                 }).render('#paypal-button-container');
             }
         }
-        hiringPayPalButton();
+        depositPayPalButton();
     </script>
     {% endif %} 
     
@@ -369,8 +367,8 @@
                 credentials: 'same-origin',
                 body: JSON.stringify(data)
             })
+            
               .then(function (response) {
-                //return (response)
                 return response.json()
               })
               .then(function (session) {

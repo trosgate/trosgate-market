@@ -322,7 +322,7 @@ def stripe_deposit(request):
     payment_intent = session.payment_intent
     print('payment_intent', payment_intent)
 
-    return JsonResponse({'session':session, 'order':payment_intent, 'message':message})
+    return JsonResponse({'session':session, 'order':payment_intent, 'message':message}, safe=False)
 
 
 @login_required
@@ -369,7 +369,7 @@ def deposit_checker(request):
             request.session["acceptdepoamount"] = {"acceptdeposit_amount": amount}
             request.session.modified = True
 
-        return JsonResponse({'total_amount':total_amount, 'message':message, 'razorpay_order_id': str(razorpay_order['id'])})
+        return JsonResponse({'total_amount':total_amount, 'message':message, 'razorpay_order_id': str(razorpay_order['id'])}, safe=False)
 
 
 def razorpay_callback(request):
@@ -416,7 +416,7 @@ def razorpay_callback(request):
             del request.session["depositgateway"]
             del request.session["acceptdepoamount"]
 
-            return JsonResponse({'perfect':'perfect'})
+            return JsonResponse({'perfect':'perfect'}, safe=False)
 
 
 # level_two_deposit_check

@@ -39,8 +39,19 @@
             "name": "Flutterwave",
             "status": true,
             "default": false,
-            "processing_fee": 15,
+            "processing_fee": 12,
             "ordering": 4
+        }
+    },
+    {
+        "model": "general_settings.paymentgateway",
+        "pk": 5,
+        "fields": {
+            "name": "Razorpay",
+            "status": true,
+            "default": false,
+            "processing_fee": 15,
+            "ordering": 5
         }
     }
 ]

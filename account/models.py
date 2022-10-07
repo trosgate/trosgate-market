@@ -73,7 +73,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     user_type = models.CharField(_("User Type"), choices=USER_TYPE, max_length=30)
     
     class Meta:
-        ordering = ("date_joined",)
+        ordering = ("-date_joined",)
         verbose_name = "User Manager"
         verbose_name_plural = "User Manager"
 
@@ -85,7 +85,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         self.email = self.email.lower()
         super(Customer, self).save(*args, **kwargs)
-
 
     def __str__(self):
         return self.get_full_name()
@@ -120,10 +119,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
             raise ValidationError(
                 {'is_staff': _('Assistant must have "Activate Staff" set to Active')})
         
-        if Customer.objects.filter(is_superuser=True).exists() and self.is_superuser == True:
-            raise ValidationError(
-                {'is_superuser': _('SuperAdmin role already exist. Maybe add them as Virtual Assistants or exchange credentials at your own risk')})
-
         if self.user_type == 'freelancer' and self.is_assistant == True:
             raise ValidationError(
                 {'is_assistant': _('Freelancer cannot be a Staff or Assistant at same time. You can let them join with a different email')})

@@ -28,12 +28,12 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 # ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-ALLOWED_HOSTS = ['trosgate.com', '68.183.137.119', '.trosgate.com'] 
+ALLOWED_HOSTS = ['support.trosgate.com'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 
@@ -148,7 +148,7 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgater',
+#         'NAME': 'trosgate',
 #         'USER': 'katey',
 #         'PASSWORD': 'Prof2ike.y2ky2k',
 #         'HOST': 'localhost',
@@ -216,6 +216,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
+LOGOUT_REDIRECT_URL = "account:homepage"
 
 #Custom Email Backend for this software
 EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
@@ -236,7 +237,7 @@ EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 
 ADMINS = (
-    ('Trosgate', 'example@gmail.com'),
+    ('Trosgate', 'myvoistudio@gmail.com'),
 )
 MANAGERS = ADMINS
 
@@ -283,7 +284,7 @@ CONTRACT_SESSION_ID = "contract"
 CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 # SECURITY HEADERS - below are required in production
-if not DEBUG:
+if DEBUG == False:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
     SESSION_COOKIE_SECURE = True

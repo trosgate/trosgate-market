@@ -31,6 +31,8 @@ class Command(BaseCommand):
             call_command("loaddata", "db_admin_auth.json")
             # call_command("loaddata", "db_client_auth.json")
             # call_command("loaddata", "db_freelancer_auth.json")
+            
+        call_command("loaddata", "db_pages.json")
 
         if not WebsiteSetting.objects.count():
             call_command("loaddata", "db_admin_settings.json")
@@ -56,8 +58,8 @@ class Command(BaseCommand):
         if not Department.objects.count():
             call_command("loaddata", "db_department.json")
 
-        if not PaymentGateway.objects.count():
-            call_command("loaddata", "db_payment_gateways.json")
+        # if not PaymentGateway.objects.count():
+        call_command("loaddata", "db_payment_gateways.json")
 
         if not SubscriptionGateway.objects.count():
             call_command("loaddata", "db_subscription.json")
