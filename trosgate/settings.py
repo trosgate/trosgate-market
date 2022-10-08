@@ -32,7 +32,8 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
 # ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
 
 AUTH_USER_MODEL = 'account.Customer'
@@ -295,7 +296,7 @@ CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 # SECURITY HEADERS - below are required in production
 if DEBUG == False:
-    SECURE_SSL_REDIRECT = True
+    #SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
