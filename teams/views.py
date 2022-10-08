@@ -37,7 +37,7 @@ from account.fund_exception import InvitationException
 from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
+from control_settings.utilities import subscription_switch
 # from .tasks import email_all_users
 # from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
@@ -502,14 +502,15 @@ def purchase_package(request, type):
 
     if team:
         package = get_object_or_404(Package, type=type)
-
+    subscript_switcher = subscription_switch()
+    
     context = {
         'package': package,
         'stripe_public_key': stripe_public_key,
         'paypal_public_key':paypal_public_key,
         'paypal_subscription_price_id':paypal_subscription_price_id,
-        'razorpay_public_key':razorpay_public_key
-
+        'razorpay_public_key':razorpay_public_key,
+        'subscript_switcher':subscript_switcher
     }
     return render(request, 'teams/purchase_package.html', context)
 

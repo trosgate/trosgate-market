@@ -1,13 +1,44 @@
 import sys
 from django.contrib import admin
 from . models import (
-    PaydayController, PaymentsController, DepositController, 
+    PaydayController, PaymentsController, DepositController, DepositSetting,
     GatewaySetting, HiringSetting, PaymentAPISetting, DiscountSettings,
     MailerSetting, TestMailSetting, SubscriptionSetting, ExchangeRateSetting,
+    LayoutSetting
 )
 
 MAX_OBJECTS = 1
 MAX_GATEWAYS = 4
+
+
+@admin.register(LayoutSetting)
+class LayoutSettingAdmin(admin.ModelAdmin):
+    model = LayoutSetting
+    list_display = ['title_block','subtitle_block']
+    list_display_links = ['title_block','subtitle_block']
+    fieldsets = (
+        ('Header Content', {'fields': ('title_block','subtitle_block', 'video_title', 'video_description', 'video_url')}),
+        ('Category Content', {'fields': ('category_title','category_subtitle',)}),
+        ('Proposal Content', {'fields': ('proposal_title','proposal_subtitle',)}),
+        ('Promotion Content', {'fields': ('promo_title','promo_subtitle','promo_description','promo_image')}),
+        ('Project Content', {'fields': ('project_title','project_subtitle',)}),
+        ('Footer Content', {'fields': ('footer_description',)}),
+    )
+
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_OBJECTS:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 @admin.register(PaydayController)
@@ -306,6 +337,36 @@ class TestEmailAdmin(admin.ModelAdmin):
 @admin.register(SubscriptionSetting)
 class SubscriptionGatewayAdmin(admin.ModelAdmin):
     model = SubscriptionSetting
+    list_display = ['name', 'paypal', 'stripe', 'razorpay', 'flutterwave']
+    list_editable = ['paypal', 'stripe', 'razorpay', 'flutterwave']
+    list_display_links = ['name']
+    # readonly_fields = ['name']
+    fieldsets = (
+        ('Paypal Config', {'fields': ('paypal',)}),
+        ('Stripe Config', {'fields': ('stripe',)}),
+        ('Razorpay Config', {'fields': ('razorpay',)}),
+        ('Flutterwave Config', {'fields': ('flutterwave',)}),
+    )
+
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_OBJECTS:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
+@admin.register(DepositSetting)
+class DepositSettingAdmin(admin.ModelAdmin):
+    model = DepositSetting
     list_display = ['name', 'paypal', 'stripe', 'razorpay', 'flutterwave']
     list_editable = ['paypal', 'stripe', 'razorpay', 'flutterwave']
     list_display_links = ['name']

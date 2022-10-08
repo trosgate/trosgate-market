@@ -9,14 +9,21 @@
 								<div class="wt-footerlogohold">
 									<strong class="wt-logo"><a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a></strong>
 									<div class="wt-description">
-										<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce <a href="javascript:void(0);">more...</a></p>
+										<p>{% if home_layout.footer_description %}{{home_layout.footer_description}}{% endif %}</a></p>
 									</div>
 									<ul class="wt-socialiconssimple wt-socialiconfooter">
-										<li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook-f"></i></a></li>
-										<li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i></a></li>
-										<li class="wt-youtube"><a href="javascript:void(0);"><i class="fab fa-youtube"></i></a></li>
-										<li class="wt-instagram"><a href="javascript:void(0);"><i class="fab fa-instagram"></i></a></li>
-										<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google-plus-g"></i></a></li>
+										{% if website.facebook_url %}
+										<li class="wt-facebook"><a href="{{website.facebook_url.url}}"><i class="fa fa-facebook-f"></i></a></li>
+										{% endif %}
+										{% if website.twitter_url %}
+										<li class="wt-twitter"><a href="{{website.twitter_url.url}}"><i class="fab fa-twitter"></i></a></li>
+										{% endif %}
+										{% if website.youtube_url %}
+										<li class="wt-youtube"><a href="{{website.youtube_url.url}}"><i class="fab fa-youtube"></i></a></li>
+										{% endif %}
+										{% if website.instagram_url %}
+										<li class="wt-instagram"><a href="{{website.instagram_url.url}}"><i class="fab fa-instagram"></i></a></li>
+										{% endif %}
 									</ul>
 								</div>
 							</div>
@@ -31,8 +38,6 @@
 										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
 										<li><a href="javascript:void(0);">Careers</a></li>
 										<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
-										<li><a href="javascript:void(0);">Trust &amp; Safety</a></li>
-										<li class="wt-viewmore"><a href="javascript:void(0);">+ View All</a></li>
 									</ul>
 								</div> 
 							</div>
@@ -56,7 +61,7 @@
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 push-lg-1">
 								<div class="wt-companyinfo">
-									<span><a href="javascript:void(0);">New @ {{website.site_name}}</a> Dotem eiusmod tempor incune utnaem labore etdolore.</span>
+									<span><a href="javascript:void(0);">New @ {{website.site_name}}?</a> For sure you can change that too.</span>
 								</div>
 								<div class="wt-fbtnarea">
 									<a href="javascript:void(0)" class="wt-btn">Join Now</a>
@@ -69,7 +74,7 @@
 					<div class="container">
 						<div class="row">
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-								<p class="wt-copyrights"><a target="_blank" href="https://www.katrr.com">Katrr Marketplace</a></p>
+								<p class="wt-copyrights"><a style="text-decoration:None; color:white;" href="/">{{website.site_name}} Marketplace </a></p>
 								<nav class="wt-addnav">
 									<ul>
 										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>

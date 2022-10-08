@@ -17,18 +17,20 @@ server {
     access_log /webapps/trosgate/trosgate_env/logs/nginx-access.log;
     error_log /webapps/trosgate/trosgate_env/logs/nginx-error.log;
 
-    ssl_certificate /etc/letsencrypt/live/trosgate.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/trosgate.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/support.trosgate.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/support.trosgate.com/privkey.pem;
 
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     ssl_prefer_server_ciphers on;
-    ssl_ciphers 'AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5';
+    ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
 
     location /static/ {
-        alias /webapps/trosgate/trosgate_env/trosgate-marketplace-script/static/;
+        autoindex on;
+        alias /webapps/trosgate/trosgate_env/trosgate-marketplace-script/staticfiles/;
     }
 
     location /media/ {
+        autoindex on;
         alias /webapps/trosgate/trosgate_env/trosgate-marketplace-script/media/;
     }
 

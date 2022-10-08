@@ -1,5 +1,6 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
+{%load embed_video_tags %}
 {% load widget_tweaks %}
 {% block content %}
 
@@ -21,11 +22,11 @@
 							<div class="wt-bannercontent">
 								<div class="wt-bannerhead">
 									<div class="wt-title">
-										<h2 style="color:white">Hire Expert, Team</h2>
+										<h2 style="color:white">{% if home_layout.title_block %}{{home_layout.title_block}} {% endif %}</h2>
 										<h2 style="color:white">in {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
 									</div>
 									<div class="wt-description">
-										<p>Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.</p>
+										<p>{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}} {% endif %}.</p>
 									</div>
 								</div>
 								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
@@ -35,14 +36,16 @@
 										</div>
 									<fieldset>
 								</form>
+								{% if home_layout.video_url %}
 								<div class="wt-videoholder">
 									<div class="wt-videoshow">
-										<a data-rel="prettyPhoto[video]" href="https://www.youtube.com/watch?v=J37W6DjqT3Q"><i class="fa fa-play"></i></a>
+										<a data-rel="prettyPhoto[video]" href="{% if home_layout.video_url %}{{home_layout.video_url.url}}{% endif %}"><i class="fa fa-play"></i></a>
 									</div>
 									<div class="wt-videocontent">
-										<span>See For Yourself!<em>How it works &amp; experience the ultimate joy.</em></span>
+										<span>{% if home_layout.video_title %}{{home_layout.video_title}}{% endif %}<em>How it works &amp; {% if home_layout.video_description %}{{home_layout.video_description}} {% endif %}.</em></span>
 									</div>
 								</div>
+								{% endif %}
 							</div>
 						</div>
 					</div>
@@ -58,8 +61,8 @@
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 								<div class="wt-sectionhead wt-textcenter">
 									<div class="wt-sectiontitle">
-										<h2>Explore Categories</h2>
-										<span>Professional by categories</span>
+										<h2>{% if home_layout.category_title %}{{home_layout.category_title}}{% endif %}</h2>
+										<span>{% if home_layout.category_subtitle %}{{home_layout.category_subtitle}}{% endif %}</span>
 									</div>
 								</div>
 							</div>
@@ -92,8 +95,8 @@
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
 								<div class="wt-sectionhead wt-textcenter">
 									<div class="wt-sectiontitle">
-										<h2>Explore Proposals</h2>
-										<span>Verified Proposals</span>
+										<h2>{% if home_layout.proposal_title %}{{home_layout.proposal_title}}{% endif %}</h2>
+										<span>{% if home_layout.proposal_subtitle %}{{home_layout.proposal_subtitle}}{% endif %}</span>
 									</div>
 								</div>
 							</div>
@@ -151,19 +154,18 @@
 					<div class="row justify-content-md-center">
 						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
 							<figure class="wt-mobileimg">
-								<img src="{% static 'images/work/img-03.jpg' %}" alt="img description">
+								<img src="{% if home_layout.promo_image %}{{home_layout.promo_image.url}}{% else %}{% static 'images/work/img-03.jpg' %}{% endif %}" alt="img description">
 							</figure>
 						</div>
 						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
 							<div class="wt-experienceholder">
 								<div class="wt-sectionhead">
 									<div class="wt-sectiontitle">
-										<h3>#1 Choice for Businesses</h3>
-										<span>Business on the Go</span>
+										<h3>{% if home_layout.promo_title %}{{home_layout.promo_title}}{% endif %}</h3>
+										<span>{% if home_layout.promo_subtitle %}{{home_layout.promo_subtitle}}{% endif %}</span>
 									</div>
 									<div class="wt-description">
-										<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination riatur lokaim urianewce.</p>
-										<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumed perspiciatis.</p>
+										<p>{% if home_layout.promo_description %}{{home_layout.promo_description|linebreaksbr}}{% endif %}</p>
 									</div>
 									<div class="wt-btnarea">
 										<a href="{% url 'pages:how_it_works' %}" class="wt-btn">How it Works</a>
@@ -179,8 +181,8 @@
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
 								<div class="wt-sectionhead wt-textcenter">
 									<div class="wt-sectiontitle">
-										<h2>Published Jobs</h2>
-										<span>Apply and get Hired</span>
+										<h2>{% if home_layout.project_title %}{{home_layout.project_title}}{% endif %}</h2>
+										<span>{% if home_layout.project_subtitle %}{{home_layout.project_subtitle}}{% endif %}</span>
 									</div>
 								</div>
 							</div>

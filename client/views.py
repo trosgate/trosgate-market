@@ -23,6 +23,7 @@ from general_settings.fund_control import get_min_depositor_balance, get_max_dep
 from django.contrib.sites.shortcuts import get_current_site
 from transactions.models import Purchase, OneClickPurchase
 from contract.models import InternalContract, Contract
+from control_settings.utilities import deposit_switch
 import stripe
 import json
 
@@ -178,12 +179,13 @@ def deposit_fee_structure(request):
     deposits = ClientAction.objects.filter(account__user = request.user)
     gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
     base_currency = get_base_currency_code()
-
+    depo_switch = deposit_switch()
     context = {
         'client': client,
         'deposits': deposits,
         'gateways': gateways,
         'base_currency': base_currency,
+        'depo_switch': depo_switch,
     }
     return render(request, 'client/deposit_step_one.html', context)
 

@@ -41,7 +41,7 @@ from transactions.hiringbox import HiringBox
 import copy
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
-
+from control_settings.utilities import homepage_layout
 
 def Logout(request):
     '''
@@ -138,7 +138,7 @@ def homepage(request):
             messages.error(request, f'Error occured. Please check and correct')
     else:
         regform = CustomerRegisterForm(supported_country)
-
+    home_layout = homepage_layout()
     context = {
         'proposals': proposals,
         'projects': projects,
@@ -149,6 +149,7 @@ def homepage(request):
         'userregistrationmodal': "userregistrationmodal",
         'base_currency': base_currency,
         'searchform': searchform,
+        'home_layout': home_layout,
     }
     return render(request, 'homepage.html', context)
 

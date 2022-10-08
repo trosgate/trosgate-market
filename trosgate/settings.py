@@ -32,8 +32,8 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+# ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 
@@ -92,8 +92,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # Two factor Authentication middleware
-    # 'django_otp.middleware.OTPMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
@@ -134,16 +132,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
+#GIGRED
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgates',
+        'NAME': 'gigred',
         'USER': 'katey',
         'PASSWORD': 'Prof2ike.y2ky2k',
         'HOST': 'localhost',
         'PORT': '',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'trosgates',
+#         'USER': 'katey',
+#         'PASSWORD': 'Prof2ike.y2ky2k',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 # DATABASES = {
 #     'default': {

@@ -224,6 +224,42 @@ class SubscriptionGateway(models.Model):
         verbose_name_plural = 'Subscription Gateways'
 
 
+class DepositGateway(models.Model):
+    name = models.CharField(
+        _("Preview"), 
+        max_length=255, 
+        help_text=_("This is the switch to show or hide deposit gateway buttons"), 
+        default="This is the switch for controlling the deposit gateway appearing to customer"
+    )
+    paypal = models.BooleanField(
+        _("PayPal"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+    stripe = models.BooleanField(
+        _("Stripe"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+    razorpay = models.BooleanField(
+        _("Razorpay"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+    flutterwave = models.BooleanField(
+        _("Flutterwave"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=True
+    )
+   
+    def __str__(self):
+        return f'{self.name}'
+
+    class Meta:
+        verbose_name = 'Deposit Gateway'
+        verbose_name_plural = 'Deposit Gateways'
+
+
 class Category(models.Model):
     name = models.CharField(_("Name"), max_length=50, help_text=_(
         "Category field is Required"), unique=True, db_index=True)

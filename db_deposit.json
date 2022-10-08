@@ -1,0 +1,13 @@
+[
+    {
+        "model": "general_settings.depositgateway",
+        "pk": 1,
+        "fields": {
+            "name": "This is the switch for controlling the deposit appearing to customer",
+            "paypal": true,
+            "stripe": true,
+            "razorpay": true,
+            "flutterwave": false
+        }
+    }
+]

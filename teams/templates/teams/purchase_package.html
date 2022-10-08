@@ -36,41 +36,44 @@
                                 </div>
                             </div> 
                         <div class="col-md-7 col-lg-8">
-                        
+                            {% if subscript_switcher.stripe == True %}
                             <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
                             <div class="row g-0">
                                 <div class="col-md-2 ps-3 ps-md-4"></div>
                                 <div class="col-md-9 ps-md-1">
                                     <div class="card-body p-1">
-                                    <h3 class="card-text ps-2 pb-3">Option #1: Stripe Checkout</h3>
+                                    <h4 class="card-text ps-2 pb-3">Option: Stripe Checkout</h4>
                                     </div>
                                 </div>
                                 <button onclick='stripeSubscriber(event)' class="btn btn-primary w-100 fw-bold">Pay with Stripe </button>
                             </div>
                             </div>
-
+                            {% endif %}
+                            {% if subscript_switcher.paypal == True %}
                             <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
                             <div class="row g-0">
                                 <div class="col-md-2 ps-3 ps-md-4">
                                 </div>
                                 <div class="col-md-9 ps-md-1">
                                 <div class="card-body p-1">
-                                    <h3 class="card-text ps-2 pb-3">Option #2: PayPal Checkout</h3>
+                                    <h4 class="card-text ps-2 pb-3">Option: PayPal Checkout</h4>
                                 </div>
                             </div>
                             <div id="paypal-button-container" class="w-100 fw-bold"></div>
                             </div>
-                            
+                            {% endif %}
+                            {% if subscript_switcher.razorpay == True %}
                             <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
                             <div class="row g-0">
                                 <div class="col-md-2 ps-3 ps-md-4"></div>
                                 <div class="col-md-9 ps-md-1">
                                 <div class="card-body p-1">
-                                    <h3 class="card-text ps-2 pb-3">Option #3: Razorpay Checkout</h3>
+                                    <h4 class="card-text ps-2 pb-3">Option: Razorpay Checkout</h4>
                                 </div>
                             </div>
                             <button id='razorpaySubscriber' class="btn btn-primary w-100 fw-bold">Pay with Razorpay</button></div>
                             </div>
+                            {% endif %}
                         </div>
                         </div>
                     </div>

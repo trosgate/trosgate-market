@@ -2,9 +2,10 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from account.models import Country, Customer
 from general_settings . models import (
-    WebsiteSetting, Category, Department, Size, PaymentsControl, SubscriptionGateway,
-    Skill, DiscountSystem, PaymentGateway, HiringFee, Currency, Payday, StorageBuckets
+    WebsiteSetting, Category, Department, Size, PaymentsControl, SubscriptionGateway, DepositControl,
+    Skill, DiscountSystem, PaymentGateway, DepositGateway, HiringFee, Currency, Payday, StorageBuckets
 )
+from control_settings.models import LayoutSetting
 from teams . models import Package, Team
 from proposals . models import Proposal
 from projects.models import Project
@@ -29,11 +30,7 @@ class Command(BaseCommand):
 
         if not Customer.objects.count():
             call_command("loaddata", "db_admin_auth.json")
-            # call_command("loaddata", "db_client_auth.json")
-            # call_command("loaddata", "db_freelancer_auth.json")
             
-        call_command("loaddata", "db_pages.json")
-
         if not WebsiteSetting.objects.count():
             call_command("loaddata", "db_admin_settings.json")
 
@@ -58,11 +55,17 @@ class Command(BaseCommand):
         if not Department.objects.count():
             call_command("loaddata", "db_department.json")
 
-        # if not PaymentGateway.objects.count():
-        call_command("loaddata", "db_payment_gateways.json")
+        if not PaymentGateway.objects.count():
+            call_command("loaddata", "db_payment_gateways.json")
 
         if not SubscriptionGateway.objects.count():
             call_command("loaddata", "db_subscription.json")
+
+        if not DepositGateway.objects.count():
+            call_command("loaddata", "db_deposit.json")
+
+        if not DepositControl.objects.count():
+            call_command("loaddata", "db_deposit_control.json")
 
         if not Payday.objects.count():
             call_command("loaddata", "db_payday.json")
@@ -75,6 +78,11 @@ class Command(BaseCommand):
 
         if not PaymentsControl.objects.count():
             call_command("loaddata", "db_fund_control.json")
+        
+        if not LayoutSetting.objects.count():
+            call_command("loaddata", "db_layout.json")
+
+        call_command("loaddata", "db_pages.json")
 
         # if not Project.objects.count():
         #   call_command("loaddata", "db_projects.json")

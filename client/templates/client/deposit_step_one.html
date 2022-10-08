@@ -41,28 +41,52 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                
                                 <tbody data-index="{{gateway.id}}">
                                     {% for gateway in gateways %}
                                     <tr>
                                         <tr> 
-                                        <td>{{gateway.name}}</td>
+                                        {% if gateway.name == 'PayPal' and depo_switch.paypal == True %}
+                                        <td>{{gateway.name }}</td>
                                         <td> ${{gateway.processing_fee}}</td>
                                         <td><input type="radio" name="depositGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
-                                        </tr>
+                                        {% endif %}
+                                        
+                                        {% if gateway.name == 'Stripe' and depo_switch.stripe == True %}
+                                        <td>{{gateway.name }}</td>
+                                        <td> ${{gateway.processing_fee}}</td>
+                                        <td><input type="radio" name="depositGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
+                                        {% endif %}
+                                        
+                                        {% if gateway.name == 'Razorpay' and depo_switch.razorpay == True %}
+                                        <td>{{gateway.name }}</td>
+                                        <td> ${{gateway.processing_fee}}</td>
+                                        <td><input type="radio" name="depositGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
+                                        {% endif %}
+                                        
+                                        {% if gateway.name == 'Flutterwave' and depo_switch.flutterwave == True %}
+                                        <td>{{gateway.name }}</td>
+                                        <td> ${{gateway.processing_fee}}</td>
+                                        <td><input type="radio" name="depositGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
+                                        {% endif %}
+                                    </tr>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
+                            {% if depo_switch.paypal == False and depo_switch.stripe == False and depo_switch.razorpay == False and depo_switch.flutterwave == False %}
+                            <hr>    
+                            <div class="text-center text-primary">This feature is under maintenance. Please check back later</div>
+                            {% endif %}
                         </div>
                     </div>								
                 </section>
+                {% if depo_switch.paypal == True or depo_switch.stripe == True or depo_switch.razorpay == True or depo_switch.flutterwave == True %}
                     <div class="wt-updatall">
                         <span>Step 1 of 2 completed</span>
                         <a href="{% url "client:final_deposit" %}" class="wt-btn">Next Step</a>
                     </div>
+                {% endif %}
             
-
             <section class="wt-haslayout wt-dbsectionspace">
                 <div class="row justify-content-md-center">				
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
@@ -141,8 +165,6 @@
             },
             success: function (json) {
                 console.log(json)
-                //document.getElementById("totalDiscount").innerHTML = json.discount;
-                //document.getElementById("totalFees").innerHTML = json.contract_fee;
             },
             error: function (xhr, errmsg, err) {},
             });
