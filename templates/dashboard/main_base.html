@@ -2,9 +2,8 @@
 <html lang="en">
 
 {% include 'dashboard/main_header.html' %}
-<body class="wt-login">
 {% include 'dashboard/main_navbar.html' %}
-
+<body class="wt-login">
     {% if request.user.freelancer %}
 	{% if active_team.status == 'inactive' %}
     <div class="alert alert-warning alert-dismissible fade show text-center">

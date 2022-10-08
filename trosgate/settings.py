@@ -28,12 +28,12 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 # ALLOWED_HOSTS = []
 # ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-ALLOWED_HOSTS = ['support.trosgate.com'] 
+ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 

@@ -34,14 +34,12 @@
                           <a href="{% url 'pages:how_it_works' %}">WorkFlow</a>
                         </li>
 
-                        <li
-                          class="menu-item-has-children page_item_has_children">
+                        <li class="nav-item">
                           <a href="{% url 'marketing:article_list' %}">Articles</a>
                         </li>
                        
                         {% if request.user.is_authenticated %}
-                        <li
-                          class="menu-item-has-children page_item_has_children">
+                        <li class="nav-item">
                           <a href="{% url 'marketing:notice' %}">Notice<small><sup class="badge badge-danger badge-sm text-white">New</sup></small></a>
                         </li>
                         {% endif %}
@@ -55,27 +53,31 @@
                           </ul>
                         </li>                        
                         <li
-                          class="menu-item-has-children page_item_has_children">
+                          class="nav-item">
                           <a href="{% url 'proposals:proposal_list' %}">Proposals</a>
+                        </li>
+                        {% endif %}
+                        {% if not request.user.is_authenticated %}
+                        <li class="nav-item text-center">
+                          <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-white">Login Now</span></a>
                         </li>
                         {% endif %}
                       </ul>
                     </div>
                   </nav>
-                  {% if not request.user.is_authenticated %}
-										<div class="wt-loginoption">
-											<a class="nav-link" href="{% url 'account:login' %}"><img src="{% static 'images/user-login.png'%}" alt="img description"></a>
-										</div>
-										<div class="wt-loginoption">
-                      {% if userregistrationmodal %}
-                      <a href="javascript:void(0);" class="nav-link btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal">Signup</a>
-                      {% else  %}			
-											<a class="nav-link btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}">Signup</a>
-                      {% endif  %}			
-										</div>
-									{% endif  %}			
-									{% if request.user.is_authenticated %}
+                  
 									<div class="wt-userlogedin">
+                    {% if not request.user.is_authenticated %}
+                      
+                      {% if userregistrationmodal %}
+                      <a href="javascript:void(0);" class="btn btn-danger" data-toggle="modal" data-target="#userregistrationmodal">Join Us</a>
+                      {% else  %}			
+											<a class="btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}">Signup</a>
+                      {% endif  %}
+                    
+                    {% endif  %}
+
+                    {% if request.user.is_authenticated %}
                     <figure class="wt-userimg">
                       {% if request.user.freelancer %}
                       <img src="{% if request.user.freelancer.profile_photo %}{{request.user.freelancer.profile_photo.url}}{% endif %}" alt="image description"/>
