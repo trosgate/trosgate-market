@@ -4,7 +4,7 @@
 {% load widget_tweaks %}
 {% block content %}
 
-
+			{% if home_layout.banner_type == True %}
 			<div class="wt-haslayout wt-bannerholder">
 				<div class="container">
 					<div class="row">
@@ -22,11 +22,11 @@
 							<div class="wt-bannercontent">
 								<div class="wt-bannerhead">
 									<div class="wt-title">
-										<h2 style="color:white">{% if home_layout.title_block %}{{home_layout.title_block}} {% endif %}</h2>
+										<h2 style="color:white">{% if home_layout.title_block %}{{home_layout.title_block}}{% endif %}</h2>
 										<h2 style="color:white">in {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
 									</div>
 									<div class="wt-description">
-										<p>{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}} {% endif %}.</p>
+										<p>{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}}{% endif %}.</p>
 									</div>
 								</div>
 								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
@@ -51,11 +51,99 @@
 					</div>
 				</div>
 			</div>
-			
+			{% else %}
+			<header class="bg-red py-5" style="background-color:{% firstof home_layout.banner_color purple %};">
+				<div class="container px-5">
+					<div class="row gx-5 align-items-center justify-content-center">
+						<div class="col-lg-8 col-xl-7 col-xxl-6">
+							<div class="my-5 text-center text-xl-start">
+								<h1 class="display-5 fw-bolder text-white mb-2">{% if home_layout.title_block %}{{home_layout.title_block}} {% endif %}</h1>
+								<p class="lead fw-normal text-white-50 mb-4" style="color:white;">{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}} {% endif %}.</p>
+								<h3 style="color:white">in {% if pypist %}<span class="autoTyper" style="color:yellow;"></span>{% endif %}</h3>
+								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
+									<fieldset>
+										<div class="form-group">
+											{{searchform.search_type}}
+										</div>
+									<fieldset>
+								</form><br>
+								<div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+									<a class="btn btn-{% firstof home_layout.banner_button_one_color blue %} btn-lg px-4 me-sm-3 text-white" href="{% url 'account:login' %}" style="margin:5px;">Get Started</a>
+									<a class="btn btn-outline-{% firstof home_layout.banner_button_two_color blue %} btn-lg px-4" href="{% url 'pages:how_it_works' %}" style="margin:2px;">Learn More</a>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if home_layout.banner_image %}{{home_layout.banner_image.url}}{% endif %}" alt="Hero banner"/></div>
+					</div>
+				</div>
+			</header>
+			{% endif %}
+
 			<!--Main Start-->
 			<main class="wt-haslayout" style="background:white;">
-				<!--Categories Start-->
+				<!--Gateways Start-->
+				{% if home_layout.show_gateways == True %}
 				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-sectionhead wt-textcenter">
+									<h3>{% if home_layout.gateway_title %}{{home_layout.gateway_title}}{% endif %}</h3>
+								</div>
+							</div>
+							<div class="wt-categoryexpl">
+								
+								<div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+									<div class="row">
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span><i class="far fa-money-bill-alt fa-4x" style="color:green;"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Stripe Checkout</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span><i class="fa fa-paypal fa-4x" style="color:blue;"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Paypal Checkout</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>												
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span style="color:orange;"><i class="fa fa-balance-scale fa-4x"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Razorpay Checkout</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>	
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span><i class="fa fa-mobile fa-4x" style="color:violet;"></i><span><i class="fa fa-check fa-2x" style="color:violet;"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Africa's Momo (Flutterwave)</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>	
+									</div>
+								</div>	
+							</div>
+						</div>
+					</div>
+				</section>
+				{% endif %}
+
+				<div class="wt-haslayout wt-main-section">
 					<div class="container">
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
@@ -85,11 +173,11 @@
 							</div>
 						</div>
 					</div>
-				</section>
+				</div>
 				<!--Categories End-->
 
 				<!--Company listing starts-->
-				<section class="wt-haslayout wt-main-section">
+				<div class="wt-haslayout wt-main-section">
 					<div class="container">
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
@@ -124,17 +212,17 @@
 											<ul class="wt-postarticlemeta">
 												<li class="wt-following">
 													<a href="javascript:void(0);">
+														<span><i class="fa fa-balance-scale"></i>{{proposal.aggregated_sales_count}}</span>
+													</a>
+												</li>
+												<li class="wt-following">
+													<a href="javascript:void(0);">
 														<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
 													</a>
 												</li>
 												<li class="wt-following">
 													<a href="javascript:void(0);">
 														<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
-													</a>
-												</li>
-												<li class="wt-following">
-													<a href="javascript:void(0);">
-														<span><i class="far fa-star"></i>5</span>
 													</a>
 												</li>
 											</ul>
@@ -149,7 +237,7 @@
 							</div>
 						</div>
 					</div>
-				</section>
+				</div>
 				<div class="container">
 					<div class="row justify-content-md-center">
 						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
@@ -199,13 +287,13 @@
 										<figure><img src="{% firstof project.created_by.clients.company_logo.url project.created_by.clients.profile_photo.url %}" style="height:60px; width:60px" alt="image"></figure>
 									</a>
 									<h4>{% firstof project.created_by.clients.brand_name project.created_by.get_full_name %}</h4>
-									<span>{{project.title}}</span>
+									<span>{{project.title|truncatechars:50}}</span>
 									<div class="wt-title">
 										<div class="wt-proposalhead">
 											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-												<li><span>Salary: {{base_currency}}{{project.amount}}</span></li>
+												<li><span><i class="far fa-money-bill-alt" style="color:green"> {{base_currency}} {{project.amount}}</i></span></li>
 												<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:50}}</span></li>
-												<li><span><i class="fa fa-tag wt-viewjobtag"></i> {{project.category.name|truncatechars:20}}</span></li>
+												<li><span><i class="fa fa-tag wt-viewjobtag"></i> {{project.category.name|truncatechars:18}}</span></li>
 												<li><a href="{{project.get_project_absolute_url}}" class="btn btn-danger btn-sm text-white"><i class="fa fa-window-restore"></i>&nbsp;Apply</i></a></li>
 											</ul>
 										</div>

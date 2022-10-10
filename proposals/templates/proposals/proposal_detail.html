@@ -45,10 +45,10 @@
 									<div class="wt-proposalhead">
 										<h2>{{proposal.title}}</h2>
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-											<li><span><i class="fa fa-arrow-up"></i> Sales: {{overal_proposal_sales_count}}</span></li>
+											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{base_currency}} {{proposal.salary}}</span></li>
+											<li><span><i class="fa fa-arrow-up" style="color:red;"></i> Sales: {{overal_proposal_sales_count}}</span></li>
 											<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
-											<li><span><i class="far fa-clock"></i> Duration: {{proposal.get_dura_converter_display }}</span></li>
-											<li><span><i class="fa fa-dollar-sign"></i> Salary: {{base_currency}} {{proposal.salary}}</span></li>
+											<li><span><i class="far fa-clock" style="color:blue;"></i> Duration: {{proposal.get_dura_converter_display }}</span></li>
 											{% if request.user.clients %}
 											<li><span><button class="btn btn-success btn-sm text-white"  data-toggle="modal" data-target="#oneClickProposalCheckout">1-Click Purchase</button></span></li>
 											{% endif %}
@@ -464,7 +464,7 @@
 										</div>
 									</div>
 									<div class="wt-clicksavearea">
-										<a href="{% url 'proposals:proposal_chat_messages' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Chat Me</a>
+										<a href="{% url 'proposals:proposal_chat_messages' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Author Support</a>
 									</div>
 								</div>
 									

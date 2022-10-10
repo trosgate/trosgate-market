@@ -17,7 +17,7 @@ class StorageBucketsAdmin(admin.ModelAdmin):
     radio_fields = {'storage_type': admin.HORIZONTAL}
     fieldsets = (
         ('Storage Type', {'fields': ('storage_type',)}),
-        ('Extra Amazon S3 Bucket Settings', {'fields': ('bucket_name','access_key','secret_key',)}),
+        ('Extra Amazon S3 Bucket Settings - Please fallback on local storage. Amazon S3 module has known bug that will be fixed in update', {'fields': ('bucket_name','access_key','secret_key',)}),
     )
     
     def has_add_permission(self, request):

@@ -59,7 +59,7 @@
                         {% endif %}
                         {% if not request.user.is_authenticated %}
                         <li class="nav-item text-center">
-                          <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-white">Login Now</span></a>
+                          <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-white" style="background-color:{% firstof home_layout.banner_color purple %};">Login Now</span></a>
                         </li>
                         {% endif %}
                       </ul>
@@ -70,9 +70,9 @@
                     {% if not request.user.is_authenticated %}
                       
                       {% if userregistrationmodal %}
-                      <a href="javascript:void(0);" class="btn btn-danger" data-toggle="modal" data-target="#userregistrationmodal">Join Us</a>
+                      <a href="javascript:void(0);" class="btn btn-danger" data-toggle="modal" data-target="#userregistrationmodal" style="background-color:{% firstof home_layout.banner_color red %}; font-color:white;">Join Us</a>
                       {% else  %}			
-											<a class="btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}">Signup</a>
+											<a class="btn btn-danger btn-sm" type="button" href="{% url 'account:register' %}" style="background-color:{% firstof home_layout.banner_color red %}; font-color:white;">Signup</a>
                       {% endif  %}
                     
                     {% endif  %}

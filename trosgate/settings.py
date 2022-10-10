@@ -33,8 +33,8 @@ DEBUG = True
 
 # ALLOWED_HOSTS = []
 # ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
-# ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 
@@ -134,27 +134,28 @@ TEMPLATES = [
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
 #GIGRED
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gigred',
-        'USER': 'katey',
-        'PASSWORD': 'Prof2ike.y2ky2k',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgates',
+#         'NAME': 'gigred',
 #         'USER': 'katey',
 #         'PASSWORD': 'Prof2ike.y2ky2k',
 #         'HOST': 'localhost',
 #         'PORT': '',
 #     }
 # }
+
+#SERVER SIDE
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trosgates',
+        'USER': 'katey',
+        'PASSWORD': 'Prof2ike.y2ky2k',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # DATABASES = {
 #     'default': {
@@ -204,37 +205,22 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
-# this will keep files on server
+# STATIC FILES PATH FOR TROSGATE SOFTWARE
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
+# MEDIA PATH FOR TROSGATE SOFTWARE
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-# This saves a copy of files on local pc
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# ENV_PATH = os.path.dirname(BASE_DIR)
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(ENV_PATH, 'media')
-
+# LOGIN AND AUTHENTICATION FOR TROSGATE SOFTWARE
 LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
 LOGOUT_REDIRECT_URL = "account:homepage"
 
-#Custom Email Backend for this software
+#Custom Email Backend for Trosgate software
 EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
-
-
-### option two for email setup in development mode ###
-# I am using gmail setup
 
 ####option one for email setup in development mode###
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -296,7 +282,7 @@ CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 # SECURITY HEADERS - below are required in production
 if DEBUG == False:
-    #SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True

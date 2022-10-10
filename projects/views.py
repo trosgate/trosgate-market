@@ -18,7 +18,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from notification.utilities import create_notification
 from django.utils import timezone
 from general_settings.models import ProposalGuides
-
+from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
 @login_required
 @user_is_client
@@ -60,6 +60,7 @@ def project_single(request, project_slug):
         'profile_view':profile_view,  
         'employees_count':employees_count,  
         'applications':applications,  
+        'base_currency':get_base_currency_symbol(),  
   
     }
     return render(request, 'projects/project_detail.html', context)

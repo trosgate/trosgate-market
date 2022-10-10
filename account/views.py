@@ -43,6 +43,7 @@ from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 from control_settings.utilities import homepage_layout
 
+
 def Logout(request):
     '''
     This is manual method for user to logout.

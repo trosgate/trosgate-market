@@ -7,6 +7,7 @@ from datetime import datetime, timezone, timedelta
 from django.utils.translation import gettext_lazy as _
 import os
 
+
 @receiver(pre_save, sender=Proposal)
 def replace_old_thumbnail_with_new_one(sender, instance, **kwargs):
     if instance._state.adding and not instance.pk:

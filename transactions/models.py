@@ -496,7 +496,6 @@ class ProposalSale(models.Model):
 
 
 class ContractSale(models.Model):
-    # status choices to be added to track the state of order
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredcontractteam', on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="contractsales", on_delete=models.CASCADE)
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)

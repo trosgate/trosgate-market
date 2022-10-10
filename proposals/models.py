@@ -2,6 +2,7 @@ from io import BytesIO
 from PIL import Image
 from django.core.files import File
 from django.db import models
+from django.db.models import Aggregate
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -13,8 +14,7 @@ from embed_video.fields import EmbedVideoField
 from uuid import uuid4
 from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta
-# from general_settings.storage_backend import activate_storage_type, DynamicStorageField
-
+from contract.models import InternalContract
 
 def proposal_images_path(instance, filename):
     return "proposal/%s/%s" % (instance.team.title, filename)
@@ -129,10 +129,28 @@ class Proposal(models.Model):
                 self.reference = 'P' + str(uuid4()).split('-')[4]
         super(Proposal, self).save(*args, **kwargs)
 
-
     def percent_progress(self):
         return f'{self.progress}%'
 
+    @property
+    def preview_proposal_sales_count(self):
+        return self.proposalhired.filter(purchase__status='success').count()
+    
+    @property
+    def preview_oneclick_sales_count(self):
+        return self.oneclickproposal.filter(status='success').count()
+    
+    @property
+    def preview_contract_sales_count(self):
+        new_contract = 0
+        contracts = InternalContract.objects.filter(proposal__id=self.id)
+        for contract in contracts:
+            new_contract = contract.contracthired.filter(purchase__status='success').count()
+        return new_contract
+
+    @property
+    def aggregated_sales_count(self):
+        return (self.preview_proposal_sales_count + self.preview_oneclick_sales_count + self.preview_contract_sales_count)
 
 
 class ProposalSupport(Proposal):

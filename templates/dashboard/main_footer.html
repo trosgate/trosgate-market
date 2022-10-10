@@ -13,16 +13,16 @@
 									</div>
 									<ul class="wt-socialiconssimple wt-socialiconfooter">
 										{% if website.facebook_url %}
-										<li class="wt-facebook"><a href="{{website.facebook_url.url}}"><i class="fa fa-facebook-f"></i></a></li>
+										<li class="wt-facebook"><a href="{{website.facebook_url}}"><i class="fa fa-facebook-f"></i></a></li>
 										{% endif %}
 										{% if website.twitter_url %}
-										<li class="wt-twitter"><a href="{{website.twitter_url.url}}"><i class="fab fa-twitter"></i></a></li>
+										<li class="wt-twitter"><a href="{{website.twitter_url}}"><i class="fab fa-twitter"></i></a></li>
 										{% endif %}
 										{% if website.youtube_url %}
-										<li class="wt-youtube"><a href="{{website.youtube_url.url}}"><i class="fab fa-youtube"></i></a></li>
+										<li class="wt-youtube"><a href="{{website.youtube_url}}"><i class="fab fa-youtube"></i></a></li>
 										{% endif %}
 										{% if website.instagram_url %}
-										<li class="wt-instagram"><a href="{{website.instagram_url.url}}"><i class="fab fa-instagram"></i></a></li>
+										<li class="wt-instagram"><a href="{{website.instagram_url}}"><i class="fab fa-instagram"></i></a></li>
 										{% endif %}
 									</ul>
 								</div>
@@ -36,7 +36,6 @@
 										<li><a href="javascript:void(0);">About Us</a></li>
 										<li><a href="{% url 'pages:how_it_works' %}">How It Works</a></li>
 										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
-										<li><a href="javascript:void(0);">Careers</a></li>
 										<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
 									</ul>
 								</div> 
@@ -64,7 +63,7 @@
 									<span><a href="javascript:void(0);">New @ {{website.site_name}}?</a> For sure you can change that too.</span>
 								</div>
 								<div class="wt-fbtnarea">
-									<a href="javascript:void(0)" class="wt-btn">Join Now</a>
+									<a href="{% url 'account:register' %}" class="wt-btn">Join Now</a>
 								</div>
 							</div>
 						</div>
@@ -80,7 +79,6 @@
 										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
 										<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
 										<li><a href="{% url 'pages:terms_and_conditions' %}">Privacy Policy</a></li>
-										<li><a href="{% url 'pages:terms_and_conditions' %}">Career</a></li>
 									</ul>
 								</nav>
 							</div>

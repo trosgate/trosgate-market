@@ -17,13 +17,17 @@ class LayoutSettingAdmin(admin.ModelAdmin):
     list_display = ['title_block','subtitle_block']
     list_display_links = ['title_block','subtitle_block']
     fieldsets = (
-        ('Header Content', {'fields': ('title_block','subtitle_block', 'video_title', 'video_description', 'video_url')}),
+        ('Banner Content', {'fields': ('banner_type', 'title_block','subtitle_block',)}),
+        ('Other Royal Banner Contents', {'fields': ('video_title', 'video_description', 'video_url',)}),
+        ('Other Hero Banner Contents', {'fields': ('banner_image', 'banner_color', 'banner_button_one_color', 'banner_button_two_color',)}),
+        ('Payments Content', {'fields': ('gateway_title','show_gateways',)}),
         ('Category Content', {'fields': ('category_title','category_subtitle',)}),
         ('Proposal Content', {'fields': ('proposal_title','proposal_subtitle',)}),
         ('Promotion Content', {'fields': ('promo_title','promo_subtitle','promo_description','promo_image')}),
         ('Project Content', {'fields': ('project_title','project_subtitle',)}),
         ('Footer Content', {'fields': ('footer_description',)}),
     )
+    radio_fields = {'banner_type': admin.HORIZONTAL}
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:
