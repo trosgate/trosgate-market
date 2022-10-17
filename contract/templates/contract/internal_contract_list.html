@@ -90,7 +90,7 @@
                                 </table>
                                 {% if not intcontracts %}
                                 <hr>
-                                <p class='text-center'><strong>{% if request.user == active_team.created_by %} You have not transfered money yet, but you can change that {% else %}You have not received transfer yet.{% endif %}</strong></p>
+                                <p class='text-center'>No contract to show at the moment</strong></p>
                                 {% endif %}											
                                 </div> 
                             </div>
@@ -168,7 +168,7 @@
                                 </table>
                                 {% if not intcontracts %}
                                 <hr>
-                                <p class='text-center'><strong>{% if request.user == intcontracts.created_by %} You have not transfered money yet, but you can change that {% else %}You have not received transfer yet.{% endif %}</strong></p>
+                                <p class='text-center'>No contract to show at the moment but you can change that</strong></p>
                                 {% endif %}											
                                 </div> 
                             </div>

@@ -3,7 +3,7 @@
 
 {% include 'dashboard/main_header.html' %}
 {% include 'dashboard/main_navbar.html' %}
-<body class="wt-login">
+<body class="wt-login" hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
     {% if request.user.freelancer %}
 	{% if active_team.status == 'inactive' %}
     <div class="alert alert-warning alert-dismissible fade show text-center">

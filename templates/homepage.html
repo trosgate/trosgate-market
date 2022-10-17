@@ -1,6 +1,6 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{%load embed_video_tags %}
+{% load embed_video_tags %}
 {% load widget_tweaks %}
 {% block content %}
 
@@ -39,7 +39,7 @@
 								{% if home_layout.video_url %}
 								<div class="wt-videoholder">
 									<div class="wt-videoshow">
-										<a data-rel="prettyPhoto[video]" href="{% if home_layout.video_url %}{{home_layout.video_url.url}}{% endif %}"><i class="fa fa-play"></i></a>
+										<a data-rel="prettyPhoto[video]" href="{% if home_layout.video_url %}{{home_layout.video_url}}{% endif %}"><i class="fa fa-play"></i></a>
 									</div>
 									<div class="wt-videocontent">
 										<span>{% if home_layout.video_title %}{{home_layout.video_title}}{% endif %}<em>How it works &amp; {% if home_layout.video_description %}{{home_layout.video_description}} {% endif %}.</em></span>
@@ -92,7 +92,6 @@
 								</div>
 							</div>
 							<div class="wt-categoryexpl">
-								
 								<div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
 									<div class="row">
 										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">

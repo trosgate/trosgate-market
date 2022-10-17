@@ -1,0 +1,35 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Invitee</th>
+            <th>Contractor</th>
+            <th>Email</th>
+            <th>date_created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>    
+    <tbody>
+        {% for contractor in contractors %}
+        <tr>
+            <td>{{forloop.counter}} </td>
+            <td>{{contractor.created_by.get_short_name}}</td>
+            <td>{{contractor.name}}</td>
+            <td>{{contractor.email}}</td>
+            <td>{{contractor.date_created|date:"M-d-Y"}}</td>
+            <td>
+                <a href="{% url 'contract:connect_contract' contractor.id %}" class="btn btn-success btn-sm text-white"><i class="fa fa-window-restore"> Connect</i></a>
+                <a class="btn btn-danger btn-sm text-white"
+                    hx-get="{% url 'contract:delete_contractor' contractor.id %}"
+                    hx-confirm="Removing a client will equally remove it's connected conntract? Are you sure?" 
+                    hx-target="#new-contractor">
+                <i class="fa fa-trash"> Delete</i></a>
+            </td> 
+        </tr>
+        {% endfor %}					
+    </tbody>
+</table>
+{% if not contractors %}
+<hr>
+<p class='text-center'><strong>No contractor added but you can change that</strong></p>
+{% endif %}

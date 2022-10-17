@@ -7,11 +7,11 @@ app_name = 'contract'
 urlpatterns = [
 
     # Urls for contractor
-    path('', views.add_contractor, name='contract_client'),
+    path('', views.contractor, name='contract_client'),
 
     # Urls for external contracts
+    path('add_contractor/', views.add_contractor, name='add_contractor'),
     path('external/', views.external_contract_list, name='external_contract_list'),
-    path('create/', views.create_external_contract, name='create_external_contract'),
 
     # Urls for internal contracts
     path('internal/', views.internal_contract_list, name='internal_contract_list'),
@@ -46,7 +46,7 @@ urlpatterns = [
     path('externalcontract/<str:contract_id>/<slug:contract_slug>/', views.final_external_contract, name='final_external_contract'),
         
     # Urls for internal contracts chats   
-    path('modify/<int:contractor_id>/', views.update_contractor, name='update_contractor'),
+    path('connect/<int:contractor_id>/', views.connect_contract, name='connect_contract'),
     path('delete/<int:contractor_id>/', views.delete_contractor, name='delete_contractor'),
 
 ]

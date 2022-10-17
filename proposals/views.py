@@ -580,14 +580,11 @@ def proposal_preview(request, short_name, proposal_slug):
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)
     
     team_members = proposal.team.members.all()
-    guides = ProposalGuides.objects.all()   
-    
-    
+        
     context = {
         "proposal": proposal,
         "team_members": team_members,
         "profile_view": profile_view,
-        "guides": guides,
 
     }
     return render(request, 'proposals/proposal_preview.html', context)

@@ -1,4 +1,5 @@
 public: 'FLWPUBK_TEST-009060208b6a00ae09f64cff55c208f1-X'
 secret: 'FLWSECK_TEST-17e087c299d85509130f4e04d7836c8b-X'
+encryption: 'FLWSECK_TEST939181d34298'
 
 http://127.0.0.1:8000/transaction/flutterwave_webhook/

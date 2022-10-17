@@ -3,7 +3,7 @@ from teams.models import Team
 from django.utils.translation import gettext_lazy as _
 from django import forms
 from proposals.models import Proposal
-
+from account.models import Customer
 
 # a class to output datepicker on template
 class DateInput(forms.DateInput):
@@ -100,14 +100,12 @@ class InternalContractForm(forms.ModelForm):
             self.fields[field].widget.attrs["readonly"] = True
 
 
-
 class ExternalContractForm(forms.ModelForm):
-    client = forms.ModelChoiceField(queryset=Contract.objects.all(), empty_label='Select Contractor')
 
     class Meta:
         model = Contract
         fields = [
-            'client', 'contract_duration', 'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',
+            'contract_duration', 'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',
             'line_two','line_two_quantity', 'line_two_unit_price', 'line_two_total_price',
             'line_three','line_three_quantity', 'line_three_unit_price', 'line_three_total_price',
             'line_four','line_four_quantity', 'line_four_unit_price', 'line_four_total_price',
@@ -117,21 +115,16 @@ class ExternalContractForm(forms.ModelForm):
 
         required = [
          # Required details 
-            'client', 'contract_duration', 'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',               
+            'contract_duration', 'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',               
         ]  
 
         readonly = [
             'line_one_total_price','line_two_total_price','line_three_total_price','line_four_total_price', 'line_five_total_price','grand_total',
         ]
 
-    def __init__(self, team, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(ExternalContractForm, self).__init__(*args, **kwargs)
-        
-        self.fields['client'].queryset = Contractor.objects.filter(team=team)
-       
-        # 'Basic Info'
-        self.fields['client'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Enter Full Name'})            
+                 
         self.fields['contract_duration'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Active Email'})
         # 'Product/Service #1',                    
@@ -199,12 +192,11 @@ class ExternalContractForm(forms.ModelForm):
 class ContractorForm(forms.ModelForm):
     class Meta:
         model = Contractor
-        fields = ['name', 'email', 'address', 'postal_code','phone_Number',] 
+        fields = ['name', 'email',] 
         required = [
          # Required details 
-            'name', 'email', 'address',               
+            'name', 'email',              
         ]  
-
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -212,36 +204,17 @@ class ContractorForm(forms.ModelForm):
         self.fields['name'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Enter Full Name'})
         self.fields['email'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Active Email'})
-        self.fields['address'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Address of client'})                       
-        self.fields['postal_code'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Postal Code'})
-        self.fields['phone_Number'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Phone number'})            
-
+            {'class': 'form-control', 'placeholder': 'Active Email'})           
      
         for field in self.Meta.required:
             self.fields[field].required = True
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if Customer.objects.filter(email=email).exists():
+            raise forms.ValidationError(_("Email Owner already exist. Please ask client to offer you contract via your profile"))
+        return email
 
-class ChangeContractorForm(forms.ModelForm):
-    class Meta:
-        model = Contractor
-        fields = ['name', 'address', 'postal_code','phone_Number'] 
-
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields['name'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Enter Full Name'})
-        self.fields['address'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Address of client'})                       
-        self.fields['postal_code'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Postal Code'})
-        self.fields['phone_Number'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Phone number'})            
 
      
 

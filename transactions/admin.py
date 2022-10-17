@@ -10,7 +10,7 @@ from .forms import ProposalRefundForm, ApplicationRefundForm, ContractRefundForm
 class OneClickPurchaseAdmin(admin.ModelAdmin):
     model = OneClickPurchase
     list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status']
-    list_filter = ['category']
+    list_filter = ['category', 'status']
     readonly_fields = [
         'client', 'payment_method','salary_paid','created_at','reference',
         'client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status',
@@ -39,7 +39,7 @@ class OneClickPurchaseAdmin(admin.ModelAdmin):
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
     list_display = ['client', 'category', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
-    list_filter = ['status']
+    list_filter = ['category', 'status']
     readonly_fields = [
         'client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',
         'paypal_order_key', 'stripe_order_key', 'flutterwave_order_key','razorpay_order_key', 

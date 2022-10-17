@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from .models import TermsAndConditions, Hiring, Freelancing, Sponsorship
-from .forms import SponsorForm
+from .models import TermsAndConditions, Hiring, Freelancing, AboutUsPage, Investor
 from django.contrib import messages
+from django.http import JsonResponse
 from general_settings.discount import (
     get_level_one_rate,
     get_level_two_rate, 
@@ -14,7 +14,6 @@ from general_settings.discount import (
     get_level_three_start_amount, 
     get_level_three_delta_amount, 
     get_level_four_start_amount,
-    get_discount_calculator,
     get_discount_value
 )
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
@@ -22,25 +21,72 @@ from general_settings.fees_and_charges import (
     get_contract_fee_percentage,
     get_contract_fee_extra,
     get_contract_delta_amount,
-    get_contract_fee_calculator, ###(amount)
+    get_contract_fee_calculator,
     get_proposal_fee_percentage,
     get_proposal_fee_extra,
     get_proposal_delta_amount,
-    get_proposal_fee_calculator, ###(amount)
+    get_proposal_fee_calculator,
     get_application_fee_percentage,
     get_application_fee_extra,
     get_application_delta_amount,
-    get_application_fee_calculator, ###(amount)
+    get_application_fee_calculator,
     get_extra_application_value,
     get_extra_proposal_value,
     get_extra_contract_value   
 )
 from general_settings.models import PaymentGateway, Payday
 from teams.models import Package
+from control_settings.utilities import homepage_layout
+from analytics.analytic import (
+    total_freelancers,
+    total_clients,
+    total_teams,
+    total_projects,
+    total_projects_reopen,
+    total_project_hired,
+    total_proposals,
+    total_proposal_hired,
+    total_proposal_review_rate,
+    total_internal_contracts,
+    total_external_contracts,
+    total_contracts_hired
+)
+
+from contract.models import InternalContract, Contract
+from .forms import InvestorForm
+
+def aboutus(request):
+    aboutpage=None
+    if AboutUsPage.objects.filter(pk=1).exists():
+        aboutpage = AboutUsPage.objects.get(pk=1)
+
+    investor_form = InvestorForm()
+    context={
+        "aboutpage":aboutpage,
+        "investor_form":investor_form,
+        "home_layout":homepage_layout(),
+        "freelancers":total_freelancers(),
+        "clients":total_clients(),
+        "teams":total_teams(),
+        "proposals":total_proposals(),
+        "proposal_hired_count":total_proposal_hired(),
+        "proposal_review_rate":total_proposal_review_rate(),
+        "projects":total_projects(),
+        "projects_reopen":total_projects_reopen(),
+        "total_hired":total_project_hired(),
+        "internal_contracts":total_internal_contracts,
+        "external_contracts":total_external_contracts,
+        "contracts_paid":total_contracts_hired,
+    }
+    return render(request, "pages/aboutus.html", context)
 
 def terms_and_conditions(request):
     termsandcond = TermsAndConditions.objects.filter(is_published = True)
-    return render(request, "pages/terms_and_conditions.html", {"termsandcond":termsandcond})
+    context={
+        "home_layout":homepage_layout(),
+        "termsandcond":termsandcond
+    }
+    return render(request, "pages/terms_and_conditions.html", context)
 
 
 def how_it_works(request):
@@ -109,6 +155,7 @@ def how_it_works(request):
     l4_application_net_earning = round(l4_disc_sales_price - get_application_fee_calculator(l4_disc_sales_price))
 
     context ={
+        "home_layout":homepage_layout(), 
         "hiring":hiring, 
         'freelancing':freelancing, 
         'gateways':gateways, 
@@ -169,3 +216,39 @@ def how_it_works(request):
         'application_delta_amount':get_application_delta_amount(),
     }
     return render(request, "pages/howitworks.html", context)
+
+
+def start_investment_now(request):
+    successful = ''
+    if request.POST.get('action') == 'invest-now':
+        salutation = request.POST.get('invSalute')
+        name = request.POST.get('invName')
+        email = request.POST.get('invEmail')
+        confirm_email = request.POST.get('invConfirmEmail')
+        if email == confirm_email:
+            try:
+                Investor.check_or_create(
+                    salutation=salutation,
+                    myname=name,
+                    myemail=email, 
+                    myconfirm_email=confirm_email
+                )
+                successful = "Information Saved. We shall keep in touch"
+            except Exception as e:
+                successful = str(e)
+                print(successful)
+            return JsonResponse({'success':successful})
+        return JsonResponse({'success':"Sorry! Emails donnot match"})
+
+
+
+
+
+
+
+
+
+
+
+
+

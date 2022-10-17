@@ -6,10 +6,7 @@ class ContractorAdmin(admin.ModelAdmin):
     model = Contractor
     list_display = ['name',  'email', 'team', 'created_by', 'date_created']
     list_display_links = ['name', 'created_by',]
-    readonly_fields = [
-        'name',  'email', 'team', 'created_by', 'date_created', 
-        'phone_Number','address','postal_code'
-        ]
+    readonly_fields = ['name', 'email', 'team', 'created_by', 'date_created']
 
     def has_add_permission(self, request):
         return False
@@ -28,6 +25,7 @@ class ContractorAdmin(admin.ModelAdmin):
 class ContractAdmin(admin.ModelAdmin):
     list_display = ['client', 'team', 'reference', 'contract_duration', 'grand_total', 'reaction']
     list_display_links = ['client', 'team']
+    # readonly_fields = ['date_created','last_updated']
     readonly_fields = [
         'team', 'created_by', 'client', 'reference', 'contract_duration', 'reaction', 'slug',
         'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',
@@ -36,8 +34,8 @@ class ContractAdmin(admin.ModelAdmin):
         'line_four','line_four_quantity', 'line_four_unit_price', 'line_four_total_price',
         'line_five','line_five_quantity', 'line_five_unit_price', 'line_five_total_price',
         'notes', 'date_created','last_updated','grand_total',
-        ]
-    # list_editable = ['reaction']
+    ]
+
 
     fieldsets = (
         ('Basic Info', {'fields': ('team', 'created_by', 'client', 'contract_duration','reaction','slug','reference',)}),

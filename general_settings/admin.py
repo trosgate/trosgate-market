@@ -56,6 +56,7 @@ class WebsiteSettingAdmin(admin.ModelAdmin):
         ('Site Description', {'fields': ('site_name', 'tagline', 'site_Logo',
          'protocol', 'site_domain', 'site_description',)}),
         ('Social Media', {'fields': ('twitter_url', 'instagram_url', 'youtube_url', 'facebook_url',)}),
+        ('Advertisement', {'fields': ('brand_ambassador_image', 'ad_image',)}),
     )
 
     radio_fields = {'protocol': admin.HORIZONTAL}

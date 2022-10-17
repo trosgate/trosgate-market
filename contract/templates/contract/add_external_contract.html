@@ -13,7 +13,7 @@
                     <div class="row justify-content-md-center">
                         <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
                             <div class="wt-innerbannercontent">
-                            <div class="wt-title"><h2>External Contract</h2></div>
+                            <div class="wt-title"><h2>Contract</h2></div>
                                 <ol class="wt-breadcrumb">
                                     <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
                                     <li class="wt-active">Add Offer Contract</li>
@@ -34,33 +34,35 @@
                                 <h2>Create a Contract</h2>
                             </div>
                             <div class="wt-dashboardboxcontent">
-                                                                                            
+                            {% if existing_user < 1 %}                                                                
                             <form method='POST' action=''>{% csrf_token %}
                                 {% if contractform.errors %}
                                 <div class="alert alert-danger text-center" role="alert">
                                     Ooop! form error occured. Please check below and correct
                                 </div>
                                 {% endif %}  
-                                    <div class="wt-jobdescription wt-tabsinfo">
+                                <div class="wt-jobdescription wt-tabsinfo">
+                                    <div class="wt-tabscontenttitle">
+                                        <h2>Client Details</h2>
+                                    </div>	
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <span><i class="fa fa-user" style="color:green;"> Client Name:</i> {{client.name}}</span><br><br>
+                                            <span><i class="fa fa-envelope" style="color:green;"> Client Email:</i> {{client.email}}</span><br><br>
+                                        </div>
+                                    </div>
+                                    <div class="wt-jobdetails wt-tabsinfo">
                                         <div class="wt-tabscontenttitle">
-                                            <h2>Contract Details</h2>
-                                        </div>	
+                                            <h2>Contract Term</h2>
+                                        </div>
                                         <div class="form-row">
-                                            <div class="form-group col-md-12">
-                                                {{contractform.client.label}}
-                                                {{contractform.client}}
-                                                
-                                                <a href="javascript:void(0);" class="text-success" data-toggle="modal" data-target="#invoiceclientmodal">Add different Contractor</a>								
-                                                <span style="color:red;" role="alert">{{ contractform.client.errors}}</span>
-                                            </div>
-                                            
                                             <div class="form-group col-md-12">
                                                 {{contractform.contract_duration.label}}
                                                 {{contractform.contract_duration}}
                                                 <span style="color:red;" role="alert">{{ contractform.contract_duration.errors}}</span>
                                             </div>
-                                           
                                         </div>  
+                                    </div>  
                                     <div class="wt-jobdetails wt-tabsinfo">
 										<div class="wt-tabscontenttitle">
 											<h2>Product and Services</h2>
@@ -69,6 +71,8 @@
                                             <div class="form-group col-md-6">
                                                 {{ contractform.line_one.label}}
                                                 {{ contractform.line_one}}
+                                                <span style="color:green;" role="alert">{{ contractform.line_one.help_text}}</span>
+                                                
                                                 <span style="color:red;" role="alert">{{ contractform.line_one.errors}}</span>
                                             </div>
                                             <div class="form-group col-md-2">
@@ -212,105 +216,17 @@
                                     </div>
                                 </div>  
                             </form>
+                            {% else %}
+                            <div class="wt-updatall">
+                                <i class="ti-announcement"></i>
+                                <span>The client is now a member. Please let him/her offer contract via your profile page.</span>
+                                <button type="button" class="btn btn-danger" disabled> Create Contract </button>
+                            </div>
+                            {% endif %}
 						</div>
 					</div>
 				</div>
 			</div>
-					
-
 			</main>
 
-			<!-- Add Invoice Client Popup Start-->
-			<!-- Popup Start-->
-			<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="invoiceclientmodal">
-				<div class="modal-dialog" role="document">
-					<div class="wt-modalcontent modal-content">
-						<div class="wt-popuptitle">
-							<h2>Add A Contractor</h2>
-							<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
-						</div>
-						<div class="modal-body">
-							<div class="wt-projectdropdown-hold">
-								<div class="wt-projectdropdown-option">
-									<div class="wt-projectselect">
-										<figure><img src="{% static 'images/thumbnail/img-07.jpg' %}" alt="img description"></figure>
-										<div class="wt-projectselect-content">
-											<h3>Project Title Here</h3>
-											<span><i class="lnr lnr-calendar-full"></i> Project Deadline: May 27, 2019</span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}                             
-                            {% if contractorform.errors %}
-                            <p>{{ contractorform.non_field_errors }}</p>
-                            {% for field in contractorform %}
-                            {% if field.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{ field.errors|striptags }}
-                            </div>
-                            {% endif %}
-                            {% endfor %}
-                            {% endif %}
-
-								<div class="form-group">
-									{{contractorform.name.label}}
-									{{contractorform.name}}
-								</div>
-								<div class="form-group">
-									{{contractorform.email.label}}
-									{{contractorform.email}}
-								</div>
-								<div class="form-group">
-									{{contractorform.address.label}}
-									{{contractorform.address}}
-								</div>
-								<div class="form-group">
-									{{contractorform.postal_code.label}}
-									{{contractorform.postal_code}}
-								</div>  
-								<div class="form-group">
-									{{contractorform.phone_Number.label}}
-									{{contractorform.phone_Number}}
-								</div>
-								<div class="form-group">
-									{{contractorform.tax_Number.label}}
-									{{contractorform.tax_Number}}
-								</div>                                                                
-								<div class="form-group wt-btnarea">
-									<button type="submit" class="wt-btn"> Add Contractor </button>
-								</div>											
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- Popup End-->
-
-
 {% endblock %}
-
-
-                            {% comment %} <div class="form-group">
-                                <input id="id_name" type="text" name="name" class="form-control" placeholder="name">
-                            </div>
-                            <div class="form-group">
-                                <input id="id_email" type="email" name="email" class="form-control" placeholder="email">
-                            </div>                                
-                            <div class="form-group">
-                                <input id="id_address" type="text" name="address" class="form-control" placeholder="address">
-                            </div>
-                            <div class="form-group">
-                                <input id="id_postal_code" type="text" name="postal_code" class="form-control" placeholder="postal_code">
-                            </div>
-                            <div class="form-group">
-                                <input id="id_phone_Number" type="text" name="phone_Number" class="form-control" placeholder="phone_Number">
-                            </div>
-                            <div class="form-group">
-                                <input id="id_tax_Number" type="text" name="tax_Number" class="form-control" placeholder="tax_Number">
-                            </div>
-
-                            <div class="form-group wt-btnarea">
-                                <button type="submit" class="wt-btn"> Add Contractor </button>
-                            </div> {% endcomment %}
-

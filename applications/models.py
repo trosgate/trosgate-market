@@ -26,11 +26,6 @@ class Application(models.Model):
     TWO_WEEK = "02 week"
     THREE_WEEK = "03 week"
     ONE_MONTH = "01 month"
-    TWO_MONTH = "02 month"
-    THREE_MONTH = "03 month"
-    FOUR_MONTH = "04 month"
-    FIVE_MONTH = "05 month"
-    SIX_MONTH = "06 month"
     ESTIMATED_DURATION = (
         (ONE_DAY, _("01 Day")),
         (TWO_DAYS, _("02 Days")),
@@ -42,11 +37,6 @@ class Application(models.Model):
         (TWO_WEEK, _("02 Weeks")),
         (THREE_WEEK, _("03 Weeks")),
         (ONE_MONTH, _("01 Month")),
-        (TWO_MONTH, _("02 Months")),
-        (THREE_MONTH, _("03 Months")),
-        (FOUR_MONTH, _("04 Months")),
-        (FIVE_MONTH, _("05 Months")),
-        (SIX_MONTH, _("06 Months")),
     )   
 
     # Application Status

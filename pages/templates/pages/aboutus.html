@@ -1,0 +1,279 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load embed_video_tags %}
+{% block content %}
+
+			<div class="wt-haslayout wt-innerbannerholder">
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>About Us</h2></div>
+							{% if request.user.is_authenticated %}
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Home</a></li>
+								<li class="wt-active">About Us</li>
+							</ol>
+							{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Inner Home End-->
+			<!--Main Start-->
+				<!--Two Columns Start-->
+			<div class="wt-haslayout wt-main-section">
+				<section class="wt-haslayout">
+					<div class="container">
+						<div class="row">
+							<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+								<div class="wt-greeting-holder">
+									<div class="row">
+										<div class="col-12 col-sm-12 col-md-12 col-lg-7 float-left">
+											<div class="wt-greetingcontent">
+												<div class="wt-sectionhead">
+													<div class="wt-sectiontitle">
+														<h2>{{aboutpage.title}}</h2>
+														<span>{{aboutpage.subtitle}}</span>
+													</div>
+													<div class="wt-description">
+														<p>{{aboutpage.description|linebreaks}}</p>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-12 col-sm-12 col-md-12 col-lg-5 float-left">
+											{% if aboutpage.banner_type == True %}
+											<div class="wt-greetingvideo">
+												<figure>
+													<a data-rel="prettyPhoto[video]" href="{% if aboutpage.video_url %}{{aboutpage.video_url}}{% endif %}"><img src="{% static 'images/video-img.png' %}" alt="video">
+													</a>
+												</figure>
+											</div>
+											{% else %}
+											<img class="img-fluid rounded-3 my-5" 
+												src="{% if aboutpage.ad_image %}{{aboutpage.ad_image.url}}{% endif %}"
+												alt="Hero banner"/>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!--Greetings & Welcome End-->
+				<!--Signup Start-->
+				<section class="wt-haslayout">
+					<div class="container">
+						<div class="row">
+							<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+								<header class="bg-red py-5" style="background-color:{% firstof aboutpage.banner_color purple %};">
+									<div class="container px-5">
+										<div class="row gx-5 align-items-center justify-content-center">
+											<div class="col-lg-8 col-xl-7 col-xxl-6">
+												<div class="my-5 text-center text-xl-start">
+													<h1 class="display-5 fw-bolder text-white mb-2">{% if aboutpage.title_block %}{{aboutpage.title_block}} {% endif %}</h1>
+													<p class="lead fw-normal text-white-50 mb-4" style="color:white;">{% if aboutpage.subtitle_block %}{{aboutpage.subtitle_block}} {% endif %}.</p>
+													
+													<br>
+													<br>
+													<div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+														<a class="btn btn-{% firstof aboutpage.banner_button_one_color blue %} btn-lg px-4 me-sm-3 text-white" href="{% url 'account:register' %}" style="margin:5px;">Get Started</a>
+														<a class="btn btn-outline-{% firstof aboutpage.banner_button_two_color blue %} btn-lg px-4" href="{% url 'pages:how_it_works' %}" style="margin:2px;">Workflow</a>
+													</div>
+												</div>
+											</div>
+											<div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if website.ad_image %}{{website.ad_image.url}}{% elif website.brand_ambassador_image %}{{website.brand_ambassador_image.url}}{% endif %}" alt="Ad banner"/></div>
+										</div>
+									</div>
+								</header>
+							</div>
+						</div>
+					</div>
+					{% if aboutpage.display_stats == True %}
+					<div class="container">
+						<div class="row">
+							<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+								<div class="wt-proposalholder">												
+								<h4>Data Speaks</h4>
+								<div class="wt-tabscontenttitle">
+									<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+										Info: Enough of the talk. See the data speak for itself. 
+									</span>
+								</div>									 
+								<div class="table-responsive">
+								<div id="wt-statistics" class="wt-statistics">
+									<table class="table">
+									<thead>
+										<tr>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Partners</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">freelancers</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Clients</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Teams</th>
+										</tr>
+									</thead>
+									<body>
+										<tr>
+											<td>Statistics</td>
+											<td><div class="wt-statisticcontent wt-countercolor1"><h3 data-from="0" data-to="{{freelancers}}" data-speed="8000" data-refresh-interval="100">{{freelancers}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor1"><h3 data-from="0" data-to="{{clients}}" data-speed="8000" data-refresh-interval="100">{{clients}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor1"><h3 data-from="0" data-to="{{teams}}" data-speed="8000" data-refresh-interval="100">{{teams}}</h3></div></td>
+										</tr>
+									</body>
+									
+									<body>
+										<tr>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Proposals</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Total Count</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Total Hired</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Great Feedbacks</th>
+										</tr>
+										<tr>
+											<td>Statistics</td>
+											<td><div class="wt-statisticcontent wt-countercolor2"><h3 data-from="0" data-to="{{proposals}}" data-speed="8000" data-refresh-interval="100">{{proposals}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor2"><h3 data-from="0" data-to="{{proposal_hired_count}}" data-speed="8000" data-refresh-interval="100">{{proposal_hired_count}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor2"><h3 data-from="0" data-to="{{proposal_review_rate}}" data-speed="8000" data-refresh-interval="50">{{proposal_review_rate}}</h3><em>%</em></div></td>
+										</tr>
+									</body>	
+									<body>
+										<tr>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Projects</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Total Jobs</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Total Hired</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Job Reopen</th>
+										</tr>
+										<tr>
+											<td>Statistics</td>
+											<td><div class="wt-statisticcontent wt-countercolor3"><h3 data-from="0" data-to="{{projects}}" data-speed="8000" data-refresh-interval="100">{{projects}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor3"><h3 data-from="0" data-to="{{total_hired}}" data-speed="8000" data-refresh-interval="100">{{total_hired}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor3"><h3 data-from="0" data-to="{{projects_reopen}}" data-speed="8000" data-refresh-interval="100">{{projects_reopen}}</h3></div></td>
+										</tr>
+									</body>	
+									<body>
+										<tr>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Contracts</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Internal</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">External</th>
+											<th style="color:{% firstof aboutpage.banner_color purple %};">Total Paid</th>
+										</tr>
+										<tr>
+											<td>Statistics</td>
+											<td><div class="wt-statisticcontent wt-countercolor2"><h3 style="color:green" data-from="0" data-to="{{internal_contracts}}" data-speed="8000" data-refresh-interval="100">{{internal_contracts}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor2"><h3 style="color:green" data-from="0" data-to="{{external_contracts}}" data-speed="8000" data-refresh-interval="100">{{external_contracts}}</h3></div></td>
+											<td><div class="wt-statisticcontent wt-countercolor2"><h3 style="color:green" data-from="0" data-to="{{contracts_paid}}" data-speed="8000" data-refresh-interval="100">{{contracts_paid}}</h3></div></td>
+										</tr>
+									</body>	
+									</table>
+								</div> 
+							</div> 
+						</div>
+					</div>
+				</div>
+				{% endif %}
+			</div>								
+		</section>
+		{% comment %} <div class="wt-proposalholder"> {% endcomment %}
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<header class="bg-red py-5" style="background-color:green;">
+						<div class="container px-5">
+							<div class="row gx-5 align-items-center justify-content-center">
+								<div class="col-lg-8 col-xl-7 col-xxl-6">
+									<div class="my-5 text-center text-xl-start">
+									<h3 class="display-5 fw-bolder text-white mb-2">Become an Investor</h3>
+									<form method='POST' action=''>{% csrf_token %}
+
+										<span id="invest-message" style="background-color:white; color:green; text-align:center;"></span>
+										<div class="form-group">
+											{{investor_form.salutation}}
+											<span style="color:red;" role="alert">{{ investor_form.salutation.errors}}</span>
+										</div>	
+										<div class="form-group">
+											{{investor_form.myname}}
+											<span style="color:red;" role="alert">{{ investor_form.myname.errors}}</span>
+										</div>	
+										<div class="form-group">
+											{{investor_form.myemail}}
+											<span style="color:red;" role="alert">{{ investor_form.myemail.errors}}</span>
+										</div>	
+										<divclass="form-group">
+											{{investor_form.myconfirm_email}}
+											<span style="color:red;" role="alert">{{ investor_form.myconfirm_email.errors}}</span>
+										</div>	
+										<button id="start-investor" type="button" class="btn btn-outline-danger text-white"> Submit Info </button>
+										<button id="confirm-investor" type="submit" class="btn btn-danger"> Confirm Now</button>
+									</form>
+								</div>
+								<div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if website.brand_ambassador_image %}{{website.brand_ambassador_image.url}}{% elif website.ad_image %}{{website.ad_image.url}}{% endif %}" alt="Ambassador banner"/></div>
+							</div>
+						</div>
+					</header>
+				</div>
+			</div>
+		</div>
+	{% comment %} </div> {% endcomment %}
+	{% endblock content %}
+	{% block scripts %}
+    	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    	
+		<script>
+			//TRANSFER OF FUND BUTTON CONFIRMATION  
+			$(document).ready(function(){
+
+				$('#confirm-investor').hide()				
+				$('#start-investor').click(function(){
+					$('#start-investor').hide()
+					$('#confirm-investor').slideToggle(200)
+				});
+				$('#confirm-investor').click(function(){
+					$('#confirm-investor').hide()
+					$('#start-investor').show()       
+				});	
+			});
+				
+		</script>
+	
+		<script>
+			//TRANSFER OF FUND             
+			$(document).on('click', '#confirm-investor', function (e) {
+			e.preventDefault();
+	
+			let myname = $('[name="myname"]').val();
+			let myemail = $('[name="myemail"]').val();
+			let myconfirmemail = $('[name="myconfirm_email"]').val();
+	
+			if(myname == ''||myemail == ''||myconfirmemail == ''){
+				//swal("Alert!", "All fields are required", "error");
+				console.log("field empty")
+				return false;
+			}
+			else{
+				$.ajax({
+					type: 'POST',
+					url: '{% url "pages:start_investment_now" %}',
+					data: {
+						invSalute: $('#id_salutation').val(),
+						invName: $('#id_myname').val(),
+						invEmail: $('#id_myemail').val(),
+						invConfirmEmail: $('#id_myconfirm_email').val(),
+						csrfmiddlewaretoken: "{{csrf_token}}",
+						action: 'invest-now'
+					},
+					success: function (json) {
+						$('#id_myname').val('');
+						$('#id_myemail').val('');
+						$('#id_myconfirm_email').val('');
+						$('#start-investor').show()
+						document.getElementById('invest-message').innerHTML = json.success
+						//swal("Alert!", json.success, "error");
+			   
+					},
+					error: function (xhr, errmsg, err) {},
+				});
+			}
+		})
+		</script>
+		{% endblock scripts %}

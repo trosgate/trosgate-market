@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from .models import Sponsor
+from .models import Investor
 from django import forms
 
 
@@ -8,28 +8,22 @@ class DateInput(forms.DateInput):
     input_type = 'date'
 
 
-class SponsorForm(forms.ModelForm):
-    availability1 = forms.DateField(widget=DateInput)
-    availability2 = forms.DateField(widget=DateInput)
-    availability3 = forms.DateField(widget=DateInput)
+class InvestorForm(forms.ModelForm):
 
     class Meta:
-        model = Sponsor
-        fields = ['name', 'email', 'availability1', 'availability2', 'availability3', 'comment',] 
+        model = Investor
+        fields = ['salutation','myname', 'myemail', 'myconfirm_email'] 
 
 
     def __init__(self, *args, **kwargs):
-        super(SponsorForm, self).__init__(*args, **kwargs)
+        super(InvestorForm, self).__init__(*args, **kwargs)
 
-        self.fields['name'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'eg. enter fullname'})
-        self.fields['email'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'enter valid enail'})
-        self.fields['availability1'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['availability2'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['availability3'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['comment'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Any comment you have' })
+        self.fields['salutation'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['myname'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Enter fullname'})
+        self.fields['myemail'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Enter valid email'})
+        self.fields['myconfirm_email'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Confirm email'})
+        

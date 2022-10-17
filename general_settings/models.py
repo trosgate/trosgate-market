@@ -7,6 +7,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
 
+from django.core.validators import FileExtensionValidator
+
+def site_path(instance, filename):
+    return "site/%s/%s" % (instance.site_name, filename)
+
 
 class WebsiteSetting(models.Model):
     USE_HTTPS = "https://"
@@ -25,7 +30,7 @@ class WebsiteSetting(models.Model):
     site_description = models.TextField(
         _("Site Decription"), max_length=300, default="The Example Marketplace", null=True, blank=True)
     site_Logo = models.ImageField(
-        _("Site Logo"),  upload_to='site/', default='site/logo.png', null=True, blank=True)
+        _("Site Logo"),  upload_to=site_path, default='site/logo.png', null=True, blank=True)
     protocol = models.CharField(
         _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS, help_text=_("Warning! Make sure you have SSL Certificate for your site before switing to Secure options"))
     site_domain = models.CharField(_("Website Domain"), max_length=255, default="example.com", help_text=_(
@@ -57,6 +62,21 @@ class WebsiteSetting(models.Model):
         null=True, 
         blank=True, 
         help_text=_("Enter the full secure url path of your Facebook page")
+    )
+    ad_image = models.ImageField(
+        _("Hero Image"), 
+        help_text=_("This will appear on 'proposal ad, project ad and all other ad slots'. image must be any of these: 'JPEG','JPG','PNG','PSD'"), 
+        null=True, blank=True, 
+        upload_to=site_path, 
+        validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])]
+    )
+    
+    brand_ambassador_image = models.ImageField(
+        _("Brand Ambassador Image"), 
+        help_text=_("This will appear on 'About Us Page'. image must be any of these: 'JPEG','JPG','PNG','PSD'"), 
+        null=True, blank=True, 
+        upload_to=site_path, 
+        validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])]
     )
 
     def __str__(self):
@@ -520,7 +540,6 @@ class CurrencyConverter(models.Model):
         return self.currency.name
 
     # Api call from https://v6.exchangerate-api.com/
-
 
 class ExachangeRateAPI(models.Model):
     preview = models.CharField(

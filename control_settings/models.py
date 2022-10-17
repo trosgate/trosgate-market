@@ -18,12 +18,12 @@ class LayoutSetting(models.Model):
     subtitle_block = models.CharField(_("Banner Subtitle"), max_length=150, default="Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.")
     video_title = models.CharField(_("Royal Video Title"), max_length=100, default="See For Yourself!", null=True, blank=True)
     video_description = models.CharField(_("Royal Video Description"), max_length=100, default="Hire Experts or Team", null=True, blank=True)
+    banner_type = models.BooleanField(_("Banner Type"), choices=((False, 'Switch Hero Banner'), (True, 'Switch Royal Banner')), default=False)
     video_url = EmbedVideoField(_("Royal embed Video"), help_text=_("Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed"), null=True, blank=True)
     banner_image = models.ImageField(_("Hero Image"), help_text=_("image must be any of these: 'JPEG','JPG','PNG','PSD'"), null=True, blank=True, upload_to=home_layout_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     banner_color = models.CharField(_("Hero Background Color"), max_length=100, default="purple", help_text=_("Put your color here to decorate Hero Banner Background and buttons like signup and login. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes"), null=True, blank=True)
     banner_button_one_color = models.CharField(_("Hero Button1 Color"), max_length=100, default="green", help_text=_("Put your bootstrap color here to decorate Hero Button 1. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
-    banner_button_two_color = models.CharField(_("Hero Button2 Color"), max_length=100, default="light", help_text=_("Put your bootstrap color here to decorate Hero Button 1. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
-    banner_type = models.BooleanField(_("Banner Type"), choices=((False, 'Switch Hero Banner'), (True, 'Switch Royal Banner')), default=False)
+    banner_button_two_color = models.CharField(_("Hero Button2 Color"), max_length=100, default="light", help_text=_("Put your bootstrap color here to decorate Hero Button 2. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
 
     show_gateways = models.BooleanField(_("Display Gateway"), default=True)
     gateway_title = models.CharField(_("Gateway Title"), max_length=100, default="Collection and Payout Methods", null=True, blank=True)
@@ -51,6 +51,7 @@ class LayoutSetting(models.Model):
 
     def __str__(self):
         return str(self.title_block)
+
 
 class PaydayController(Payday):
     class Meta:
@@ -112,15 +113,15 @@ class DiscountSettings(DiscountSystem):
 class MailerSetting(Mailer):
     class Meta:
         proxy=True
-        verbose_name = _("Mailer")
-        verbose_name_plural = _("Mailer")
+        verbose_name = 'Mailer Settings'
+        verbose_name_plural = 'Mailer Settings'
 
 
 class TestMailSetting(TestEmail):
     class Meta:
         proxy=True
-        verbose_name = _("Test Email")
-        verbose_name_plural = _("Test Email")
+        verbose_name = _("Testing Email Settings")
+        verbose_name_plural = _("Testing Email Settings")
 
 
 class SubscriptionSetting(SubscriptionGateway):

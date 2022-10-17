@@ -129,7 +129,7 @@ class OneClickPurchase(models.Model):
             selected_contract.reaction = 'paid'
             selected_contract.save(update_fields=['reaction'])
             
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, paid_amount=purchass.salary_paid, purchase=selected_contract)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, purchase=selected_contract)
 
         return account, purchass, selected_contract
 
@@ -175,7 +175,7 @@ class OneClickPurchase(models.Model):
             selected_contract.reaction = 'paid'
             selected_contract.save(update_fields=['reaction'])
             
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, paid_amount=purchass.salary_paid, purchase=selected_contract)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, purchase=selected_contract)
 
         return account, purchass, selected_contract
 
@@ -188,13 +188,13 @@ class Purchase(models.Model):
         (FAILED, _('Failed'))
     )    
 
-    ONE_CLICK = 'one_click'
+    # ONE_CLICK = 'one_click'
     PROPOSAL = 'proposal'
     PROJECT = 'project'
     CONTRACT = 'contract'
     EX_CONTRACT = 'excontract'
     PURCHASE_CATEGORY = (
-        (ONE_CLICK, _('One Click')),
+        # (ONE_CLICK, _('One Click')),
         (PROPOSAL, _('Proposal')),
         (PROJECT, _('Project')),
         (CONTRACT, _('Contract')),

@@ -153,14 +153,11 @@ class Contractor(models.Model):
     """
     This is the external client to be invited
     """
-    name = models.CharField(blank=True, max_length=100)
-    email = models.CharField(max_length=100)
-    address = models.CharField(null=True, blank=True, max_length=150)
-    postal_code = models.CharField(null=True, blank=True, max_length=6)
-    phone_Number = models.CharField(null=True, blank=True, max_length=100)
+    name = models.CharField(max_length=100, help_text=_("Enter an official name known for the client"))
+    email = models.CharField(max_length=100, help_text=_("Enter Valid Email for client to receive mail"))
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="contractors", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Invitee"), related_name="contractors", on_delete=models.CASCADE)
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="contractors", on_delete=models.CASCADE)    
 
     def __str__(self):
@@ -235,7 +232,7 @@ class Contract(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     
-    line_one = models.CharField(_('Service Description'), max_length=120)
+    line_one = models.CharField(_('Service Description'), max_length=120, help_text=_("Enter your main product or service here"))
     line_one_quantity = models.PositiveIntegerField(_('Quantity'), default=0)
     line_one_unit_price = models.PositiveIntegerField(_('Unit Price'), default=0)
     line_one_total_price = models.PositiveIntegerField(_('Total'), default=0)

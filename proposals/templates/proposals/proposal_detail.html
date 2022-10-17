@@ -473,7 +473,7 @@
 									<span>Advertisement</span>
 									<div class="wt-companyad">
 										<figure class="wt-companyadimg">
-											<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="height:270px; width:350px;" alt="img description">
+											<img src="{% if website.ad_image %}{{website.ad_image.url}}{% elif website.brand_ambassador_image %}{{website.brand_ambassador_image.url}}{% endif %}" style="height:270px; width:350px;" alt="Ad description">
 										</figure>
 									</div>
 								</div>

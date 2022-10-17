@@ -2,8 +2,9 @@ import json
 import stripe
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import ContractorForm, InternalContractForm, ExternalContractForm, ChangeContractorForm
+from .forms import ContractorForm, InternalContractForm, ExternalContractForm
 from .models import Contractor, Contract, InternalContract, ContractChat
+from django.db import transaction as db_transaction
 from general_settings.models import PaymentGateway
 from account.models import Customer
 from proposals.models import Proposal
@@ -236,59 +237,62 @@ def final_intcontract_checkout(request, contract_id, contract_slug):
 @user_is_client
 def flutter_payment_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
-
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
-
     contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
     
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()
     grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)  
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
+    purchase = None
 
     base_currency = get_base_currency_code()
-
     flutterwaveClient = FlutterwaveClientConfig()
     unique_reference = flutterwaveClient.flutterwave_unique_reference()
 
-
     if Purchase.objects.filter(unique_reference=unique_reference).exists():
         pass
-    else:        
-        purchase = Purchase.objects.create(
-            client=request.user,
-            full_name=request.user.get_full_name,
-            email=request.user.email,
-            country=str(request.user.country),
-            payment_method=gateway_type,
-            category = Purchase.CONTRACT,
-            salary_paid=grand_total,
-            unique_reference=unique_reference,           
-        )           
-        purchase.status=Purchase.FAILED
-        purchase.save()
+    else:
+        try:                
+            purchase = Purchase.objects.create(
+                client=request.user,
+                full_name=request.user.get_full_name,
+                email=request.user.email,
+                country=str(request.user.country),
+                payment_method=gateway_type,
+                category = Purchase.CONTRACT,
+                salary_paid=grand_total,
+                unique_reference=unique_reference,           
+            )           
+            purchase.status=Purchase.FAILED
+            purchase.save()
+        except Exception as e:
+            print('%s' % (str(e)))
 
-        ContractSale.objects.create(
-            team=contract.team, 
-            purchase=purchase,  
-            contract=contract, 
-            sales_price=contract.grand_total, 
-            staff_hired=int(1),
-            earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-            total_earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-        
-        )
+        try:
+            ContractSale.objects.create(
+                team=contract.team, 
+                purchase=purchase,  
+                contract=contract, 
+                sales_price=contract.grand_total, 
+                staff_hired=int(1),
+                earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
+                total_earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
+            
+            )
+        except Exception as e:
+            print('%s' % (str(e)))
 
     auth_token = flutterwaveClient.flutterwave_secret_key()
     headers = {'Authorization': 'Bearer ' + auth_token}
@@ -340,6 +344,7 @@ def stripe_contract_intent(request):
     total_gateway_fee = chosen_contract.get_fee_payable()
     grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)  
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)  
+    purchase=None
 
     stripe_obj = StripeClientConfig()
     stripe_reference = stripe_obj.stripe_unique_reference()
@@ -368,42 +373,48 @@ def stripe_contract_intent(request):
 
     if Purchase.objects.filter(stripe_order_key=payment_intent).exists():
         pass
-    else:        
-        purchase = Purchase.objects.create(
-            client=request.user,
-            full_name=request.user.get_full_name,
-            email=request.user.email,
-            country=str(request.user.country),
-            payment_method=gateway_type,
-            client_fee = int(total_gateway_fee),
-            category = Purchase.CONTRACT,
-            salary_paid=grand_total,
-            unique_reference=stripe_reference,           
-        )           
-        purchase.stripe_order_key=payment_intent
-        purchase.status=Purchase.FAILED
-        purchase.save()
+    else:
+        try:        
+            purchase = Purchase.objects.create(
+                client=request.user,
+                full_name=request.user.get_full_name,
+                email=request.user.email,
+                country=str(request.user.country),
+                payment_method=gateway_type,
+                client_fee = int(total_gateway_fee),
+                category = Purchase.CONTRACT,
+                salary_paid=grand_total,
+                unique_reference=stripe_reference,           
+            )           
+            purchase.stripe_order_key=payment_intent
+            purchase.status=Purchase.FAILED
+            purchase.save()
+        except Exception as e:
+            print('%s' % (str(e)))
 
-        ContractSale.objects.create(
-            team=contract.team, 
-            purchase=purchase,  
-            contract=contract, 
-            sales_price=contract.grand_total,  
-            staff_hired=int(1),
-            earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-            total_earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-        
-        )
+        try:
+            ContractSale.objects.create(
+                team=contract.team, 
+                purchase=purchase,  
+                contract=contract, 
+                sales_price=contract.grand_total,  
+                staff_hired=int(1),
+                earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
+                total_earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
+            
+            )
+        except Exception as e:
+            print('%s' % (str(e)))
 
         chosen_contract.clean_box()
         return JsonResponse({'session': session,})
@@ -426,46 +437,51 @@ def paypal_contract_intent(request):
     body = json.loads(request.body)
     data = body["orderID"]
 
-    purchase = ''
+    purchase = None
     paypal_request_order = OrdersGetRequest(data)
     response = PayPalClient.paypal_httpclient().execute(paypal_request_order)
     
     if response:
+        try:
+            purchase = Purchase.objects.create(
+                client=request.user,
+                full_name=response.result.purchase_units[0].shipping.name.full_name,
+                email=response.result.payer.email_address,
+                country = request.user.country,
+                payment_method=str(gateway_type),
+                client_fee = int(total_gateway_fee),
+                category = Purchase.CONTRACT,
+                salary_paid=round(float(response.result.purchase_units[0].amount.value)),
+                paypal_order_key=response.result.id,
+                unique_reference=PayPalClient.paypal_unique_reference(),
+                status = Purchase.FAILED
+            )
+        except Exception as e:
+            print('%s' % (str(e)))
 
-        purchase = Purchase.objects.create(
-            client=request.user,
-            full_name=response.result.purchase_units[0].shipping.name.full_name,
-            email=response.result.payer.email_address,
-            country = request.user.country,
-            payment_method=str(gateway_type),
-            client_fee = int(total_gateway_fee),
-            category = Purchase.CONTRACT,
-            salary_paid=round(float(response.result.purchase_units[0].amount.value)),
-            paypal_order_key=response.result.id,
-            unique_reference=PayPalClient.paypal_unique_reference(),
-            status = Purchase.FAILED
-        )
-
-        ContractSale.objects.create(
-            team=contract.team, 
-            purchase=purchase,  
-            contract=contract, 
-            sales_price=contract.grand_total, 
-            staff_hired=int(1),
-            earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-            total_earning=int(get_earning_calculator(
-                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-        
-        )
+        try:
+            ContractSale.objects.create(
+                team=contract.team, 
+                purchase=purchase,  
+                contract=contract, 
+                sales_price=contract.grand_total, 
+                staff_hired=int(1),
+                earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
+                total_earning=int(get_earning_calculator(
+                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
+            
+            )
+        except Exception as e:
+            print('%s' % (str(e)))
 
         try:
             Purchase.paypal_order_confirmation(pk=purchase.pk)
@@ -499,40 +515,45 @@ def razorpay_contract_intent(request):
     
     razorpay_api = RazorpayClientConfig()
     unique_reference = razorpay_api.razorpay_unique_reference()
+    try:
+        purchase = Purchase.objects.create(
+            client=request.user,
+            full_name=request.user.get_full_name,
+            email=request.user.email,
+            country=str(request.user.country),
+            payment_method=gateway_type,
+            client_fee = total_gateway_fee,
+            category = Purchase.CONTRACT,
+            salary_paid=grand_total,
+            unique_reference=unique_reference,
+            status = Purchase.FAILED 
+        )
+    except Exception as e:
+        print('%s' % (str(e)))
 
-    purchase = Purchase.objects.create(
-        client=request.user,
-        full_name=request.user.get_full_name,
-        email=request.user.email,
-        country=str(request.user.country),
-        payment_method=gateway_type,
-        client_fee = total_gateway_fee,
-        category = Purchase.CONTRACT,
-        salary_paid=grand_total,
-        unique_reference=unique_reference,
-        status = Purchase.FAILED 
-    )
-
-    ContractSale.objects.create(
-        team=contract.team, 
-        purchase=purchase,  
-        contract=contract, 
-        sales_price=contract.grand_total, 
-        staff_hired=int(1),
-        earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-        total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                 
-        discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-        total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-        disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-        total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-        earning=int(get_earning_calculator(
-            (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-        total_earning=int(get_earning_calculator(
-            (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-            get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-    
-    )
+    try:
+        ContractSale.objects.create(
+            team=contract.team, 
+            purchase=purchase,  
+            contract=contract, 
+            sales_price=contract.grand_total, 
+            staff_hired=int(1),
+            earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+            total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                 
+            discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+            disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+            total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+            earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
+            total_earning=int(get_earning_calculator(
+                (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
+        
+        )
+    except Exception as e:
+        print('%s' % (str(e)))
 
     notes = {'Total Price': 'The total amount may change with discount'}
     currency = base_currency_code
@@ -605,61 +626,35 @@ def payment_success(request):
 
 @user_is_freelancer
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def add_contractor(request):
-    team = get_object_or_404(
-        Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-    contract_offerror = Contractor.objects.filter(team=team)
+def contractor(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    contractorform = ContractorForm(request.POST or None)
+    contractors = Contractor.objects.filter(team=team)
 
-    if request.method == 'POST':
-        contractorform = ContractorForm(request.POST)
-        if contractorform.is_valid():
-            contractor = contractorform.save(commit=False)
-            contractor.created_by = request.user
-            contractor.team = team
-            contractor.save()
-
-            messages.success(request, 'The contractor was added successfully!')
-            return redirect('contract:contract_client')
-
-    else:
-        contractorform = ContractorForm()
     context = {
         'contractorform': contractorform,
         'team': team,
-        'contract_offerror': contract_offerror,
+        'contractors': contractors,
     }
-    return render(request, 'contract/add_contractor.html', context)
+    return render(request, 'contract/contractor.html', context)
 
 
 @login_required
 @user_is_freelancer
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def update_contractor(request, contractor_id):
-    team = get_object_or_404(
-        Team, 
-        pk=request.user.freelancer.active_team_id, 
-        members__in=[request.user], 
-        status=Team.ACTIVE
-    )
-    contractor = get_object_or_404(Contractor, team=team, pk=contractor_id)
+@db_transaction.atomic
+def add_contractor(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    contractors = Contractor.objects.filter(team=team)
 
-    if request.method == 'POST':
-        update_contractor = ChangeContractorForm(request.POST, instance=contractor)
-
-        if update_contractor.is_valid():
-            update_contractor.save()
-
-            messages.success(request, 'The contractor was modified!')
-            return redirect('contract:contract_client')
-
-    else:
-        update_contractor = ChangeContractorForm(instance=contractor)
-
-    context = {
-        "update_contractor": update_contractor,
-        "contractor": contractor,
-    }
-    return render(request, 'contract/modify_contractor.html', context)
+    name = request.POST.get('name', '')
+    email = request.POST.get('email', '')
+    if name != '' and name != '':
+        if not Customer.objects.filter(email=email).exists():
+            try:
+                Contractor.objects.create(name=name, email=email, team=team, created_by=request.user)
+            except Exception as e:
+                print(str(e))
+    return render(request, 'contract/components/partial_contractor.html', {'contractors': contractors})
 
 
 @login_required
@@ -671,50 +666,43 @@ def delete_contractor(request, contractor_id):
         members__in=[request.user], 
         status=Team.ACTIVE
     )
+    contractors = Contractor.objects.filter(team=team)    
     contractor = get_object_or_404(Contractor, team=team, pk=contractor_id)
     contractor.delete()
 
-    messages.success(request, f'The contractor was deleted!')
-    return redirect('contract:contract_client')
+    return render(request, 'contract/components/partial_contractor.html', {'contractors': contractors})
 
 
 # <...........................................................External Contract Section..........................................................>
 @login_required
 @user_is_freelancer
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def create_external_contract(request):
+def connect_contract(request, contractor_id):
     team = get_object_or_404(Team,pk=request.user.freelancer.active_team_id,status=Team.ACTIVE)
+    client = get_object_or_404(Contractor, pk=contractor_id, team=team)
+    existing_user = Customer.objects.filter(email=client.email).count()
 
     if request.method == 'POST':
-        contractform = ExternalContractForm(team, request.POST or None)
-        contractorform = ContractorForm(request.POST or None)
+        contractform = ExternalContractForm(request.POST or None)
 
         if contractform.is_valid():
             contract = contractform.save(commit=False)
             contract.created_by = request.user
             contract.team = team
+            contract.client = client
             contract.slug = slugify(contract.line_one)
             contract.save()
 
             messages.info(request, 'The contract was added!')
             return redirect('contract:external_contract_list')
 
-        if contractorform.is_valid():
-            contractor = contractorform.save(commit=False)
-            contractor.created_by = request.user
-            contractor.team = team
-            contractor.save()
-
-            messages.info(request, f'The contractor "{contractor.name}" was added!')
-            return redirect('contract:create_external_contract')
-
     else:
-        contractform = ExternalContractForm(team)
-        contractorform = ContractorForm()
+        contractform = ExternalContractForm()
     context = {
         'contractform': contractform,
-        'contractorform': ContractorForm,
         'team': team,
+        'client': client,
+        'existing_user': existing_user,
     }
     return render(request, 'contract/add_external_contract.html', context)
 
