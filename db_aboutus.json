@@ -1,0 +1,24 @@
+[
+    {
+        "model": "pages.aboutuspage",
+        "pk": 1,
+        "fields": {
+            "title": "What we have to say about Us",
+            "subtitle": "How to create Proposals How to create Proposals",
+            "description": "This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page\r\n\r\nThis is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about pageThis is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about pageThis is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page",
+            "display_stats": true,
+            "banner_type": true,
+            "video_url": "https://youtu.be/vyMopYvFI4E",
+            "ad_image": "aboutus/What we have to say about Us/gentlesuitman.png",
+            "slug": "what-we-have-to-say-about-us",
+            "title_block": "Join us and be counted",
+            "subtitle_block": "Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.",
+            "banner_color": "purple",
+            "banner_button_one_color": "success",
+            "banner_button_two_color": "light",
+            "banner_image": "aboutus/What we have to say about Us/pexels-life-of-pix-7974.jpg",
+            "created_at": "2022-10-16T00:14:33.103Z",
+            "updated_at": "2022-10-16T12:09:16.538Z"
+        }
+    }
+]

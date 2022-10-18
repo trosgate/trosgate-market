@@ -5,6 +5,7 @@ python manage.py dumpdata > railway.json
 
 //this will indent dumpdata
 python manage.py dumpdata teams.Team --indent 4 > new.json
+python manage.py dumpdata general_settings.DiscountSystem --indent 4 > db_discount_system.json
 
 //listen to stripe webhook on a particular endpoint
 stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/   

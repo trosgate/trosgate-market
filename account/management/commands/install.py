@@ -2,8 +2,10 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from account.models import Country, Customer
 from general_settings . models import (
-    WebsiteSetting, Category, Department, Size, PaymentsControl, SubscriptionGateway, DepositControl,
-    Skill, DiscountSystem, PaymentGateway, DepositGateway, HiringFee, Currency, Payday, StorageBuckets
+    WebsiteSetting, Category, Department, Size, PaymentsControl, 
+    SubscriptionGateway, DepositControl, CommunicationLanguage,
+    Skill, DiscountSystem, PaymentGateway, DepositGateway, HiringFee, 
+    Currency, Payday, StorageBuckets
 )
 from control_settings.models import LayoutSetting
 from teams . models import Package, Team
@@ -11,6 +13,8 @@ from proposals . models import Proposal
 from projects.models import Project
 from analytics.models import NewStats
 from marketing.models import AutoTyPist
+from pages.models import TermsAndConditions, Hiring, Freelancing, AboutUsPage
+
 
 class Command(BaseCommand):
     help = "this creates default values via commands for the entire system"
@@ -82,7 +86,21 @@ class Command(BaseCommand):
         if not LayoutSetting.objects.count():
             call_command("loaddata", "db_layout.json")
 
-        call_command("loaddata", "db_pages.json")
+        if not TermsAndConditions.objects.count():
+            call_command("loaddata", "db_termsandcond.json")
+
+        if not Hiring.objects.count():
+            call_command("loaddata", "db_howitworkhiring.json")
+        
+        if not Freelancing.objects.count():
+            call_command("loaddata", "db_howitworkfreelancing.json")
+
+        if not AboutUsPage.objects.count():
+            call_command("loaddata", "db_aboutus.json")
+
+        if not CommunicationLanguage.objects.count():
+            call_command("loaddata", "db_comlanguages.json")
+
 
         # if not Project.objects.count():
         #   call_command("loaddata", "db_projects.json")

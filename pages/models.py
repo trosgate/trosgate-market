@@ -12,6 +12,7 @@ from account.utilities import auth_code as get_token
 def aboutus_path(instance, filename):
     return "aboutus/%s/%s" % (instance.title, filename)
 
+
 class TermsAndConditions(models.Model):
     title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
     quote = models.TextField(_("Quote"), max_length=350, help_text=_("This optional text will appear at the top of Description"), blank=True, null=True)

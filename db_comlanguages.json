@@ -1,0 +1,23 @@
+[
+    {
+        "model": "general_settings.communicationlanguage",
+        "pk": 1,
+        "fields": {
+            "language": "English"
+        }
+    },
+    {
+        "model": "general_settings.communicationlanguage",
+        "pk": 2,
+        "fields": {
+            "language": "French"
+        }
+    },
+    {
+        "model": "general_settings.communicationlanguage",
+        "pk": 3,
+        "fields": {
+            "language": "Urdu"
+        }
+    }
+]

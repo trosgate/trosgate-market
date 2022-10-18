@@ -95,7 +95,7 @@ class Proposal(models.Model):
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     dura_converter = models.CharField(_("Duration"), max_length=100, choices=DURATION_CONVERTER, default=ONE_DAY)
     thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
-    progress = models.PositiveIntegerField(_("% Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+    progress = models.PositiveIntegerField(_("% Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(100)])
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     published = models.BooleanField(_("Published"), choices=((False, 'Private'), (True, 'Public')), default=False)

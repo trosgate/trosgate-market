@@ -51,7 +51,7 @@ class Application(models.Model):
     team = models.ForeignKey('teams.Team', verbose_name=_("Applicant Team"), related_name="applications", on_delete=models.CASCADE, max_length=250)
     project = models.ForeignKey('projects.Project', verbose_name=_("Project"), related_name="applications", on_delete=models.CASCADE)
     message = models.TextField(_("Message"), max_length=2000, null=True, blank=True)
-    budget = models.IntegerField(_("Budget"), default=5, validators=[MinValueValidator(5), MaxValueValidator(50000)], error_messages={"name": {"max_length": _("Set the budget amount (Eg.1000) excluding the currency sign")}},)
+    budget = models.IntegerField(_("Budget"), default=10, validators=[MinValueValidator(10), MaxValueValidator(70000)], error_messages={"budget": {"max_length": _("Set the budget amount between 10 and 50000 currency points")}},)
     estimated_duration = models.CharField(_("Est. Duration"), max_length=20, choices=ESTIMATED_DURATION)    
     created_at = models.DateTimeField(auto_now_add=True)
     applied_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Applicant"),  related_name="applicants", on_delete=models.CASCADE)

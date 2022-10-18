@@ -368,35 +368,35 @@ class DiscountSystem(models.Model):
         _("Level One(L1)"), max_length=30, default="Level One Discount System", unique=True)
     level_one_rate = models.PositiveIntegerField(_("L1 Rate"), default=0, help_text=_(
         "Starting Rate for L1 Discount with minimum default of 0 %"), validators=[MinValueValidator(0), MaxValueValidator(0)])
-    level_one_start_amount = models.PositiveIntegerField(_("L1 Amount Start"), default=0, help_text=_(
-        "Minimum checkout amount with default of zero(0) currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+    level_one_start_amount = models.PositiveIntegerField(_("L1 Amount Start"), default=10, help_text=_(
+        "Minimum checkout amount with default of zero(0) currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
     level_one_delta_amount = models.PositiveIntegerField(_("L1 Amount Delta"), default=199, help_text=_(
-        "checkout amount delta with default of 199 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+        "checkout amount delta with default of 199 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
 
     level_two_name = models.CharField(
         _("Level Two(L2)"), max_length=30, default="Level Two Discount System", unique=True)
     level_two_rate = models.PositiveIntegerField(_("L2 Rate"), default=3, help_text=_(
         "Second level Rate for L2 Discount with minimum default of 3%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     level_two_start_amount = models.PositiveIntegerField(_("L2 Amount Start"), default=300, help_text=_(
-        "Minimum checkout amount with default of 300 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+        "Minimum checkout amount with default of 300 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
     level_two_delta_amount = models.PositiveIntegerField(_("L2 Amount Delta"), default=499, help_text=_(
-        "checkout amount delta with default of 499 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+        "checkout amount delta with default of 499 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
 
     level_three_name = models.CharField(
         _("Level Three(L3)"), max_length=30, default="Level Three Discount System", unique=True)
     level_three_rate = models.PositiveIntegerField(_("L3 Rate"), default=5, help_text=_(
         "Medium Rate for L3 Discount with minimum default of 5%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     level_three_start_amount = models.PositiveIntegerField(_("L3 Amount Start"), default=500, help_text=_(
-        "Minimum checkout amount with default of 500 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+        "Minimum checkout amount with default of 500 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
     level_three_delta_amount = models.PositiveIntegerField(_("L3 Amount Delta"), default=999, help_text=_(
-        "checkout amount delta with default of 999 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+        "checkout amount delta with default of 999 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
 
     level_four_name = models.CharField(
         _("Level Four(L4)"), max_length=30, default="Level Four Discount System", unique=True)
     level_four_rate = models.PositiveIntegerField(_("L4 Rate"), default=7, help_text=_(
         "Highest Rate for L4 Discount with minimum default of 7%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     level_four_start_amount = models.PositiveIntegerField(_("L4 Amount Start"), default=1000, help_text=_(
-        "Minimum checkout Amount with default of 1000 currency points"), validators=[MinValueValidator(0), MaxValueValidator(50000)])
+        "Minimum checkout Amount with default of 1000 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
 
     class Meta:
         verbose_name = _("Discount Level System")

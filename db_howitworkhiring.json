@@ -1,0 +1,66 @@
+[
+    {
+        "model": "pages.hiring",
+        "pk": 1,
+        "fields": {
+            "title": "Project Applicant Hiring",
+            "subtitle": "How to create Proposals How to create Proposals",
+            "preview": "This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position\r\n\r\nThis determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position Thi",
+            "is_published": true,
+            "slug": "project-applicant-hiring",
+            "thumbnail": "howitworks/thumbnail/hd-wallpaper-ge5a5df732_1280_T8g3TM2.jpg",
+            "backlink": "https://www.googe.com",
+            "created_at": "2022-06-19T17:42:14.663Z",
+            "updated_at": "2022-08-29T00:20:35.754Z",
+            "ordering": 4
+        }
+    },
+    {
+        "model": "pages.hiring",
+        "pk": 4,
+        "fields": {
+            "title": "Contract Hiring",
+            "subtitle": "How to create Proposals How to create Proposals",
+            "preview": "This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position\r\n\r\nThis determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position Thi",
+            "is_published": true,
+            "slug": "contract-hiring",
+            "thumbnail": "howitworks/thumbnail/hungarian-parliament-building-g1bbf3f6a5_1920_XG9DTda.jpg",
+            "backlink": "https://www.googe.com",
+            "created_at": "2022-06-19T17:45:00.689Z",
+            "updated_at": "2022-10-13T20:40:04.509Z",
+            "ordering": 3
+        }
+    },
+    {
+        "model": "pages.hiring",
+        "pk": 5,
+        "fields": {
+            "title": "Proposal Hiring",
+            "subtitle": "How to create Proposals How to create Proposals",
+            "preview": "This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position\r\n\r\nThis determines how each package will appear to user eg, 1 means first position This determines how each package will appear to user eg, 1 means first position Thi",
+            "is_published": true,
+            "slug": "proposal-hiring",
+            "thumbnail": "howitworks/thumbnail/pexels-life-of-pix-7974_b2mBgqY.jpg",
+            "backlink": "https://www.googe.com",
+            "created_at": "2022-06-19T17:46:28.474Z",
+            "updated_at": "2022-08-29T00:20:35.722Z",
+            "ordering": 2
+        }
+    },
+    {
+        "model": "pages.hiring",
+        "pk": 6,
+        "fields": {
+            "title": "One-Click Checkout",
+            "subtitle": "How to create Proposals How to create Proposals",
+            "preview": "How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals\r\n\r\nHow to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals How to create Proposals",
+            "is_published": true,
+            "slug": "one-click-checkout",
+            "thumbnail": "howitworks/thumbnail/pexels-lisa-fotios-1006293_Vhb0BYv.jpg",
+            "backlink": "http://127.0.0.1:8000/pages/how-it-works",
+            "created_at": "2022-08-29T00:19:49.575Z",
+            "updated_at": "2022-08-29T00:20:35.707Z",
+            "ordering": 1
+        }
+    }
+]
