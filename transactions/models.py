@@ -302,6 +302,44 @@ class Purchase(models.Model):
 
 
     @classmethod
+    def flutterwave_order_confirmation(cls, unique_reference, flutterwave_order_key):
+        with db_transaction.atomic():
+            purchase = cls.objects.select_for_update().get(unique_reference=unique_reference)
+            if purchase.status != Purchase.FAILED:
+                raise Exception(_("This purchase already succeeded and cannot be processed"))
+            purchase.status = Purchase.SUCCESS
+            purchase.flutterwave_order_key = flutterwave_order_key
+            purchase.save()
+
+            contract = ''
+            contract_item = ''
+
+            if purchase.category == Purchase.PROPOSAL:
+                for item in ProposalSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
+            
+            if purchase.category == Purchase.PROJECT:
+                for item in ApplicationSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
+            
+            if purchase.category == Purchase.CONTRACT:
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
+
+            if purchase.category == Purchase.EX_CONTRACT:
+                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                contract.reaction = 'paid'
+                contract.save(update_fields=['reaction'])
+
+        return purchase, contract_item, contract
+        
+
+    @classmethod
     def razorpay_order_confirmation(cls, razorpay_order_key, razorpay_payment_id, razorpay_signature):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)

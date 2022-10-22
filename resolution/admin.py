@@ -3,7 +3,7 @@ from . models import (
     OneClickResolution, OneClickCancellation, ProjectResolution, ApplicationReview,
     ProjectCompletionFiles, ProposalResolution,OneClickReview, ApplicationCancellation,
     ProposalCompletionFiles, ProposalReview, ContractResolution,ContractCancellation, 
-    ContractReview, ProposalCancellation,ApplicationCancellation
+    ContractReview, ProposalCancellation,ApplicationCancellation, ExtContractResolution
 )
 
 
@@ -33,7 +33,6 @@ class OneClickCancellationAdmin(admin.ModelAdmin):
     model = OneClickCancellation
     list_display = ['cancel_type', 'status', 'created_at', 'message']
     list_display_links = None
-
 
     def has_add_permission(self, request):        
         return False
@@ -262,7 +261,8 @@ class ProposalReviewAdmin(admin.ModelAdmin):
 class ContractResolutionAdmin(admin.ModelAdmin):
     model = ContractResolution
     list_display = ['team','start_time', 'end_time', 'status'] 
-
+    readonly_fields = ['team','start_time', 'end_time', 'status', 'contract_sale']
+    
     def has_add_permission(self, request):        
         return False
 
@@ -285,6 +285,26 @@ class ContractReviewAdmin(admin.ModelAdmin):
     list_display_links = None
     search_fields = ['title', 'resolution__team__title', 'message']
     readonly_fields = ['title', 'resolution', 'rating','status','message']
+
+    def has_add_permission(self, request):        
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
+@admin.register(ExtContractResolution)
+class ExtContractResolutionAdmin(admin.ModelAdmin):
+    model = ExtContractResolution
+    list_display = ['team','start_time', 'end_time', 'status']     
+    readonly_fields = ['team','start_time', 'end_time', 'status', 'contract_sale']
 
     def has_add_permission(self, request):        
         return False

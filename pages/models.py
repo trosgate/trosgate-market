@@ -4,7 +4,6 @@ from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
 from django.core.validators import FileExtensionValidator
 from django.utils.safestring import mark_safe
-from  embed_video.fields  import  EmbedVideoField
 from django.core.exceptions import ValidationError
 from django_cryptography.fields import encrypt
 from account.utilities import auth_code as get_token
@@ -118,7 +117,6 @@ class AboutUsPage(models.Model):
     description = models.TextField(verbose_name=_("Description"), max_length=3500, default="This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page", help_text=_("Description max length is 3500"))
     display_stats = models.BooleanField(_("Display Stats"), choices=((True, 'Yes'), (False, 'No')), default=True)
     banner_type = models.BooleanField(_("Media Switch"), choices=((True, 'Activate Video'), (False, 'Activate Banner')), default=False)
-    video_url = EmbedVideoField(_("Embed Video"), help_text=_("Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed"), null=True, blank=True)
     ad_image = models.ImageField(_("Ad Image"), help_text=_("image must be any of these: 'JPEG','JPG','PNG','PSD'"), null=True, blank=True, upload_to=aboutus_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     slug = models.SlugField(_("Slug"), max_length=255)
     title_block = models.CharField(_("Banner Title"), max_length=100, default="Hire Experts or Team")
@@ -127,7 +125,13 @@ class AboutUsPage(models.Model):
     banner_button_one_color = models.CharField(_("Banner Button1 Color"), max_length=100, default="green", help_text=_("Put your bootstrap color here to decorate Banner Button 1. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
     banner_button_two_color = models.CharField(_("Banner Button2 Color"), max_length=100, default="light", help_text=_("Put your bootstrap color here to decorate Banner Button 2. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
     banner_image = models.ImageField(_("Hero Image"), help_text=_("image must be any of these: 'JPEG','JPG','PNG','PSD'"), null=True, blank=True, upload_to=aboutus_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
-
+    video_url= models.URLField(
+        _("Embed Video Url"), 
+        max_length=2083, 
+        null=True, 
+        blank=True, 
+        help_text=_("Enter the full path to your video url on youtube or vimeo etc")
+    )
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
 

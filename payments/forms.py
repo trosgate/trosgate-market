@@ -3,24 +3,77 @@ from django import forms
 from account.fund_exception import FundException
 from notification.mailer import send_credit_to_team, send_withdrawal_marked_failed_email
 from django.utils.translation import gettext_lazy as _
-
+from general_settings.models import PaymentGateway
 
 class PaymentAccountForm(forms.ModelForm):
     class Meta:
         model = PaymentAccount
-        fields = ['paypal', 'stripe', 'flutterwave', 'razorpay']
+        fields = [
+            'primary_account_type',
+            # Flutterwave
+            'flutterwave_country', 'flutterwave_type', 'flutterwave_bank', 'flutterwave_bearer',
+            'flutterwave_account', 'flutterwave_swift_iban', 'flutterwave_extra_info',
+            # Paypal
+            'paypal_account', 'paypal_bearer', 'paypal_country',
+            # Stripe
+            'stripe_country', 'stripe_bank', 'stripe_account', 'stripe_routing',
+            'stripe_swift_iban', 'stripe_bearer', 'stripe_extra_info',
+            # Razorpay
+            'razorpay_bearer', 'razorpay_upi','razorpay_country',    
+            ]
 
     def __init__(self, *args, **kwargs):
         super(PaymentAccountForm, self).__init__(*args, **kwargs)
-
-        self.fields['paypal'].widget.attrs.update(
-            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center'})
-        self.fields['stripe'].widget.attrs.update(
-            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center'})
-        self.fields['flutterwave'].widget.attrs.update(
-            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center'})
-        self.fields['razorpay'].widget.attrs.update(
-            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center'})
+        self.fields['primary_account_type'].queryset = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
+        # Flutterwave
+        self.fields['primary_account_type'].widget.attrs.update(
+            {'class': 'form-control col-md-6'})
+        self.fields['flutterwave_country'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_type'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_bank'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_bearer'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_account'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_swift_iban'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_extra_info'].widget.attrs.update(
+            {'class': 'form-control'})
+        # PayPal
+        self.fields['paypal_account'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paypal_bearer'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paypal_country'].widget.attrs.update(
+            {'class': 'form-control'})
+        
+        # Stripe
+        self.fields['stripe_country'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_bank'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_account'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_routing'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_swift_iban'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_bearer'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_bearer'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_extra_info'].widget.attrs.update(
+            {'class': 'form-control'})
+        # Razorpay           
+        self.fields['razorpay_bearer'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['razorpay_upi'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['razorpay_country'].widget.attrs.update(
+            {'class': 'form-control'})
 
 
 class BaseMemoForm(forms.Form):

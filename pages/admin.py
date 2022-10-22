@@ -137,11 +137,7 @@ class InvestorAdmin(admin.ModelAdmin):
     list_display = ['id', 'salutation', 'myname', 'myemail', 'created_at', 'verified']
     list_display_links = None
     readonly_fields = ['salutation', 'myname', 'myemail', 'created_at', 'updated_at', 'verified']
-    # radio_fields = {'verified': admin.HORIZONTAL}
     
-    
-    
-    
-    # def has_add_permission(self, request): 
-    #     return False
+    def has_add_permission(self, request): 
+        return False
 

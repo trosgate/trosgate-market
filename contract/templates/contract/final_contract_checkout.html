@@ -63,7 +63,7 @@
                                     {% if gateway_type.name == "PayPal" %}
                                     <div id="paypal-button-container"></div>
                                     {% elif gateway_type.name == "Flutterwave" %}
-                                    <button onclick='flutterwavePay(event)' class="btn btn-success w-100 fw-bold" >
+                                    <button onclick='flutterwavePaymt(event)' id="flutterintcontsubmit" class="btn btn-success w-100 fw-bold" >
                                         Pay with flutterwave
                                     </button>
                                     {% elif gateway_type.name == "Stripe" %}
@@ -270,11 +270,14 @@
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     {% comment %} <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script> {% endcomment %}
     <script>
-        function flutterwavePay(event) {
+        function flutterwavePaymt(event) {
         event.preventDefault();
-        
+
+          $("#flutterintcontsubmit").attr("disabled", true);
+          $("#convert-currency").attr("disabled", true);
+
             let data = {
-            'amount': "{{hiring_box.get_total_price_after_discount_and_fee}}",
+            'amount': "{{grand_total}}",
             'name': "{{request.user.get_full_name}}",
             'email': "{{request.user.email}}",
             'consumerid': "{{request.user.id}}",
@@ -297,6 +300,8 @@
                 window.location.href = session.redirectToCheckout
             })
             .then(function (result) {
+                $("#flutterintcontsubmit").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
                 return console.log(result)
             })
             .catch(function (error) {

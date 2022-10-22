@@ -134,7 +134,12 @@ class TwoFactorAuth(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='twofactorauth', on_delete=models.CASCADE)
     pass_code = encrypt(models.CharField(_("Access Token"), max_length=255, blank=True, null=True))
     last_login = models.DateTimeField(_("Last Login"), auto_now=True)
-    
+
+    class Meta:
+        ordering = ("-last_login",)
+        verbose_name = "Access Token"
+        verbose_name_plural = "Access Token"
+
     def __str__(self):
         return f'{self.user.get_full_name()}'    
 

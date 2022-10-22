@@ -1,6 +1,5 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% load embed_video_tags %}
 {% block content %}
 
 			<div class="wt-haslayout wt-innerbannerholder">
@@ -47,8 +46,7 @@
 											{% if aboutpage.banner_type == True %}
 											<div class="wt-greetingvideo">
 												<figure>
-													<a data-rel="prettyPhoto[video]" href="{% if aboutpage.video_url %}{{aboutpage.video_url}}{% endif %}"><img src="{% static 'images/video-img.png' %}" alt="video">
-													</a>
+													<a data-rel="prettyPhoto[video]" href="{% if aboutpage.video_url %}{{aboutpage.video_url}}{% endif %}"><img src="{% static 'images/video-img.png' %}" alt="video"></a>
 												</figure>
 											</div>
 											{% else %}
@@ -56,6 +54,7 @@
 												src="{% if aboutpage.ad_image %}{{aboutpage.ad_image.url}}{% endif %}"
 												alt="Hero banner"/>
 											{% endif %}
+											
 										</div>
 									</div>
 								</div>

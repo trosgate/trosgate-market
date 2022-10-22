@@ -10,7 +10,6 @@ from ckeditor.fields import RichTextField
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from embed_video.fields import EmbedVideoField
 from uuid import uuid4
 from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta

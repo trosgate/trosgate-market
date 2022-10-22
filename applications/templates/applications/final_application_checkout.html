@@ -74,14 +74,14 @@
                             <div id="paypal-button-container"></div>
                             {% endif %}
                             {% if gateway_type.name == "Flutterwave" %}
-                            <button onclick='flutterwavePay(event)' class="btn btn-success w-100 fw-bold" >
+                            <button onclick='flutterwavePay(event)' id="flutterwavecontsubmit" class="btn btn-success w-100 fw-bold" >
                                 Pay with flutterwave
                             </button>
                             {% endif %}
                             {% if gateway_type.name == "Stripe" %}
                             <button 
                             onclick='stripePay(event)' 
-                            id="stripesubmit" class="btn btn-primary w-100 fw-bold" >
+                            id="stripesubmit" id="stripecontsubmit" class="btn btn-primary w-100 fw-bold" >
                             Pay with Stripe
                             </button>
                             
@@ -240,6 +240,9 @@
         function stripePay(event) {
         event.preventDefault();
 
+          $("#stripecontsubmit").attr("disabled", true);
+          $("#convert-currency").attr("disabled", true);
+
           let data = {
             'stripepCustomer': '{{request.user.get_full_name}}', 
             'stripepEmail': '{{request.user.email}}',
@@ -264,7 +267,9 @@
               return stripe.redirectToCheckout({ sessionId: session.session.id })
             })
             .then(function (result) {
-              return console.log(result.error.message)
+                $("#stripecontsubmit").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
+                return console.log(result)
             })
             .catch(function (error) {
               return console.log(error)
@@ -279,7 +284,10 @@
     <script>
         function flutterwavePay(event) {
         event.preventDefault();
-      
+
+          $("#flutterwavecontsubmit").attr("disabled", true);
+          $("#convert-currency").attr("disabled", true);
+
           let data = {
             'amount': "{{application_addon.get_total_price_after_discount_and_fee}}",
             'name': "{{request.user.get_full_name}}",
@@ -303,7 +311,9 @@
                 window.location.href = session.redirectToCheckout
             })
             .then(function (result) {
-              return console.log(result)
+                $("#flutterwavecontsubmit").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
+                return console.log(result)
             })
             .catch(function (error) {
               return console.log(error)

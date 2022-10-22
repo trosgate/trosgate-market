@@ -5,7 +5,6 @@ from django.conf import settings
 from ckeditor.fields import RichTextField
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils import timezone
-from embed_video.fields import EmbedVideoField
 from uuid import uuid4
 from django.template.defaultfilters import slugify
 import secrets

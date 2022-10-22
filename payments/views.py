@@ -9,16 +9,26 @@ from .models import PaymentAccount, PaymentRequest
 from .forms import PaymentAccountForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from general_settings.models import PaymentGateway
 
 
 @login_required
 @user_is_freelancer
-def payment_modes(request, username):
-    account = get_object_or_404(PaymentAccount, user__short_name=username, user=request.user)
-    paymentForm = PaymentAccountForm(instance=account)
+def payment_vault(request):
+    account = None
+    gateways = PaymentGateway.objects.filter(status=True)
+
+    if PaymentAccount.objects.filter(user=request.user).exists():
+        account = get_object_or_404(PaymentAccount, user=request.user)
+        paymentForm = PaymentAccountForm(instance=account)
+    else:
+        account = PaymentAccount(user=request.user).save()
+        paymentForm = PaymentAccountForm(instance=account)
        
     context = {
         'paymentForm': paymentForm,
+        'account': account,
+        'gateways': gateways
     }
     return render(request, "payments/payment_details.html", context)
 

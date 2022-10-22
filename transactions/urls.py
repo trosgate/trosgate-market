@@ -22,7 +22,7 @@ urlpatterns = [
     path('payment_fee_structure/', views.payment_fee_structure,name='payment_fee_structure'),
     path('api/checkout/', views.final_checkout, name='payment_checkout'),
     path('flutter/checkout/api/', views.flutter_payment_intent, name='flutter_payment_intent'),
-    path('flutterwave_webhook/', views.flutterwave_webhook, name='flutterwave_webhook'),
+    # path('flutterwave_webhook/', views.flutterwave_webhook, name='flutterwave_webhook'),
     path('flutter_success/', views.flutter_success, name='flutter_success'),
     
     path('stripe/checkout/api/', views.stripe_payment_order, name='stripe_payment_order'),

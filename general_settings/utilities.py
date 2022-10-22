@@ -7,6 +7,14 @@ def website_name():
     except:
         return None
 
+def get_protocol_only():
+    try:
+        website_setting = WebsiteSetting.objects.get(pk=1)
+        return website_setting.protocol
+    except:
+        website_setting = None
+        return 'http://'
+
 def get_protocol_with_domain_path():
     try:
         website_setting = WebsiteSetting.objects.get(pk=1)

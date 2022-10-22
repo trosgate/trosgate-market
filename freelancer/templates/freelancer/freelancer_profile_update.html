@@ -23,17 +23,11 @@
 						<div class="wt-tabscontent tab-content">
 							<div class="wt-personalskillshold tab-pane active fade show" id="wt-skills">
 								<div class="wt-yourdetails wt-tabsinfo">
-									{% if profileform %}
-									<p>Please correct the following errors:</p>
-									{% for field in profileform %}
-										{% if field.errors %}
-										<div class="alert alert-danger" role="alert">
-											{{ field.label_tag }}:{{ field.errors|striptags }}
-											 {% comment %} #{{ field.label_tag }}   {% endcomment %}
-										</div>
-										{% endif %}
-									{% endfor %}
-									{% endif %}											
+									{% if profileform.errors %}
+									<div class="alert alert-danger text-center" role="alert">
+										<span style="color:red;" role="alert">Please check error below and correct</span>
+									</div>
+									{% endif %}
 									<div class="wt-tabscontenttitle">
 										<h2>Your Details</h2>
 									</div>
@@ -48,10 +42,12 @@
 									<div class="form-group">
 										{{profileform.gender.label}}
 										{{profileform.gender}}
+										<span style="color:red;" role="alert">{{ profileform.gender.errors}}</span>
 									</div>
 									<div class="form-group">
 										{{profileform.address.label}}
 										{{profileform.address}}
+										<span style="color:red;" role="alert">{{ profileform.address.errors}}</span>
 									</div>
 								
 									<div class="form-group">
@@ -61,6 +57,7 @@
 									<div class="form-group">
 										{{profileform.description.label}}
 										{{profileform.description}}
+										<span style="color:red;" role="alert">{{ profileform.description.errors}}</span>
 									</div>
 									</div> 
 									<div class="wt-profilephoto wt-tabsinfo">
@@ -106,7 +103,7 @@
 										</div>
 										<div class="wt-profilephotocontent">
 											<div class="wt-description">
-												<p>Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua aut enim ad minim veniamac quis nostrud exercitation ullamco laboris.</p>
+												<p>Please upload a professional looking banner of your brand.</p>
 											</div>
 												<div class="form-group form-group-label">
 													<div class="wt-labelgroup">
@@ -129,7 +126,6 @@
 																<div class="wt-uploadingbar">
 																	<span class="uploadprogressbar"></span>
 																	<span>Banner Photo.jpg</span>
-																	<em>File size: 300 kb<a href="javascript:void(0);" class="lnr lnr-cross"></a></em>
 																</div>
 															</div>
 														</li>
@@ -190,25 +186,30 @@
 												<div class="form-group form-group-half">
 													{{profileform.company_name.label}}
 													{{profileform.company_name}}
+													<span style="color:red;" role="alert">{{ profileform.company_name.errors}}</span>
 												</div>															
 												<div class="form-group form-group-half">
 													{{profileform.start_date.label}}
 													{{profileform.start_date}}
+													<span style="color:red;" role="alert">{{ profileform.start_date.errors}}</span>
 												</div>
 												<div class="form-group form-group-half">
 													{{profileform.end_date.label}}
 													{{profileform.end_date}}
+													<span style="color:red;" role="alert">{{ profileform.end_date.errors}}</span>
 												</div>
 												<div class="form-group form-group-half">
 													{{profileform.job_position.label}}
 													{{profileform.job_position}}
+													<span style="color:red;" role="alert">{{ profileform.job_position.errors}}</span>
 												</div>	
 												<div class="form-group">
 													{{profileform.job_description.label}}
 													{{profileform.job_description}}
+													<span style="color:red;" role="alert">{{ profileform.job_description.errors}}</span>
 												</div>																				
 												<div class="form-group">
-													<span>* Leave ending date empty if its your current job</span>
+													<span>* You can also use your experience with us as well. Please leave ending date empty if its your current job</span>
 												</div>
 											</div>
 										</li>
@@ -230,25 +231,30 @@
 												<div class="form-group form-group-half">
 													{{profileform.company_name_two.label}}
 													{{profileform.company_name_two}}
+													<span style="color:red;" role="alert">{{ profileform.company_name_two.errors}}</span>
 												</div>															
 												<div class="form-group form-group-half">
 													{{profileform.start_date_two.label}}
 													{{profileform.start_date_two}}
+													<span style="color:red;" role="alert">{{ profileform.start_date_two.errors}}</span>
 												</div>
 												<div class="form-group form-group-half">
 													{{profileform.end_date_two.label}}
 													{{profileform.end_date_two}}
+													<span style="color:red;" role="alert">{{ profileform.end_date_two.errors}}</span>
 												</div>
 												<div class="form-group form-group-half">
 													{{profileform.job_position_two.label}}
 													{{profileform.job_position_two}}
+													<span style="color:red;" role="alert">{{ profileform.job_position_two.errors}}</span>
 												</div>	
 												<div class="form-group">
 													{{profileform.job_description_two.label}}
 													{{profileform.job_description_two}}
+													<span style="color:red;" role="alert">{{ profileform.job_description_two.errors}}</span>
 												</div>																				
 												<div class="form-group">
-													<span>* Leave ending date empty if its your current job</span>
+													<span>* You can also use your experience with us as well. Please leave ending date empty if its your current job</span>
 												</div>															
 											</div>
 										</li>
@@ -264,23 +270,18 @@
 										<li>
 											<div class="wt-accordioninnertitle">
 												<div class="wt-projecttitle collapsed" data-toggle="collapse" data-target="#innertitlebone">
-
-													{% if request.user.freelancer.image_one.url %}
-													<figure><img src="{{request.user.freelancer.image_one.url}}" alt="img description"></figure>
-													{% else %}
-													<figure><img src="{% static 'images/banner.jpg' %}" alt="img description"></figure>
-												{% endif %}
+													<figure><img src="{% if freelancer.image_one %}{{freelancer.image_one.url}}{% else %}{% static 'images/banner.jpg' %}{% endif %}" alt="img description"></figure>
 													<h3>
-														{% if request.user.freelancer.project_title %}
-														{{request.user.freelancer.project_title}}
+														{% if freelancer.project_title %}
+															{{freelancer.project_title}}
 														{% else %}
-														No project yet
+															No project yet
 														{% endif %}
 														<span>
-															{% if request.user.freelancer.project_url %}
-															{{request.user.freelancer.project_url|truncatechars:30}}
+															{% if freelancer.project_url %}
+																{{freelancer.project_url|truncatechars:30}}
 															{% else %}
-															No sample work yet
+																No sample work yet
 															{% endif %}
 														</span>
 													</h3> 
@@ -293,27 +294,38 @@
 												<div class="form-group form-group-half">
 														{{profileform.project_title.label}}
 														{{profileform.project_title}}
+														<span style="color:red;" role="alert">{{ profileform.job_description_two.errors}}</span>
 												</div>	
 												<div class="form-group form-group-half">
 														{{profileform.project_url.label}}
 														{{profileform.project_url}}
+														<span style="color:red;" role="alert">{{ profileform.job_description_two.errors}}</span>
 												</div>
 												<div class="form-group form-group-label">
 												<div class="wt-labelgroup">
 													<span>{{profileform.image_one}}</span>
-													<img src="{{ profileform.image_one.url}}">
+													<img src="{% if profileform.image_one %}{{ profileform.image_one.url}}{% endif %}">
 												</div>																	
 											</div>
 										</li>												
 										<li>
 											<div class="wt-accordioninnertitle">
 												<div class="wt-projecttitle collapsed" data-toggle="collapse" data-target="#innertitleaone">
-												{% if profileform.image_two.url %}
-													<figure><img src="{{profileform.image_two.url}}" alt="img description"></figure>
-												{% else %}
-													<figure><img src="{% static 'images/banner.jpg' %}" alt="img description"></figure>
-												{% endif %}
-													<h3>{% if request.user.freelancer.project_title_two %}{{request.user.freelancer.project_url_two|truncatechars:30}}{% else %}No project yet{% endif %}<span>{% if request.user.freelancer.project_url_two %}{{request.user.freelancer.project_url_two|truncatechars:30}}{% else %}No sample work yet{% endif %}</span></h3> 
+													<figure><img src="{% if freelancer.image_two %}{{freelancer.image_two.url}}{% else %}{% static 'images/banner.jpg' %}{% endif %}" alt="img description"></figure>
+													<h3>
+														{% if freelancer.project_title_two %}
+														{{freelancer.project_title_two|truncatechars:30}}
+														{% else %}
+														No project yet
+														{% endif %}
+														<span>
+															{% if freelancer.project_url_two %}
+																{{freelancer.project_url_two|truncatechars:30}}
+															{% else %}
+																No sample work yet
+															{% endif %}
+														</span>
+													</h3> 
 												</div>
 												<div class="wt-rightarea">
 													<a href="javascript:void(0);" class="wt-addinfo wt-skillsaddinfo" data-toggle="collapse" data-target="#innertitleaone"><i class="lnr lnr-pencil"></i></a>
@@ -338,12 +350,21 @@
 										<li>
 											<div class="wt-accordioninnertitle">
 												<div class="wt-projecttitle collapsed" data-toggle="collapse" data-target="#innertitlecone">
-												{% if profileform.image_three.url %}
-													<figure><img src="{{profileform.image_three.url}}" alt="img description"></figure>
-												{% else %}
-													<figure><img src="{% static 'images/banner.jpg' %}" alt="img description"></figure>
-												{% endif %}
-													<h3>{% if request.user.freelancer.project_title_three %}{{request.user.freelancer.project_url_three|truncatechars:30}}{% else %}No project yet{% endif %}<span>{% if request.user.freelancer.project_url_three %}{{request.user.freelancer.project_url_three|truncatechars:30}}{% else %}No sample work yet{% endif %}</span></h3> 
+													<figure><img src="{% if freelancer.image_three %}{{freelancer.image_three.url}}{% else %}{% static 'images/banner.jpg' %}{% endif %}" alt="img description"></figure>
+													<h3>
+														{% if freelancer.project_title_three %}
+															{{freelancer.project_title_three|truncatechars:30}}
+														{% else %}
+															No project yet
+														{% endif %}
+														<span>
+															{% if freelancer.project_url_three %}
+																{{freelancer.project_url_three|truncatechars:30}}
+															{% else %}
+																No sample work yet
+															{% endif %}
+														</span>
+													</h3> 
 												</div>
 												<div class="wt-rightarea">
 													<a href="javascript:void(0);" class="wt-addinfo wt-skillsaddinfo" data-toggle="collapse" data-target="#innertitlecone"><i class="lnr lnr-pencil"></i></a>

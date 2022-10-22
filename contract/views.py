@@ -28,8 +28,9 @@ from general_settings.models import PaymentGateway
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from teams.controller import PackageController
-from notification.mailer import send_contract_accepted_email, send_contract_rejected_email
 from django.views.decorators.cache import cache_control
+from general_settings.utilities import get_protocol_only
+from django.views.decorators.http import require_http_methods
 # <...........................................................Internal Contract Section..........................................................>
 
 
@@ -239,7 +240,7 @@ def flutter_payment_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
-    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
     
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()
@@ -261,6 +262,7 @@ def flutter_payment_intent(request):
                 email=request.user.email,
                 country=str(request.user.country),
                 payment_method=gateway_type,
+                client_fee = int(total_gateway_fee),
                 category = Purchase.CONTRACT,
                 salary_paid=grand_total,
                 unique_reference=unique_reference,           
@@ -275,7 +277,7 @@ def flutter_payment_intent(request):
                 team=contract.team, 
                 purchase=purchase,  
                 contract=contract, 
-                sales_price=contract.grand_total, 
+                sales_price=contract.grand_total,  
                 staff_hired=int(1),
                 earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
                 total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
@@ -294,13 +296,14 @@ def flutter_payment_intent(request):
         except Exception as e:
             print('%s' % (str(e)))
 
+    redirect_url= f"{get_protocol_only()}{str(get_current_site(request))}/contract/flutter-success/",
     auth_token = flutterwaveClient.flutterwave_secret_key()
     headers = {'Authorization': 'Bearer ' + auth_token}
     data = {
         "tx_ref": unique_reference,
         "amount": grand_total,
         "currency": base_currency,
-        "redirect_url": "http://127.0.0.1:8000/transaction/flutter_success/",
+        "redirect_url": redirect_url,
         "payment_options": "card, mobilemoneyghana, ussd",
         "meta": {
             "consumer_id": str(request.user.id),
@@ -325,11 +328,27 @@ def flutter_payment_intent(request):
     return JsonResponse({'redirectToCheckout': redirectToCheckout})
 
 
-def get_flutterwave_verification(unique_reference, flutterwave_order_key):
-    Purchase.objects.filter(
-        unique_reference=unique_reference, 
-        status=Purchase.FAILED,        
-    ).update(status=Purchase.SUCCESS, flutterwave_order_key=flutterwave_order_key)
+@login_required
+@user_is_client
+@require_http_methods(['GET', 'POST'])
+def flutter_contract_success(request):
+    chosen_contract = BaseContract(request)
+    status = request.GET.get('status', None)
+    unique_reference = request.GET.get('tx_ref', '')
+    flutterwave_order_key = request.GET.get('transaction_id', '')
+    message = ''
+    if status == 'successful' and unique_reference != '' and flutterwave_order_key != '':
+        Purchase.flutterwave_order_confirmation(unique_reference=unique_reference, flutterwave_order_key=flutterwave_order_key)
+        message = 'Payment succeeded'
+    else:
+        message = 'Payment failed'
+        return HttpResponse(status=401)
+       
+    chosen_contract.clean_box()
+    context = {
+        "good": message
+    }
+    return render(request, "contract/payment_success.html", context)
 
 
 @login_required
@@ -611,17 +630,7 @@ def contract_success(request):
     return render(request, "contract/payment_success.html", context)
 
 
-@login_required
-def payment_success(request):
-    chosen_contract = BaseContract(request)
-    chosen_contract.clean_box()
-
-    context = {
-        "good": "good"
-    }
-    return render(request, "applications/payment_success.html", context)
-
-# <...........................................................Contractor Section starts..........................................................>
+#..........................................Contractor Section starts..........................................................>
 
 
 @user_is_freelancer
@@ -1088,13 +1097,13 @@ def extern_razorpay(request):
 
 @login_required
 @user_is_client
-def flutter_payment_intent(request):
+def flutter_extern_intent(request):
     contract_id = request.session["contractchosen"]["contract_id"]
 
     chosen_contract = BaseContract(request)
     gateway_type = str(chosen_contract.get_gateway())
 
-    contract = get_object_or_404(InternalContract, pk=contract_id, team_reaction=True, status=InternalContract.PENDING, created_by=request.user)
+    contract = get_object_or_404(InternalContract, pk=contract_id, reaction=InternalContract.ACCEPTED, created_by=request.user)
     
     discount_value = chosen_contract.get_discount_value(contract)
     total_gateway_fee = chosen_contract.get_fee_payable()

@@ -1,5 +1,4 @@
 from django.db import models
-from  embed_video.fields  import  EmbedVideoField
 from general_settings . models import (
     PaymentGateway, PaymentAPIs, Payday,  DiscountSystem,
     TestEmail, SubscriptionGateway, HiringFee, ExachangeRateAPI,
@@ -19,7 +18,7 @@ class LayoutSetting(models.Model):
     video_title = models.CharField(_("Royal Video Title"), max_length=100, default="See For Yourself!", null=True, blank=True)
     video_description = models.CharField(_("Royal Video Description"), max_length=100, default="Hire Experts or Team", null=True, blank=True)
     banner_type = models.BooleanField(_("Banner Type"), choices=((False, 'Switch Hero Banner'), (True, 'Switch Royal Banner')), default=False)
-    video_url = EmbedVideoField(_("Royal embed Video"), help_text=_("Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed"), null=True, blank=True)
+    video_url = models.URLField(_("Royal embed Video"), help_text=_("Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed"), null=True, blank=True)
     banner_image = models.ImageField(_("Hero Image"), help_text=_("image must be any of these: 'JPEG','JPG','PNG','PSD'"), null=True, blank=True, upload_to=home_layout_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     banner_color = models.CharField(_("Hero Background Color"), max_length=100, default="purple", help_text=_("Put your color here to decorate Hero Banner Background and buttons like signup and login. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes"), null=True, blank=True)
     banner_button_one_color = models.CharField(_("Hero Button1 Color"), max_length=100, default="green", help_text=_("Put your bootstrap color here to decorate Hero Button 1. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)

@@ -1,6 +1,6 @@
 //this will dumpdata
 python manage.py dumpdata teams.Team > new.json
-
+python manage.py dumpdata proposals.Proposal > db_proposals.json
 python manage.py dumpdata > railway.json
 
 //this will indent dumpdata

@@ -8,16 +8,37 @@ from django.utils.html import format_html
 from django.http import HttpResponseRedirect
 
 
-
 @admin.register(PaymentAccount)
 class PaymentAccountAdmin(admin.ModelAdmin):
     model = PaymentAccount
-    list_display = ['user', 'created_at']
-    readonly_fields = ['created_at',]
+    list_display = ['user', 'primary_account_type', 'created_at']
+    readonly_fields = ['user', 'primary_account_type', 'created_at','modified_on']
     list_display_links = ['user',]
+    fieldsets = (
+        ('Account Baseline', {
+         'fields': ('user', 'primary_account_type',)}),
+        ('Flutterwave Account', {
+         'fields': (
+            'flutterwave_type', 'flutterwave_country', 'flutterwave_bank', 'flutterwave_bearer',
+            'flutterwave_account', 'flutterwave_swift_iban', 'flutterwave_extra_info',
+            )}),
+        ('Stripe Account ', {
+         'fields': (
+            'stripe_country', 'stripe_bank', 'stripe_account', 'stripe_routing',
+            'stripe_swift_iban', 'stripe_bearer', 'stripe_extra_info',
+            )}),
+        ('PayPal Account', {
+         'fields': ('paypal_account', 'paypal_bearer', 'paypal_country',)}),
+        ('Razorpay Account', {
+         'fields': ('razorpay_bearer', 'razorpay_upi','razorpay_country',)}),
+        ('Account Log', {
+         'fields': ('created_at', 'modified_on',)}),
+    )
 
-    def has_add_permission(self, request):        
-        return False
+    radio_fields = {'flutterwave_type': admin.HORIZONTAL}
+
+    # def has_add_permission(self, request):        
+    #     return False
 
     def has_delete_permission(self, request, obj=None):
         return False

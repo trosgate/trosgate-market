@@ -65,7 +65,7 @@
                             <div id="paypal-button-container"></div>
                             {% endif %}
                             {% if gateway_type.name == "Flutterwave" %}
-                            <button onclick='flutterwavePay(event)' class="btn btn-success w-100 fw-bold" >
+                            <button onclick='flutterwavePay(event)' id="flutterwaveprojsubmit" class="btn btn-success w-100 fw-bold">
                                 Pay with flutterwave
                             </button>
                             {% endif %}
@@ -275,7 +275,10 @@
     <script>
         function flutterwavePay(event) {
         event.preventDefault();
-      
+
+          $("#flutterwaveprojsubmit").attr("disabled", true);
+          $("#convert-currency").attr("disabled", true);
+            
           let data = {
             'amount': "{{hiring_box.get_total_price_after_discount_and_fee}}",
             'name': "{{request.user.get_full_name}}",
@@ -300,7 +303,9 @@
                 window.location.href = session.redirectToCheckout
             })
             .then(function (result) {
-              return console.log(result)
+                $("#flutterwaveprojsubmit").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
+                return console.log(result)
             })
             .catch(function (error) {
               return console.log(error)

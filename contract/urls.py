@@ -25,7 +25,7 @@ urlpatterns = [
     # Urls for Stripe gateway
     path('stripe_contract_intent/', views.stripe_contract_intent, name='stripe_contract_intent'),
     path('extern_stripe_contract_intent/', views.extern_stripe_contract_intent, name='extern_stripe_contract_intent'),
-    path('success/', views.payment_success, name='hiring_payment_success'),
+    path('flutter-success/', views.flutter_contract_success, name='flutter_contract_success'),
     
     path('flutter_payment_intent/', views.flutter_payment_intent, name='flutter_payment_intent'),
     # Urls for Razorpay gateway

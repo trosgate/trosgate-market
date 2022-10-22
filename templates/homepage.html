@@ -1,6 +1,5 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% load embed_video_tags %}
 {% load widget_tweaks %}
 {% block content %}
 
@@ -36,7 +35,7 @@
 										</div>
 									<fieldset>
 								</form>
-								{% if home_layout.video_url %}
+								{% if home_layout.video_url or website.embed_video %}
 								<div class="wt-videoholder">
 									<div class="wt-videoshow">
 										<a data-rel="prettyPhoto[video]" href="{% if home_layout.video_url %}{{home_layout.video_url}}{% endif %}"><i class="fa fa-play"></i></a>

@@ -184,38 +184,38 @@ class CountryAdmin(admin.ModelAdmin):
         return False
 
 
-# class TwoFactorAuthAdmin(admin.ModelAdmin):
-#     model = TwoFactorAuth    
-#     list_display = ['user', 'get_user_type', 'last_login', 'pass_code']
-#     readonly_fields = ['user', 'last_login', 'pass_code']     
-#     list_display_links = None
+class TwoFactorAuthAdmin(admin.ModelAdmin):
+    model = TwoFactorAuth    
+    list_display = ['user', 'get_user_type', 'last_login', 'pass_code']
+    readonly_fields = ['user', 'last_login', 'pass_code']     
+    list_display_links = None
 
-#     def get_queryset(self, request):
-#         qs = super(TwoFactorAuthAdmin, self).get_queryset(request)
-#         if request.user.is_superuser:
-#             return qs.all()  
-#         else:
-#             return qs.filter(pk=0)  
+    def get_queryset(self, request):
+        qs = super(TwoFactorAuthAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs.all()  
+        else:
+            return qs.filter(pk=0)  
             
-#     @admin.display(description='User Types', ordering='user__user_type')
-#     def get_user_type(self, obj):
-#         return obj.user.user_type
+    @admin.display(description='User Types', ordering='user__user_type')
+    def get_user_type(self, obj):
+        return obj.user.user_type
 
-#     def has_add_permission(self, request):
-#         return False
+    def has_add_permission(self, request):
+        return False
 
-#     def has_delete_permission(self, request, obj=None):
-#         return False
+    def has_delete_permission(self, request, obj=None):
+        return False
 
-#     def get_actions(self, request):
-#         actions = super().get_actions(request)
+    def get_actions(self, request):
+        actions = super().get_actions(request)
 
-#         if 'delete_selected' in actions:
-#             del actions['delete_selected']
-#         return actions
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Country, CountryAdmin)
-# admin.site.register(TwoFactorAuth, TwoFactorAuthAdmin)
+admin.site.register(TwoFactorAuth, TwoFactorAuthAdmin)
 admin.site.unregister(Group)

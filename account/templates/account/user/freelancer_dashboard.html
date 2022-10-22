@@ -30,7 +30,7 @@
 							<div class="wt-title">
 								<h3>Settings</h3>
 								{% comment %} <a href="/account/two_factor/setup/">Add Extra Security</a> | {% endcomment %}
-								<a href="{% url 'payments:payment_modes' request.user.short_name %}">Account Settings</a>
+								<a href="{% url 'payments:payment_vault' %}">Account Settings</a>
 							</div>													
 						</div>	
 					</div>
@@ -56,8 +56,8 @@
 						</figure>
 						<div class="wt-insightdetails">
 							<div class="wt-title">
-								<h3>New Messages</h3>
-								<a href="{% url 'teams:team' %}"target='_new'>Click To Preview</a>
+								<h3>Admin Notice<small><sup class="badge badge-danger badge-sm text-white">New</sup></small></h3>
+								<a href="{% url 'marketing:notice' %}" target='_new'>Click To View</a>
 							</div>													
 						</div>	
 					</div>

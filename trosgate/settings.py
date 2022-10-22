@@ -28,13 +28,13 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+#DEBUG = False
 
 # ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
 # ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
-ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
+# ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
 
 AUTH_USER_MODEL = 'account.Customer'
 
@@ -73,23 +73,14 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_countries',
     'ckeditor',
-    'embed_video',
-    # 'mptt',
-    # 'channels',
-    # 'django_celery_results',
-    # 'django_celery_beat',
-    # Two factor Authentication
-    
-    # 'django_otp',
-    # 'django_otp.plugins.otp_totp',
-    # 'django_otp.plugins.otp_static',
-    # 'storages',
+    'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -114,8 +105,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # for embed video
-                'django.template.context_processors.request',
                 # custom processors
                 'proposals.context_processors.published_proposal',
                 'teams.context_processors.active_team',
@@ -134,16 +123,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
 #GIGRED
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gigred',
-        'USER': 'katey',
-        'PASSWORD': 'Prof2ike.y2ky2k',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'gigred',
+#         'USER': 'katey',
+#         'PASSWORD': 'Prof2ike.y2ky2k',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 #SERVER SIDE
 # DATABASES = {
@@ -157,16 +146,16 @@ DATABASES = {
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgate',
-#         'USER': 'katey',
-#         'PASSWORD': 'Prof2ike.y2ky2k',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trosgate',
+        'USER': 'katey',
+        'PASSWORD': 'Prof2ike.y2ky2k',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -281,8 +270,10 @@ CONTRACT_SESSION_ID = "contract"
 CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 # SECURITY HEADERS - below are required in production
+
+USE_THOUSAND_SEPARATOR = True
+
 if DEBUG == False:
-    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -291,3 +282,13 @@ if DEBUG == False:
     SECURE_HSTS_PRELOAD = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     CSRF_COOKIE_SECURE = True
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ALLOWED_ORIGINS = [
+#     "https://api.flutterwave.com/",
+#     "https://api-m.paypal.com/",
+#     "http://localhost:8080",
+#     "http://127.0.0.1:9000",
+# ]

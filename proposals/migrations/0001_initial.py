@@ -5,7 +5,6 @@ from django.conf import settings
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
-import embed_video.fields
 import proposals.models
 
 
@@ -72,7 +71,7 @@ class Migration(migrations.Migration):
                 ('duration', models.DateTimeField(blank=True, help_text='duration for proposal task to be completed', verbose_name='Completion In')),
                 ('discount_price', models.PositiveIntegerField(blank=True, default=5, help_text='discount price must be less than actual price', null=True, validators=[django.core.validators.MinValueValidator(5), django.core.validators.MaxValueValidator(10000)], verbose_name='Discount Price')),
                 ('discount_code', models.CharField(blank=True, help_text='Discount code for customer', max_length=20, null=True, verbose_name='Discount code')),
-                ('video', embed_video.fields.EmbedVideoField(blank=True, help_text='Paste Youtube or Vimeo url here', max_length=2083, null=True, verbose_name='Proposal Video')),
+                ('video', models.URLField(blank=True, null=True, help_text='Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed', verbose_name='Royal embed Video')),
                 ('thumbnail', models.ImageField(blank=True, default='proposal_files/thumbnail.jpg', help_text="image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312", upload_to=proposals.models.proposal_images_path, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])], verbose_name='Proposal Thumbnail')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),

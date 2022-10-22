@@ -2,7 +2,6 @@
 
 import django.core.validators
 from django.db import migrations, models
-import embed_video.fields
 import pages.models
 
 
@@ -21,7 +20,7 @@ class Migration(migrations.Migration):
                 ('subtitle', models.CharField(blank=True, help_text='subtitle field is optional with length of 200 characters', max_length=200, null=True, verbose_name='Subtitle')),
                 ('description', models.TextField(default='This is the description of the about page This is the description of the about page This is the description of the about page This is the description of the about page', help_text='Description max length is 3500', max_length=3500, verbose_name='Description')),
                 ('banner_type', models.BooleanField(choices=[(True, 'Activate Video'), (False, 'Activate Banner')], default=False, verbose_name='Media Switch')),
-                ('video_url', embed_video.fields.EmbedVideoField(blank=True, help_text='Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed', null=True, verbose_name='Embed Video')),
+                ('video_url', models.URLField(blank=True, null=True, help_text='Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed', verbose_name='Royal embed Video')),
                 ('ad_image', models.ImageField(blank=True, help_text="image must be any of these: 'JPEG','JPG','PNG','PSD'", null=True, upload_to=pages.models.aboutus_path, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])], verbose_name='Ad Image')),
                 ('slug', models.SlugField(max_length=255, verbose_name='Slug')),
                 ('banner_color', models.CharField(blank=True, default='purple', help_text="Put your color here to decorate Banner Background and buttons like signup and login. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes", max_length=100, null=True, verbose_name='Banner Background Color')),

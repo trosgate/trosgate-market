@@ -3,7 +3,6 @@
 import control_settings.models
 import django.core.validators
 from django.db import migrations, models
-import embed_video.fields
 
 
 class Migration(migrations.Migration):
@@ -65,6 +64,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='layoutsetting',
             name='video_url',
-            field=embed_video.fields.EmbedVideoField(blank=True, help_text='Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed', null=True, verbose_name='Royal embed Video'),
+            field= models.URLField(blank=True, null=True, help_text='Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed', verbose_name='Royal embed Video'),
         ),
     ]

@@ -116,10 +116,11 @@ class ProposalStepFourForm(forms.ModelForm):
             
 
 class ModifyProposalStepOneForm(forms.ModelForm):
+    thumbnail = forms.ImageField(widget=forms.FileInput,)
     category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label='Select category')
     class Meta:
         model = Proposal
-        fields = ['preview', 'category','skill']
+        fields = ['preview', 'category','skill', 'thumbnail']
         required = ['preview', 'category','skill']
 
     def __init__(self, *args, **kwargs):
@@ -129,6 +130,8 @@ class ModifyProposalStepOneForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'Proposal Preview'})
         self.fields['category'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Proposal Category'})        
+        self.fields['skill'].widget.attrs.update(
+            {'class': 'form-control chosen-select Skills', 'placeholder': 'select some skills'})
         self.fields['skill'].widget.attrs.update(
             {'class': 'form-control chosen-select Skills', 'placeholder': 'select some skills'})
 

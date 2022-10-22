@@ -54,7 +54,8 @@ class WebsiteSettingAdmin(admin.ModelAdmin):
     list_per_page = sys.maxsize
     fieldsets = (
         ('Site Description', {'fields': ('site_name', 'tagline', 'site_Logo',
-         'protocol', 'site_domain', 'site_description',)}),
+         'protocol', 'site_domain', 'site_description',)}), 
+        ('Color Scheme', {'fields': ('button_color', 'navbar_color',)}),
         ('Social Media', {'fields': ('twitter_url', 'instagram_url', 'youtube_url', 'facebook_url',)}),
         ('Advertisement', {'fields': ('brand_ambassador_image', 'ad_image',)}),
     )

@@ -3,7 +3,6 @@ from . import views
 
 app_name = 'applications'
 
-
 urlpatterns = [
     # Urls for application addon table
     path('addon/', views.application_multiple_summary, name='application_multiple_summary'),
@@ -23,8 +22,7 @@ urlpatterns = [
     path('stripe/checkout/api/', views.stripe_application_intent, name='stripe_application_intent'),
     # Urls for Paypal gateway
     path('paypal/checkout/api/', views.paypal_application_intent, name='paypal_payment_order'),
-    path('success/', views.payment_success, name='hiring_payment_success'),
-    path('congrats/', views.application_success, name='application_success'),
+    path('success/', views.application_success, name='hiring_payment_success'),
 
     path('flutter/checkout/api/', views.flutter_payment_intent, name='flutter_payment_intent'),
     # path('flutterwave-webhook/', viewsflutterwave_webhook, name='flutterwave_webhook'),

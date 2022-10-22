@@ -43,12 +43,6 @@
                           <a href="{% url 'marketing:article_list' %}">Articles</a>
                         </li>
                        
-                        {% if request.user.is_authenticated %}
-                        <li class="nav-item">
-                          <a href="{% url 'marketing:notice' %}">Notice<small><sup class="badge badge-danger badge-sm text-white">New</sup></small></a>
-                        </li>
-                        {% endif %}
-                        
                         {% if request.user.is_authenticated and request.user.clients %}
                         <li class="menu-item-has-children page_item_has_children"><span class="wt-dropdowarrow"><i class="lnr lnr-chevron-right"></i></span>
                           <a href="javascript:void(0);">Bucket</a>
@@ -104,8 +98,8 @@
                       <ul>
                         <li
                           class="menu-item-has-children page_item_has_children">
-                          <a href="javascript:void(0);">
-                            <span>Insights</span>
+                          <a href="{% url 'payments:payment_vault' %}">
+                            <span>Account</span>
                           </a>
                           <ul class="sub-menu children">
                             <li>

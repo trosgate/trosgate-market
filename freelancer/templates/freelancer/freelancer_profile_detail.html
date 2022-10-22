@@ -27,13 +27,16 @@
 										
 										<div class="wt-userprofile">
 											<figure>
-												<img src="{{freelancer.profile_photo.url}}" alt="img description">
+												<img src="{% if freelancer.profile_photo %}{{freelancer.profile_photo.url}}{% endif %}" alt="img description">
+												{% if freelancer.user.is_authenticated %}
 												<div class="wt-userdropdown wt-online"></div>
+												{% else %}
+												<div class="wt-userdropdown wt-offline" style="background-color:red;"></div>
+												{% endif %}
 											</figure>
-											<div class="wt-title">
+											<div class="wt-title"> 
 												<h3><i class="fa fa-check-circle"></i> {{freelancer.user.get_full_name}}</h3>
-												<span>5.0/5 <a class="javascript:void(0);">(860 Feedback)</a> <br>Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
-
+												<span>{{good_review_rate}} Good Review{{good_review_rate|pluralize}} <a class="javascript:void(0);">(3 Stars & Above)</a> <br>Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
 												{% if active_team.created_by == request.user %}
 												{% if max_team_members %}
 												{% if team.status == 'active' %}
@@ -64,21 +67,20 @@
 										</div>
 										<div id="wt-statistics" class="wt-statistics wt-profilecounter">
 											<div class="wt-statisticcontent wt-countercolor1">
-												<h3 data-from="0" data-to="03" data-speed="800" data-refresh-interval="03">03</h3>
-												<h4>Ongoing <br>Projects</h4>
+												<h3 data-from="0" data-to="{{ongoing_projects}}" data-speed="800" data-refresh-interval="03">{{ongoing_projects}}</h3>
+												<h4>Ongoing <br>Project{{ongoing_projects|pluralize }}</h4>
 											</div>
 											<div class="wt-statisticcontent wt-countercolor2">
-												<h3 data-from="0" data-to="1503" data-speed="8000" data-refresh-interval="100">1503</h3>
-												<h4>Completed <br>Projects</h4>
+												<h3 data-from="0" data-to="{{completed_projects}}" data-speed="8000" data-refresh-interval="100">{{completed_projects}}</h3>
+												<h4>Completed <br>Project{{completed_projects|pluralize }}</h4>
 											</div>
 											<div class="wt-statisticcontent wt-countercolor4">
-												<h3 data-from="0" data-to="02" data-speed="800" data-refresh-interval="02">02</h3>
-												<h4>Cancelled <br>Projects</h4>
+												<h3 data-from="0" data-to="{{cancelled_projects}}" data-speed="800" data-refresh-interval="02">{{cancelled_projects}}</h3>
+												<h4>Cancelled <br>Project{{cancelled_projects|pluralize }}</h4>
 											</div>
 											<div class="wt-statisticcontent wt-countercolor3">
-												<h3 data-from="0" data-to="25" data-speed="8000" data-refresh-interval="100">25</h3>
-												<em>k</em>
-												<h4>Served <br>Hours</h4>
+												<h3 data-from="0" data-to="{{verified_sale}}" data-speed="8000" data-refresh-interval="100">{{verified_sale}}</h3>
+												<h4>Total <br>Sales</h4>
 											</div>
 											<div class="wt-description">
 												{% if request.user.clients %}
@@ -127,12 +129,12 @@
 													<h3>{{freelancer.project_title}}</h3>
 												{% endif %}
 												{% if freelancer.project_url %}
-													<a href="{{freelancer.project_url}}">{{freelancer.project_url}}</a>
+													<a href="{{freelancer.project_url}}">{{freelancer.project_url|truncatechars:30}}</a>
 												{% endif %}
 												</div>
 											</div>
 											<div class="wt-project">
-												{% if freelancer.image_two.url %}
+												{% if freelancer.image_two %}
 												<figure>
 													<img src="{{freelancer.image_two.url}}"alt="img description">
 												</figure>
@@ -142,7 +144,7 @@
 													<h3>{{freelancer.project_title_two}}</h3>
 												{% endif %}
 												{% if freelancer.project_url_two %}
-													<a href="{{freelancer.project_url_two}}">{{freelancer.project_url_two}}</a>
+													<a href="{{freelancer.project_url_two}}">{{freelancer.project_url_two|truncatechars:30}}</a>
 												{% endif %}
 												</div>
 											</div>
@@ -157,7 +159,7 @@
 													<h3>{{freelancer.project_title_three}}</h3>
 												{% endif %}
 												{% if freelancer.project_url_three %}
-													<a href="{{freelancer.project_url_three}}">{{freelancer.project_url_three}}</a>
+													<a href="{{freelancer.project_url_three}}">{{freelancer.project_url_three|truncatechars:30}}</a>
 												{% endif %}
 												</div>
 											</div>
@@ -168,70 +170,68 @@
 											<h2>Education And Experience</h2>
 										</div>
 										<div class="wt-experiencelisting-hold">
-											<div class="wt-experiencelisting wt-bgcolor">
-												<div class="wt-title">
-													<h3>{{freelancer.job_position}}</h3>
-												</div>
-												<div class="wt-experiencecontent">
-													<ul class="wt-userlisting-breadcrumb">
-														<li><span><i class="far fa-building"></i>{{freelancer.user.get_full_name}}</span></li>
-														<li><span><i class="far fa-calendar"></i> {{freelancer.start_date}} - {{freelancer.end_date}}</span></li>
-													</ul>
-													<div class="wt-description">
-														<p>“ {{freelancer.job_description}}. ”</p>
+											{% if freelancer.job_position or freelancer.job_position_two %}
+												{% if freelancer.job_position %}
+												<div class="wt-experiencelisting wt-bgcolor">
+													<div class="wt-title">
+														<h3>{{freelancer.job_position}}</h3>
+													</div>
+													<div class="wt-experiencecontent">
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="far fa-building"></i>{{freelancer.user.get_full_name}}</span></li>
+															<li><span><i class="far fa-calendar"></i> {{freelancer.start_date}} - {{freelancer.end_date}}</span></li>
+														</ul>
+														<div class="wt-description">
+															<p>“ {{freelancer.job_description}}. ”</p>
+														</div>
 													</div>
 												</div>
-											</div>
-											<div class="wt-experiencelisting">
-												<div class="wt-title">
-													<h3>{{freelancer.job_position_two}}</h3>
-												</div>
-												<div class="wt-experiencecontent">
-													<ul class="wt-userlisting-breadcrumb">
-														<li><span><i class="far fa-building"></i> {{freelancer.user.get_full_name}}</span></li>
-														<li><span><i class="far fa-calendar"></i> {{freelancer.start_date_two}}- {{freelancer.end_date_two}}</span></li>
-													</ul>
-													<div class="wt-description">
-														<p>“ {{freelancer.job_description_two}}. ”</p>
+												{% endif %}
+												{% if freelancer.job_position_two %}
+												<div class="wt-experiencelisting">
+													<div class="wt-title">
+														<h3>{{freelancer.job_position_two}}</h3>
+													</div>
+													<div class="wt-experiencecontent">
+														<ul class="wt-userlisting-breadcrumb">
+															<li><span><i class="far fa-building"></i> {{freelancer.user.get_full_name}}</span></li>
+															<li><span><i class="far fa-calendar"></i> {{freelancer.start_date_two}}- {{freelancer.end_date_two}}</span></li>
+														</ul>
+														<div class="wt-description">
+															<p>“ {{freelancer.job_description_two}}. ”</p>
+														</div>
 													</div>
 												</div>
+												{% endif %}
+												<div class="divheight"></div>
+											{% else %}
+											<div class="alert alert-info alert-dismissible fade show text-center">
+												<span> No Education or Experience provided. Consider experience on {{website.site_name|capfirst}} </span>
 											</div>
-											<div class="divheight"></div>
+											{% endif %}
 										</div>
 									</div>
 								</div>
 							</div>
 							<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
 								<aside id="wt-sidebar" class="wt-sidebar">
+									{% if website.brand_ambassador_image %}
 									<div class="wt-widget wt-widgetarticlesholder wt-articlesuser">
 										<div class="wt-widgettitle">
 											<h2>Advertisement</h2>
 										</div>										
 										<div class="wt-companyad">
-											<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
-											<span>Image Size  255px X 255px</span>
+											<figure class="wt-companyadimg"><img src="{{website.brand_ambassador_image.url}}" alt="img description"></figure>
 										</div>										
 									</div>
-									<div class="wt-proposalsr">
-										<div class="tg-authorcodescan tg-authorcodescanvtwo">
-											<figure class="tg-qrcodeimg">
-												<img src="{% static 'images/qrcode.png' %}" alt="img description">
-											</figure>
-											<div class="tg-qrcodedetail">
-												<span class="lnr lnr-laptop-phone"></span>
-												<div class="tg-qrcodefeat">
-													<h3>Scan with your <span>Smart Phone </span> To Get It Handy.</h3>
-												</div>
-											</div>
-										</div>
-									</div>
+									{% endif %}
 									<div class="wt-widget">
 										<div class="wt-widgettitle">
 											<h2>My Skills</h2>
 										</div>
 										<div class="wt-widgetcontent">
 											<div class="wt-widgettag wt-widgettagvtwo">
-											{% for skill in freelancer.my_skill.all %}
+											{% for skill in freelancer.skill.all %}
 												<a href="javascript:void(0);">{{skill}}</a>
 											{% endfor %}
 											</div>
@@ -242,40 +242,9 @@
 											<h2>Share This User</h2>
 										</div>
 										<div class="wt-widgetcontent">
-											<ul class="wt-socialiconssimple">
-												<li class="wt-facebook"><a href="javascript:void(0);"><i class="fab fa-facebook-f"></i>Share on Facebook</a></li>
-												<li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i>Share on Twitter</a></li>
-												<li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i>Share on Linkedin</a></li>
-												<li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google-plus-g"></i>Share on Google Plus</a></li>
-											</ul>
-										</div>
-									</div>
-									<div class="wt-widget wt-reportjob">
-										<div class="wt-widgettitle">
-											<h2>Report This User</h2>
-										</div>
-										<div class="wt-widgetcontent">
-											<form class="wt-formtheme wt-formreport">
-												<fieldset>
-													<div class="form-group">
-														<span class="wt-select">
-															<select>
-																<option value="reason">Select Reason</option>
-																<option value="reason1">Reason1</option>
-																<option value="reason2">Reason2</option>
-																<option value="reason3">Reason3</option>
-																<option value="reason4">Reason4</option>
-															</select>
-														</span>
-													</div>
-													<div class="form-group">
-														<textarea class="form-control" placeholder="Description"></textarea>
-													</div>
-													<div class="form-group wt-btnarea">
-														<a href="javascrip:void(0);" class="wt-btn">Submit</a>
-													</div>
-												</fieldset>
-											</form>
+											<!-- sharethis script starts-->
+											<div class="sharethis-inline-share-buttons"></div>
+											<!-- sharethis script ends-->											
 										</div>
 									</div>
 								</aside>
@@ -291,7 +260,7 @@
 {% endblock %}
 
 {% block scripts %}
-
+<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
 <script>
 	//INVITATION TO TEAM             
 	$(document).on('click', '#userInvitation', function (e) {

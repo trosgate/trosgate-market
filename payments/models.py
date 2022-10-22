@@ -10,16 +10,59 @@ from teams.models import Team
 
 
 class PaymentAccount(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='paymentaccount', on_delete=models.PROTECT,)
-    paypal = encrypt(models.CharField(_("PayPal Account"), max_length=100, help_text=_(
-        'Paypal Account to receive payment'), null=True, blank=True))
-    stripe = encrypt(models.CharField(_("Stripe Account"), max_length=100, help_text=_(
-        'Stripe Account to receive payment'), null=True, blank=True))
-    flutterwave = encrypt(models.CharField(_("Flutterwave Account"), max_length=100, help_text=_(
-        'Flutterwave Account to receive payment'), null=True, blank=True))
-    razorpay = encrypt(models.CharField(_("Razorpay Account"), max_length=100, help_text=_(
-        'Razorpay Account to receive payment'), null=True, blank=True))
-    created_at = models.DateTimeField(_("Started On"), auto_now_add=True,)
+    MOMO = 'mobilemoney'
+    BANK = 'bank'
+    FLUTTERWAVE_CHOICES = (
+        (MOMO, _('Mobile Money')),
+        (BANK, _('Bank Account')),
+    )  
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='paymentaccount', on_delete=models.PROTECT,)
+    primary_account_type = models.ForeignKey('general_settings.PaymentGateway', verbose_name=_('Account Type'), related_name='paymntaccountgateway', null=True, blank=True, on_delete=models.SET_NULL,)
+    
+    paypal_account = encrypt(models.CharField(_("Bearer Account/Email"), max_length=100, help_text=_(
+        'Bearer Account Number'), null=True, blank=True))
+    paypal_bearer = encrypt(models.CharField(_("Bearer names"), max_length=100, help_text=_(
+        'Bearer names'), null=True, blank=True))
+    paypal_country = encrypt(models.CharField(_("Bearer Country Name"), max_length=100, help_text=_(
+        'Bearer account country. E.g Singapore'), null=True, blank=True))    
+
+    stripe_country = encrypt(models.CharField(_("Bearer Country Name"), max_length=100, help_text=_(
+        'Bearer account country. E.g Canada'), null=True, blank=True))    
+    stripe_bank = encrypt(models.CharField(_("Bearer Bank Name"), max_length=100, help_text=_(
+        'Bearer Bank Name - Account Specific'), null=True, blank=True))    
+    stripe_account = encrypt(models.CharField(_("Account Number"), max_length=100, help_text=_(
+        'Bearer Account Number'), null=True, blank=True))
+    stripe_routing = encrypt(models.CharField(_("Routing Number"), max_length=100, help_text=_(
+        'Bearer Routing Number - Country/Bank Specific'), null=True, blank=True))
+    stripe_swift_iban = encrypt(models.CharField(_("Swift/Iban code"), max_length=100, help_text=_(
+        'Bearer Swift code/Iban- Country/Bank Specific'), null=True, blank=True))
+    stripe_bearer = encrypt(models.CharField(_("Bearer Names"), max_length=150, help_text=_(
+        'Bearer names'), null=True, blank=True))
+    stripe_extra_info = encrypt(models.TextField(_("Extra Credentials"), max_length=100, help_text=_(
+        'Additional information to be included'), null=True, blank=True))
+
+    flutterwave_type = encrypt(models.CharField(_("Flutterwave Account Type"), choices=FLUTTERWAVE_CHOICES, default=MOMO, max_length=20))
+    flutterwave_bank = encrypt(models.CharField(_("Bearer Bank Names"), max_length=150, help_text=_(
+        'Bearer Bank name - Account Type Specific'), null=True, blank=True))
+    flutterwave_bearer = encrypt(models.CharField(_("Bearer Names"), max_length=150, help_text=_(
+        'Bearer Account names'), null=True, blank=True))
+    flutterwave_country = encrypt(models.CharField(_("Bearer Country Name"), max_length=100, help_text=_(
+        'Bearer account country. E.g Nigeria'), null=True, blank=True))
+    flutterwave_account = encrypt(models.CharField(_("Flutterwave Account Number"), max_length=100, help_text=_(
+        'Bearer Account Number'), null=True, blank=True))
+    flutterwave_swift_iban = encrypt(models.CharField(_("Swift/Iban"), max_length=100, help_text=_(
+        'Swift code/Iban- Country Specific'), null=True, blank=True))
+    flutterwave_extra_info = encrypt(models.TextField(_("Extra Credentials"), max_length=100, help_text=_(
+        'Additional information to be included'), null=True, blank=True))
+    
+    razorpay_bearer = encrypt(models.CharField(_("Razorpay Bearer Names"), max_length=150, help_text=_(
+        'Bearer Account names'), null=True, blank=True))
+    razorpay_upi = encrypt(models.CharField(_("Razorpay UPI ID"), max_length=100, help_text=_(
+        'Bearer UPI ID to receive payment'), null=True, blank=True))
+    razorpay_country = encrypt(models.CharField(_("Bearer Country Name"), max_length=100, help_text=_(
+        'Bearer account country. E.g India'), null=True, blank=True))
+    
+    created_at = models.DateTimeField(_("Started On"), auto_now_add=True,)  
     modified_on = models.DateTimeField(auto_now=True,)
 
     class Meta:
@@ -28,7 +71,6 @@ class PaymentAccount(models.Model):
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
-
 
     @classmethod
     def payment_mode(cls, user, paypal:None, stripe:None, flutterwave:None, razorpay:None):

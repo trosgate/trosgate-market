@@ -205,7 +205,6 @@ class OneClickResolution(models.Model):
 
         return oneclick
 
-
     @classmethod
     def review_and_approve(cls, resolution_pk, team, title:str, message:str, rating:int):
         with db_transaction.atomic():  
@@ -247,7 +246,6 @@ class OneClickResolution(models.Model):
 
             return resolution, oneclick_team, team_manager, review
 
-
     @classmethod
     def cancel_oneclick(cls, resolution:int, cancel_type:str, message:str):
         with db_transaction.atomic():  
@@ -270,7 +268,6 @@ class OneClickResolution(models.Model):
             # db_transaction.on_commit(lambda: application_cancel_email(message))
             print("cancelled requested")
         return resolution, message
-
 
     @classmethod
     def approve_and_cancel_oneclick(cls, resolution:int):
@@ -1208,8 +1205,8 @@ class ExtContractResolution(models.Model):
         
     class Meta:
         ordering = ("-created_at",) 
-        verbose_name = _("Ext-Contract Awarded")
-        verbose_name_plural = _("Ext-Contract Awarded")
+        verbose_name = _("Ext Contract Awarded")
+        verbose_name_plural = _("Ext Contract Awarded")
 
     def __str__(self):
         return f'{self.team.title} vrs. {self.contract_sale.purchase.client.get_full_name()}'

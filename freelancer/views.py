@@ -29,7 +29,11 @@ from .utilities import (
 )
 from teams.controller import PackageController
 from django.core.paginator import Paginator
-
+from analytics.analytic import (
+    ongoing_founder_projects, completed_founder_projects,
+    cancelled_founder_projects, total_verified_sale,
+    user_review_rate
+)
 
 # this will appear in search results
 def freelancer_listing(request):
@@ -137,7 +141,12 @@ def freelancer_profile(request, short_name):
     team = get_object_or_404(Team, pk=freelancer.active_team_id)
     proposal_count = len(Proposal.objects.filter(team=team, status=Proposal.ACTIVE)) > 0
     monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
-    
+    ongoing_projects = ongoing_founder_projects(team, freelancer.user)
+    completed_projects = completed_founder_projects(team, freelancer.user)
+    cancelled_projects = cancelled_founder_projects(team, freelancer.user)
+    verified_sale = total_verified_sale(team)
+    review_rate = user_review_rate(team) 
+
     max_team_members = ''
     my_team = ''
     if request.user.user_type == Customer.FREELANCER:
@@ -153,6 +162,11 @@ def freelancer_profile(request, short_name):
         'proposal_count': proposal_count,
         'monthly_contracts_limiter': monthly_contracts_limiter,
         'max_team_members': max_team_members,
+        'ongoing_projects': ongoing_projects,
+        'completed_projects': completed_projects,
+        'cancelled_projects': cancelled_projects,
+        'verified_sale': verified_sale,
+        'good_review_rate': review_rate,
     }
     return render(request, 'freelancer/freelancer_profile_detail.html', context)
 

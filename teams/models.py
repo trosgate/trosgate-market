@@ -9,7 +9,6 @@ from ckeditor.fields import RichTextField
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from embed_video.fields import EmbedVideoField
 from django.core.mail import send_mail
 from . utilities import create_random_code
 from django.core.exceptions import ValidationError

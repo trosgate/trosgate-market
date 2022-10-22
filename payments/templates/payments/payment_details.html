@@ -23,8 +23,7 @@
 			<div class="wt-proposalholder">
 				<div class="row justify-content-md-center">
 					<div class="wt-hireduserstatus">
-						<h4>Invitation to "{{ teams.title }}"</h4>
-						<em>There are two options available to invite users. (1) Internal Users & (2) External Freelancers</em>
+						<em>Any account filled will must be selected during withdrawal request else we will not process your payment</em>
 					</div>											
 				</div>
 			</div>
@@ -36,66 +35,319 @@
 							<div class="wt-dashboardboxcontent wt-rcvproposala">
 								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
 									<div class="wt-freelancerholder wt-rcvproposalholder">												
-										<div class="wt-sectiontitle">
-											<span>Payment Modes</span>
-										</div>
-										<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
-
-										<form method="POST", autocomplete='off'> {% csrf_token %}
-											<div class="form-group ">
-												{{paymentForm.paypal.label}}
-												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
-												{{paymentForm.paypal}}<br>
-												{{paymentForm.paypal.help_text}}
-												</div> 
-											<div class="form-group ">
-												{{paymentForm.stripe.label}}
-												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
-												{{paymentForm.stripe}}<br>
-												{{paymentForm.stripe.help_text}}
-												</div> 
-											<div class="form-group ">
-												{{paymentForm.flutterwave.label}}
-												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
-												{{paymentForm.flutterwave}}<br>
-												{{paymentForm.flutterwave.help_text}}
-												</div> 
-											<div class="form-group ">
-												{{paymentForm.razorpay.label}}
-												<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center"></div>
-												{{paymentForm.razorpay}}<br>
-												{{paymentForm.razorpay.help_text}}
-												</div> 
-											
-											<div class="form-group wt-btnarea">
-												<button id="updatePaymentAccount" type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Save Changes </button>
-											</div>											
-										</form> 
-										<ul class="wt-projectliststyle">
-											<div class="wt-title">
-												<h5>Information!</h5>
-											</div>	
-											<li><span><i class="fa fa-check"></i>#1: These accounts are only accessible to you and our account department in charge of payments</span></li>
-											<li><span><i class="fa fa-check"></i>#2: No staff of {{website.site_name|capfirst}} will ever contact you for any account info</span></li>
-											<li><span><i class="fa fa-check"></i>#3: You are not obliged to provide all account. Give what you wish to receive to</span></li>
-										</ul>											                  														
+									<div class="wt-sectiontitle">
+										<span>Payment Modes</span>
 									</div>
-								</div>
+									<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
+
+									<form method="POST", autocomplete='off'> {% csrf_token %}
+													   
+									<div class="wt-jobdescription wt-tabsinfo">
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Primary Account</h2>
+											</div>
+											{{paymentForm.primary_account_type}}
+										</div> 
+									</div> 
+									{% for gateway in gateways %}
+
+									{% if gateway.name == "Flutterwave" %} 
+									<div class="wt-jobdescription wt-tabsinfo">
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Flutterwave Account</h2>
+											</div>                                          
+											<div class="table-responsive">
+												<table class="table">
+													<thead>
+													<tr>
+														<th>Account</th>
+														<th>Form</th>
+													</tr>
+													</thead>
+													<body>
+													<tr>
+														<td>Payment Mode</td>
+														<td>
+															{{paymentForm.flutterwave_type}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_type.errors}}</span>
+														</td>
+													</tr>
+													</body>												
+													<body>
+													<tr>
+														<td>Country</td>
+														<td>
+															{{paymentForm.flutterwave_country}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_country.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+													<body>
+													<tr>
+														<td>Account Number</td>
+														<td>
+															{{paymentForm.flutterwave_account}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_account.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+													<body>
+													<tr>
+														<th>If Bank Selected</th>
+														<th>Extra Bank Info</th>
+													</tr>
+													</body>													
+													<body>													
+													<tr>
+														<td>Bank Name</td>
+														<td>
+															{{paymentForm.flutterwave_bank}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_bank.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Account Number</td>
+														<td>
+															{{paymentForm.flutterwave_account}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_account.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Swift/Iban Code</td>
+														<td>
+															{{paymentForm.flutterwave_swift_iban}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_swift_iban.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Extra Info</td>
+														<td>
+															{{paymentForm.flutterwave_extra_info}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_extra_info.errors}}</span>
+														</td>
+													</tr>
+													</body>
+											</table> 
+										</div>
+										{% endif %}
+										{% if gateway.name == "PayPal" %}
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Paypal Account</h2>
+											</div>                                          
+											<div class="table-responsive">
+												<table class="table">
+													<thead>
+													<tr>
+														<th>Account</th>
+														<th>Form</th>
+													</tr>
+													</thead>
+													<body>
+													<tr>
+														<td>Account/Email</td>
+														<td>
+															{{paymentForm.paypal_account}}
+															<span style="color:red;" role="alert">{{ paymentForm.paypal_account.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Bearer Name</td>
+														<td>
+															{{paymentForm.paypal_bearer}}
+															<span style="color:red;" role="alert">{{ paymentForm.paypal_bearer.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+													<body>
+													<tr>
+														<td>Country</td>
+														<td>
+															{{paymentForm.paypal_country}}
+															<span style="color:red;" role="alert">{{ paymentForm.paypal_country.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+													
+											</table> 
+										</div>
+										{% endif %}
+										{% if gateway.name == "Stripe" %}
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Stripe Account</h2>
+											</div>                                          
+											<div class="table-responsive">
+												<table class="table">
+													<thead>
+													<tr>
+														<th>Account</th>
+														<th>Form</th>
+													</tr>
+													</thead>
+													<body>
+													<body>
+													<tr>
+														<td>Country</td>
+														<td>
+															{{paymentForm.stripe_country}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_country.errors}}</span>
+														</td>
+													</tr>
+													</body>	
+																								
+													<body>
+													<tr>
+														<td>Bank Name</td>
+														<td>
+															{{paymentForm.stripe_bank}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_bank.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+													
+													<body>
+													<tr>
+														<td>Account Number</td>
+														<td>
+															{{paymentForm.stripe_account}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_account.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Routing Number</td>
+														<td>
+															{{paymentForm.stripe_routing}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_routing.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Swift/Iban Code</td>
+														<td>
+															{{paymentForm.stripe_swift_iban}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_swift_iban.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Account Bearer</td>
+														<td>
+															{{paymentForm.stripe_bearer}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_bearer.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Extra Info</td>
+														<td>
+															{{paymentForm.stripe_extra_info}}
+															<span style="color:red;" role="alert">{{ paymentForm.stripe_extra_info.errors}}</span>
+														</td>
+													</tr>
+													</body>
+											</table> 
+										</div>
+										{% endif %}
+										{% if gateway.name == "Razorpay" %}
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Razorpay Account</h2>
+											</div>                                          
+											<div class="table-responsive">
+												<table class="table">
+													<thead>
+													<tr>
+														<th>Account</th>
+														<th>Form</th>
+													</tr>
+													</thead>
+													<body>
+													<tr>
+														<td>Bearer Name</td>
+														<td>
+															{{paymentForm.razorpay_bearer}}
+															<span style="color:red;" role="alert">{{ paymentForm.razorpay_bearer.errors}}</span>
+														</td>
+													</tr>
+													</body>
+													<body>
+													<tr>
+														<td>Account UPI ID</td>
+														<td>
+															{{paymentForm.razorpay_upi}}
+															<span style="color:red;" role="alert">{{ paymentForm.razorpay_upi.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+													<body>
+													<tr>
+														<td>Country</td>
+														<td>
+															{{paymentForm.razorpay_country}}
+															<span style="color:red;" role="alert">{{ paymentForm.razorpay_country.errors}}</span>
+														</td>
+													</tr>
+													</body>													
+											</table> 
+										</div>
+										{% endif %}
+										{% endfor %}
+										</div>
+											</div>
+												</div>
+													<div class="wt-updatall">
+														<i class="far fa-money-bill-alt"></i>
+														<span> click on "Save Changes" button</span>
+														<button type="submit" class="wt-btn"> Save Changes</button>
+													</div>
+												</div>
+											</div>
+										</div>  
+									</form>
+											
+								<ul class="wt-projectliststyle">
+									<div class="wt-title">
+										<h5>Information!</h5>
+									</div>	
+									<li><span><i class="fa fa-check"></i>#1: Bearer and account must come from countries supported by respective partners</span></li>
+									<li><span><i class="fa fa-check"></i>#2: When making a withdrawal request, you will have to select primary account</span></li>
+									<li><span><i class="fa fa-check"></i>#3: If your primary account was declined by our payment partners (e.g Stripe), we will connsider any other account you have provided </span></li>
+									<li><span><i class="fa fa-check"></i>#4: If your account details are declined, we shall halt the payment process and send you an email using your account mail</span></li>
+									<li><span><i class="fa fa-check"></i>#5: Your request will categorized as "Pending". After you rectify, we will proceed to pay.</span></li>
+									<li><span><i class="fa fa-check"></i>#6: In the case of (#4), all other request in queue may be processed before returning. To avoid delays, you need to prompt our support.</span></li>
+								</ul>											                  														
 							</div>
 						</div>
 					</div>
 				</div>
-			</section>
+					
+				</section>
 
-			<div class="wt-proposalholder">
-				<div class="row justify-content-md-center">
-					<div class="wt-sectionhead wt-textcenter">
-						<span>Copyright @ {{website.site_name}}</span>
+				<div class="wt-proposalholder">
+					<div class="row justify-content-md-center">
+						<div class="wt-sectionhead wt-textcenter">
+							<span>Copyright @ {{website.site_name}}</span>
+						</div>
 					</div>
 				</div>
-			</div>
 
-		</main>
+			</main>
 		<!--Main End-->	
 				
 {% endblock %}
