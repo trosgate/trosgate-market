@@ -11,5 +11,4 @@ urlpatterns = [
     path('account-vault/', views.payment_vault, name='payment_vault'),
     path('transfers/', views.transfer_transactions, name='transfer_transactions'),
     path('withdrawals/', views.withdrawal_transactions, name='withdrawal_transactions'),
-    path('settlement/', views.update_payment_account, name='update_payment_account'),
 ]

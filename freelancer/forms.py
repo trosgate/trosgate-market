@@ -31,9 +31,27 @@ class FreelancerForm(forms.ModelForm):
     image_two = forms.ImageField(widget=forms.FileInput, required=False)
     image_three = forms.ImageField(widget=forms.FileInput, required=False)
 
+    class Meta:
+        model = Freelancer
+        fields = [
+            # personal details required
+            'gender', 'tagline', 'description', 'address', 'profile_photo', 'banner_photo', 'brand_name', 'business_size', 'department',
+            # Skills and specialty
+            'skill', 'keyskill_one', 'key_skill_one_score', 'keyskill_two','key_skill_two_score','keyskill_three',
+            'key_skill_three_score', 'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score',
+            #Education and Experience
+            'company_name', 'job_position', 'job_description', 'start_date', 'end_date', 'company_name_two', 'job_position_two', 'start_date_two', 'end_date_two', 'job_description_two',
+            # Projects and Awards
+            'project_title', 'project_url', 'image_one', 'project_title_two', 'project_url_two', 'image_two', 'project_title_three', 'project_url_three', 'image_three',
+        ]
+
+        required = [
+            # Required details
+            'gender', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'business_size', 'department',
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         # personal details
         self.fields['gender'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Select Gender'})
@@ -49,9 +67,30 @@ class FreelancerForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'banner photo'})
         self.fields['address'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Country address'})
+        # Skill and Specialty
         self.fields['skill'].widget.attrs.update(
-            {'class': 'form-control col-12', 'placeholder': 'User Skills'})
-        #Education and Experience
+            {'class': 'form-control chosen-select Skills', 'placeholder': 'User Skills'})
+        self.fields['keyskill_one'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['key_skill_one_score'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['keyskill_two'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['key_skill_two_score'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['keyskill_three'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['key_skill_three_score'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['keyskill_four'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['key_skill_four_score'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['keyskill_five'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['key_skill_five_score'].widget.attrs.update(
+            {'class': 'form-control'})           
+        # Education and Experience
         self.fields['company_name'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'company name'})
         self.fields['start_date'].widget.attrs.update(
@@ -89,21 +128,6 @@ class FreelancerForm(forms.ModelForm):
         for field in self.Meta.required:
             self.fields[field].required = True
 
-    class Meta:
-        model = Freelancer
-        fields = [
-            # personal details required
-            'gender', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'brand_name', 'business_size', 'department',
-            #Education and Experience
-            'company_name', 'job_position', 'job_description', 'start_date', 'end_date', 'company_name_two', 'job_position_two', 'start_date_two', 'end_date_two', 'job_description_two',
-            # Projects and Awards
-            'project_title', 'project_url', 'image_one', 'project_title_two', 'project_url_two', 'image_two', 'project_title_three', 'project_url_three', 'image_three',
-        ]
-
-        required = [
-            # Required details
-            'gender', 'tagline', 'description', 'address', 'skill', 'profile_photo', 'banner_photo', 'business_size', 'department',
-        ]
 
 
 class FundTransferForm(forms.ModelForm):

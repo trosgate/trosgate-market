@@ -1,0 +1,21 @@
+{% if freelancer %}
+<ul class="sortable list">
+    {% for skill in freelancer.skill.all %}
+    <li>
+        <div class="wt-dragdroptool">
+            <a href="javascript:void(0)" class="lnr lnr-menu"></a>
+        </div>
+        <span class="skill-dynamic-html">{{skill}} (<em class="skill-val">90</em>%)</span>
+        <span class="skill-dynamic-field">
+            <input type="text" name="skills[1][percentage]" value="90">
+        </span>
+        <div class="wt-rightarea">
+            <a href="javascript:void(0);" class="wt-addinfo"><i class="lnr lnr-pencil"></i></a>
+            <a href="javascript:void(0);" class="wt-deleteinfo"><i class="lnr lnr-trash"></i></a>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<span style="color:blue;"> No skill selected at the moment </span>
+{% endif %}

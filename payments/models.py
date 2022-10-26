@@ -72,23 +72,6 @@ class PaymentAccount(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
-    @classmethod
-    def payment_mode(cls, user, paypal:None, stripe:None, flutterwave:None, razorpay:None):
-        with db_transaction.atomic():
-            account = cls.objects.select_for_update().get(pk=user.id)
-
-            if paypal != '':
-                account.paypal = paypal
-            if stripe != '':
-                account.stripe = stripe
-            if flutterwave != '':
-                account.flutterwave = flutterwave
-            if razorpay != '':
-                account.razorpay = razorpay
-
-            account.save(update_fields=['paypal', 'stripe', 'flutterwave', 'razorpay'])
-            return account
-
 
 class PaymentRequest(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='paymentrequest', on_delete=models.PROTECT,)

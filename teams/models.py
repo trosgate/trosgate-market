@@ -296,16 +296,12 @@ class TeamChat(models.Model):
     def __str__(self):
         return self.content[:50] + '...'
 
-    # def get_team_activated_url(self):
-    #       return reverse('teams:team_chat', args=[self.id])
-
 
 class AssignMember(models.Model):
 
     # Status
     TODO = 'todo'
     COMPLETED = 'completed'
-
     STATUS = (
         (TODO, 'Todo'),
         (COMPLETED, 'Completed'),

@@ -11,10 +11,10 @@
 						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 							<div class="wt-innerbannercontent">
 							<div class="wt-title"><h2>Payment Modes</h2></div>
-							<ol class="wt-breadcrumb">
-								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-								<li class="wt-active">Modes </li>
-							</ol>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									<li class="wt-active">Modes </li>
+								</ol>
 							</div>
 						</div>
 					</div>
@@ -33,7 +33,6 @@
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
 						<div class="wt-dashboardbox">
 							<div class="wt-dashboardboxcontent wt-rcvproposala">
-								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
 									<div class="wt-freelancerholder wt-rcvproposalholder">												
 									<div class="wt-sectiontitle">
 										<span>Payment Modes</span>
@@ -41,15 +40,18 @@
 									<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
 
 									<form method="POST", autocomplete='off'> {% csrf_token %}
-													   
+									
+									{% if gateways|length > 0 %}				   
 									<div class="wt-jobdescription wt-tabsinfo">
 										<div class="wt-jobdetails wt-tabsinfo">
 											<div class="wt-tabscontenttitle">
 												<h2>Primary Account</h2>
 											</div>
-											{{paymentForm.primary_account_type}}
-										</div> 
+										{{paymentForm.primary_account_type}}
+										<span style="color:red;" role="alert">{{ paymentForm.primary_account_type.errors}}</span>
 									</div> 
+									</div> 
+									
 									{% for gateway in gateways %}
 
 									{% if gateway.name == "Flutterwave" %} 
@@ -86,13 +88,22 @@
 													</body>													
 													<body>
 													<tr>
-														<td>Account Number</td>
+														<td>Bearer Name</td>
 														<td>
-															{{paymentForm.flutterwave_account}}
-															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_account.errors}}</span>
+															{{paymentForm.flutterwave_bearer}}
+															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_bearer.errors}}</span>
 														</td>
 													</tr>
-													</body>													
+													</body>
+													<body>
+														<tr>
+															<td>Account Number</td>
+															<td>
+																{{paymentForm.flutterwave_account}}
+																<span style="color:red;" role="alert">{{ paymentForm.flutterwave_account.errors}}</span>
+															</td>
+														</tr>
+														</body>														
 													<body>
 													<tr>
 														<th>If Bank Selected</th>
@@ -105,15 +116,6 @@
 														<td>
 															{{paymentForm.flutterwave_bank}}
 															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_bank.errors}}</span>
-														</td>
-													</tr>
-													</body>
-													<body>
-													<tr>
-														<td>Account Number</td>
-														<td>
-															{{paymentForm.flutterwave_account}}
-															<span style="color:red;" role="alert">{{ paymentForm.flutterwave_account.errors}}</span>
 														</td>
 													</tr>
 													</body>
@@ -135,7 +137,8 @@
 														</td>
 													</tr>
 													</body>
-											</table> 
+												</table> 
+											</div>
 										</div>
 										{% endif %}
 										{% if gateway.name == "PayPal" %}
@@ -179,7 +182,8 @@
 													</tr>
 													</body>													
 													
-											</table> 
+												</table> 
+											</div>
 										</div>
 										{% endif %}
 										{% if gateway.name == "Stripe" %}
@@ -261,7 +265,8 @@
 														</td>
 													</tr>
 													</body>
-											</table> 
+												</table> 
+											</div>
 										</div>
 										{% endif %}
 										{% if gateway.name == "Razorpay" %}
@@ -304,13 +309,14 @@
 														</td>
 													</tr>
 													</body>													
-											</table> 
+												</table> 
+											</div>
 										</div>
 										{% endif %}
 										{% endfor %}
-										</div>
-											</div>
-												</div>
+										<div>
+											<div>
+												<div>
 													<div class="wt-updatall">
 														<i class="far fa-money-bill-alt"></i>
 														<span> click on "Save Changes" button</span>
@@ -318,20 +324,23 @@
 													</div>
 												</div>
 											</div>
-										</div>  
+										
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Information!</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: Bearer and account must come from countries supported by respective partners</span></li>
+											<li><span><i class="fa fa-check"></i>#2: When making a withdrawal request, you will have to select primary account</span></li>
+											<li><span><i class="fa fa-check"></i>#3: If your primary account was declined by our payment partners (e.g Stripe), we will connsider any other account you have provided </span></li>
+											<li><span><i class="fa fa-check"></i>#4: If your account details are declined, we shall halt the payment process and send you an email using your account mail</span></li>
+											<li><span><i class="fa fa-check"></i>#5: Your request will categorized as "Pending". After you rectify, we will proceed to pay.</span></li>
+											<li><span><i class="fa fa-check"></i>#6: In the case of (#4), all other request in queue may be processed before returning. To avoid delays, you need to prompt our support.</span></li>
+										</ul>  
 									</form>
-											
-								<ul class="wt-projectliststyle">
-									<div class="wt-title">
-										<h5>Information!</h5>
-									</div>	
-									<li><span><i class="fa fa-check"></i>#1: Bearer and account must come from countries supported by respective partners</span></li>
-									<li><span><i class="fa fa-check"></i>#2: When making a withdrawal request, you will have to select primary account</span></li>
-									<li><span><i class="fa fa-check"></i>#3: If your primary account was declined by our payment partners (e.g Stripe), we will connsider any other account you have provided </span></li>
-									<li><span><i class="fa fa-check"></i>#4: If your account details are declined, we shall halt the payment process and send you an email using your account mail</span></li>
-									<li><span><i class="fa fa-check"></i>#5: Your request will categorized as "Pending". After you rectify, we will proceed to pay.</span></li>
-									<li><span><i class="fa fa-check"></i>#6: In the case of (#4), all other request in queue may be processed before returning. To avoid delays, you need to prompt our support.</span></li>
-								</ul>											                  														
+								</div>
+								{% else %}
+								<span style="color:blue;"> The withdrawal options will be activated soon. Please check back </span>
+								{% endif %}												                  														
 							</div>
 						</div>
 					</div>
@@ -351,41 +360,3 @@
 		<!--Main End-->	
 				
 {% endblock %}
-
-{% block scripts %}
-
-<script>
-	//UPDATE PAYMENT ACCOUNT             
-	$(document).on('click', '#updatePaymentAccount', function (e) {
-	e.preventDefault();
-
-		$.ajax({
-			type: 'POST',
-			url: "{% url 'payments:update_payment_account' %}",
-			data: {
-				paypalAccount: $('#id_paypal').val(),
-				stripeAccount: $('#id_stripe').val(),
-				flutterwaveAccount: $('#id_flutterwave').val(),
-				razorpayAccount: $('#id_razorpay').val(),
-				csrfmiddlewaretoken: "{{csrf_token}}",
-				action: 'payment-account'
-			},
-			success: function (json) {
-				console.log(json)
-				if (json.message){
-					document.getElementById('paymentAccount-message').innerHTML = json.result
-					$('#paymentAccount-message').addClass('alert alert-success');
-					
-				}
-				else if (json.errors){
-					document.getElementById('paymentAccount-message').innerHTML = json.errors
-					$('#paymentAccount-message').addClass('alert alert-danger');
-				} 
-				
-			},
-			error: function (error) {}            
-		});
-	});
-</script>
-
-{% endblock scripts %}

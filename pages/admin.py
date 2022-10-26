@@ -8,9 +8,8 @@ HIRING_MAX_OBJECTS = 4
 @admin.register(TermsAndConditions)
 class TermsAndConditionsAdmin(admin.ModelAdmin):
     model=TermsAndConditions
-    list_display = ['title', 'created_at', 'updated_at', 'is_published', ]
+    list_display = ['title', 'created_at', 'updated_at', 'is_published']
     list_display_links = ['title', ]
-    list_editable = ['is_published', ]
     prepopulated_fields = {'slug': ('title',)}
     fieldsets = (
         ('Basic Info', {'fields': ('title', 'slug',)}),
@@ -20,6 +19,21 @@ class TermsAndConditionsAdmin(admin.ModelAdmin):
     )
     radio_fields = {'is_published': admin.VERTICAL}
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        if not is_superuser: 
+            disabled_fields |= {
+                'is_published', 
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
 @admin.register(Hiring)
 class HiringAdmin(admin.ModelAdmin):
@@ -27,7 +41,6 @@ class HiringAdmin(admin.ModelAdmin):
     list_display = ['get_howitwork_hiring_tag', 'title',
                     'updated_at', 'ordering', 'is_published', ]
     list_display_links = ['get_howitwork_hiring_tag', 'title', ]
-    list_editable = ['ordering', 'is_published', ]
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['get_howitwork_hiring_tag']
     fieldsets = (
@@ -38,6 +51,22 @@ class HiringAdmin(admin.ModelAdmin):
 
     )
     radio_fields = {'is_published': admin.VERTICAL}
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        if not is_superuser: 
+            disabled_fields |= {
+                'is_published', 
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= HIRING_MAX_OBJECTS:
@@ -61,7 +90,6 @@ class FreelancingAdmin(admin.ModelAdmin):
     list_display = ['get_howitwork_freelancing_tag', 'title',
                     'created_at', 'updated_at', 'is_published', ]
     list_display_links = ['get_howitwork_freelancing_tag', 'title', ]
-    list_editable = ['is_published', ]
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['get_howitwork_freelancing_tag']
     fieldsets = (
@@ -78,6 +106,22 @@ class FreelancingAdmin(admin.ModelAdmin):
 
     )
     radio_fields = {'is_published': admin.VERTICAL}
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        if not is_superuser: 
+            disabled_fields |= {
+                'is_published', 
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:
@@ -114,6 +158,35 @@ class AboutUsPageAdmin(admin.ModelAdmin):
 
     )
     radio_fields = {'banner_type': admin.HORIZONTAL}
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        if not is_superuser: 
+            disabled_fields |= {
+                'title', 
+                'subtitle', 
+                'slug', 
+                'description',
+                'banner_type', 
+                'video_url', 
+                'ad_image', 
+                'display_stats',
+                'title_block', 
+                'subtitle_block', 
+                'banner_image',
+                'banner_color', 
+                'banner_button_one_color', 
+                'banner_button_two_color'
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:

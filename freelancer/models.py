@@ -50,8 +50,19 @@ class Freelancer(models.Model):
     department = models.ForeignKey('general_settings.Department', verbose_name=_("Department"),  null=True, blank=True, on_delete=models.RESTRICT)
     business_size = models.ForeignKey('general_settings.Size', verbose_name=_("Business Size"), related_name="freelancers", null=True, blank=True, on_delete=models.RESTRICT)
     address = models.CharField(_("Residence Address"), max_length=100, null=True, blank=True)
-    skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("skill"), related_name="freelancerskill")
-    #Experience and Education(freelancer)
+    # Skill and Specialty
+    skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("General skill"), related_name="freelancerskill")
+    keyskill_one = models.CharField(_("Key Skill 1"), max_length=60, null=True, blank=True,)
+    key_skill_one_score = models.PositiveIntegerField(_("Key Skill 1 Score"),null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    keyskill_two = models.CharField(_("Key Skill 2"), max_length=60, null=True, blank=True,)
+    key_skill_two_score = models.PositiveIntegerField(_("Key Skill 2 Score"),null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    keyskill_three = models.CharField(_("Key Skill 3"), max_length=60, null=True, blank=True,)
+    key_skill_three_score = models.PositiveIntegerField(_("Key Skill 3 Score"),null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    keyskill_four = models.CharField(_("Key Skill 4"), max_length=60, null=True, blank=True,)
+    key_skill_four_score = models.PositiveIntegerField(_("Key Skill 4 Score"),null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    keyskill_five = models.CharField(_("Key Skill 5"), max_length=60, null=True, blank=True,)
+    key_skill_five_score = models.PositiveIntegerField(_("Key Skill 5 Score"),null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])    
+    #Experience and Education
     company_name = models.CharField(_("Company Name 1"), max_length=100, null=True, blank=True,)
     start_date = models.DateField(_("Start Date 1"), default=timezone.now,auto_now_add=False, auto_now=False, null=True, blank=True,)
     end_date = models.DateField(_("End Date 1"), default=timezone.now,auto_now_add=False, auto_now=False, null=True, blank=True,)
@@ -62,7 +73,7 @@ class Freelancer(models.Model):
     end_date_two = models.DateField(_("End Date 2"), default=timezone.now, auto_now_add=False, auto_now=False, null=True, blank=True,)
     job_position_two = models.CharField(_("Job Position 2"), max_length=100, null=True, blank=True,)
     job_description_two = models.TextField(_("Job Description 2"), max_length=500, null=True, blank=True,)
-    #Projects and Awards(freelancer)
+    # Projects and Awards
     project_title = models.CharField(_("Project Title 1"), max_length=100, null=True, blank=True,)
     project_url = models.URLField(_("Project Url 1"), max_length=2083, null=True, blank=True,)
     image_one = models.ImageField(_("Image 1"), upload_to='freelancer/awards/',default='freelancer/awards/banner.png', null=True, blank=True,)
@@ -101,9 +112,28 @@ class Freelancer(models.Model):
             raise ValidationError(
                 {'end_date': _('End date should be greater tha start date')})
 
+        if self.keyskill_one and self.key_skill_one_score is None:
+            raise ValidationError(
+                {'key_skill_one_score': _('Skill #1 and Score #1 are required together')})
+        
+        if self.keyskill_two and self.key_skill_two_score is None:
+            raise ValidationError(
+                {'key_skill_two_score': _('Skill #2 and Score #2 are required together')})
+        
+        if self.keyskill_three and self.key_skill_three_score is None:
+            raise ValidationError(
+                {'key_skill_three_score': _('Skill #3 and Score #3 are required together')})
+        
+        if self.keyskill_four and self.key_skill_four_score is None:
+            raise ValidationError(
+                {'key_skill_four_score': _('Skill #4 and Score #4 are required together')})
+        
+        if self.keyskill_five and self.key_skill_five_score is None:
+            raise ValidationError(
+                {'key_skill_five_score': _('Skill #5 and Score #5 are required together')})
+
         return super().clean()
 
-    # a url route for the profile detail page
 
     def freelancer_profile_absolute_url(self):
         return reverse('freelancer:freelancer_profile', args=([(self.user.short_name)]))

@@ -19,6 +19,7 @@ def notice(request):
     }
     return render(request, 'marketing/notice.html', context)
 
+
 def article_list(request):
     all_blogs  = Blog.objects.filter(published=True)
     freelancer_blogs = Blog.objects.filter(published=True, type=Blog.FREELANCER)
@@ -27,7 +28,7 @@ def article_list(request):
     context ={
         "all_blogs":all_blogs,
         "freelancer_blogs":freelancer_blogs,
-        "client_blogs":client_blogs,
+        "client_blogs":client_blogs
     }
     return render( request, "marketing/blog_list.html", context)
 

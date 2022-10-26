@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Proposal, ProposalSupport, ProposalChat
 from django import forms
 
-
+@admin.register(Proposal)
 class ProposalAdmin(admin.ModelAdmin):
     model = Proposal
     list_display = ['image_tag', 'title', 'team','category', 'salary', 'percent_progress', 'status', 'published']
@@ -45,56 +45,54 @@ class ProposalAdmin(admin.ModelAdmin):
         return actions
 
 
-# class ProposalSupportInline(admin.StackedInline):
-#     model = ProposalChat
-#     list_display = ['team', 'sender', 'sent_on']
-#     readonly_fields = ['team', 'sender', 'sent_on','content']
-#     extra = 0
+class ProposalSupportInline(admin.StackedInline):
+    model = ProposalChat
+    list_display = ['team', 'sender', 'sent_on']
+    readonly_fields = ['team', 'sender', 'sent_on','content']
+    extra = 0
 
-#     fieldsets = (
-#         ('Reply Messages', {'fields': ('content', 'sent_on',)}),
-#     )
-
-
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-
-#     def get_actions(self, request):
-#         actions = super().get_actions(request)
-
-#         if 'delete_selected' in actions:
-#             del actions['delete_selected']
-#         return actions
+    fieldsets = (
+        ('Comment Thread', {'fields': ('content', 'sent_on',)}),
+    )
 
 
-# class ProposalSupportAdmin(admin.ModelAdmin):
-#     model = ProposalSupport
-#     list_display = ['team', 'title', 'created_at']
-#     list_display_links = ['team','title',]
-#     readonly_fields = ['team', 'title']
-#     search_fields = ['team__title', 'title']
+    def has_delete_permission(self, request, obj=None):
+        return False
 
-#     fieldsets = (
-#         ('Proposal Info', {'fields': ('team', 'title',)}),
-#     )
-#     inlines = [ProposalSupportInline]
+    def get_actions(self, request):
+        actions = super().get_actions(request)
 
-#     def has_add_permission(self, request):
-#         return False
-
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-
-#     def get_actions(self, request):
-#         actions = super().get_actions(request)
-
-#         if 'delete_selected' in actions:
-#             del actions['delete_selected']
-#         return actions
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
-admin.site.register(Proposal, ProposalAdmin)
-# admin.site.register(ProposalSupport, ProposalSupportAdmin)
+@admin.register(ProposalSupport)
+class ProposalSupportAdmin(admin.ModelAdmin):
+    model = ProposalSupport
+    list_display = ['team', 'title', 'created_at']
+    list_display_links = ['team','title',]
+    readonly_fields = ['team', 'title', 'created_at']
+    search_fields = ['team__title', 'title']
+
+    fieldsets = (
+        ('Proposal Info', {'fields': ('team', 'title',)}),
+    )
+    inlines = [ProposalSupportInline]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
 
 
 

@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError
 from .models import Customer, Country, TwoFactorAuth
 from django.utils.translation import gettext_lazy as _
 import sys
-
+from django.contrib.admin.models import LogEntry
+import warnings
 
 MAX_OBJECTS = 0
 
@@ -47,8 +48,8 @@ class CustomerChangeForm(forms.ModelForm):
         return self.initial['password']
 
 
-class CustomerAdmin(BaseUserAdmin,):
-    model = Customer    
+@admin.register(Customer)
+class CustomerAdmin(BaseUserAdmin,):  
     form = CustomerChangeForm
     add_form = CustomerCreationForm
 
@@ -156,8 +157,42 @@ class CustomerAdmin(BaseUserAdmin,):
         return form
 
 
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ['user', 'content_type', 'action_time',  'action_flag']
+    readonly_fields = [
+        'action_time', 'user', 'content_type', 'action_flag', 
+        'object_repr', 'change_message', 'object_id'
+    ]
+    list_display_links = ['content_type', 'user']
+    search_fields = ['object_repr', 'change_message']
+    list_filter = ('action_flag',)
+
+    def get_queryset(self, request):
+        qs = super(LogEntryAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs.all()  
+        else:
+            return qs.filter(user=request.user)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    model = Country
     list_display = ['flag_tag', 'name', 'country_code', 'ordering', 'supported']
     readonly_fields = ['flag_tag']
     list_display_links = ['flag_tag', 'name']
@@ -184,8 +219,8 @@ class CountryAdmin(admin.ModelAdmin):
         return False
 
 
-class TwoFactorAuthAdmin(admin.ModelAdmin):
-    model = TwoFactorAuth    
+@admin.register(TwoFactorAuth)
+class TwoFactorAuthAdmin(admin.ModelAdmin):   
     list_display = ['user', 'get_user_type', 'last_login', 'pass_code']
     readonly_fields = ['user', 'last_login', 'pass_code']     
     list_display_links = None
@@ -193,13 +228,13 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(TwoFactorAuthAdmin, self).get_queryset(request)
         if request.user.is_superuser:
-            return qs.all()  
+            return qs.all().exclude(user__is_staff=True)  
         else:
             return qs.filter(pk=0)  
             
     @admin.display(description='User Types', ordering='user__user_type')
     def get_user_type(self, obj):
-        return obj.user.user_type
+        return obj.user.user_type.capitalize()
 
     def has_add_permission(self, request):
         return False
@@ -214,8 +249,4 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-
-admin.site.register(Customer, CustomerAdmin)
-admin.site.register(Country, CountryAdmin)
-admin.site.register(TwoFactorAuth, TwoFactorAuthAdmin)
 admin.site.unregister(Group)

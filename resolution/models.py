@@ -64,8 +64,8 @@ class OneClickResolution(models.Model):
         
     class Meta:
         ordering = ("-created_at",) 
-        verbose_name = _("One Click Hired")
-        verbose_name_plural = _("One Click Hired")
+        verbose_name = _("One Click Manager")
+        verbose_name_plural = _("One Click Manager")
 
     def __str__(self):
         return f'{self.team.title} vrs. {self.oneclick_sale.client.get_full_name()}'
@@ -407,8 +407,8 @@ class ProjectResolution(models.Model):
         
     class Meta:
         ordering = ("-created_at",) 
-        verbose_name = _("Application Approved")
-        verbose_name_plural = _("Application Approved")
+        verbose_name = _("Application Manager")
+        verbose_name_plural = _("Application Manager")
 
     def __str__(self):
         return f'{self.team.title}'
@@ -668,8 +668,8 @@ class ProposalResolution(models.Model):
         
     class Meta:
         ordering = ("-created_at",) 
-        verbose_name = _("Proposal Approved")
-        verbose_name_plural = _("Proposal Approved")
+        verbose_name = _("Proposal Manager")
+        verbose_name_plural = _("Proposal Manager")
 
     def __str__(self):
         return f'{self.team.title} vrs. {self.proposal_sale.proposal.created_by.get_full_name()}'
@@ -930,8 +930,8 @@ class ContractResolution(models.Model):
         
     class Meta:
         ordering = ("-created_at",) 
-        verbose_name = _("Contract Awarded")
-        verbose_name_plural = _("Contract Awarded")
+        verbose_name = _("Contract Manager")
+        verbose_name_plural = _("Contract Manager")
 
     def __str__(self):
         return f'{self.team.title} vrs. {self.contract_sale.contract.created_by.get_full_name()}'
@@ -1205,8 +1205,8 @@ class ExtContractResolution(models.Model):
         
     class Meta:
         ordering = ("-created_at",) 
-        verbose_name = _("Ext Contract Awarded")
-        verbose_name_plural = _("Ext Contract Awarded")
+        verbose_name = _("Ext-Contract Manager")
+        verbose_name_plural = _("Ext-Contract Manager")
 
     def __str__(self):
         return f'{self.team.title} vrs. {self.contract_sale.purchase.client.get_full_name()}'

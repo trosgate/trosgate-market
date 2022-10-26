@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from .forms import ProposalRefundForm, ApplicationRefundForm, ContractRefundForm, ExtContractRefundForm
 
 
+@admin.register(OneClickPurchase)
 class OneClickPurchaseAdmin(admin.ModelAdmin):
     model = OneClickPurchase
     list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status']
@@ -36,6 +37,7 @@ class OneClickPurchaseAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
     list_display = ['client', 'category', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
@@ -68,10 +70,12 @@ class PurchaseAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(ApplicationSale)
 class ApplicationSaleAdmin(admin.ModelAdmin):
     model = ApplicationSale
     list_display = ['team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action']    
-    list_filter = ['purchase__status']
+    list_filter = ['purchase__status','is_refunded']
+    search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
          'team', 'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earnings', 'total_sales_price', 'discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value', 'is_refunded'
@@ -151,12 +155,14 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(ProposalSale)
 class ProposalSaleAdmin(admin.ModelAdmin):
     model = ProposalSale
     list_display = [
         'team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action'
     ]    
-    list_filter = ['purchase__status']
+    list_filter = ['purchase__status','is_refunded']
+    search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
         'team', 'purchase','proposal', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged'
@@ -238,12 +244,14 @@ class ProposalSaleAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(ContractSale)
 class ContractSaleAdmin(admin.ModelAdmin):
     model = ContractSale
     list_display = [
         'team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action'
     ]    
-    list_filter = ['purchase__status']
+    list_filter = ['purchase__status','is_refunded']
+    search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
         'team', 'purchase','contract', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged'
@@ -331,7 +339,8 @@ class ExtContractAdmin(admin.ModelAdmin):
     list_display = [
         'team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action'
     ]   
-    list_filter = ['purchase__status']
+    list_filter = ['purchase__status','is_refunded']
+    search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
         'team', 'purchase','contract', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged',
         'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged'
@@ -412,9 +421,12 @@ class ExtContractAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(SubscriptionItem)
 class SubscriptionItemAdmin(admin.ModelAdmin):
     model = SubscriptionItem
-    list_display = ['team', 'subscription_id', 'payment_method', 'price', 'status', 'activation_time','expired_time']
+    list_display = ['team', 'subscription_id', 'payment_method', 'expired_time']
+    search_fields = ['team__title', 'subscription_id', 'customer_id']
+    list_filter=['status']
     readonly_fields = [
         'team', 'customer_id', 'subscription_id','created_at',
         'price', 'status','payment_method', 'activation_time','expired_time'
@@ -438,11 +450,3 @@ class SubscriptionItemAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-
-
-admin.site.register(OneClickPurchase, OneClickPurchaseAdmin)
-admin.site.register(Purchase, PurchaseAdmin)
-admin.site.register(ApplicationSale, ApplicationSaleAdmin)
-admin.site.register(ProposalSale, ProposalSaleAdmin)
-admin.site.register(ContractSale, ContractSaleAdmin)
-admin.site.register(SubscriptionItem, SubscriptionItemAdmin)

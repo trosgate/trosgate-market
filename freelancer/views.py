@@ -172,6 +172,7 @@ def freelancer_profile(request, short_name):
 
 
 @login_required
+@user_is_freelancer
 def update_freelancer(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name, user=request.user)
     if request.method == 'POST':
@@ -196,6 +197,7 @@ def update_freelancer(request, short_name):
         'freelancer': freelancer,
     }
     return render(request, 'freelancer/freelancer_profile_update.html', context)
+
 
 
 @login_required

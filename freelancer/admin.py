@@ -23,11 +23,17 @@ class FreelancerAdmin(admin.ModelAdmin):
         'project_title', 'project_url', 'image_one',
         'project_title_two', 'project_url_two', 'image_two',
         'project_title_three','project_url_three', 'image_three',
+        'keyskill_one', 'key_skill_one_score', 'keyskill_two','key_skill_two_score','keyskill_three',
+        'key_skill_three_score', 'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score'
     ]
     search_fields = ('user__short_name','gender','tagline',)
     fieldsets = (
         ('Personal info', {'fields': ('gender', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
-        ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'skill', 'business_size', 'department',)}),
+        ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'business_size', 'department',)}),
+        ('Skill and Specialty', {'fields': (
+            'skill', 'keyskill_one', 'key_skill_one_score', 'keyskill_two','key_skill_two_score','keyskill_three',
+            'key_skill_three_score', 'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score'
+        )}),
         ('Education and Experience #1', {'fields': ('company_name','job_position', 'start_date', 'end_date', 'job_description',)}),
         ('Education and Experience #2', {'fields': ('company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',)}),
         ('Projects and Awards #1', {'fields': ('project_title', 'project_url', 'image_one',)}),

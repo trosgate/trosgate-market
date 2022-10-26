@@ -12,7 +12,15 @@ from django.http import HttpResponseRedirect
 class PaymentAccountAdmin(admin.ModelAdmin):
     model = PaymentAccount
     list_display = ['user', 'primary_account_type', 'created_at']
-    readonly_fields = ['user', 'primary_account_type', 'created_at','modified_on']
+    readonly_fields = [
+        'user', 'primary_account_type', 'created_at','modified_on',
+        'flutterwave_type', 'flutterwave_country', 'flutterwave_bank', 'flutterwave_bearer',
+        'flutterwave_account', 'flutterwave_swift_iban', 'flutterwave_extra_info',
+        'stripe_country', 'stripe_bank', 'stripe_account', 'stripe_routing',
+        'stripe_swift_iban', 'stripe_bearer', 'stripe_extra_info',
+        'paypal_account', 'paypal_bearer', 'paypal_country',
+        'razorpay_bearer', 'razorpay_upi','razorpay_country'
+    ]
     list_display_links = ['user',]
     fieldsets = (
         ('Account Baseline', {
@@ -37,8 +45,8 @@ class PaymentAccountAdmin(admin.ModelAdmin):
 
     radio_fields = {'flutterwave_type': admin.HORIZONTAL}
 
-    # def has_add_permission(self, request):        
-    #     return False
+    def has_add_permission(self, request):        
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False

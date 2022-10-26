@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render,get_object_or_404, redirect
 from account.models import Customer
 from freelancer.models import Freelancer, FreelancerAccount, FreelancerAction
 from django.contrib.auth.decorators import login_required
@@ -16,52 +16,28 @@ from general_settings.models import PaymentGateway
 @user_is_freelancer
 def payment_vault(request):
     account = None
-    gateways = PaymentGateway.objects.filter(status=True)
-
+    gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
     if PaymentAccount.objects.filter(user=request.user).exists():
         account = get_object_or_404(PaymentAccount, user=request.user)
-        paymentForm = PaymentAccountForm(instance=account)
     else:
         account = PaymentAccount(user=request.user).save()
+    
+    if request.method == "POST":
+        paymentForm = PaymentAccountForm(request.POST or None, instance=account)
+        if paymentForm.is_valid():
+            account_vault = paymentForm.save(commit=False)
+            account_vault.user = request.user
+            account_vault.save()
+
+            return redirect("payments:payment_vault") 
+    else:
         paymentForm = PaymentAccountForm(instance=account)
-       
     context = {
         'paymentForm': paymentForm,
         'account': account,
         'gateways': gateways
     }
     return render(request, "payments/payment_details.html", context)
-
-
-@login_required
-@user_is_freelancer
-def update_payment_account(request):
-    user = get_object_or_404(PaymentAccount, user=request.user, user__is_active=True, user__user_type=Customer.FREELANCER)
-    message = ''
-    mes = ''
-    if request.POST.get('action') == 'payment-account':
-        paypal = str(request.POST.get('paypalAccount', ''))
-        stripe = str(request.POST.get('stripeAccount', ''))
-        flutterwave = str(request.POST.get('flutterwaveAccount', ''))
-        razorpay = str(request.POST.get('razorpayAccount', ''))
-
-        print(paypal, stripe, flutterwave, razorpay)
-
-        try:
-            PaymentAccount.payment_mode(
-                user=user,
-                paypal=paypal,
-                stripe=stripe,
-                flutterwave=flutterwave,
-                razorpay=razorpay,
-            )
-
-            message = f'The account was updated successfully'
-        except Exception as e:
-            mes = str(e)
-            message = message = f'<span id="debit-message" class="alert alert-danger" style="color:red; text-align:right;">{mes}</span>'
-
-        return JsonResponse({'message': message})
 
 
 @login_required
