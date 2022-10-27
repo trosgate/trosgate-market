@@ -370,6 +370,7 @@ def stripe_contract_intent(request):
     stripe.api_key = stripe_obj.stripe_secret_key()
 
     session = stripe.checkout.Session.create(
+        metadata = {'mode':'payment'},
         payment_method_types=['card'],
         line_items = [
             {
@@ -874,6 +875,7 @@ def extern_stripe_contract_intent(request):
     stripe.api_key = stripe_obj.stripe_secret_key()
 
     session = stripe.checkout.Session.create(
+        metadata = {'mode':'payment'},
         payment_method_types=['card'],
         line_items = [
             {

@@ -274,34 +274,36 @@ def final_deposit(request):
 @user_is_client
 def stripe_deposit(request):
     message = ''
-    mes = ''
     data = json.loads(request.body)
     gateway_id = request.session["depositgateway"]["gateway_id"]
     selected_gateway = PaymentGateway.objects.get(pk=gateway_id, status=True)
 
     deposit_amount = data['stripeAmount']
     narration = data['stripeNarration']
+    amount_to_str = int(deposit_amount)
     deposit_fee = selected_gateway.processing_fee
-    total_amount = int((deposit_amount + deposit_fee) * 100)
-    
-    # stripe_obj = StripeClientConfig()
-    # stripe_reference = stripe_obj.stripe_unique_reference()
-    # stripe.api_key = stripe_obj.stripe_secret_key()
+    total_amount = int((amount_to_str + deposit_fee) * 100)
+
+    stripe_obj = StripeClientConfig()
+    stripe.api_key = stripe_obj.stripe_secret_key()
 
     try:
-        ClientAccount.level_one_deposit_check(
-            user=request.user, 
-            deposit_amount=deposit_amount, 
-            narration=narration, 
-            reference = payment_intent
+        ClientAccount.deposit_check(
+            user=request.user, deposit_amount=total_amount, narration=narration
         )
-        message = 'The deposit was successful'
 
     except FundException as e:
-        mes = str(e)
-        message = f'<span id="debit-message" style="color:red; text-align:right;">{mes}</span>'
-            
+        message = str(e)
+
     session = stripe.checkout.Session.create(
+        client_reference_id=request.user.id,
+        customer_email = request.user.email,        
+        metadata = {
+            'mode':'deposit', 
+            'gateway':selected_gateway.name, 
+            'deposit_fee':deposit_fee, 
+            'narration':narration
+        },
         payment_method_types=['card'],
         line_items = [
             {
@@ -322,13 +324,14 @@ def stripe_deposit(request):
 
     print('sessionId', session)
     payment_intent = session.payment_intent
-    print('payment_intent', payment_intent)
 
+    # del request.session["depositgateway"]
+    # del request.session["acceptdepoamount"]
     return JsonResponse({'session':session, 'order':payment_intent, 'message':message}, safe=False)
 
 
 @login_required
-def deposit_checker(request):
+def razor_deposit_checker(request):
     razorpay_api = RazorpayClientConfig()
 
     gateway_id = request.session["depositgateway"]["gateway_id"]

@@ -1,7 +1,5 @@
 import stripe
-import random
 import json
-import math
 import requests
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -21,7 +19,6 @@ from general_settings.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
 from .models import OneClickPurchase, ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
-from . forms import PurchaseForm
 from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
@@ -36,7 +33,7 @@ from teams.utilities import get_expiration
 from django.db import transaction as db_transaction
 from freelancer.models import FreelancerAccount
 from general_settings.utilities import get_protocol_only
-
+from client.models import ClientAccount
 
 
 @login_required
@@ -353,6 +350,7 @@ def stripe_payment_order(request):
     stripe.api_key = stripe_obj.stripe_secret_key()
 
     session = stripe.checkout.Session.create(
+        metadata = {'mode':'payment'},
         payment_method_types=['card'],
         line_items = [
             {
@@ -426,7 +424,6 @@ def stripe_payment_order(request):
 
 @csrf_exempt
 def stripe_webhook(request):
-    # hiringbox = HiringBox(request)
     payload = request.body
     stripe.api_key = StripeClientConfig().stripe_secret_key()
     webhook_key = StripeClientConfig().stripe_webhook_key()    
@@ -445,12 +442,34 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         if session.payment_status == 'paid':
-            if session.mode == 'payment':
+
+            if session.mode == 'payment' and session['metadata']['mode'] == 'payment':
                 try:
                     Purchase.stripe_order_confirmation(session.payment_intent)                    
                 except Exception as e:
                     print('%s' % (str(e)))
-            else:# else a subscription
+
+            if session.mode == 'payment' and session['metadata']['mode'] == 'deposit':
+                try:
+                    deposit_fee = session['metadata']['deposit_fee']
+                    deposit_gateway = session['metadata']['gateway']
+                    narration = session['metadata']['narration']
+                    amount_total = session.get('amount_total')
+                    convert_fee = int(deposit_fee)
+                    convert_amount = int(amount_total)
+                    value_returned = int((convert_amount/100) - convert_fee)
+
+                    ClientAccount.final_deposit(
+                        user=session.get('client_reference_id'), 
+                        amount=value_returned, 
+                        deposit_fee=convert_fee, 
+                        narration=narration, 
+                        gateway=deposit_gateway
+                    )                    
+                except Exception as e:
+                    print('%s' % (str(e)))
+
+            if session.mode == 'subscription':
                 try:                            
                     package = Package.objects.get(is_default=False, type='Team')
                     team = Team.objects.get(pk=session.get('client_reference_id'))

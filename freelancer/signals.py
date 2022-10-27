@@ -5,8 +5,6 @@ from account. models import Customer
 from payments.models import PaymentAccount
 
 
-
-
 @receiver(post_save, sender=Customer)
 def create_freelancer_profile(sender, instance, created, **kwargs):
     '''

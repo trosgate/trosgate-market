@@ -127,33 +127,15 @@
                                                 
                                                 <div class="form-group">
                                                     <label for="stripeAmount" class="form-label">Deposit Amount </label>
-                                                    <input name="stripeAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="stripeAmount">
+                                                    <input name="stripeAmount" type="number" value="" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="stripeDepoAmount">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="stripeNarration" class="form-label">Narration <span class="text-muted"></span></label>
-                                                    <input name="stripeNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="stripeNarration" value="">
+                                                    <input name="stripeNarration" type="text" class="form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="stripeDepoNarration" value="">
                                                 </div>
                                                 
-                                                <div id = 'stripe-deposit-confirm' class="wt-updatall">
-                                                    <span>Step 1: I confirm that I, <em>"{{request.user.get_full_name}}"</em> am making this transaction </span>
-                                                    <a href="javascript:void(0);" class="wt-btn">
-                                                        <div class="btn btn-inline-danger text-white">I Confirm</div>
-                                                    </a>
-                                                </div>
-                                                
-                                                <div id = 'stripe-deposit-nextstep' class="wt-updatall">
-                                                    <span>Step 2: I understand that after successful deposit, its Irreversible</span>
-                                                    <button onclick='stripeDepoPay(event)' class="wt-btn"> Yes, Make Deposit </button>
-                                                </div>											
-                                                <ul class="wt-projectliststyle">
-                                                    <div class="wt-title">
-                                                        <h5><span style="color: red; font-weight: bold;"> Our Deposit Policy </span><br></h5>
-                                                    </div>	
-                                                    <li><span><i class="fa fa-check"></i>#1: Deposit amount must range between <em> {{base_currency}}{{min_deposit}} - {{base_currency}}{{max_deposit}} </em></span></li>
-                                                    <li><span><i class="fa fa-check"></i>#2: While making deposit, we expect your total balance less than or equal to {{base_currency}}{{max_depositor_balance}}</span></li>
-                                                    <li><span><i class="fa fa-check"></i>#3: Your deposit can be used for <em style='color:green'>One-Click-Checkout</em></span></li>
-                                                </ul>
-         
+                                                <button type="button" class="btn btn-danger"><a href="javascript:void(0);" class="text-white" data-toggle="modal" data-target="#makeDepositNow">Make deposit</a></button>
+                                                                                                        
                                             </div>
                                         {% endif %} 
                                         {% if selected_gateway.name == "Razorpay" %} 
@@ -207,6 +189,28 @@
                 </div>
             </div>
         </main>
+	<!-- Add team Popup Start-->
+	
+    <!-- Popup Start-->
+	<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="makeDepositNow">
+		<div class="modal-dialog" role="document">
+			<div class="wt-modalcontent modal-content">
+				<div class="modal-body">
+                    <ul class="wt-projectliststyle">
+                        <div class="wt-title">
+                            <h5><span style="color: red; font-weight: bold;"> Making Deposit </span><br></h5>
+                        </div>	
+                        <li><span><i class="fa fa-check"></i>#1: Deposit amount must range between <em> {{base_currency}}{{min_deposit}} - {{base_currency}}{{max_deposit}} </em></span></li>
+                        <li><span><i class="fa fa-check"></i>#2: While making deposit, we expect your total balance less than or equal to {{base_currency}}{{max_depositor_balance}}</span></li>
+                        <li><span><i class="fa fa-check"></i>#3: After Successful deposit, we will credit value to yuour account</span></li>
+                    </ul>
+                    <button onclick="stripeDepoPay(event)" class="btn btn-danger">Yes Proceed</button>
+                    <a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 
     {% endblock content %}
 
@@ -316,21 +320,8 @@
     {% endif %} 
     
     {% if selected_gateway.name == "Stripe" %}
-    <script>
-        //STRIPE DEPOSIT BUTTON CONFIRMATION  
-        $(document).ready(function(){
 
-            $('#stripe-deposit-nextstep').hide()
-            $('#stripe-deposit-confirm').click(function(){
-                $('#stripe-deposit-nextstep').slideToggle(200)       
-            });
-            $('#stripe-deposit-nextstep').click(function(){
-                $('#stripe-deposit-nextstep').hide()       
-            });            
-        });
-    </script>  
     <script src="https://js.stripe.com/v3/"></script>
-    <!-- <script src="{% static 'js/deposits/stripe-deposit.js' %}"></script> -->
     <script>
         function stripeDepoPay(event) {
         event.preventDefault();
@@ -358,7 +349,7 @@
 
             let stripe = Stripe('{{stripe_public_key}}');
 
-            fetch('/client/stripe-deposit/', {
+            fetch("{% url 'client:stripe_deposit' %}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
