@@ -14,7 +14,7 @@
                     </div>
                     <div class="wt-dashboardboxcontent">
                                                                                     
-                    <form method='POST' action=''>{% csrf_token %}
+                    <form method="POST" action="{% url 'account:register' %}">{% csrf_token %}
                         {% if regform.errors %}
                         <div class="alert alert-danger text-center" role="alert">
                             Ooop! form error occured. Please check below and correct

@@ -1,11 +1,18 @@
-# from django.contrib.auth.forms import UserCreationForm
+from django.db import transaction as db_transaction
 from django.core.exceptions import ValidationError
-from .models import Customer, Country, TwoFactorAuth
+from . models import Customer, Country, TwoFactorAuth
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
 from django.forms import ModelForm
 from django import forms
 from datetime import datetime
+from freelancer.models import Freelancer, FreelancerAccount
+from payments.models import PaymentAccount
+from client.models import Client, ClientAccount
+from teams.models import Package, Team, Invitation
+from django.utils.text import slugify
+from notification.mailer import new_user_registration
+from contract.models import Contract
 
 
 class SearchTypeForm(forms.Form):
@@ -91,12 +98,75 @@ class CustomerRegisterForm(forms.ModelForm):
             raise forms.ValidationError(_("Email characters must all be in lowercase"))
         return email
 
+
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise ValidationError("Passwords don't match")
         return password2
+
+
+    @db_transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        user.is_active = False
+        user.set_password(self.cleaned_data["password1"])
+        user.save()
+
+        if user.user_type == Customer.FREELANCER:
+            freelancer_profile = Freelancer.objects.create(user=user)
+            freelancer_profile.save()
+            
+            freelancer_account = FreelancerAccount.objects.create(user=user)
+            freelancer_account.save()
+        
+
+            freelancer_payment_account = PaymentAccount.objects.create(user=user)
+            freelancer_payment_account.save()
+
+            try:
+                package = Package.objects.get(pk=1, type='Basic')
+            except Exception as e:
+                print(str(e))
+                package = Package.objects.create(pk=1, type='Basic')
+
+            team = Team.objects.create(
+                # status = "inactive" until signup is confirmed
+                title=user.short_name,
+                notice="This is the basic team", 
+                created_by = user,
+                package = package,
+                package_status = Team.DEFAULT,
+                slug = slugify(user.short_name)
+            )
+            team.save()
+            team.members.add(user)
+            
+            freelancer = freelancer_profile
+            freelancer.active_team_id = team.id
+            freelancer.save()
+
+            invitation = Invitation.objects.create(
+                # status = "invited" until signup is confirmed
+                team=team, 
+                sender=user, 
+                email=user.email, 
+                type=Invitation.INTERNAL,
+            )
+            invitation.save()
+
+        if user.user_type == Customer.CLIENT:
+            client = Client.objects.create(user=user)
+            client.save()
+
+            client_account = ClientAccount.objects.create(user=user)
+            client_account.save()
+            
+        db_transaction.on_commit(lambda: new_user_registration(user, user.email))
+
+        return user
+
 
 
 class UserLoginForm(AuthenticationForm):

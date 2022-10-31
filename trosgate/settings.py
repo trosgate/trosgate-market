@@ -33,6 +33,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+# ALLOWED_HOSTS = ['support.trosgate.com', 'trosgate.com'] 
 # ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
 
@@ -73,14 +74,14 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_countries',
     'ckeditor',
-    'corsheaders',
+    # 'corsheaders',
     'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
+    # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -146,6 +147,7 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 #     }
 # }
 
+# LOCAL SIDE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -209,10 +211,10 @@ LOGIN_REDIRECT_URL = "account:dashboard"
 LOGOUT_REDIRECT_URL = "account:homepage"
 
 #Custom Email Backend for Trosgate software
-EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'example@gmail.com'
@@ -272,8 +274,10 @@ CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 # SECURITY HEADERS - below are required in production
 
 USE_THOUSAND_SEPARATOR = True
+EMAIL_USE_LOCALTIME = True
 
 if DEBUG == False:
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -284,7 +288,7 @@ if DEBUG == False:
     CSRF_COOKIE_SECURE = True
 
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 
 # CORS_ALLOWED_ORIGINS = [
 #     "https://api.flutterwave.com/",

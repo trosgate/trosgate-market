@@ -10,6 +10,7 @@ from .forms import PaymentAccountForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from general_settings.models import PaymentGateway
+from general_settings.currency import get_base_currency_symbol
 
 
 @login_required
@@ -35,6 +36,7 @@ def payment_vault(request):
     context = {
         'paymentForm': paymentForm,
         'account': account,
+        'base_currency': get_base_currency_symbol(),
         'gateways': gateways
     }
     return render(request, "payments/payment_details.html", context)

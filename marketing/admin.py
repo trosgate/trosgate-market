@@ -62,13 +62,13 @@ class HelpDeskAdmin(admin.ModelAdmin):
 
 class TicketMessageInline(admin.StackedInline):
     model = TicketMessage
-    # form =TicketMessageForm
     readonly_fields = ('support', 'created_at',)
     extra = 0
 
     fieldsets = (
         ('Reply Body', {'fields': ('content','link_title_one','link_title_one_backlink','link_title_two','link_title_two_backlink',)}),
     )
+
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -95,7 +95,7 @@ class TicketAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.support = request.user
         super().save_model(request, obj, form, change)
-
+        
     def has_delete_permission(self, request, obj=None):
         return False
 
@@ -108,7 +108,6 @@ class AutoTyPistAdmin(admin.ModelAdmin):
     list_display = ['title', 'is_active', 'ordering']
     list_display_links = None
     list_editable = ['title', 'is_active', 'ordering']
-
 
 
     

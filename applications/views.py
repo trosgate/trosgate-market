@@ -40,7 +40,7 @@ from freelancer.models import FreelancerAccount
 from teams.controller import PackageController
 from notification.mailer import application_notification
 from general_settings.utilities import get_protocol_only
-
+from analytics.analytic import user_review_rate
 
 @login_required
 @user_is_freelancer
@@ -50,7 +50,8 @@ def apply_for_project(request, project_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
     can_apply_for_project = PackageController(team).monthly_projects_applicable_per_team()
     applied = Application.objects.filter(team=team, project=project)
-    
+    base_currency = get_base_currency_symbol()
+
     if applied:
         messages.error(request, 'Your team already applied for this job!')
 
@@ -80,7 +81,8 @@ def apply_for_project(request, project_slug):
     context = {
         'applyform': applyform,
         'project': project,
-        'can_apply_for_project': can_apply_for_project,
+        'base_currency': base_currency,
+        'can_apply_for_project': can_apply_for_project
     }
     return render(request, 'applications/application.html', context)
 
@@ -111,7 +113,7 @@ def freelancer_application_view(request):
 @login_required
 def application_detail(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
-
+    base_currency = get_base_currency_symbol()
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
         applications = Application.objects.filter(project=project, team=team)
@@ -121,6 +123,7 @@ def application_detail(request, project_slug):
     context = {
         'project': project,
         'applications': applications,
+        'base_currency': base_currency
 
     }
     return render(request, 'applications/manage_application_detail.html', context)

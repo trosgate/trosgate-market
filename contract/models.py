@@ -154,7 +154,7 @@ class Contractor(models.Model):
     This is the external client to be invited
     """
     name = models.CharField(max_length=100, help_text=_("Enter an official name known for the client"))
-    email = models.CharField(max_length=100, help_text=_("Enter Valid Email for client to receive mail"))
+    email = models.CharField(max_length=100, help_text=_("Enter Valid Email for client to receive mail"), unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Invitee"), related_name="contractors", on_delete=models.CASCADE)

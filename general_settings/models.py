@@ -35,10 +35,10 @@ class WebsiteSetting(models.Model):
     site_domain = models.CharField(_("Website Domain"), max_length=255, default="example.com", help_text=_(
         'E.x: example.com'), null=True, blank=True)
     button_color = models.CharField(
-        _("Hero Background Color"), 
+        _("Visitor Buttons"), 
         max_length=100, 
         default="purple", 
-        help_text=_("Customize colors for signup and login buttons. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes"), 
+        help_text=_("Customize colors for signup, login, any other visitor buttons. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes"), 
         null=True, 
         blank=True
     )   

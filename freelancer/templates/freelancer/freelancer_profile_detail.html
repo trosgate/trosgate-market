@@ -36,7 +36,8 @@
 											</figure>
 											<div class="wt-title"> 
 												<h3><i class="fa fa-check-circle"></i> {{freelancer.user.get_full_name}}</h3>
-												<span>{{good_review_rate}} Good Review{{good_review_rate|pluralize}} <a class="javascript:void(0);">(3 Stars & Above)</a> <br>Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
+												
+												<span>{% if good_review_rate > 0 %}{{good_review_rate}} Good Review{{good_review_rate|pluralize}} <a class="javascript:void(0);">(3 Stars & Above)</a> <br>{% endif %} Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
 												{% if active_team.created_by == request.user %}
 												{% if max_team_members %}
 												{% if team.status == 'active' %}
@@ -59,7 +60,7 @@
 											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
 												<li><span><i class="fa fa-group" style="color:green;"></i> {{team.title}}</span></li>
 												<li><span> {% if freelancer.user.country.flag %}<img src="{{freelancer.user.country.flag.url}}" alt="img description"> {% else %}{{freelancer.user.country.country_code}} - {% endif %} {{freelancer.user.country.name}}</span><li>
-												<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+												<li><span>Jobs in Queue: <em style="color:green;">{{projects_in_queue}}</em></span></li>
 											</ul>
 											<div class="wt-description">
 												{{freelancer.description|linebreaksbr}}

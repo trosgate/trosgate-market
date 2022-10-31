@@ -114,6 +114,9 @@ class Client(models.Model):
     # a url route for the profile detail page
     def client_profile_get_absolute_url(self):
         return reverse('client:client_profile', args=([(self.user.short_name)]))
+    
+    def modify_client_get_absolute_url(self):
+        return reverse('client:update_client_profile', args=([(self.user.short_name)]))
 
     # profile image display in Admin
     def image_tag(self):

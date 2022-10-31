@@ -32,7 +32,7 @@ from django.core.paginator import Paginator
 from analytics.analytic import (
     ongoing_founder_projects, completed_founder_projects,
     cancelled_founder_projects, total_verified_sale,
-    user_review_rate
+    user_review_rate, total_projects_in_queue
 )
 
 # this will appear in search results
@@ -47,18 +47,18 @@ def freelancer_listing(request):
 
     totalcount = f' There are {all_freelancers} Freelancers available for search'
     context = {
-        'freelancer_list': freelancer_list,
+        "freelancer_list": freelancer_list,
         "skills":skills, 
         "countries":countries, 
         "categorie":categorie, 
         "base_currency": base_currency,
-        "totalcount": totalcount,        
+        "totalcount": totalcount        
     }
     return render(request, 'freelancer/freelancer_listing.html', context)
 
 
 def freelancer_search(request):
-    freelancer_list = ''
+    freelancer_list = Freelancer.active.all().exclude(description = "", skill = None)
     base_currency = get_base_currency_symbol()
     #Country
     country = request.GET.getlist('country[]')
@@ -141,11 +141,12 @@ def freelancer_profile(request, short_name):
     team = get_object_or_404(Team, pk=freelancer.active_team_id)
     proposal_count = len(Proposal.objects.filter(team=team, status=Proposal.ACTIVE)) > 0
     monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
-    ongoing_projects = ongoing_founder_projects(team, freelancer.user)
-    completed_projects = completed_founder_projects(team, freelancer.user)
-    cancelled_projects = cancelled_founder_projects(team, freelancer.user)
+    ongoing_projects = ongoing_founder_projects(team)
+    completed_projects = completed_founder_projects(team)
+    cancelled_projects = cancelled_founder_projects(team)
     verified_sale = total_verified_sale(team)
     review_rate = user_review_rate(team) 
+    projects_in_queue = total_projects_in_queue(team) 
 
     max_team_members = ''
     my_team = ''
@@ -167,6 +168,8 @@ def freelancer_profile(request, short_name):
         'cancelled_projects': cancelled_projects,
         'verified_sale': verified_sale,
         'good_review_rate': review_rate,
+        'projects_in_queue': projects_in_queue
+        
     }
     return render(request, 'freelancer/freelancer_profile_detail.html', context)
 

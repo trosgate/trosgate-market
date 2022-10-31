@@ -364,18 +364,23 @@ def stripe_contract_intent(request):
     grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)  
     grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)  
     purchase=None
-
+    
+    base_currency_symb = get_base_currency_symbol()
+    print('base_currency_symb: ', base_currency_symb)
+    base_currency_code = get_base_currency_code()
+    print('base_currency_code: ', base_currency_code)
+    
     stripe_obj = StripeClientConfig()
     stripe_reference = stripe_obj.stripe_unique_reference()
     stripe.api_key = stripe_obj.stripe_secret_key()
-
+    base_currency_code = get_base_currency_code()
     session = stripe.checkout.Session.create(
         metadata = {'mode':'payment'},
         payment_method_types=['card'],
         line_items = [
             {
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': base_currency_code.lower(),
                     'product_data': {
                         'name': 'Hiring of Applicants',
                     },
@@ -385,8 +390,8 @@ def stripe_contract_intent(request):
             },
         ],
         mode='payment',
-        success_url='http://' + str(get_current_site(request)) + '/contract/congrats/',
-        cancel_url='http://' + str(get_current_site(request)) + '/dashboard/'
+        success_url=f"{get_protocol_only()}{str(get_current_site(request))}/contract/congrats/",
+        cancel_url=f"{get_protocol_only()}{str(get_current_site(request))}/dashboard/"
     )
 
     payment_intent = session.payment_intent
@@ -691,7 +696,9 @@ def connect_contract(request, contractor_id):
     team = get_object_or_404(Team,pk=request.user.freelancer.active_team_id,status=Team.ACTIVE)
     client = get_object_or_404(Contractor, pk=contractor_id, team=team)
     existing_user = Customer.objects.filter(email=client.email).count()
-
+    existing_contract = Contract.objects.filter(client__email=client.email).count()
+    profile_path= f"{get_protocol_only()}{str(get_current_site(request))}/freelancer/profile/{request.user.short_name}/"
+    base_currency = get_base_currency_symbol()
     if request.method == 'POST':
         contractform = ExternalContractForm(request.POST or None)
 
@@ -712,14 +719,17 @@ def connect_contract(request, contractor_id):
         'contractform': contractform,
         'team': team,
         'client': client,
+        'base_currency': base_currency,
         'existing_user': existing_user,
+        'existing_contract': existing_contract,
+        'profile_path': profile_path
     }
     return render(request, 'contract/add_external_contract.html', context)
 
 
 @login_required
 def external_contract_list(request):
-
+    base_currency = get_base_currency_symbol()
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(
             Team, 
@@ -733,6 +743,7 @@ def external_contract_list(request):
         contracts = Contract.objects.filter(client__email=request.user.email)
 
     context = {
+        "base_currency": base_currency,
         "contracts": contracts
     }
     return render(request, 'contract/external_contract_list.html', context)
@@ -873,14 +884,14 @@ def extern_stripe_contract_intent(request):
     stripe_obj = StripeClientConfig()
     stripe_reference = stripe_obj.stripe_unique_reference()
     stripe.api_key = stripe_obj.stripe_secret_key()
-
+    base_currency_code = get_base_currency_code()
     session = stripe.checkout.Session.create(
         metadata = {'mode':'payment'},
         payment_method_types=['card'],
         line_items = [
             {
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': base_currency_code.lower(),
                     'product_data': {
                         'name': 'Hiring of Applicants',
                     },
@@ -890,8 +901,8 @@ def extern_stripe_contract_intent(request):
             },
         ],
         mode='payment',
-        success_url='http://' + str(get_current_site(request)) + '/contract/congrats/',
-        cancel_url='http://' + str(get_current_site(request)) + '/dashboard/'
+        success_url=f"{get_protocol_only()}{str(get_current_site(request))}/contract/congrats/",
+        cancel_url=f"{get_protocol_only()}{str(get_current_site(request))}/dashboard/"
     )
 
     payment_intent = session.payment_intent

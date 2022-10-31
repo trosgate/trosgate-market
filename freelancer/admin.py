@@ -13,18 +13,17 @@ MAX_OBJECTS = 0
 @admin.register(Freelancer)
 class FreelancerAdmin(admin.ModelAdmin):
     model = Freelancer
-    list_display = ['image_tag', 'user', 'support', 'tagline']
+    list_display = ['image_tag', 'user', 'tagline']
     list_display_links = ('image_tag', 'user',)    
     readonly_fields = [
         'gender', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',
         'brand_name', 'tagline','description', 'skill', 'business_size', 'department',
         'company_name','job_position', 'start_date', 'end_date', 'job_description',
         'company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',
-        'project_title', 'project_url', 'image_one',
-        'project_title_two', 'project_url_two', 'image_two',
-        'project_title_three','project_url_three', 'image_three',
-        'keyskill_one', 'key_skill_one_score', 'keyskill_two','key_skill_two_score','keyskill_three',
-        'key_skill_three_score', 'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score'
+        'project_title', 'project_url', 'image_one','project_title_two', 'project_url_two', 'image_two',
+        'project_title_three','project_url_three', 'image_three','keyskill_one', 'key_skill_one_score', 
+        'keyskill_two','key_skill_two_score','keyskill_three','key_skill_three_score', 
+        'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score'
     ]
     search_fields = ('user__short_name','gender','tagline',)
     fieldsets = (

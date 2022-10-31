@@ -24,7 +24,6 @@ from notification.mailer import initiate_credit_memo_email, credit_pending_balan
 from PIL import Image
 
 
-
 class ActiveFreelancer(models.Manager):
     def get_queryset(self):
         return super(ActiveFreelancer, self).get_queryset().filter(user__is_active=True, user__user_type=Customer.FREELANCER)
@@ -44,7 +43,6 @@ class Freelancer(models.Model):
     tagline = models.CharField(_("Tagline"), max_length=100, blank=True)
     description = models.TextField(_("Description"), max_length=2000, blank=True, error_messages={"name": {"max_length": _("Ensure a maximum character of 2000 for description field")}},)
     brand_name = models.CharField(_("Brand Name"), max_length=60, null=True, blank=True)
-    support = models.CharField(unique=True, max_length=15, null=True, blank=True,)
     profile_photo = models.ImageField(_("Profile Photo"), upload_to='freelancer/', default='freelancer/user-login.png')
     banner_photo = models.ImageField(_("Banner Photo"),  upload_to='freelancer/', default='freelancer/banner.png')
     department = models.ForeignKey('general_settings.Department', verbose_name=_("Department"),  null=True, blank=True, on_delete=models.RESTRICT)
@@ -76,13 +74,13 @@ class Freelancer(models.Model):
     # Projects and Awards
     project_title = models.CharField(_("Project Title 1"), max_length=100, null=True, blank=True,)
     project_url = models.URLField(_("Project Url 1"), max_length=2083, null=True, blank=True,)
-    image_one = models.ImageField(_("Image 1"), upload_to='freelancer/awards/',default='freelancer/awards/banner.png', null=True, blank=True,)
+    image_one = models.ImageField(_("Image 1"), upload_to='freelancer/awards/', null=True, blank=True,)
     project_title_two = models.CharField(_("Project Title 2"), max_length=100, null=True, blank=True,)
     project_url_two = models.URLField(_("Project Url 2"), max_length=2083, null=True, blank=True,)
-    image_two = models.ImageField(_("Image 2"), upload_to='freelancer/awards/',default='freelancer/awards/banner.png', null=True, blank=True,)
+    image_two = models.ImageField(_("Image 2"), upload_to='freelancer/awards/', null=True, blank=True,)
     project_title_three = models.CharField(_("Project Title 3"), max_length=100, null=True, blank=True,)
     project_url_three = models.URLField(_("Project Url 3"), max_length=2083, null=True, blank=True,)
-    image_three = models.ImageField(_("Image 3"), upload_to='freelancer/awards/',default='freelancer/awards/banner.png', null=True, blank=True,)
+    image_three = models.ImageField(_("Image 3"), upload_to='freelancer/awards/', null=True, blank=True,)
     slug = models.SlugField(_("Slug"), max_length=30, null=True, blank=True,)
     active_team_id = models.PositiveIntegerField(_("Active Team ID"), default=0)
     objects = models.Manager()
@@ -137,6 +135,9 @@ class Freelancer(models.Model):
 
     def freelancer_profile_absolute_url(self):
         return reverse('freelancer:freelancer_profile', args=([(self.user.short_name)]))
+    
+    def modify_freelancer_absolute_url(self):
+        return reverse('freelancer:update_freelancer_profile', args=([(self.user.short_name)]))
 
     # image display in Admin
     def image_tag(self):

@@ -261,6 +261,7 @@ class Purchase(models.Model):
                 contract.reaction = 'paid'
                 contract.save(update_fields=['reaction'])
 
+
         return purchase, contract_item, contract
 
 

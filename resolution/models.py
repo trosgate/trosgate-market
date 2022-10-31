@@ -1335,3 +1335,4 @@ class ExtContractReview(models.Model):
             raise ReviewException(_("rating is required"))   
 
         return cls.objects.create(resolution=resolution, title=title, message=message, rating=rating, status = True)
+

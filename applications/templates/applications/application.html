@@ -12,7 +12,7 @@
 						<div class="wt-title"><h2>Application</h2></div>
 						<ol class="wt-breadcrumb">
 							<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-							<li class="wt-active">Apply for project</li>
+							<li class="wt-active">Apply for Job</li>
 						</ol>
 						</div>
 					</div>
@@ -31,10 +31,9 @@
 								<div class="wt-proposalhead">
 									<h2>{{project.title}}</h2>
 									<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-										<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{project.get_service_level_display}}</span></li>
-										<li><span><i class="far fa-money-bill-alt"></i> Type: {{project.get_project_type_display}}</span></li>
-										<li><span><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>
-										<li><span><i class="far fa-clock"></i> Budget: ${{project.amount}}</span></li>
+										<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{base_currency}} {{project.amount}}</span></li>
+										<li><span><i class="fa fa-star" style="color:gold;"></i> Rating: {{project.get_rating_display}}</span></li>
+										<li><span><i class="far fa-clock" style="color:violet;"></i> Duration: {{project.get_dura_converter_display}}</span></li>
 									</ul>
 								</div>
 							</div>

@@ -35,6 +35,7 @@
                             </div>
                             <div class="wt-dashboardboxcontent">
                             {% if existing_user < 1 %}                                                                
+                            {% if existing_contract < 1 %}                                                                
                             <form method='POST' action=''>{% csrf_token %}
                                 {% if contractform.errors %}
                                 <div class="alert alert-danger text-center" role="alert">
@@ -49,6 +50,7 @@
                                         <div class="form-group col-md-6">
                                             <span><i class="fa fa-user" style="color:green;"> Client Name:</i> {{client.name}}</span><br><br>
                                             <span><i class="fa fa-envelope" style="color:green;"> Client Email:</i> {{client.email}}</span><br><br>
+                                            <span><i class="far fa-money-bill-alt" style="color:green;"> Currency:</i> {{base_currency}}</span><br><br>
                                         </div>
                                     </div>
                                     <div class="wt-jobdetails wt-tabsinfo">
@@ -218,10 +220,12 @@
                             </form>
                             {% else %}
                             <div class="wt-updatall">
-                                <i class="ti-announcement"></i>
-                                <span>The client is now a member. Please let him/her offer contract via your profile page.</span>
-                                <button type="button" class="btn btn-danger" disabled> Create Contract </button>
+                                <span>The client is either an existing member or has already been offered external contract. Let him/her offer from your profile</span>
+                                <span>
+                                    Copy and Share:<em style="color:green;">{{profile_path}}</em>
+                                <span>
                             </div>
+                            {% endif %}
                             {% endif %}
 						</div>
 					</div>

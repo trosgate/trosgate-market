@@ -42,6 +42,7 @@ import copy
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 from control_settings.utilities import homepage_layout
+from contract.models import Contract
 
 
 def Logout(request):
@@ -104,11 +105,11 @@ def homepage(request):
     regform = CustomerRegisterForm(supported_country, request.POST or None)
     searchform = SearchTypeForm()
 
-    if request.user.is_authenticated and not user.user_type == Customer.ADMIN:
+    if request.user.is_authenticated and not request.user.user_type == Customer.ADMIN:
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('account:dashboard')
 
-    if request.user.is_authenticated and user.user_type == Customer.ADMIN:
+    if request.user.is_authenticated and request.user.user_type == Customer.ADMIN:
         messages.info(request, f'Welcome back {request.user.short_name}')
 
         return redirect('/admin')
@@ -118,21 +119,8 @@ def homepage(request):
     if request.method == 'POST':
         regform = CustomerRegisterForm(supported_country, request.POST or None)
         if regform.is_valid():
-            user = regform.save(commit=False)
-            user.email = regform.cleaned_data['email']
-            user.short_name = regform.cleaned_data['short_name']
-            user.country = regform.cleaned_data['country']
-            user.set_password(regform.cleaned_data['password1'])
-            user.is_active = False
-            user.save()
+            regform.save()
 
-            user_email = user.email
-            messages.info(request, f'Please check your email for a confirmation mail')
-
-            try:
-                new_user_registration(user, user_email)
-            except Exception as e:
-                print(str(e))
             return render(request, 'account/registration/register_email_confirm.html', {'regform': regform})
 
         else:
@@ -285,7 +273,7 @@ def account_register(request):
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('account:dashboard')
 
-    if request.user.is_authenticated and user.user_type == Customer.ADMIN:
+    if request.user.is_authenticated and request.user.user_type == Customer.ADMIN:
         messages.info(request, f'Welcome back {request.user.short_name}')
 
         return redirect('/admin')
@@ -295,22 +283,8 @@ def account_register(request):
     if request.method == 'POST':
         regform = CustomerRegisterForm(supported_country, request.POST or None)
         if regform.is_valid():
-            user = regform.save(commit=False)
-            user.email = regform.cleaned_data['email']
-            user.country = regform.cleaned_data['country']
-            user.short_name = regform.cleaned_data['short_name']
-            user.set_password(regform.cleaned_data['password1'])
-            user.is_active = False
-            user.save()
-
-            user_email = user.email
-            messages.info(request, f'Please check your email for a confirmation mail')
-
-            try:
-                new_user_registration(user, user_email)
-            except Exception as e:
-                print(str(e))
-            return render(request, 'account/registration/register_email_confirm.html', {'success': 'success'})
+            regform.save()
+        return render(request, 'account/registration/register_email_confirm.html', {'success': 'success'})
 
     else:
         regform = CustomerRegisterForm(supported_country)
@@ -323,9 +297,30 @@ def account_activate(request, uidb64, token):
         user = Customer.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, request.user.DoesNotExist):
         user = None
+    try:
+        package = Package.objects.get(pk=1, type='Basic')
+    except Exception as e:
+        print(str(e))
+        package = Package.objects.create(pk=1, type='Basic')
+    
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
+       
+        Team.objects.filter(
+            title=user.short_name, created_by=user, 
+            status = Team.INACTIVE, package = package, 
+        ).update(status = Team.ACTIVE)
+
+        Invitation.objects.filter(
+            email=user.email, sender=user, 
+            team__package=package, status = Invitation.INVITED
+        ).update(status = Invitation.ACCEPTED)
+
+        Contract.objects.filter(
+            client__email=user.email, reaction=Contract.AWAITING
+        ).update(reaction=Contract.ACCEPTED)
+            
         return redirect('account:login')
     else:
         return render(request, 'account/registration/register_activation_invalid.html')

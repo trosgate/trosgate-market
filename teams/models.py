@@ -88,7 +88,7 @@ class Team(models.Model):
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
-    status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=ACTIVE)
+    status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=INACTIVE)
     package = models.ForeignKey(Package, related_name='teams', on_delete=models.CASCADE)
     package_status = models.CharField(_("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
@@ -161,9 +161,9 @@ class Invitation(models.Model):
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
     email = models.EmailField(_("Email"),max_length=100, blank=True)
     code = models.CharField(_("Code"), unique=True, max_length=10, blank=True)
-    status = models.CharField(_("Status"),max_length=20, choices=STATUS, default=INVITED)
-    type = models.CharField(_("Invite Type"),max_length=20, choices=TYPE, default=FOUNDER)
-    sent_on = models.DateTimeField(_("Date"),auto_now_add=True)
+    status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=INVITED)
+    type = models.CharField(_("Invite Type"), max_length=20, choices=TYPE, default=FOUNDER)
+    sent_on = models.DateTimeField(_("Date"), auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if self.code == "":

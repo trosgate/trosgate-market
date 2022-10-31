@@ -93,39 +93,7 @@
 									</form>
 								</div>
 							</div>
-							<div class="wt-widget wt-effectiveholder">
-								<div class="wt-widgettitle">
-									<h2>Freelancer Review</h2>
-								</div>
-								<div class="wt-widgetcontent">
-									<form class="wt-formtheme wt-formsearch">
-										<fieldset>
-											<div class="wt-checkboxholder">
-												<span class="wt-checkbox">
-													<input id="onestarfreelancer" class="freelancer-checked" type="checkbox" data-filter="onestarfreelancer" name="onestarfreelancer" value="onestarfreelancer">
-													<label for="onestarfreelancer"> One <i class="fa fa-star fill" style="color:gold"></i></label>
-												</span>
-												<span class="wt-checkbox">
-													<input id="twostarfreelancer" class="freelancer-checked" type="checkbox" data-filter="twostarfreelancer" name="twostarfreelancer" value="twostarfreelancer">
-													<label for="twostarfreelancer"> Two <i class="fa fa-star fill" style="color:gold"></i></label>
-												</span>
-												<span class="wt-checkbox">
-													<input id="threestarfreelancer" class="freelancer-checked" type="checkbox" data-filter="threestarfreelancer" name="threestarfreelancer" value="threestarfreelancer">
-													<label for="threestarfreelancer"> Three <i class="fa fa-star fill" style="color:gold"></i></label>
-												</span>
-												<span class="wt-checkbox">
-													<input id="fourstarfreelancer" class="freelancer-checked" type="checkbox" data-filter="fourstarfreelancer" name="fourstarfreelancer" value="fourstarfreelancer">
-													<label for="fourstarfreelancer"> Four <i class="fa fa-star fill" style="color:gold"></i></label>
-												</span>
-												<span class="wt-checkbox">
-													<input id="fivestarfreelancer" class="freelancer-checked" type="checkbox" data-filter="fivestarfreelancer" name="fivestarfreelancer" value="fivestarfreelancer">
-													<label for="fivestarfreelancer"> Five <i class="fa fa-star fill" style="color:gold"></i></label>
-												</span>
-											</div>
-										</fieldset>
-									</form>
-								</div>
-							</div>
+							
 							<div class="wt-widget wt-effectiveholder">
 								<div class="wt-widgettitle">
 									<h2> Membership</h2>
@@ -201,20 +169,13 @@
 											<a href="{{profile.freelancer_profile_absolute_url}}">{{profile.tagline}} </a>
 										</div>
 										<ul class="wt-userlisting-breadcrumb">
-											<li><span><i class="far fa-money-bill-alt"></i> ${{profile.hourly_rate}}/ hr</span></li>
+											<li><span><i class="fa fa-building" style="color:violet;"></i> {{profile.department.name}}</span></li>
 											<li><span> {% if profile.user.country.flag %}<img src="{{profile.user.country.flag.url}}" alt="img description"> {% else %}{{profile.user.country.country_code}} - {% endif %} {{profile.user.country.name}}<span></li>
-											<li><a href="javascript:void(0);" class="wt-clicksave"><i class="fa fa-heart"></i> Save</a></li>
+											<li><span><i class="fa fa-group" style="color:blue;"></i> {{profile.business_size.size}}</span></li>
 										</ul>
 									</div>
 									<div class="wt-rightarea">
-										<span class="wt-starsvtwo">
-											<i class="fa fa-star fill"></i>
-											<i class="fa fa-star fill"></i>
-											<i class="fa fa-star fill"></i>
-											<i class="fa fa-star fill"></i>
-											<i class="fa fa-star fill"></i>
-										</span>
-										<span class="wt-starcontent">4.5/<sub>5</sub> <em>(860 Feedback)</em></span>
+										<a class="badge badge-success" href="{{profile.freelancer_profile_absolute_url}}" style="font-size:12px;"><i class="fa fa-check-circle"></i> Open Resume</a>
 									</div>
 								</div>
 								<div class="wt-description">

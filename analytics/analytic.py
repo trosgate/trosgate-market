@@ -21,29 +21,32 @@ from transactions.models import OneClickPurchase, Purchase
 from contract.models import InternalContract, Contract
 from django.utils import timezone
 
-def ongoing_founder_projects(team, founder):
-    one_click_tasks = OneClickResolution.objects.filter(team=team, team__created_by=founder, status='ongoing').count()
-    applied_tasks = ProjectResolution.objects.filter(team=team, team__created_by=founder, status='ongoing').count()
-    int_contract_tasks = ContractResolution.objects.filter(team=team, team__created_by=founder, status='ongoing').count()
-    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, team__created_by=founder, status='ongoing').count()
-    
-    return one_click_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+def ongoing_founder_projects(team):
+    one_click_tasks = OneClickResolution.objects.filter(team=team, status='ongoing').count()
+    roposal_tasks = ProposalResolution.objects.filter(team=team, status='ongoing').count()
+    applied_tasks = ProjectResolution.objects.filter(team=team, status='ongoing').count()
+    int_contract_tasks = ContractResolution.objects.filter(team=team, status='ongoing').count()
+    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='ongoing').count()
+ 
+    return one_click_tasks + roposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
 
-def cancelled_founder_projects(team, founder):
-    one_click_tasks = OneClickResolution.objects.filter(team=team, team__created_by=founder, status='cancelled').count()
-    applied_tasks = ProjectResolution.objects.filter(team=team, team__created_by=founder, status='cancelled').count()
-    int_contract_tasks = ContractResolution.objects.filter(team=team, team__created_by=founder, status='cancelled').count()
-    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, team__created_by=founder, status='cancelled').count()
-    
-    return one_click_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+def cancelled_founder_projects(team):
+    one_click_tasks = OneClickResolution.objects.filter(team=team, status='cancelled').count()
+    proposal_tasks = ProposalResolution.objects.filter(team=team, status='cancelled').count()
+    applied_tasks = ProjectResolution.objects.filter(team=team, status='cancelled').count()
+    int_contract_tasks = ContractResolution.objects.filter(team=team, status='cancelled').count()
+    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='cancelled').count()
+  
+    return one_click_tasks + proposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
 
-def completed_founder_projects(team, founder):
-    one_click_tasks = OneClickResolution.objects.filter(team=team, team__created_by=founder, status='completed').count()
-    applied_tasks = ProjectResolution.objects.filter(team=team, team__created_by=founder, status='completed').count()
-    int_contract_tasks = ContractResolution.objects.filter(team=team, team__created_by=founder, status='completed').count()
-    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, team__created_by=founder, status='completed').count()
-    
-    return one_click_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+def completed_founder_projects(team):
+    one_click_tasks = OneClickResolution.objects.filter(team=team, status='completed').count()
+    proposal_tasks = ProposalResolution.objects.filter(team=team, status='completed').count()
+    applied_tasks = ProjectResolution.objects.filter(team=team, status='completed').count()
+    int_contract_tasks = ContractResolution.objects.filter(team=team, status='completed').count()
+    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='completed').count()
+
+    return one_click_tasks + proposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
 
 def total_verified_sale(team):
     proposal_total_sales = ProposalSale.objects.filter(team=team, purchase__status='success').count() 
@@ -52,6 +55,12 @@ def total_verified_sale(team):
     oneclick_total_sales = OneClickPurchase.objects.filter(team=team, status='success').count() 
     
     return proposal_total_sales + contract_total_sales + application_total_sales +oneclick_total_sales
+
+
+def total_projects_in_queue(team):
+    started = ongoing_founder_projects(team) + completed_founder_projects(team) + cancelled_founder_projects(team)
+    all_tasks = total_verified_sale(team)
+    return int(all_tasks - started)
 
 def user_review_rate(team):
     proposal_reviews = ProposalReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()

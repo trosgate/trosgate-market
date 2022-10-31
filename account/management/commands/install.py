@@ -15,6 +15,16 @@ from analytics.models import NewStats
 from marketing.models import AutoTyPist
 from pages.models import TermsAndConditions, Hiring, Freelancing, AboutUsPage
 
+# New scripts
+from transactions.models import (
+    OneClickPurchase, Purchase, ApplicationSale, ProposalSale, 
+    ContractSale,ExtContract, SubscriptionItem
+)
+from resolution.models import (
+    OneClickResolution, ProposalResolution, ProjectResolution, 
+    ContractResolution, ExtContractResolution
+) 
+
 
 class Command(BaseCommand):
     help = "this creates default values via commands for the entire system"
@@ -22,89 +32,125 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         call_command("makemigrations")
         call_command("migrate")
+        
+        # INITIAL DATABASE POPULATOR STARTS
+        # if not Country.objects.count():
+        #     call_command("loaddata", "db_countries.json")
 
-        if not Country.objects.count():
-            call_command("loaddata", "db_countries.json")
+        # if not NewStats.objects.count():
+        #     call_command("loaddata", "db_statistics.json")
 
-        if not NewStats.objects.count():
-            call_command("loaddata", "db_statistics.json")
+        # if not AutoTyPist.objects.count():
+        #     call_command("loaddata", "db_autotypist.json")
 
-        if not AutoTyPist.objects.count():
-            call_command("loaddata", "db_autotypist.json")
-
-        if not Customer.objects.count():
-            call_command("loaddata", "db_admin_auth.json")
+        # if not Customer.objects.count():
+        #     call_command("loaddata", "db_admin_auth.json")
             
-        if not WebsiteSetting.objects.count():
-            call_command("loaddata", "db_admin_settings.json")
+        # if not WebsiteSetting.objects.count():
+        #     call_command("loaddata", "db_admin_settings.json")
 
-        if not DiscountSystem.objects.count():
-            call_command("loaddata", "db_discount_system.json")
+        # if not DiscountSystem.objects.count():
+        #     call_command("loaddata", "db_discount_system.json")
 
-        if not HiringFee.objects.count():
-            call_command("loaddata", "db_freelancer_fee.json")
+        # if not HiringFee.objects.count():
+        #     call_command("loaddata", "db_freelancer_fee.json")
 
-        if not Package.objects.count():
-            call_command("loaddata", "db_packages.json")
+        # if not Package.objects.count():
+        #     call_command("loaddata", "db_packages.json")
 
-        if not Category.objects.count():
-            call_command("loaddata", "db_categories.json")
+        # if not Category.objects.count():
+        #     call_command("loaddata", "db_categories.json")
 
-        if not Skill.objects.count():
-            call_command("loaddata", "db_skills.json")
+        # if not Skill.objects.count():
+        #     call_command("loaddata", "db_skills.json")
 
-        if not Size.objects.count():
-            call_command("loaddata", "db_business_size.json")
+        # if not Size.objects.count():
+        #     call_command("loaddata", "db_business_size.json")
 
-        if not Department.objects.count():
-            call_command("loaddata", "db_department.json")
+        # if not Department.objects.count():
+        #     call_command("loaddata", "db_department.json")
 
-        if not PaymentGateway.objects.count():
-            call_command("loaddata", "db_payment_gateways.json")
+        # if not PaymentGateway.objects.count():
+        #     call_command("loaddata", "db_payment_gateways.json")
 
-        if not SubscriptionGateway.objects.count():
-            call_command("loaddata", "db_subscription.json")
+        # if not SubscriptionGateway.objects.count():
+        #     call_command("loaddata", "db_subscription.json")
 
-        if not DepositGateway.objects.count():
-            call_command("loaddata", "db_deposit.json")
+        # if not DepositGateway.objects.count():
+        #     call_command("loaddata", "db_deposit.json")
 
-        if not DepositControl.objects.count():
-            call_command("loaddata", "db_deposit_control.json")
+        # if not DepositControl.objects.count():
+        #     call_command("loaddata", "db_deposit_control.json")
 
-        if not Payday.objects.count():
-            call_command("loaddata", "db_payday.json")
+        # if not Payday.objects.count():
+        #     call_command("loaddata", "db_payday.json")
 
-        if not StorageBuckets.objects.count():
-            call_command("loaddata", "db_storage.json")
+        # if not StorageBuckets.objects.count():
+        #     call_command("loaddata", "db_storage.json")
 
-        if not Currency.objects.count():
-            call_command("loaddata", "db_currencies.json")
+        # if not Currency.objects.count():
+        #     call_command("loaddata", "db_currencies.json")
 
-        if not PaymentsControl.objects.count():
-            call_command("loaddata", "db_fund_control.json")
+        # if not PaymentsControl.objects.count():
+        #     call_command("loaddata", "db_fund_control.json")
         
-        if not LayoutSetting.objects.count():
-            call_command("loaddata", "db_layout.json")
+        # if not LayoutSetting.objects.count():
+        #     call_command("loaddata", "db_layout.json")
 
-        if not TermsAndConditions.objects.count():
-            call_command("loaddata", "db_termsandcond.json")
+        # if not TermsAndConditions.objects.count():
+        #     call_command("loaddata", "db_termsandcond.json")
 
-        if not Hiring.objects.count():
-            call_command("loaddata", "db_howitworkhiring.json")
+        # if not Hiring.objects.count():
+        #     call_command("loaddata", "db_howitworkhiring.json")
         
-        if not Freelancing.objects.count():
-            call_command("loaddata", "db_howitworkfreelancing.json")
+        # if not Freelancing.objects.count():
+        #     call_command("loaddata", "db_howitworkfreelancing.json")
 
-        if not AboutUsPage.objects.count():
-            call_command("loaddata", "db_aboutus.json")
+        # if not AboutUsPage.objects.count():
+        #     call_command("loaddata", "db_aboutus.json")
 
-        if not CommunicationLanguage.objects.count():
-            call_command("loaddata", "db_comlanguages.json")
+        # if not CommunicationLanguage.objects.count():
+        #     call_command("loaddata", "db_comlanguages.json")
+        # INITIAL DATABASE POPULATOR ENDS
 
-
+        # FIXURE OBJECTS INSERTION STARTS FROM HERE
         # if not Project.objects.count():
-        #   call_command("loaddata", "db_projects.json")
+        call_command("loaddata", "db_projects.json")
 
-        # if not Proposals.objects.count():
-            # call_command("loaddata", "db_proposals.json")
+        # if not Proposal.objects.count():
+        #     call_command("loaddata", "db_proposals.json")
+
+        # if not OneClickPurchase.objects.count():
+        #     call_command("loaddata", "db_oneclickpurchase.json")
+
+        # if not Purchase.objects.count():
+        #     call_command("loaddata", "db_purchase.json")
+
+        # if not ApplicationSale.objects.count():
+        #     call_command("loaddata", "db_applicationsale.json")
+
+        # if not ProposalSale.objects.count():
+        #     call_command("loaddata", "db_proposalsale.json")
+
+        # if not ContractSale.objects.count():
+        #     call_command("loaddata", "db_contractsale.json")
+
+        # if not ExtContract.objects.count():
+        #     call_command("loaddata", "db_extcontractsale.json")
+
+        # if not SubscriptionItem.objects.count():
+        #     call_command("loaddata", "db_subscription.json")
         
+        # if not OneClickResolution.objects.count():
+        #     call_command("loaddata", "db_oneclickresolver.json")
+
+        # if not ProjectResolution.objects.count():
+        #     call_command("loaddata", "db_projectresolver.json")
+            
+        # if not ProposalResolution.objects.count():
+        #     call_command("loaddata", "db_proposalresolver.json")
+            
+        # if not ContractResolution.objects.count():
+        #     call_command("loaddata", "db_contractresolver.json")
+            
+        # FIXURE OBJECT INSERTION ENDS

@@ -20,6 +20,7 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="wt-proposalholder">
 				<div class="row justify-content-md-center">
 					<div class="wt-hireduserstatus">
@@ -33,10 +34,45 @@
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
 						<div class="wt-dashboardbox">
 							<div class="wt-dashboardboxcontent wt-rcvproposala">
-									<div class="wt-freelancerholder wt-rcvproposalholder">												
-									<div class="wt-sectiontitle">
-										<span>Payment Modes</span>
+								<div class="row">
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<button type="button" class="btn btn-secondary btn-sm" disabled style="background-color:grey;">{{base_currency}}&nbsp;{{request.user.fundtransferuser.pending_balance}}</button>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Book Balance</strong></span>
+												</div>													
+											</div>	
+										</div>
 									</div>
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											{% if active_team.created_by == request.user %}
+											<button type="button" class="btn btn-primary btn-sm" disabled style="background-color:indigo;">{{base_currency}}&nbsp;{{active_team.team_balance}}</button>
+											{% else %}
+											<span style="color:red;"><i class="ti-na">&nbsp;Restricted</i></span>
+											{% endif %}
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Team Balance</strong></span>
+												</div>													
+											</div>	
+										</div>
+									</div>												
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<button type="button" class="btn btn-success btn-sm" disabled style="background-color:green;">{{base_currency}}&nbsp;{{request.user.fundtransferuser.available_balance}}</button>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Avail Balance</strong></span>
+												</div>													
+											</div>	
+										</div>
+									</div>	
+								</div>
+								{% if active_team.created_by == request.user %}
+								<div class="wt-freelancerholder wt-rcvproposalholder">
+																						
 									<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
 
 									<form method="POST", autocomplete='off'> {% csrf_token %}
@@ -65,7 +101,7 @@
 													<thead>
 													<tr>
 														<th>Account</th>
-														<th>Form</th>
+														<th>Inputs</th>
 													</tr>
 													</thead>
 													<body>
@@ -340,6 +376,11 @@
 								</div>
 								{% else %}
 								<span style="color:blue;"> The withdrawal options will be activated soon. Please check back </span>
+								{% endif %}												                  														
+								{% else %}
+								<div class="text-center"><br><br>
+									<span style="color:red;"> You must be in your founded team to make changes </span>
+								</div>
 								{% endif %}												                  														
 							</div>
 						</div>

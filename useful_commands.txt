@@ -4,8 +4,22 @@ python manage.py dumpdata proposals.Proposal > db_proposals.json
 python manage.py dumpdata > railway.json
 
 //this will indent dumpdata
-python manage.py dumpdata teams.Team --indent 4 > new.json
-python manage.py dumpdata general_settings.DiscountSystem --indent 4 > db_discount_system.json
+python manage.py dumpdata resolution.OneClickResolution --indent 4 > db_oneclickresolver.json
+python manage.py dumpdata resolution.ProjectResolution --indent 4 > db_projectresolver.json
+python manage.py dumpdata resolution.ProposalResolution --indent 4 > db_proposalresolver.json
+python manage.py dumpdata resolution.ContractResolution --indent 4 > db_contractresolver.json
+
+python manage.py dumpdata resolution.ExtContractResolution --indent 4 > db_extcontractresolver.json
+
+
+python manage.py dumpdata resolution.OneClickPurchase --indent 4 > db_oneclickpurchase.json
+python manage.py dumpdata resolution.Purchase --indent 4 > db_purchase.json
+python manage.py dumpdata transactions.ApplicationSale --indent 4 > db_applicationsale.json
+python manage.py dumpdata transactions.ProposalSale --indent 4 > db_proposalsale.json
+python manage.py dumpdata transactions.ContractSale --indent 4 > db_contractsale.json
+python manage.py dumpdata transactions.ExtContract --indent 4 > db_extcontractsale.json
+python manage.py dumpdata transactions.SubscriptionItem --indent 4 > db_subscription.json
+
 
 //listen to stripe webhook on a particular endpoint
 stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/   

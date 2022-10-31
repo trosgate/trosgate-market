@@ -43,11 +43,6 @@ def proposal_listing(request):
     base_currency = get_base_currency_symbol()
     all_proposals = proposals.count()
     
-    # for prop in proposals:
-    #     sales_summary = preview_sales_count_by_proposal(prop.id)
-    # print('sales_summary:', sales_summary)
-    # # print('sales_summary:', sales_summary)
-
     totalcount = f'{all_proposals} found for the search'
     context = {
         "skills":skills, 
@@ -55,7 +50,7 @@ def proposal_listing(request):
         "categorie":categorie, 
         "proposals": proposals,
         "base_currency": base_currency,
-        "totalcount": totalcount,
+        "totalcount": totalcount
     }
     return render(request, 'proposals/proposal_listing.html', context)
 

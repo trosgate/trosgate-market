@@ -29,8 +29,8 @@
 						<div class="wt-insightdetails">
 							<div class="wt-title">
 								<h3>Settings</h3>
-								{% comment %} <a href="/account/two_factor/setup/">Add Extra Security</a> | {% endcomment %}
-								<a href="{% url 'payments:payment_vault' %}">Account Settings</a>
+								
+								<a href="{% url 'payments:payment_vault' %}">Payment Settings</a>
 							</div>													
 						</div>	
 					</div>
@@ -43,7 +43,7 @@
 						<div class="wt-insightdetails">
 							<div class="wt-title">
 								<h3>Profile</h3>
-								<a href="{% url 'freelancer:update_freelancer_profile' request.user.short_name %}">Click To Update</a> |
+								<a href="{{freelancer_profile.modify_freelancer_absolute_url}}">Click To Update</a> |
 								<a href="{{freelancer_profile.freelancer_profile_absolute_url}}"target='_blank'>Click To Preview</a>
 							</div>													
 						</div>	

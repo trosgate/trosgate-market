@@ -40,8 +40,8 @@
 							</figure>
 							<div class="wt-insightdetails">
 								<div class="wt-title">
-									<h3>Profile</h3>
-									<a href="{% url 'client:update_client_profile' request.user.short_name %}">Click To Update</a> |
+									<h3>Brand Profile</h3>
+									<a href="{{client_profile.modify_client_get_absolute_url}}">Click To Update</a> |
 									<a href="{{client_profile.client_profile_get_absolute_url}}"target='_blank'>Click To Preview</a>
 								</div>													
 							</div>	
