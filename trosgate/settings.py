@@ -28,12 +28,12 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+#DEBUG = False
 
 # ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-ALLOWED_HOSTS = ['support.trosgate.com', 'trosgate.com'] 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+# ALLOWED_HOSTS = ['support.trosgate.com', 'trosgate.com'] 
 # ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
 
@@ -136,28 +136,28 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 # }
 
 #SERVER SIDE
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgates',
-#         'USER': 'katey',
-#         'PASSWORD': 'Prof2ike.y2ky2k',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
-
-# LOCAL SIDE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgate',
+        'NAME': 'trosgates',
         'USER': 'katey',
         'PASSWORD': 'Prof2ike.y2ky2k',
         'HOST': 'localhost',
         'PORT': '',
     }
 }
+
+# LOCAL SIDE
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'trosgate',
+#         'USER': 'katey',
+#         'PASSWORD': 'Prof2ike.y2ky2k',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
