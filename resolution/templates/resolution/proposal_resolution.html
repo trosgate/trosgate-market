@@ -247,6 +247,7 @@
 			</section>
 			{% endif %}
 
+			{% if resolution %}
 			{% if resolution.status != 'cancelled' %}  			
 			<section class="wt-haslayout wt-dbsectionspace">
 				<div class="row justify-content-md-center">				
@@ -292,6 +293,7 @@
 				</div>	
 			</section>	 
 			{% endif %}
+			{% endif %}
 
 			{% if resolution.status != 'completed' %}
 			<section class="wt-proposalholder">
@@ -307,7 +309,8 @@
 						</div>
 					</div>
 				</div>
-				<div id="confirm-cancelled" class='col-md-6'></div>		
+				<div id="confirm-cancelled" hx-get='{% url "resolution:remove_message" %}' hx-trigger='load delay:3s'></div>
+				
 				<div class="row">
 					<div id="proposal-cancelled" class='col-md-6'>
 						{% include 'resolution/component/proposal_cancelled.html' %}

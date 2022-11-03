@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.utils import timezone
 from contract.models import InternalContract
 from projects.models import Project
@@ -348,12 +349,14 @@ def proposal_cancelled(request):
                     cancel_type=cancel_type,
                     message=message
                 )
+                
             except Exception as e:
                 print(str(e))
 
     cancel_message = ProposalCancellation.objects.filter(resolution=resolution, status = 'initiated')
     if cancel_message.count() > 0:
-        cancellation_message = cancel_message.first()    
+        cancellation_message = cancel_message.first()
+    messages.info(request, "Cancellation initiated")    
     context = {
         'cancellation_message':cancellation_message
     }       
@@ -365,9 +368,10 @@ def proposal_cancelled(request):
 def confirm_proposal_cancel(request):
     resolution_id = request.POST.get('confirmcancelproposal')
     resolution = get_object_or_404(ProposalResolution, pk=resolution_id, proposal_sale__team__created_by = request.user)    
+    
     try:
         ProposalResolution.approve_and_cancel_proposal(resolution=resolution.id)
-        return HttpResponse("<div style='color:green;'> Successfully approved cancellation request </div>")
+        return HttpResponse("<div style='color:green;'> Successfully cancelled order</div>")
     except Exception as e:
         errors = (str(e))
         return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
@@ -685,7 +689,9 @@ def confirm_oneclick_contract(request):
         return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
 
 
-
+@login_required
+def remove_message(request):
+    return HttpResponse('')
 
 
 

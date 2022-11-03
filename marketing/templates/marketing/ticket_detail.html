@@ -4,7 +4,8 @@
 
 {% block content %}
 {% include 'dashboard/main_sidebar.html' %}
-            <main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
+            
+<main id="wt-main" class="wt-main wt-haslayout wt-innerbgcolor">
 			<div class="wt-haslayout wt-innerbannerholder">
 				<div class="container">
 					<div class="row justify-content-md-center">
@@ -28,6 +29,7 @@
                         <div class="wt-dashboardbox">
                             <div class="wt-dashboardboxtitle wt-titlewithsearch">
                                 <h2>Manage Ticket</h2>
+                                (<a href="{% url 'marketing:customer_ticket_list' %}"><span style="color:blue;">Go Back</span></a>)
                             </div>
                             <div class="wt-dashboardboxcontent wt-helpsupporthead">
                                 <div class="wt-tabscontenttitle">
@@ -39,7 +41,7 @@
                                         <h6>Ticket #: {{ticket.reference}}</h6>
                                         <p>{{ticket.content|linebreaks}}</p>
                                     </div>
-
+                                    
                                     {% for tickets in replies %}
                                     <ul class="wt-accordionhold accordion">
                                         <li>
@@ -75,6 +77,7 @@
                         <div class="wt-dashboardbox wt-holdersolution">
                             <div class="wt-dashboardboxtitle">
                                 <h2>Reply to Ticket Response</h2>
+                                
                             </div>
                             <div class="wt-dashboardboxcontent wt-querycontent">
                                 <span id="ticket-message" style="color:green; text-align:right;"></span>
@@ -83,6 +86,7 @@
                                 <div class="wt-tabscontenttitle">
                                     <h2>Create your Reply</h2>
                                 </div>
+                                
                                 {% if ticket.states != 'closed' %}
                                 <form method='POST' class="wt-formtheme wt-userform">
                                     {% csrf_token %}

@@ -8,6 +8,7 @@ app_name = 'resolution'
 urlpatterns = [
 
     # Urls for team table
+    path('remove_message/',views.remove_message, name='remove_message'),
     path('applicant_start_work/',views.applicant_start_work, name='applicant_start_work'),
     path('applicant_review/',views.applicant_review, name='applicant_review'),
     path('app/<int:application_id>/<slug:project_slug>/',views.application_manager, name='application_resolution'),

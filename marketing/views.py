@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Announcement, Blog, HelpDesk, Ticket, TicketMessage
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -130,14 +131,14 @@ def customer_ticket_list(request):
 
 
 @login_required
-def customer_ticket_detail(request, ticket_id, ticket_slug):
+def customer_ticket_detail(request, reference, ticket_slug):
     team = None
     reply = ''
     replies = ''
 
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-        ticket = get_object_or_404(Ticket, pk=ticket_id, slug=ticket_slug, team=team)
+        ticket = get_object_or_404(Ticket, reference=reference, slug=ticket_slug, team=team)
         replies = ticket.tickettracker.all().order_by('-id')
 
         statusform = TicketStatesForm(request.POST or None, instance=ticket)
@@ -151,10 +152,10 @@ def customer_ticket_detail(request, ticket_id, ticket_slug):
             statusform.save()
 
             messages.info(request, 'The Ticket was replied successfully')
-            return redirect('marketing:customer_ticket_detail', ticket_id=ticket.id, ticket_slug=ticket.slug)
+            return redirect('marketing:customer_ticket_detail', reference=ticket.reference, ticket_slug=ticket.slug)
 
     elif request.user.user_type == Customer.CLIENT:
-        ticket = get_object_or_404(Ticket, pk=ticket_id, slug=ticket_slug, created_by=request.user)
+        ticket = get_object_or_404(Ticket, reference=reference, slug=ticket_slug, created_by=request.user)
         replies = ticket.tickettracker.all().order_by('-id')
         
         statusform = TicketStatesForm(request.POST or None, instance=ticket)
@@ -169,7 +170,7 @@ def customer_ticket_detail(request, ticket_id, ticket_slug):
             statusform.save()
 
             messages.info(request, 'The Ticket was replied successfully')
-            return redirect('marketing:customer_ticket_detail', ticket_id=ticket.id, ticket_slug=ticket.slug)
+            return redirect('marketing:customer_ticket_detail', reference=ticket.reference, ticket_slug=ticket.slug)
            
     context ={
         "ticket":ticket,
@@ -178,8 +179,6 @@ def customer_ticket_detail(request, ticket_id, ticket_slug):
         "statusform":statusform,
     }
     return render( request, "marketing/ticket_detail.html", context)
-
-
 
 
 

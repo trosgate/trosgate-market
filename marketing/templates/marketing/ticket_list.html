@@ -46,7 +46,7 @@
                                         <td>{{ticket.title|truncatechars:50}}</td>
                                         <td>{{ticket.created_at}}</td>
                                         <td {% if ticket.states == 'closed' %} style="color:red;" {% else %} style="color:green;" {% endif %}>{{ticket.get_states_display}}</td>
-                                        <td><a href="{% url 'marketing:customer_ticket_detail' ticket.id ticket.slug %} "><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i>Detail</button></a></td>
+                                        <td><a href="{% url 'marketing:customer_ticket_detail' ticket.reference ticket.slug %} "><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i>Detail</button></a></td>
                                     </tr> 
                                 {% endfor %}					
                                     </tbody>

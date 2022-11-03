@@ -136,28 +136,28 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 # }
 
 #SERVER SIDE
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trosgates',
-        'USER': 'katey',
-        'PASSWORD': 'Prof2ike.y2ky2k',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
-# LOCAL SIDE
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgate',
+#         'NAME': 'trosgates',
 #         'USER': 'katey',
 #         'PASSWORD': 'Prof2ike.y2ky2k',
 #         'HOST': 'localhost',
 #         'PORT': '',
 #     }
 # }
+
+# LOCAL SIDE
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trosgate',
+        'USER': 'katey',
+        'PASSWORD': 'Prof2ike.y2ky2k',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
