@@ -1,0 +1,25 @@
+[
+    {
+        "model": "general_settings.paymentapis",
+        "pk": 1,
+        "fields": {
+            "preview": "This is the API Section for the integrated payment gateways",
+            "gateway_count": 4,
+            "stripe_public_key": "pk_test_51JxEf423cP",
+            "stripe_secret_key": "sk_test_51JxEfNF4wH8i",
+            "stripe_webhook_key": "whsec_4f",
+            "stripe_subscription_price_id": "price_1KI9",
+            "paypal_public_key": "AQYALADOfAPqPt3OSl7-",
+            "paypal_secret_key": "EOhjdJJZw9CITEKc-",
+            "paypal_subscription_price_id": "P-4T5",
+            "sandbox": true,
+            "flutterwave_public_key": "FLWPUBK_TEST-00",
+            "flutterwave_secret_key": "FLWSECK_TEST-17",
+            "flutterwave_secret_hash": "123e4567-e89b-12d3-a456-426614174000",
+            "flutterwave_subscription_price_id": "3ef7c",
+            "razorpay_public_key_id": "rzp_",
+            "razorpay_secret_key_id": "9sL",
+            "razorpay_subscription_price_id": "plan_"
+        }
+    }
+]

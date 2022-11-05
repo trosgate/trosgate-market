@@ -14,6 +14,7 @@ urlpatterns = [
 
 
     path('', views.team, name='team'),
+    path('send-test-email', views.send_email_to_all_users, name='send_email_to_all_users'),
 
     # payment subscription urls
     path('packages/', views.packages, name='packages'),

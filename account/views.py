@@ -44,6 +44,9 @@ from django_htmx.http import HttpResponseClientRedirect
 from control_settings.utilities import homepage_layout
 from contract.models import Contract
 
+def subscribers(request):
+    return render(request, 'account/subscriber.html', {})
+
 
 def Logout(request):
     '''

@@ -1,0 +1,10 @@
+[
+    {
+        "model": "general_settings.exachangerateapi",
+        "pk": 1,
+        "fields": {
+            "preview": "Exchange rate API",
+            "exchange_rates_api_key": "680128ddd7f61d"
+        }
+    }
+]

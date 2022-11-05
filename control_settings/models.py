@@ -129,6 +129,7 @@ class SubscriptionSetting(SubscriptionGateway):
         verbose_name = _("Subscription Setting")
         verbose_name_plural = _("Subscription Setting")
 
+
 class DepositSetting(DepositGateway):
     class Meta:
         proxy=True

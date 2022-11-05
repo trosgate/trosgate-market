@@ -80,7 +80,7 @@ class CustomerAdmin(BaseUserAdmin,):
         if request.user.is_superuser:
             return qs.all()  
         else:
-            return qs.filter(pk=request.user.id)  
+            return qs.filter(pk=request.user.id, is_staff=True)  
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -142,13 +142,19 @@ class CustomerAdmin(BaseUserAdmin,):
                 'is_assistant',               
             }
 
-        if obj is not None and not obj.is_staff: # Means object is freelancer or client
+        if obj is not None and obj.user_type == 'freelancer':
             disabled_fields |= {                
                 'is_superuser',
                 'is_staff',
                 'is_assistant',
             }
 
+        if obj is not None and obj.user_type == 'client':
+            disabled_fields |= {                
+                'is_superuser',
+                'is_staff',
+                'is_assistant',
+            }
 
         for field in disabled_fields:
             if field in form.base_fields:

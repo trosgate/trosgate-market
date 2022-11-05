@@ -1,0 +1,58 @@
+[
+    {
+        "model": "teams.invitation",
+        "pk": 1,
+        "fields": {
+            "team": 1,
+            "sender": 2,
+            "receiver": null,
+            "email": "sirkatey@gmail.com",
+            "code": "H3kLSx",
+            "status": "invited",
+            "type": "internal",
+            "sent_on": "2022-11-03T19:26:24.467Z"
+        }
+    },
+    {
+        "model": "teams.invitation",
+        "pk": 2,
+        "fields": {
+            "team": 2,
+            "sender": 3,
+            "receiver": null,
+            "email": "sirkatey@gmail.com",
+            "code": "JM5SpJ",
+            "status": "accepted",
+            "type": "internal",
+            "sent_on": "2022-11-03T19:40:09.161Z"
+        }
+    },
+    {
+        "model": "teams.invitation",
+        "pk": 3,
+        "fields": {
+            "team": 4,
+            "sender": 5,
+            "receiver": null,
+            "email": "sirkatey@gmail.com",
+            "code": "PZoDpo",
+            "status": "invited",
+            "type": "internal",
+            "sent_on": "2022-11-03T19:51:08.372Z"
+        }
+    },
+    {
+        "model": "teams.invitation",
+        "pk": 4,
+        "fields": {
+            "team": 5,
+            "sender": 6,
+            "receiver": null,
+            "email": "sirkatey@gmail.com",
+            "code": "bS6GD-",
+            "status": "accepted",
+            "type": "internal",
+            "sent_on": "2022-11-03T19:55:52.746Z"
+        }
+    }
+]

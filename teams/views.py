@@ -38,12 +38,12 @@ from .paypal_subscription import get_paypal_subscription_url, get_subscription_a
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from control_settings.utilities import subscription_switch
-# from .tasks import email_all_users
+from .tasks import email_all_users
 # from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
-# def send_email_to_all_users(request):
-#     email_all_users.delay()
-#     return HttpResponse('Mail Sent')
+def send_email_to_all_users(request):
+    email_all_users.delay()
+    return HttpResponse('Mail Sent')
 
 
 # Instead of hard-coding tasks,
@@ -59,7 +59,6 @@ from control_settings.utilities import subscription_switch
 @user_is_freelancer
 def team(request):
     teams = "Ooops! You seem to be lost but dont worry, we have other resources for you"
-
     context = {
         'teams': teams,
     }

@@ -1,7 +1,7 @@
 import sys
 from django.contrib import admin
 from . models import (
-    Category, Department, Skill, Size, CommunicationLanguage, ProposalGuides,
+    Category, Department, Skill, Size, ProposalGuides,
     WebsiteSetting, AutoLogoutSystem, Currency, StorageBuckets
 )
 
@@ -137,6 +137,5 @@ class CurrencyAdmin(admin.ModelAdmin):
 admin.site.register(Department)
 admin.site.register(Size)
 admin.site.register(Skill)
-admin.site.register(CommunicationLanguage)
 admin.site.register(ProposalGuides)
 

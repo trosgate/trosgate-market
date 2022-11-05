@@ -1,0 +1,17 @@
+[
+    {
+        "model": "general_settings.mailer",
+        "pk": 1,
+        "fields": {
+            "email_hosting_server": "smtp.gmail.com",
+            "email_hosting_server_password": "xqztesterbwz",
+            "email_hosting_username": "tester@gmail.com",
+            "from_email": "tester@gmail.com",
+            "email_use_tls": true,
+            "email_use_ssl": false,
+            "email_fail_silently": true,
+            "email_hosting_server_port": 587,
+            "email_timeout": 60
+        }
+    }
+]

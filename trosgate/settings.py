@@ -76,6 +76,8 @@ INSTALLED_APPS = [
     'ckeditor',
     # 'corsheaders',
     'rest_framework',
+    'django_celery_results',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -122,18 +124,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
-
-#GIGRED
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'gigred',
-#         'USER': 'katey',
-#         'PASSWORD': 'Prof2ike.y2ky2k',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
 
 #SERVER SIDE
 # DATABASES = {
@@ -211,19 +201,12 @@ LOGIN_REDIRECT_URL = "account:dashboard"
 LOGOUT_REDIRECT_URL = "account:homepage"
 
 #Custom Email Backend for Trosgate software
-# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'example@gmail.com'
-# EMAIL_HOST_PASSWORD = 'kadjbfgubatoipur'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# DEFAULT_EMAIL_FROM = 'Trosgate <myvoistudio@gmail.com>'
-
-
+ 
 ADMINS = (
     ('Trosgate', 'myvoistudio@gmail.com'),
 )
@@ -246,21 +229,6 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
 }
-
-# CELERY CONFIGURATIONS
-### CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-# accept_content = ['application/json']
-# result_serializer = 'json'
-# task_serializer = 'json'
-### default timezone is "UTC". Activate this if you want a different timzone ###
-timezone = 'UTC'
-# timezone = 'Africa/Accra'
-
-# STORAGE CHOICE OF CELERY TASKS
-# result_backend = 'django-db'
-
-# CELERY BEAT CONFIGURATIONS
-# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
 # CUSTOM SESSION OBJECTS
@@ -296,3 +264,23 @@ if DEBUG == False:
 #     "http://localhost:8080",
 #     "http://127.0.0.1:9000",
 # ]
+
+# CELERY CONFIGURATIONS
+#CELERY_BROKER_URL = 'redis://127.0.0.1:6379' #Either this in settings file, or used as 'broker_url' variable in celery.py
+ACCEPT_CONTENT = ['application/json']
+# accept_content = ['application/json']
+RESULT_SERIALIZER = 'json'
+# result_serializer = 'json'
+TASK_SERIALIZER = 'json'
+# task_serializer = 'json'
+TIMEZONE = 'UTC'
+# timezone = 'UTC'
+## default timezone is "UTC". Activate this if you want a different timzone ###
+# timezone = 'Africa/Accra'
+
+# STORAGE CHOICE OF CELERY TASKS
+RESULT_BACKEND = 'django-db'
+
+# CELERY BEAT CONFIGURATIONS
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+

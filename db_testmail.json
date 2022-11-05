@@ -1,0 +1,10 @@
+[
+    {
+        "model": "general_settings.testemail",
+        "pk": 1,
+        "fields": {
+            "title": "Testing Email",
+            "test_email": "tester@gmail.com"
+        }
+    }
+]

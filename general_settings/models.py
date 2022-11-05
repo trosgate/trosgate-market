@@ -355,14 +355,6 @@ class Skill(models.Model):
         return self.name
 
 
-class CommunicationLanguage(models.Model):
-    language = models.CharField(_("User Communication Language"), max_length=100, help_text=_(
-        "User Communication Language Required"), unique=True)
-
-    def __str__(self):
-        return self.language
-
-
 class ProposalGuides(models.Model):
     guide = models.CharField(_("guide"), max_length=100, help_text=_(
         "Instructions you want to show to customers"), unique=True)

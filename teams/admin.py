@@ -3,9 +3,9 @@ from .models import Package, Team, Invitation, TeamChat, AssignMember, Tracking
 
 MAX_OBJECTS = 2
 
+
 @admin.register(Package)
-class PackageAdmin(admin.ModelAdmin):
-    model = Package    
+class PackageAdmin(admin.ModelAdmin):  
     list_display = ['type','price', 'is_default', 'status', 'verbose_type', 'ordering']
     list_display_links = ['type','status']
     excludes = ['daily_Handshake_mails_to_clients']
@@ -56,7 +56,6 @@ class PackageAdmin(admin.ModelAdmin):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    model = Team
     list_display = ['title', 'created_at', 'package_status', 'team_balance', 'status',]
     list_display_links = ['title', 'package_status']
     search_fields = ['title']
@@ -113,7 +112,6 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
-    model = Invitation
     list_display = ['email','team', 'code', 'sent_on', 'status']
     list_display_links = ['email', 'team']
     search_fields = ['code','email']

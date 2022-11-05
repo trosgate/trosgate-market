@@ -17,7 +17,8 @@ urlpatterns = [
     # path('countries/', views.countries, name='countries'),
     # path('states/', views.states, name='states'),
 
-    path('', views.homepage, name='homepage'),
+    path("", views.homepage, name='homepage'),
+    path("subscribers/", views.subscribers, name='subscribers'),
     path("account/login/", views.loginView, name = "login"),
     path('dashboard/', views.user_dashboard, name='dashboard'), 
     path("account/two-factor-auth/", views.two_factor_auth, name = "two_factor_auth"),    

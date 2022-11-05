@@ -117,15 +117,15 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         
         if self.is_assistant == True and self.is_staff == False:
             raise ValidationError(
-                {'is_staff': _('Assistant must have "Activate Staff" set to Active')})
+                {'is_staff': _('Virtual Assistant cannot be active when "Activate Staff" status is disabled')})
         
         if self.user_type == 'freelancer' and self.is_assistant == True:
             raise ValidationError(
-                {'is_assistant': _('Freelancer cannot be a Staff or Assistant at same time. You can let them join with a different email')})
+                {'is_assistant': _('Freelancer cannot be a Staff or Assistant at same time. You can let them join with a different email and username')})
         
         if self.user_type == 'client' and self.is_assistant == True:
             raise ValidationError(
-                {'is_assistant': _('Client cannot be a Staff or Assistant at same time. You can let them join with a different email')})
+                {'is_assistant': _('Client cannot be a Staff or Assistant at same time. You can let them join with a different email and username')})
            
         return super().clean()
 

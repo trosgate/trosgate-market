@@ -16,7 +16,7 @@ from general_settings.utilities import (
 )
 
 #
-# Utility function for sending Test email
+# Utility function for sending Test email using celery
 def send_test_mail(to_email):
     from_email = get_from_email()
     subject = f'Test Email on {website_name()}'

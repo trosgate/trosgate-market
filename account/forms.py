@@ -110,8 +110,15 @@ class CustomerRegisterForm(forms.ModelForm):
     @db_transaction.atomic
     def save(self):
         user = super().save(commit=False)
-        user.is_active = False
+        user.email = self.cleaned_data.get('email')
+        user.short_name = self.cleaned_data.get('short_name')
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.phone = self.cleaned_data.get('phone')
+        user.country = self.cleaned_data.get('country')
+        user.user_type = self.cleaned_data.get('user_type')
         user.set_password(self.cleaned_data["password1"])
+        user.is_active = False
         user.save()
 
         if user.user_type == Customer.FREELANCER:
@@ -166,7 +173,6 @@ class CustomerRegisterForm(forms.ModelForm):
         db_transaction.on_commit(lambda: new_user_registration(user, user.email))
 
         return user
-
 
 
 class UserLoginForm(AuthenticationForm):

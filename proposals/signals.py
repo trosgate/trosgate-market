@@ -10,7 +10,7 @@ import os
 
 @receiver(pre_save, sender=Proposal)
 def replace_old_thumbnail_with_new_one(sender, instance, **kwargs):
-    if instance._state.adding and not instance.pk:
+    if instance._state.adding and not instance.pk and not instance.thumbnail:
         return False
     
     try:
