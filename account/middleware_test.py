@@ -1,6 +1,4 @@
 import re
-import subprocess
-import os
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseBadRequest
@@ -52,90 +50,19 @@ class DynamicHostMiddleware:
         try:
             # Look up the Site object for the requested domain
             site = Site.objects.get(domain=domain)
-            
-            # Set the SITE_ID header to the ID of the Site object          
-            request.META['SITE_ID'] = site.id # or settings.SITE_ID = site.id
-            
-            # Call the next middleware or view function
-            response = self.get_response(request)
-
         except Site.DoesNotExist:
             return HttpResponseForbidden()
       
-        # Check if SSL certificate exists for the domain
-        if os.path.exists(f"/etc/letsencrypt/live/{site.domain}/fullchain.pem"):
-            ssl_certificate = f"/etc/letsencrypt/live/{site.domain}/fullchain.pem"
-            ssl_certificate_key = f"/etc/letsencrypt/live/{site.domain}/privkey.pem"
+        settings.SITE_ID = site.id
         
-        else:
-            # Generate SSL certificate using Certbot
-            cmd = f"certbot certonly --nginx -d {site.domain} -n --agree-tos --email admin@{site.domain}"
-            subprocess.run(cmd.split())
-
-            ssl_certificate = f"/etc/letsencrypt/live/{site.domain}/fullchain.pem"
-            ssl_certificate_key = f"/etc/letsencrypt/live/{site.domain}/privkey.pem"
-
-        # Configure the upstream server based on the value of the HTTP_UPSTREAM header
-        upstream = request.META.get('HTTP_UPSTREAM', 'error')
-
         # Set an atribute to differentiate parent site instance from all other merchants
         if site.id == 1:
             request.parent = site
         else:
             request.parent = None
 
-        # Configure the SSL block for the domain
-        ssl_block = f"""
-            ssl_certificate {ssl_certificate};
-            ssl_certificate_key {ssl_certificate_key};
-        """
-
-        # Configure the server block for the domain
-        server_block = f"""
-            server {{
-                listen 443 ssl;
-
-                # Set the upstream server based on the value of the HTTP_UPSTREAM header
-                # if in test environment, proxy_pass will listen on port 8000;
-                # if in live environment, proxy_pass will listen on port 80;
-
-                location / {{
-                    proxy_pass http://{upstream}:80;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Scheme $scheme;
-                    proxy_set_header X-Forwarded-Proto $scheme;
-                }}
-
-                # Configure SSL for the domain
-                {ssl_block}
-            }}
-        """
-
-        # Configure the default server block for unknown domains
-        default_server_block = f"""
-            server {{
-                listen 443 ssl;
-                server_name _;
-
-                # Return a 403 Forbidden response for unknown domains
-                return 403;
-
-                # SSL configuration goes here
-                {ssl_block}
-            }}
-        """
-
-        return response, server_block, default_server_block, upstream
-
-        # Call the next middleware or view function
-        # response = self.get_response(request)
-
-        # redirect_url = reverse('/')
-        # return HttpResponseRedirect(redirect_url)
-
-        # return response
+        response = self.get_response(request)
+        return response
 
 
 class MerchantGateMiddleware:

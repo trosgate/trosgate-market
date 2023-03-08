@@ -87,7 +87,7 @@ MIDDLEWARE = [
     # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'account.middleware.DynamicHostMiddleware',
+    'account.middleware_test.DynamicHostMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
@@ -96,8 +96,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
     'analytics.middleware.Middleware',
-    'account.middleware.MerchantGateMiddleware',
+    'account.middleware_test.MerchantGateMiddleware',
 ]
+
 
 ROOT_URLCONF = 'trosgate.urls'
 
