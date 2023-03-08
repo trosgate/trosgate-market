@@ -1,0 +1,28 @@
+#!/bin/sh
+
+NAME='trosgate'
+DJANGODIR=/webapps/trosgate/trosgate_env/trosgate-marketplace-script
+SOCKFILE=/webapps/trosgate/trosgate_env/run/gunicorn.sock
+USER=katey
+GROUP=webapps
+NUM_WORKERS=3
+DJANGO_SETTINGS_MODULE=trosgate.settings
+DJANGO_WSGI_MODULE=trosgate.wsgi
+TIMEOUT=120
+
+cd $DJANGODIR
+source ../bin/activate
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+
+RUNDIR=$(dirname $SOCKFILE)
+test -d $RUNDIR || mkdir -p $RUNDIR
+
+exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+--name $NAME \
+--workers $NUM_WORKERS \
+--timeout $TIMEOUT \
+--user=$USER --group=$GROUP \
+--bind=unix:$SOCKFILE \
+--log-level=debug \
+--log-file=-
