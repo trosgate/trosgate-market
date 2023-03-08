@@ -2,15 +2,16 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .tokens import account_activation_token
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites.models import Site
 from django.contrib.auth import authenticate, login
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text
 from django.contrib import auth, messages
-from .forms import SearchTypeForm, CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
+from .forms import SearchTypeForm, MerchantRegisterForm, CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Customer, Country, TwoFactorAuth
+from .models import Customer, Country, Package, Merchant, TwoFactorAuth
 from proposals.models import Proposal
-from teams.models import Invitation, Team, Package
+from teams.models import Invitation, Team
 from teams.forms import TeamCreationForm
 from client.models import Client
 from freelancer.models import Freelancer
@@ -43,11 +44,19 @@ from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 from control_settings.utilities import homepage_layout
 from contract.models import Contract
+from django.conf import UserSettingsHolder
 
+
+@login_required
+def remove_message(request):
+    return HttpResponse("")
+
+    
 def subscribers(request):
     return render(request, 'account/subscriber.html', {})
 
 
+@login_required
 def Logout(request):
     '''
     This is manual method for user to logout.
@@ -97,7 +106,7 @@ def autoLogout(request):
 def homepage(request):
     if request.user.is_authenticated:
         return redirect('account:dashboard')
-    
+
     base_currency = get_base_currency_symbol()
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
@@ -167,16 +176,16 @@ def loginView(request):
         
         user = authenticate(request, email=email, password=password)
 
-        if user is not None and user.user_type == Customer.ADMIN and user.is_active == True and user.is_staff == True:
+        if user is not None and user.is_admin:
              
             login(request, user)
 
-            messages.info(request, f'Welcome back {user.short_name}')
+            messages.info(request, f'Welcome back {user.get_short_name()}')
 
             return redirect('/admin')
 
         # Checks for freelancer and redirect to 2FA or otherwise
-        elif user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and user.is_staff == False and get_sms_feature():
+        if user is not None and user.is_freelancer and get_sms_feature():
 
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
@@ -185,15 +194,32 @@ def loginView(request):
 
             return redirect('account:two_factor_auth')
 
-        elif user is not None and user.user_type == Customer.FREELANCER and user.is_active == True and user.is_staff == False and not get_sms_feature():
+        if user is not None and user.is_freelancer and not get_sms_feature():
             
             login(request, user)
 
-            messages.info(request, f'Welcome back {user.short_name}')
+            messages.info(request, f'Welcome back {user.get_short_name()}')
+
+            return redirect('account:dashboard')
+                            
+        if user is not None and user.is_merchant and get_sms_feature():
+
+            if "twofactoruser" not in session:
+                session["twofactoruser"] = {"user_pk": user.pk}
+                session.modified = True
+                return redirect('account:two_factor_auth')
+
+            return redirect('account:two_factor_auth')
+
+        if user is not None and user.is_merchant and not get_sms_feature():
+            
+            login(request, user)
+
+            messages.info(request, f'Welcome back {user.get_short_name()}')
 
             return redirect('account:dashboard')                    
 
-        elif user is not None and user.user_type == Customer.CLIENT and user.is_active == True and user.is_staff == False and get_sms_feature():
+        if user is not None and request.user.is_client and get_sms_feature():
 
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
@@ -202,15 +228,15 @@ def loginView(request):
 
             return redirect('account:two_factor_auth')
 
-        elif user is not None and user.user_type == Customer.CLIENT and user.is_active == True and user.is_staff == False and not get_sms_feature():            
+        if user is not None and request.user.is_client and not get_sms_feature():            
             
             login(request, user)
 
-            messages.info(request, f'Welcome back {user.short_name}')
+            messages.info(request, f'Welcome back {user.get_short_name()}')
 
             return redirect('account:dashboard')
-        else:
-             messages.error(request, f'Invalid email or Password.')           
+        # else:
+        messages.error(request, f'Invalid email or Password.')           
         
     else:
         loginform = UserLoginForm()
@@ -287,11 +313,36 @@ def account_register(request):
         regform = CustomerRegisterForm(supported_country, request.POST or None)
         if regform.is_valid():
             regform.save()
-        return render(request, 'account/registration/register_email_confirm.html', {'success': 'success'})
+            return render(request, 'account/registration/register_email_confirm.html', {'success': 'success'})
 
     else:
         regform = CustomerRegisterForm(supported_country)
     return render(request, 'account/register.html', {'regform': regform})
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def create_merchant(request, type):
+    if request.user.is_authenticated and request.user.user_type == Customer.MERCHANT:
+        messages.info(request, f'Welcome back {request.user.get_short_name}')
+        return redirect('account:dashboard')
+
+    if request.user.is_authenticated and request.user.user_type == Customer.ADMIN:
+        messages.info(request, f'Welcome back {request.user.get_short_name}')
+
+        return redirect('/admin')
+
+    package = get_object_or_404(Package, type=type)
+    supported_country = Country.objects.filter(supported=True)
+
+    if request.method == 'POST':
+        regform = MerchantRegisterForm(supported_country, request.POST or None)
+        if regform.is_valid():
+            regform.save()
+            return render(request, 'account/registration/register_email_confirm.html', {'success': 'success'})
+
+    else:
+        regform = MerchantRegisterForm(supported_country)
+    return render(request, 'account/subscription.html', {'regform': regform, 'package':package,})
 
 
 def account_activate(request, uidb64, token):
@@ -341,7 +392,8 @@ def user_dashboard(request):
     contracts=None
     proposals=None
     msg = ''
-    if request.user.user_type == Customer.FREELANCER and request.user.is_active == True:
+
+    if request.user.is_freelancer:
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
             contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
@@ -356,10 +408,8 @@ def user_dashboard(request):
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.all().exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
-        try:
-            package=Package.objects.get(id=1)
-        except:
-            package = None
+
+        package=Package.objects.get_or_create(id=1)[0]
 
         base_currency = get_base_currency_symbol()
 
@@ -402,7 +452,8 @@ def user_dashboard(request):
         }
         return render(request, 'account/user/freelancer_dashboard.html', context)
 
-    elif request.user.user_type == Customer.CLIENT and request.user.is_active == True:
+
+    if request.user.is_client:
         client_profile = Client.objects.get(user=request.user)
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
@@ -418,8 +469,31 @@ def user_dashboard(request):
             'base_currency': base_currency,
         }
         return render(request, 'account/user/client_dashboard.html', context)
-    
-    elif request.user.user_type == Customer.ADMIN and request.user.is_active == True and request.user.is_staff == True:
+
+
+    if request.user.is_merchant:
+        merchant_profile = Merchant.objects.get(merchant=request.user)
+        merchant_p = Merchant.objects.all().count()
+        merchant_d = Merchant.curr_merchant.all().count()
+        # print('merchant_p :', merchant_p, request.site)
+        # print('merchant_d :', merchant_d)
+        # proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
+        # open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
+        # closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
+        # contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
+        # base_currency = get_base_currency_symbol()
+        context = {
+            'merchant_profile': merchant_profile,
+            # 'closed_projects': closed_projects,
+            # 'proposals': proposals,
+            # 'contracts': contracts,
+            # 'client_profile': client_profile,
+            # 'base_currency': base_currency,
+        }
+        return render(request, 'account/user/merchant_dashboard.html', context)
+
+
+    if request.user.is_admin:
         messages.info(request, f'Welcome back {request.user.short_name}')
 
         return redirect('/admin/')

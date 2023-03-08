@@ -8,6 +8,7 @@ from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
+
 def site_path(instance, filename):
     return "site/%s/%s" % (instance.site_name, filename)
 
@@ -322,6 +323,10 @@ class Category(models.Model):
     def category_absolute_url(self):
         return reverse('general_settings:category', args=[self.slug])
 
+    # @property
+    def proposal_count(self):
+        return len(self.proposal.filter(status='active'))
+
 
 class Department(models.Model):
     name = models.CharField(_("Department Name"), max_length=100, help_text=_(
@@ -547,6 +552,7 @@ class CurrencyConverter(models.Model):
         return self.currency.name
 
     # Api call from https://v6.exchangerate-api.com/
+
 
 class ExachangeRateAPI(models.Model):
     preview = models.CharField(

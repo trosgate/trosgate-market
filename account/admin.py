@@ -4,13 +4,15 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
-from .models import Customer, Country, TwoFactorAuth
+from .models import Customer, Country, Package, Merchant, TwoFactorAuth
 from django.utils.translation import gettext_lazy as _
 import sys
 from django.contrib.admin.models import LogEntry
 import warnings
 
-MAX_OBJECTS = 0
+
+MAX_PACKAGE = 3
+
 
 class CustomerCreationForm(forms.ModelForm):
     short_name = forms.CharField(label='Username', min_length=4, max_length=30)
@@ -53,15 +55,15 @@ class CustomerAdmin(BaseUserAdmin,):
     form = CustomerChangeForm
     add_form = CustomerCreationForm
 
-    list_display = ['id', 'short_name', 'email', 'country','user_type', 'is_active', 'last_login']
+    list_display = ['id', 'get_short_name', 'email', 'is_superuser','user_type', 'is_active', 'last_login']
     readonly_fields = ['date_joined', 'user_type', 'last_login']
-    list_display_links = ['short_name']
+    list_display_links = ['get_short_name']
     list_filter = ['user_type', 'is_superuser', 'is_assistant',]
     fieldsets = (
         ('Personal Information', {'fields': ('email', 'short_name', 'first_name', 'last_name', 'phone', 'country', 'password',)}),
         ('All User Permissions', {'fields': ('user_type','is_active','is_staff',)}),
         ('Company Roles', {'fields': ('is_assistant', 'is_superuser',)}),
-        ('Activity Log', {'fields': ('date_joined', 'last_login',)}),
+        ('Activity Log', {'fields': ('site', 'date_joined', 'last_login',)}),
     )
     add_fieldsets = (
         (None, {
@@ -225,6 +227,57 @@ class CountryAdmin(admin.ModelAdmin):
         return False
 
 
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):  
+    list_display = ['type','price', 'is_default', 'verbose_type', 'ordering']
+    list_display_links = ['type','verbose_type']
+    excludes = ['daily_Handshake_mails_to_clients']
+    readonly_fields = ['daily_Handshake_mails_to_clients']
+    radio_fields = {'is_default': admin.HORIZONTAL}    
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        is_admin = request.user.user_type == 'admin'
+        disabled_fields = set() 
+
+        if not is_admin: 
+            disabled_fields |= {
+                'type',
+                'price', 
+                'is_default', 
+                'status', 
+                'verbose_type', 
+                'ordering',
+                'max_member_per_team',
+                'monthly_offer_contracts_per_team',
+                'max_proposals_allowable_per_team',
+                'monthly_projects_applicable_per_team',
+                'daily_Handshake_mails_to_clients'
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
+
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_PACKAGE:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
 @admin.register(TwoFactorAuth)
 class TwoFactorAuthAdmin(admin.ModelAdmin):   
     list_display = ['user', 'get_user_type', 'last_login', 'pass_code']
@@ -255,4 +308,37 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
+
+@admin.register(Merchant)
+class MerchantAdmin(admin.ModelAdmin):   
+    list_display = ['business_name', 'merchant', 'type', 'site', 'created_at']
+    readonly_fields = ['merchant','created_at'] #'business_name', 'merchant'
+    radio_fields = {'type': admin.HORIZONTAL}    
+    # list_display_links = None
+
+    # def get_queryset(self, request):
+    #     qs = super(MerchantAdmin, self).get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs.all().exclude(user__is_staff=True)  
+    #     else:
+    #         return qs.filter(pk=0)  
+            
+    @admin.display(description='Merchant Types', ordering='merchant__user_type')
+    def get_user_type(self, obj):
+        return obj.merchant.user_type.capitalize()
+
+    # def has_add_permission(self, request):
+    #     return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
 admin.site.unregister(Group)
+

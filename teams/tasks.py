@@ -7,7 +7,7 @@ from general_settings.backends import get_from_email
 
 
 #Send a mail via celery
-@shared_task(bind=True)
+# @shared_task(bind=True)
 def email_all_users(self):
     freelancers = Customer.objects.filter(is_active = True)
     for freelancer in freelancers:

@@ -4,7 +4,7 @@ from .views import account_register, account_activate, homepage
 from .forms import PasswordResetForm, PasswordResetConfirmForm
 from django.views.generic import TemplateView
 from . import views
-from . validators import verify_username, verify_team, user_types
+from . validators import verify_username, verify_team, user_types, build_subdomain
 from general_settings.utilities import (
     website_name,
     get_protocol_with_domain_path,
@@ -15,9 +15,9 @@ app_name = 'account'
 # shared accounts app urls
 urlpatterns = [
     # path('countries/', views.countries, name='countries'),
-    # path('states/', views.states, name='states'),
 
     path("", views.homepage, name='homepage'),
+    path('subscription/<str:type>/', views.create_merchant, name='create_merchant'),
     path("subscribers/", views.subscribers, name='subscribers'),
     path("account/login/", views.loginView, name = "login"),
     path('dashboard/', views.user_dashboard, name='dashboard'), 
@@ -61,6 +61,8 @@ htmx_urlpatterns = [
     path("verify_team/", verify_team, name = "verify_team"),
     path('user_types/', user_types, name='user_types'),
     path('searchtype/', user_types, name='searchtype'),
+    path('remove_message/', views.remove_message, name='remove_message'),
+    path('build_subdomain/', build_subdomain, name='build_subdomain'),
 ]
 
 urlpatterns += htmx_urlpatterns

@@ -2,8 +2,8 @@ from django.contrib import admin
 from .models import Contractor, Contract, InternalContract, ContractChat, InternalContractChat
 
 
+@admin.register(Contractor)
 class ContractorAdmin(admin.ModelAdmin):
-    model = Contractor
     list_display = ['name',  'email', 'team', 'created_by', 'date_created']
     list_display_links = ['name', 'created_by',]
     readonly_fields = ['name', 'email', 'team', 'created_by', 'date_created']
@@ -22,6 +22,7 @@ class ContractorAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(Contract)
 class ContractAdmin(admin.ModelAdmin):
     list_display = ['client', 'team', 'reference', 'contract_duration', 'grand_total', 'reaction']
     list_display_links = ['client', 'team']
@@ -63,6 +64,7 @@ class ContractAdmin(admin.ModelAdmin):
         return actions
 
 
+@admin.register(InternalContract)
 class InternalContractAdmin(admin.ModelAdmin):
     list_display = ['team','reference', 'get_proposal_title', 'grand_total', 'reaction']
     list_display_links = ['team','reference']
@@ -147,8 +149,6 @@ class InternalContractAdmin(admin.ModelAdmin):
 #         return obj.proposal.title
 
 
-admin.site.register(Contract, ContractAdmin)
-admin.site.register(InternalContract, InternalContractAdmin)
-admin.site.register(Contractor, ContractorAdmin)
+
 # admin.site.register(InternalContractChat, InternalContractChatAdmin)
 

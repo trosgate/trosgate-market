@@ -9,7 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from . models import Team, Package
+from .models import Team
+from account.models import Package
 from .utilities import get_expiration
 from transactions.models import SubscriptionItem
 from general_settings.gateways import RazorpayClientConfig

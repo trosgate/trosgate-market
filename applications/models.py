@@ -45,7 +45,7 @@ class Application(models.Model):
     REJECTED = 'rejected'
     APPLICATION_STATUS = (
         (PENDING, _('Pending')),
-        (ACCEPTED, _('Accepted')),
+        (ACCEPTED, _('Approved')),
         (REJECTED, _('Rejected')),
     ) 
     team = models.ForeignKey('teams.Team', verbose_name=_("Applicant Team"), related_name="applications", on_delete=models.CASCADE, max_length=250)

@@ -7,7 +7,7 @@ app_name = 'transaction'
 urlpatterns = [
 
     # Urls for hiring app
-    path('box-summary/', views.proposal_multiple_summary,name='hiring_box_summary'),
+    path('box-summary/', views.proposal_bucket,name='hiring_box_summary'),
     path('add/', views.add_proposal_to_box, name='add_to_hiring_box'),
     path('remove/', views.remove_from_hiring_box, name='remove_from_hiring_box'),
     path('modify/', views.modify_from_hiring_box, name='modify_from_hiring_box'),
@@ -28,7 +28,7 @@ urlpatterns = [
     path('stripe/checkout/api/', views.stripe_payment_order, name='stripe_payment_order'),
     path('paypal/checkout/api/', views.paypal_payment_order, name='paypal_payment_order'),
     path('success/true/', views.payment_success, name='hiring_payment_success'),
-    path('<str:short_name>/<slug:proposal_slug>', views.proposal_single_summary, name='hiring_summary'),
+    path('<str:short_name>/<slug:proposal_slug>', views.proposal_direct_hire, name='hiring_summary'),
     path('stripe-webhook/', views.stripe_webhook, name='stripe_webhook'),
     path('razorpay/checkout/api/', views.razorpay_application_intent,name='razorpay_application_intent'),
     path('razorpay_webhook/', views.razorpay_webhook,name='razorpay_webhook'),    

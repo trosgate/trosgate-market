@@ -168,6 +168,18 @@ class Contractor(models.Model):
         verbose_name = _("External Client")
         verbose_name_plural = _("External Client")
 
+    def save(self, *args, **kwargs):
+        self.email = self.email.lower()
+        super(Contractor, self).save(*args, **kwargs)
+
+    @property
+    def is_connected(self):
+        if self.contractsclient.filter(client__email=self.email).exists():
+            return True
+        else:
+            return False
+
+
 
 class Contract(models.Model):
     """

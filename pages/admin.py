@@ -12,7 +12,7 @@ class TermsAndConditionsAdmin(admin.ModelAdmin):
     list_display_links = ['title', ]
     prepopulated_fields = {'slug': ('title',)}
     fieldsets = (
-        ('Basic Info', {'fields': ('title', 'slug',)}),
+        ('Basic Info', {'fields': ('title', 'slug', 'sites',)}),
         ('Body Description', {'fields': ('quote', 'description',)}),
         ('Publish/Hide', {'fields': ('is_published',)}),
 

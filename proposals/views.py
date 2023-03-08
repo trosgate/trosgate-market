@@ -159,16 +159,16 @@ def proposal_step_one(request):
     proposalstepone=None
     can_create_new_proposal = PackageController(team).max_proposals_allowable_per_team()
     
+    proposalformone = ProposalStepOneForm(request.POST or None, request.FILES or None)
     if "proposalstepone" not in session:
-        proposalformone = ProposalStepOneForm(request.POST or None, request.FILES or None)
-        
+
         if proposalformone.is_valid():
             proposal = proposalformone.save(commit=False)
             proposal.created_by = request.user
             proposal.team = team
             proposal.slug = slugify(proposal.title)
             proposal.progress = int(30)
-            proposal.save()
+            proposal.save()          
             proposalformone.save_m2m()
 
             session["proposalstepone"] = {"proposalstepone_id": proposal.id}
@@ -182,14 +182,13 @@ def proposal_step_one(request):
         except:
             del session["proposalstepone"]
 
-        proposalformone = ProposalStepOneForm(request.POST, instance = proposalstepone) 
+        proposalformone = ProposalStepOneForm(request.POST, request.FILES, instance = proposalstepone) 
 
         if proposalformone.is_valid():
             proposalformone.instance.title = proposalformone.cleaned_data['title']
             proposalformone.instance.preview = proposalformone.cleaned_data['preview']
             proposalformone.instance.category = proposalformone.cleaned_data['category']
             proposalformone.save()
- 
             return redirect("proposals:proposal_step_two") 
 
         proposalformone = ProposalStepOneForm(instance = proposalstepone)           
@@ -373,7 +372,7 @@ def modify_proposal_step_one(request, proposal_id, proposal_slug):
 
     description = proposal.description
 
-    proposalformone = ModifyProposalStepOneForm(request.POST or None, instance=proposal)
+    proposalformone = ModifyProposalStepOneForm(request.POST or None, request.FILES or None, instance=proposal)
 
     if proposalformone.is_valid():
         proposalformone.save()
@@ -486,7 +485,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
     if proposalformfour.is_valid():
         proposalformfour.save()
 
-        if proposal.title != '' and proposal.preview != '' and proposal.category != '' and proposal.skill != '' and description != '' and faq_one != '' and faq_one_description != '' and faq_two != '' and faq_two_description != '' and faq_three != '' and faq_three_description != '' and salary != '' and service_level != '' and revision != '' and dura_converter != '':
+        if proposal.title != '' and proposal.preview != '' and proposal.category != '' and proposal.skill is not None and description != '' and faq_one != '' and faq_one_description != '' and faq_two != '' and faq_two_description != '' and faq_three != '' and faq_three_description != '' and salary != '' and service_level != '' and revision != '' and dura_converter != '':
             proposal.progress = int(100)
             proposal.status = Proposal.ACTIVE
             proposal.save()
@@ -595,7 +594,14 @@ def proposal_detail(request, short_name, proposal_slug):
         resolution__proposal_sale__proposal__team=proposal.team, 
         resolution__proposal_sale__proposal=proposal,
         status = True
-    )[:30]
+    )[:15]
+    oneclick_review_msg = OneClickReview.objects.filter(
+        resolution__oneclick_sale__team=proposal.team, 
+        resolution__oneclick_sale__proposal=proposal,
+        status = True
+    )[:15]
+
+    review_status = ((proposal_review_msg.count() + oneclick_review_msg.count()) < 1)
 
     proposal_review_avg = proposal_review_average(proposal.team, proposal)
     contract_review_avg = contract_review_average(proposal.team, proposal)
@@ -651,6 +657,8 @@ def proposal_detail(request, short_name, proposal_slug):
         "oneclick_proposal_review_avg": oneclick_proposal_review_avg,
         "oneclick_contract_review_avg": oneclick_contract_review_avg,
         "proposal_review_msg":proposal_review_msg,
+        "oneclick_review_msg":oneclick_review_msg,
+        "review_status":review_status,
         "sesion_proposal":sesion_proposal,
         "all_viewed_proposals":all_viewed_proposals,
     }

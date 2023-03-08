@@ -4,13 +4,19 @@ from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
-from .forms import ProposalRefundForm, ApplicationRefundForm, ContractRefundForm, ExtContractRefundForm
+from .forms import (
+    ProposalRefundForm, 
+    ApplicationRefundForm, 
+    ContractRefundForm, 
+    ExtContractRefundForm,
+    OneClickRefundForm
+)
 
 
 @admin.register(OneClickPurchase)
 class OneClickPurchaseAdmin(admin.ModelAdmin):
     model = OneClickPurchase
-    list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status']
+    list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'is_refunded', 'admin_action']
     list_filter = ['category', 'status']
     readonly_fields = [
         'client', 'payment_method','salary_paid','created_at','reference',
@@ -22,6 +28,60 @@ class OneClickPurchaseAdmin(admin.ModelAdmin):
         ('Product Type', {'fields': ('team', 'category', 'proposal', 'contract', 'extcontract')}),
         
     )
+
+
+    def get_urls(self):
+        urls = super().get_urls()
+        pattern = [
+            path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='oneclick-refund'),
+        ]
+        return pattern + urls
+
+
+    def admin_action(self, obj):
+        return format_html(
+            '<a class="button" href="{}"> Refund</a>',
+            reverse('admin:oneclick-refund', args=[obj.pk]),
+        )
+    
+    admin_action.allow_tags = True
+    admin_action.short_description = 'Admin Action'
+
+    def approve_refund(self, request, pk, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            pk=pk,
+            action_form=OneClickRefundForm,
+            action_title='About to issue refund. Action is irreversible so be sure',
+        )
+
+    def process_action(self, request, pk, action_form, action_title):
+        account = self.get_object(request, pk)
+        form = ''
+        error_message = ''
+        if request.method != 'POST':
+            form = action_form()
+        else:
+            form = action_form(request.POST)
+            if form.is_valid():
+                try:
+                    form.save(pk)
+                except Exception as e:
+                    error_message = str(e)
+                    print(error_message)
+                    pass
+                else:
+                    self.message_user(request, 'Successfully made refund')
+                    url = reverse('admin:transactions_oneclickpurchase_change', args=[pk], current_app=self.admin_site.name)
+                    return HttpResponseRedirect(url)
+
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        context['form'] = form
+        context['account'] = account
+        context['title'] = action_title
+
+        return TemplateResponse(request, 'admin/account/project_refund.html', context)
 
     def has_add_permission(self, request):        
         return False

@@ -10,7 +10,7 @@
 					<div class="row justify-content-md-center">
 						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 							<div class="wt-innerbannercontent">
-							<div class="wt-title"><h2>Payment Modes</h2></div>
+							<div class="wt-title"><h2>Account Vault</h2></div>
 								<ol class="wt-breadcrumb">
 									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
 									<li class="wt-active">Modes </li>
@@ -23,8 +23,9 @@
 
 			<div class="wt-proposalholder">
 				<div class="row justify-content-md-center">
-					<div class="wt-hireduserstatus">
-						<em>Any account filled will must be selected during withdrawal request else we will not process your payment</em>
+					<div class="wt-hireduserstatus text-left">
+						<em>**1. Your details are kept in our secured vault and only our Account Officers signed Oath of secrecy form to manage your data</em><br>
+						<em>**2. Hence, no staff of {{website.site_name}} will ever call to request your account information. Where neccesary, we will tell you to come here to update your payment record</em>
 					</div>											
 				</div>
 			</div>
@@ -35,36 +36,36 @@
 						<div class="wt-dashboardbox">
 							<div class="wt-dashboardboxcontent wt-rcvproposala">
 								<div class="row">
-									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-											<button type="button" class="btn btn-secondary btn-sm" disabled style="background-color:grey;">{{base_currency}}&nbsp;{{request.user.fundtransferuser.pending_balance}}</button>
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4" style="margin-bottom:3px">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow" style="background-color:rgb(212, 6, 219, 1);">
+											<span><i class="far fa-money-bill-alt fa-2x" style="color:white;"> {{base_currency}}&nbsp;{{request.user.fundtransferuser.pending_balance}}</i></span>
 											<div class="wt-insightdetails">
 												<div class="wt-title">
-													<span><strong>Book Balance</strong></span>
+													<span><strong style="color:white;">Book Balance</strong></span>
 												</div>													
 											</div>	
 										</div>
 									</div>
-									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4" style="margin-bottom:3px">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow" style="background-color:indigo;">
 											{% if active_team.created_by == request.user %}
-											<button type="button" class="btn btn-primary btn-sm" disabled style="background-color:indigo;">{{base_currency}}&nbsp;{{active_team.team_balance}}</button>
+											<span><i class="far fa-money-bill-alt fa-2x" style="color:white;"> {{base_currency}}&nbsp;{{active_team.team_balance}}</i></span>
 											{% else %}
 											<span style="color:red;"><i class="ti-na">&nbsp;Restricted</i></span>
 											{% endif %}
 											<div class="wt-insightdetails">
 												<div class="wt-title">
-													<span><strong>Team Balance</strong></span>
+													<span><strong style="color:white;">Team Balance</strong></span>
 												</div>													
 											</div>	
 										</div>
 									</div>												
-									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-											<button type="button" class="btn btn-success btn-sm" disabled style="background-color:green;">{{base_currency}}&nbsp;{{request.user.fundtransferuser.available_balance}}</button>
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4" style="margin-bottom:3px">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow" style="background-color:rgb(40, 218, 40);">
+											<span><i class="far fa-money-bill-alt fa-2x" style="color:white;"> {{base_currency}}&nbsp;{{request.user.fundtransferuser.available_balance}}</i></span>
 											<div class="wt-insightdetails">
 												<div class="wt-title">
-													<span><strong>Avail Balance</strong></span>
+													<span><strong style="color:white;">Cash Balance</strong></span>
 												</div>													
 											</div>	
 										</div>
@@ -84,9 +85,10 @@
 												<h2>Primary Account</h2>
 											</div>
 										{{paymentForm.primary_account_type}}
-										<span style="color:red;" role="alert">{{ paymentForm.primary_account_type.errors}}</span>
+										<span style="color:red;" role="alert">{{ paymentForm.primary_account_type.errors}}</span><br>
+										<span style="color:blue;" role="alert">This account will be your primary settlement account</span>
 									</div> 
-									</div> 
+									{% comment %} </div>  {% endcomment %}
 									
 									{% for gateway in gateways %}
 
@@ -101,7 +103,7 @@
 													<thead>
 													<tr>
 														<th>Account</th>
-														<th>Inputs</th>
+														<th>form</th>
 													</tr>
 													</thead>
 													<body>
@@ -143,7 +145,7 @@
 													<body>
 													<tr>
 														<th>If Bank Selected</th>
-														<th>Extra Bank Info</th>
+														<th>Extra Bank form</th>
 													</tr>
 													</body>													
 													<body>													

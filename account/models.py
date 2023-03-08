@@ -11,6 +11,9 @@ from django.urls import reverse
 from . utilities import auth_code
 from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
+from django.contrib.sites.models import Site
+from django.contrib.sites.managers import CurrentSiteManager
+
 
 
 class Country(models.Model):
@@ -46,19 +49,19 @@ class Country(models.Model):
 class Customer(AbstractBaseUser, PermissionsMixin):
 
     ADMIN = 'admin'
+    MERCHANT = 'merchant'
     FREELANCER = 'freelancer'
     CLIENT = 'client'
     USER_TYPE = (
         (ADMIN, _('Admin')),
+        (MERCHANT, _('Merchant')),
         (FREELANCER, _('Freelancer')),
         (CLIENT, _('Client')),
     )
     email = models.EmailField(_("Email Address"), max_length=100, unique=True)
-    short_name = models.CharField(_("Username"), max_length=30, unique=True)
-    first_name = models.CharField(_("First Name"), max_length=50)
-    last_name = models.CharField(_("Last Name"), max_length=50)
-    date_joined = models.DateTimeField(_("Date Joined"), auto_now_add=True)
-    last_login = models.DateTimeField(_("Last Login"), auto_now=True)
+    short_name = models.CharField(_("Username"), max_length=30, blank=True, null=True, unique=True)
+    first_name = models.CharField(_("First Name"), max_length=50, blank=True, null=True)
+    last_name = models.CharField(_("Last Name"), max_length=50, blank=True, null=True)
     phone = models.CharField(_("Phone"), max_length=20, blank=True, null=True)
     country = models.ForeignKey(Country, 
         verbose_name=_("Country"), 
@@ -71,7 +74,11 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(_("CEO/SuperAdmin"), default=False)
     is_assistant = models.BooleanField(_("Virtual Assistant"), default=False)
     user_type = models.CharField(_("User Type"), choices=USER_TYPE, max_length=30)
-    
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    date_joined = models.DateTimeField(_("Date Joined"), auto_now_add=True)
+    last_login = models.DateTimeField(_("Last Login"), auto_now=True)
+
     class Meta:
         ordering = ("-date_joined",)
         verbose_name = "User Manager"
@@ -79,8 +86,12 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
-    REQUIRED_FIELDS = ['short_name', 'user_type']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
+
     objects = UserManager()
+    # With merchant manager below, Customer.objects.all() will return all Customer objects in the database, 
+    # but Customer.merchant.all() will return only the Customer objects associated with the current site, according to the SITE_ID setting.
+    merchant = CurrentSiteManager()
 
     def save(self, *args, **kwargs):
         self.email = self.email.lower()
@@ -93,13 +104,26 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         return f'{self.first_name} {self.last_name}'
 
     def get_short_name(self):
-        return self.short_name
+        return self.short_name if self.short_name else self.first_name
 
     def get_username(self):
         return self.email
-
-    def get_first_name(self):
-        return self.first_name
+    
+    @property
+    def is_freelancer(self):
+        return self.user_type == 'freelancer' and self.is_active == True
+    
+    @property
+    def is_client(self):
+        return self.user_type == 'client' and self.is_active == True
+    
+    @property
+    def is_merchant(self):
+        return self.user_type == 'merchant' and self.is_active == True
+    
+    @property
+    def is_admin(self):
+        return self.user_type == 'admin' and self.is_active == True and self.is_staff == True
 
     def email_user(self, subject, message, from_email, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
@@ -129,6 +153,172 @@ class Customer(AbstractBaseUser, PermissionsMixin):
            
         return super().clean()
 
+
+# NB ---> create seperate status for each of the fields and display to users
+class Package(models.Model):
+    #
+    # Package Type
+    STARTER = 'Basic'
+    STANDARD = 'Team'
+    LATEST = 'Enterprise'
+    STATUS = (
+        (STARTER, _('Starter')),
+        (STANDARD, _('Standard')),
+        (LATEST, _('Enterprise')),
+    )
+
+    #
+    # Initial Plan Configuration
+    type = models.CharField(_("Package Type"), choices=STATUS, default=STARTER, unique=True, max_length=50)
+    verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_("Customize name for the package. If empty, the default names will be displayed"), max_length=50)
+    max_member_per_team = models.PositiveIntegerField(_("Max member Per Team"), default=1, help_text=_("You can only add up to 4 members for the biggest package"), validators=[MinValueValidator(1), MaxValueValidator(5)])
+    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    daily_Handshake_mails_to_clients = models.PositiveIntegerField(_("Daily Contract Mail reminder"), default=0, help_text=_("New feature Coming Soon: Here, freelancer team can send followup/ reminder mail per external contract to client. Daily sending will have min of 1 amd max is 3 mails"), validators=[MinValueValidator(0), MaxValueValidator(3)])
+    price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
+    is_default = models.BooleanField(_("Make Default"), choices=((False, 'No'), (True, 'Yes')), help_text=_("Only 1 package should have a default set to 'Yes'"), default=False)
+    ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
+
+    def __str__(self):
+        return str(self.verbose_type) if self.verbose_type else str(self.get_type_display())
+
+    class Meta:
+        ordering = ['ordering']
+
+
+class Merchant(models.Model):
+    # Merchant Type
+    EXEMPT = 1 # For special accounts that require no subscription
+    BETA = 2 # For beta users
+    TRIALING = 4 # For users who have been given a trial
+    ACTIVE = 5
+    PAST_DUE = 6
+    CANCELED = 7
+    TRIAL_EXPIRED = 8
+    MERCHANT_TYPE = (
+        (EXEMPT, _('Exempted')),
+        (BETA, _('Beta')),
+        (TRIALING, _('Trialing')),
+        (ACTIVE, _('Active')),
+        (PAST_DUE, _('Past Due')),
+        (CANCELED, _('Canceled')),
+        (TRIAL_EXPIRED, _('Trial Expired')),
+    )
+
+    MALE = 'male'
+    FEMALE = 'female'
+    GENDER = (
+        (MALE, _('Male')),
+        (FEMALE, _('Female'))
+    )    
+    ACTIVE_TYPES = (EXEMPT, BETA, TRIALING, ACTIVE)
+    PRE_PLAN_TYPES = (TRIALING, TRIAL_EXPIRED)
+    END_TYPES = (CANCELED, TRIAL_EXPIRED)
+
+    # Initial Plan Configuration
+    type = models.PositiveIntegerField(_("Account Status"), choices=MERCHANT_TYPE, default=TRIALING)
+    merchant = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant', on_delete=models.CASCADE)
+    business_name = models.CharField(_("Business Name"), max_length=255)
+    site = models.OneToOneField(Site, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(_("Last Created"), auto_now=True)
+    package = models.ForeignKey("account.Package", 
+        verbose_name=_("Package"), 
+        related_name="packages", 
+        on_delete=models.PROTECT
+    )
+
+    gender = models.CharField(
+        _("Gender"), 
+        max_length=10, 
+        choices=GENDER
+    )
+
+    tagline = models.CharField(
+        _("Tagline"), 
+        max_length=100, 
+        blank=True
+    )
+    description = models.TextField(
+        _("Description"), 
+        max_length=2000, 
+        blank=True, 
+        error_messages={"name": {"max_length": _("A maximum of 2000 words required")}},
+    )
+
+    profile_photo = models.ImageField(
+        _("Profile Photo"), 
+        upload_to='client/', 
+        default='client/avatar5.png'
+    )
+    company_logo = models.ImageField(
+        _("Brand Logo"), 
+        upload_to='client/', 
+        default='client/logo.png'
+    )
+    banner_photo = models.ImageField(
+        _("Banner Photo"), 
+        upload_to='client/', 
+        default='client/banner.png'
+    )
+   
+    address = models.CharField(
+        _("Residence Address"), 
+        max_length=100, 
+        null=True, 
+        blank=True
+    )
+
+    announcement = models.TextField(
+        _("Announcement"), 
+        max_length=1000, 
+        null=True, 
+        blank=True
+    )
+
+    objects = models.Manager()
+    curr_merchant = CurrentSiteManager()
+
+    def __str__(self):
+        return str(self.business_name)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = "Merchant"
+        verbose_name_plural = "Merchants"
+
+
+    # # a url route for the profile detail page
+    # def merchant_profile_get_absolute_url(self):
+    #     return reverse('client:client_profile', args=([(self.user.short_name)]))
+    
+    # def modify_merchant_get_absolute_url(self):
+    #     return reverse('client:update_client_profile', args=([(self.user.short_name)]))
+
+    # profile image display in Admin
+    def image_tag(self):
+        return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.profile_photo))
+    
+    image_tag.short_description = 'profile_photo'
+
+    # banner image display in Admin
+    def banner_tag(self):
+        return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.banner_photo))
+
+    banner_tag.short_description = 'banner_photo'
+
+    # logo image display in Admin
+    def logo_tag(self):
+        return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.company_logo))
+
+    logo_tag.short_description = 'company_logo'
+
+
+    # @property
+    # def trial_end(self):
+    #     """Calculate the account's trial end date."""
+    #     return self.user.date_joined + datetime.timedelta(days=constants.TRIAL_DAYS)
+    
 
 class TwoFactorAuth(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='twofactorauth', on_delete=models.CASCADE)

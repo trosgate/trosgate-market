@@ -13,7 +13,6 @@ MAX_GATEWAYS = 4
 
 @admin.register(LayoutSetting)
 class LayoutSettingAdmin(admin.ModelAdmin):
-    model = LayoutSetting
     list_display = ['title_block','subtitle_block']
     list_display_links = ['title_block','subtitle_block']
     fieldsets = (
@@ -47,7 +46,6 @@ class LayoutSettingAdmin(admin.ModelAdmin):
 
 @admin.register(PaydayController)
 class PaydayAdmin(admin.ModelAdmin):
-    model = PaydayController
     list_display = ['preview','payday_converter']
     list_editable = ['payday_converter']
     readonly_fields = ['preview']
@@ -74,7 +72,6 @@ class PaydayAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentsController)
 class PaymentControlAdmin(admin.ModelAdmin):
-    model = PaymentsController
     list_display = ['preview', 'min_balance', 'max_receiver_balance', 'min_transfer', 'max_transfer', 'min_withdrawal', 'max_withdrawal']
     list_display_links = ['preview']
     list_editable = ['min_balance', 'max_receiver_balance', 'min_transfer', 'max_transfer', 'min_withdrawal', 'max_withdrawal']
@@ -105,7 +102,6 @@ class PaymentControlAdmin(admin.ModelAdmin):
 
 @admin.register(DepositController)
 class DepositControlAdmin(admin.ModelAdmin):
-    model = DepositController
     list_display = ['preview', 'min_balance', 'max_balance', 'min_deposit', 'max_deposit']
     list_display_links = ['preview']
     list_editable = ['min_balance', 'max_balance', 'min_deposit', 'max_deposit']
@@ -134,7 +130,6 @@ class DepositControlAdmin(admin.ModelAdmin):
 
 @admin.register(ExchangeRateSetting)
 class ExachangeRateAPIAdmin(admin.ModelAdmin):
-    model = ExchangeRateSetting
     list_display = ['preview', 'exchange_rates_api_key']
     list_display_links = ['preview']
     list_editable = ['exchange_rates_api_key']
@@ -157,7 +152,6 @@ class ExachangeRateAPIAdmin(admin.ModelAdmin):
 
 @admin.register(GatewaySetting)
 class PaymentGatewayAdmin(admin.ModelAdmin):
-    model = GatewaySetting
     list_display = ['name', 'default', 'processing_fee', 'status', 'ordering']
     list_editable = ['processing_fee', 'default', 'status', 'ordering']
     readonly_fields = ['name']
@@ -180,7 +174,6 @@ class PaymentGatewayAdmin(admin.ModelAdmin):
 
 @admin.register(HiringSetting)
 class HiringFeeAdmin(admin.ModelAdmin):
-    model = HiringSetting
     list_display = ['preview', 'contract_percentage',
                     'proposal_percentage', 'application_percentage']
     list_display_links = ['preview']
@@ -215,7 +208,6 @@ class HiringFeeAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentAPISetting)
 class PaymentAPIsAdmin(admin.ModelAdmin):
-    model = PaymentAPISetting
     list_display = ['preview', 'gateway_count']
     list_display_links = ['preview', 'gateway_count']
     readonly_fields = ['preview']
@@ -252,7 +244,6 @@ class PaymentAPIsAdmin(admin.ModelAdmin):
 
 @admin.register(DiscountSettings)
 class DiscountSystemAdmin(admin.ModelAdmin):
-    model = DiscountSettings
     list_display = ['preview', 'level_one_discount', 'level_two_discount', 'level_three_discount', 'level_four_discount']
     list_display_links = ['preview']
     readonly_fields = ['level_one_name', 'level_two_name', 'level_three_name', 'level_four_name']
@@ -285,7 +276,6 @@ class DiscountSystemAdmin(admin.ModelAdmin):
 
 @admin.register(MailerSetting)
 class MailerAdmin(admin.ModelAdmin):
-    model = MailerSetting
     list_display = ['from_email', 'email_hosting_server', 'email_use_tls', 'email_use_ssl']
     list_display_links = ['from_email', 'email_hosting_server']
     list_per_page = sys.maxsize
@@ -314,7 +304,6 @@ class MailerAdmin(admin.ModelAdmin):
 
 @admin.register(TestMailSetting)
 class TestEmailAdmin(admin.ModelAdmin):
-    model = TestMailSetting
     list_display = ['title', 'test_email']
     list_display_links = ['title', 'test_email']
     readonly_fields = ['title']
@@ -340,7 +329,6 @@ class TestEmailAdmin(admin.ModelAdmin):
 
 @admin.register(SubscriptionSetting)
 class SubscriptionGatewayAdmin(admin.ModelAdmin):
-    model = SubscriptionSetting
     list_display = ['name', 'paypal', 'stripe', 'razorpay', 'flutterwave']
     list_editable = ['paypal', 'stripe', 'razorpay', 'flutterwave']
     list_display_links = ['name']
@@ -370,7 +358,6 @@ class SubscriptionGatewayAdmin(admin.ModelAdmin):
 
 @admin.register(DepositSetting)
 class DepositSettingAdmin(admin.ModelAdmin):
-    model = DepositSetting
     list_display = ['name', 'paypal', 'stripe', 'razorpay', 'flutterwave']
     list_editable = ['paypal', 'stripe', 'razorpay', 'flutterwave']
     list_display_links = ['name']

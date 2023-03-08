@@ -16,7 +16,7 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_p
 from account.fund_exception import FundException
 from teams.models import Team
 from client.models import ClientAccount
-from resolution.models import ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
+from resolution.models import OneClickResolution, ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
 
 
 class OneClickPurchase(models.Model):
@@ -37,7 +37,7 @@ class OneClickPurchase(models.Model):
     )    
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="oneclickclient")
     salary_paid = models.PositiveIntegerField(_("Salary Paid"))
-    total_earning = models.PositiveIntegerField(_("Totoal Earning"))
+    total_earning = models.PositiveIntegerField(_("Total Earning"))
     earning_fee = models.PositiveIntegerField(_("Earning Fee"))
     payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
     category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
@@ -50,6 +50,7 @@ class OneClickPurchase(models.Model):
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal"), related_name="oneclickproposal", null=True, blank=True, on_delete=models.PROTECT)
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Int Contract"), related_name="intoneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
     extcontract = models.ForeignKey("contract.Contract", verbose_name=_("Ext Contract"), related_name="extoneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
+    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -180,6 +181,42 @@ class OneClickPurchase(models.Model):
         return account, purchass, selected_contract
 
 
+    @classmethod
+    def oneclick_refund(cls, pk:int):
+        with db_transaction.atomic():
+            oneclick_sale = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=oneclick_sale.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=oneclick_sale.team.created_by)
+            
+            try:
+                resolution = OneClickResolution.objects.select_for_update().get(oneclick_sale=oneclick_sale)            
+            except:
+                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
+            
+            if oneclick_sale.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            # if contract_sale.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == 'ongoing':
+                raise Exception(_("This transaction is ongoing and cannot be refunded"))
+
+            resolution.status = 'cancelled'
+            resolution.save()
+
+            oneclick_sale.is_refunded = True
+            oneclick_sale.save()
+            
+            freelancer.pending_balance -= int(oneclick_sale.salary_paid)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(oneclick_sale.salary_paid)
+            client.save(update_fields=['available_balance'])
+
+        return oneclick_sale, client, freelancer, resolution
+
+
 class Purchase(models.Model):
     SUCCESS = 'success'
     FAILED = 'failed'
@@ -232,12 +269,12 @@ class Purchase(models.Model):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(stripe_order_key=stripe_order_key)
             if purchase.status != Purchase.FAILED:
-                raise Exception(_("This purchase already succeeded and cannot be processed"))
+                raise Exception(_("This purchase already succeeded"))
             purchase.status = Purchase.SUCCESS
             purchase.save()
 
-            contract = ''
-            contract_item = ''
+            contract = None
+            contract_item = None
             
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
@@ -252,15 +289,16 @@ class Purchase(models.Model):
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
             
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
-
+                contract.save()
+                # contract.save(update_fields=['reaction'])
 
         return purchase, contract_item, contract
 
@@ -270,12 +308,12 @@ class Purchase(models.Model):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(pk=pk)
             if purchase.status != Purchase.FAILED:
-                raise Exception(_("This purchase already succeeded and cannot be processed"))
+                raise Exception(_("This purchase already succeeded"))
             purchase.status = Purchase.SUCCESS
             purchase.save()
 
-            contract = ''
-            contract_item = ''
+            contract = None
+            contract_item = None
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
@@ -290,14 +328,16 @@ class Purchase(models.Model):
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
 
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
                 
         return purchase, contract_item, contract
 
@@ -307,13 +347,14 @@ class Purchase(models.Model):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(unique_reference=unique_reference)
             if purchase.status != Purchase.FAILED:
-                raise Exception(_("This purchase already succeeded and cannot be processed"))
+                raise Exception(_("This purchase already succeeded"))
+
             purchase.status = Purchase.SUCCESS
             purchase.flutterwave_order_key = flutterwave_order_key
             purchase.save()
 
-            contract = ''
-            contract_item = ''
+            contract = None
+            contract_item = None
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase):
@@ -328,14 +369,16 @@ class Purchase(models.Model):
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
 
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
 
         return purchase, contract_item, contract
         
@@ -345,14 +388,15 @@ class Purchase(models.Model):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(razorpay_order_key=razorpay_order_key)
             if purchase.status != Purchase.FAILED:
-                raise Exception(_("This purchase already succeeded and cannot be processed"))
+                raise Exception(_("This purchase already succeeded"))
+
             purchase.status = Purchase.SUCCESS
             purchase.razorpay_payment_id = razorpay_payment_id
             purchase.razorpay_signature = razorpay_signature
             purchase.save()
 
-            contract = ''
-            contract_item = ''
+            contract = None
+            contract_item = None
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase):
@@ -367,14 +411,16 @@ class Purchase(models.Model):
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
 
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
-                contract.save(update_fields=['reaction'])
+                contract.save()
+                # contract.save(update_fields=['reaction'])
 
         return purchase, contract_item, contract
 
@@ -426,13 +472,13 @@ class ApplicationSale(models.Model):
             try:
                 resolution = ProjectResolution.objects.select_for_update().get(application=application)            
             except:
-                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
+                raise Exception(_("Sorry! could not raise refund. It could be that Team is yet to start work"))
             
             if application.is_refunded != False:
                 raise Exception(_("This transaction cannot be refunded twice"))
 
-            if application.purchase.status != Purchase.SUCCESS:
-                raise Exception(_("You cannot issue refund for a failed transaction"))
+            # if application.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
 
             if resolution.status == ProjectResolution.COMPLETED:
                 raise Exception(_("This transaction was completed and closed so cannot be refunded"))
@@ -453,7 +499,6 @@ class ApplicationSale(models.Model):
 
 
 class ProposalSale(models.Model):
-    #status choices to be added to track the state of order
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredproposalteam', on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="proposalsales", on_delete=models.CASCADE)
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal Hired"), related_name="proposalhired", on_delete=models.CASCADE)
@@ -513,8 +558,8 @@ class ProposalSale(models.Model):
             if proposal_sale.is_refunded != False:
                 raise Exception(_("This transaction cannot be refunded twice"))
 
-            if proposal_sale.purchase.status != Purchase.SUCCESS:
-                raise Exception(_("You cannot issue refund for a failed transaction"))
+            # if proposal_sale.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
 
             if resolution.status == ProposalResolution.COMPLETED:
                 raise Exception(_("This transaction was completed and closed so cannot be refunded"))
@@ -594,8 +639,8 @@ class ContractSale(models.Model):
             if contract_sale.is_refunded != False:
                 raise Exception(_("This transaction cannot be refunded twice"))
 
-            if contract_sale.purchase.status != Purchase.SUCCESS:
-                raise Exception(_("You cannot issue refund for a failed transaction"))
+            # if contract_sale.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
 
             if resolution.status == ProjectResolution.COMPLETED:
                 raise Exception(_("This transaction was completed and closed so cannot be refunded"))
@@ -675,8 +720,8 @@ class ExtContract(models.Model):
             if contract_sale.is_refunded != False:
                 raise Exception(_("This transaction cannot be refunded twice"))
 
-            if contract_sale.purchase.status != Purchase.SUCCESS:
-                raise Exception(_("You cannot issue refund for a failed transaction"))
+            # if contract_sale.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
 
             if resolution.status == ProjectResolution.COMPLETED:
                 raise Exception(_("This transaction was completed and closed so cannot be refunded"))

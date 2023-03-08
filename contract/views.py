@@ -31,6 +31,7 @@ from teams.controller import PackageController
 from django.views.decorators.cache import cache_control
 from general_settings.utilities import get_protocol_only
 from django.views.decorators.http import require_http_methods
+from django.db.models import Q
 # <...........................................................Internal Contract Section..........................................................>
 
 
@@ -366,9 +367,7 @@ def stripe_contract_intent(request):
     purchase=None
     
     base_currency_symb = get_base_currency_symbol()
-    print('base_currency_symb: ', base_currency_symb)
     base_currency_code = get_base_currency_code()
-    print('base_currency_code: ', base_currency_code)
     
     stripe_obj = StripeClientConfig()
     stripe_reference = stripe_obj.stripe_unique_reference()
@@ -656,20 +655,32 @@ def contractor(request):
 
 @login_required
 @user_is_freelancer
-@db_transaction.atomic
 def add_contractor(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     contractors = Contractor.objects.filter(team=team)
 
     name = request.POST.get('name', '')
     email = request.POST.get('email', '')
-    if name != '' and name != '':
-        if not Customer.objects.filter(email=email).exists():
+    if name != '' and email != '':
+        if Customer.objects.filter(Q(email__iexact=email)).exists():
+            messages.error(request, 'Sorry! Email user cannot be added!')
+        elif Contractor.objects.filter(Q(email__iexact=email), team=team).exists():
+            messages.error(request, 'Your team already added client!')
+        else:
             try:
-                Contractor.objects.create(name=name, email=email, team=team, created_by=request.user)
+                Contractor.objects.create(
+                    name=name, 
+                    email=email, 
+                    team=team, 
+                    created_by=request.user
+                )
             except Exception as e:
                 print(str(e))
-    return render(request, 'contract/components/partial_contractor.html', {'contractors': contractors})
+
+    context={
+        'contractors': contractors
+    }
+    return render(request, 'contract/components/partial_contractor.html', context)
 
 
 @login_required
@@ -683,10 +694,16 @@ def delete_contractor(request, contractor_id):
     )
     contractors = Contractor.objects.filter(team=team)    
     contractor = get_object_or_404(Contractor, team=team, pk=contractor_id)
-    contractor.delete()
 
-    return render(request, 'contract/components/partial_contractor.html', {'contractors': contractors})
+    if Customer.objects.filter(email = contractor.email).exists():
+        messages.error(request, 'You cannot delete client. Client either join site or paid for the connected contract!')
+    else:
+        contractor.delete()
 
+    context={
+        'contractors': contractors
+    }
+    return render(request, 'contract/components/partial_contractor.html',context)
 
 # <...........................................................External Contract Section..........................................................>
 @login_required
@@ -699,6 +716,7 @@ def connect_contract(request, contractor_id):
     existing_contract = Contract.objects.filter(client__email=client.email).count()
     profile_path= f"{get_protocol_only()}{str(get_current_site(request))}/freelancer/profile/{request.user.short_name}/"
     base_currency = get_base_currency_symbol()
+    
     if request.method == 'POST':
         contractform = ExternalContractForm(request.POST or None)
 

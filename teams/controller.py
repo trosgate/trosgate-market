@@ -1,5 +1,3 @@
-import requests
-from django.shortcuts import redirect, get_object_or_404
 from teams.models import Team
 from projects.models import Project
 from dateutil.relativedelta import relativedelta
@@ -11,10 +9,8 @@ from applications.models import Application
 from contract.models import InternalContract
 
 
-
 def one_month():
     return (timezone.now() + relativedelta(months = 1))
-
 
 class PackageController():
     """

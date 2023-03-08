@@ -77,16 +77,21 @@
 											<span>Option #2: External Invitation</span>
 										</div>
 
-										<form method="POST", autocomplete='off'> {% csrf_token %}
-											
+										<form autocomplete='off'> {% csrf_token %}
 											{% if max_team_members %}
-											<div class="form-group ">
 											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="invitation-message"></div>
-												{{inviteform.label}}
-												{{inviteform.email}}
+											<div class="form-group ">
+												<input id="id_emailer" class="form-control col-md-6" type="email" name="emailer" placeholder="enter user email" required>
 											</div> 
 											<div class="form-group wt-btnarea">
-												<button id="emailInvitation" type="submit" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite member </button>
+												<button id="emailInvitation" 
+													type="submit" 
+													class="btn btn-danger"
+													hx-post= "{% url 'teams:external_invitation' %}"
+													hx-target="#invited-user">
+													<i class="fa fa-handshake-o" aria-hidden="true"></i>
+													 Invite member 
+												</button>
 											</div>											
 											{% else %}
 											<div class="wt-btnarea alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-6">
@@ -100,10 +105,8 @@
 											<div class="wt-title">
 												<h5>Remember!</h5>
 											</div>	
-											<li><span><i class="fa fa-check"></i>#1: Beware of scam emails. Only invite external users with trusted emails</span></li>
-											<li><span><i class="fa fa-check"></i>#2: Provide a valid and active email that invitee can monitor</span></li>
-											<li><span><i class="fa fa-check"></i>#3: The provided email owner shouldn't be an existing team member</span></li>
-											<li><span><i class="fa fa-check"></i>#4: There is possibility to invite existing user to your team if you  have their emails</span></li>
+											<li><span><i class="fa fa-check"></i>#1: Provide a valid email that invitee can monitor</span></li>
+											<li><span><i class="fa fa-check"></i>#2: The provided email owner shouldn't be one of your existing team member</span></li>
 										</ul>											                  														
 									</div>
 								</div>
@@ -125,34 +128,10 @@
 								<div class="wt-tabscontenttitle">
 									<h2>Invited Members</h2>
 									</div>									 
-										<div id="refreshDiv" class="table-responsive"><button class="btn btn-success btn-sm mb-4 text-white float-left"><i class="fas fa-sync fa-spin"></i>Refresh</button>
-										<table class="table">
-										<thead>
-										<tr>
-											<th>#</th>
-											<th>Email</th>
-											<th>Sent on </th>
-											<th>Code Sent</th>
-											<th>Status</th>
-										</tr>
-										</thead>
-										<tbody>
-										{% for invite in invited %}
-											<tr>
-											<td>{{forloop.counter}} </td>
-											<td>{{invite.email}}</td>
-											<td>{{invite.sent_on}}</td>
-											<td>{{invite.code}}</td>
-											{% if invite %}
-											<td><button class="btn btn-outline-info btn-sm mt-2" disabled>{{invite.get_status_display}}</button></td>
-											{% endif %}
-											</tr> 
-										{% endfor %}					
-											</tbody>
-										</table>
-										{% if not invited %}
-										<p><strong>No Invited Member to show yet.</strong></p>
-										{% endif %}											
+										<div id="invited-user" class="table-responsive">
+										
+												{% include 'teams/components/team_invitees.html'%}			
+																					
 										</div> 
 									</div>
 										<div class="wt-freelancerholder wt-rcvproposalholder">
@@ -177,9 +156,7 @@
 											<td>{{accept.email}}</td>
 											<td>{{accept.sent_on}}</td>
 											<td>{{accept.code}}</td>
-											{% if accept %}
-											<td><button class="btn btn-outline-success btn-sm mt-2" disabled>{{accept.get_status_display}}</button></td>
-											{% endif %}
+											<td><span class="badge badge-success badge-sm">{{accept.get_status_display}}</span></td>
 											</tr> 
 										{% endfor %}					
 											</tbody>
@@ -208,42 +185,10 @@
 
 {% block scripts %}
 
-<script> 
-	$(document).on('click', '#refreshDiv', function (e) {
-        e.preventDefault();
-		$("#refreshDiv").load(window.location.href + " #refreshDiv" );
-	});
-</script>
-
 <script>
-	//INVITATION TO TEAM             
-	$(document).on('click', '#emailInvitation', function (e) {
-	e.preventDefault();
-
-		$.ajax({
-			type: 'POST',
-			url: "{% url 'teams:external_invitation' %}",
-			data: {
-				emailId: $('#id_email').val(),
-				csrfmiddlewaretoken: "{{csrf_token}}",
-				action: 'email-invite'
-			},
-			success: function (json) {
-				console.log(json)
-				if (json.result){
-					$('#id_email').val(''),
-					document.getElementById('invitation-message').innerHTML = json.result
-					$('#invitation-message').addClass('alert alert-success');
-					
-				}
-				else if (json.errors){
-					document.getElementById('invitation-message').innerHTML = json.errors
-					$('#invitation-message').addClass('alert alert-danger');
-				}
-			},
-			error: function (error) {}            
-		});
-	});
+	$(document).on("click", "#emailInvitation", function(){
+		$("#id_emailer").val('')
+	})
 </script>
 
 {% endblock scripts %}

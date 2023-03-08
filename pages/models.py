@@ -7,6 +7,9 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django_cryptography.fields import encrypt
 from account.utilities import auth_code as get_token
+from django.contrib.sites.models import Site
+from django.contrib.sites.managers import CurrentSiteManager
+
 
 def aboutus_path(instance, filename):
     return "aboutus/%s/%s" % (instance.title, filename)
@@ -21,6 +24,8 @@ class TermsAndConditions(models.Model):
     created_at = models.DateTimeField(_("Created On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     ordering = models.PositiveIntegerField(_("Order Priority"), null=True, blank=True)
+    sites = models.ManyToManyField(Site)
+    tenants = CurrentSiteManager()
 
     def __str__(self):
         return self.title

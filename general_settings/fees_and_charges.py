@@ -43,7 +43,6 @@ def get_external_contract_gross_earning(amount):
     return (amount - get_external_contract_fee_calculator(amount))
 
 
-
 def get_contract_fee_calculator(amount):
     contract_total_fee = 0
     contract_fee = 0
@@ -69,11 +68,13 @@ def get_proposal_fee_percentage():
     except:
         return 0
 
+
 def get_proposal_fee_extra():
     try:
         return HiringFee.objects.get(id=1).proposal_fee_extra
     except:
         return 0
+
 
 def get_proposal_delta_amount():
     try:

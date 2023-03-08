@@ -43,8 +43,7 @@ urlpatterns = [
     path('update/<int:team_id>/', views.update_teams, name='update_team'),
     path('activate/<int:team_id>/', views.activate_team, name='activate_team'),
     path('preview/<int:team_id>/', views.preview_team, name='preview_inactive_team'),
-    path('delete/<int:team_id>/', views.delete_teams, name='delete_team'),
-    path('detail/<int:team_id>/', views.team_single, name='team_single'),
+    path('detail/', views.team_single, name='team_single'),
     path('internal_invitation/', views.internal_invitation, name='internal_invitation'),
     path('external_invitation/', views.external_invitation, name='external_invitation'),
     
@@ -55,3 +54,8 @@ urlpatterns = [
 
 
 ]
+htmx_urlpatterns = [
+    path('remove-invitee/', views.remove_invitee, name='remove_invitee'), 
+]
+
+urlpatterns += htmx_urlpatterns

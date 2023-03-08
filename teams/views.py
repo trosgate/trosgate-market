@@ -3,11 +3,13 @@ import json
 import stripe
 import razorpay
 import requests
+from django.db import models, transaction as db_transaction
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Team, Invitation, TeamChat, AssignMember, Tracking, Package
+from .models import Team, Invitation, TeamChat, AssignMember, Tracking
+from account.models import Package
 from django.contrib.auth.decorators import login_required
-from .forms import TeamCreationForm, InvitationForm, TeamModifyForm, TeamChatForm, AssignForm
+from .forms import TeamModifyForm, AssignForm
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -36,7 +38,7 @@ from django.conf import settings
 from account.fund_exception import InvitationException
 from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.core.validators import validate_email
 from control_settings.utilities import subscription_switch
 from .tasks import email_all_users
 # from django_celery_beat.models import PeriodicTask, CrontabSchedule
@@ -117,8 +119,8 @@ def update_teams(request, team_id):
 
 @login_required
 @user_is_freelancer
-def team_single(request, team_id):
-    team = get_object_or_404(Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
+def team_single(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
     proposals = team.proposalteam.all()
     applications = team.applications.all()
     invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
@@ -139,11 +141,21 @@ def team_single(request, team_id):
 
 @login_required
 @user_is_freelancer
-def delete_teams(request, team_id):
-    delete_team = get_object_or_404(Team, pk=team_id, created_by=request.user, members__in=[request.user])
-    delete_team.delete()
-    messages.success(request, 'The Changes were saved successfully!')
-    return redirect("teams:team")
+def remove_invitee(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
+    invitee_id = int(request.POST.get('invitee'))
+    invited = get_object_or_404(Invitation, pk=invitee_id, team=team, status='invited')
+    if team.created_by == request.user:
+        invited.delete()
+        # messages.error(request, 'Elevation required to remove this user!')
+
+    invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
+
+    context = {
+        "teams": team,
+        'invited': invited,
+    }
+    return render(request, 'teams/components/team_invitees.html', context)
 
 
 # Inviting a user that already
@@ -156,11 +168,8 @@ def invitation(request):
     code = Invitation.objects.values('code')[0]
     max_team_members = PackageController(team).max_member_per_team()
 
-    inviteform = InvitationForm()
-
     context = {
         "teams": team,
-        "inviteform": inviteform,
         "code": code,
         'invited': invited,
         'accepted': accepted,
@@ -199,13 +208,10 @@ def internal_invitation(request):
 @login_required
 @user_is_freelancer
 def external_invitation(request):
-    result = ''
-    errors = ''
-    if request.POST.get("action") == "email-invite":
-        email = str(request.POST.get('emailId'))
+    email = str(request.POST.get('emailer'))
+    team = Team.objects.get(pk=request.user.freelancer.active_team_id, created_by=request.user)
 
-        team = Team.objects.get(pk=request.user.freelancer.active_team_id, created_by=request.user)
-
+    if email:
         try:
             new_invite = Invitation.external_invitation(
                 team=team, 
@@ -214,36 +220,48 @@ def external_invitation(request):
                 email=email
             )
             send_invitation_email(new_invite.email, new_invite.code, new_invite.team)
-            result = 'The user was invited successfully'
+            messages.info(request, 'User invited successfully')
         except InvitationException as e: 
             errors = str(e)
+            messages.error(request, f'{errors}')
+    else:
+        messages.error(request, 'Email required for invitation')
 
-        return JsonResponse({'result':result, 'errors':errors})
-        
+    invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
+
+    context = {
+        "teams": team,
+        'invited': invited,
+    }
+    return render(request, 'teams/components/team_invitees.html', context)
+
 
 @login_required
 @user_is_freelancer
+@db_transaction.atomic
 def accept_team_invitation(request):
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-    if not team:
+    my_team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+    if not my_team:
         return redirect('account:dashboard')
 
     if request.method == "POST":
-        code = request.POST.get('code')
+        code = str(request.POST.get('code'))
+
         if code:
-            invitations = Invitation.objects.filter(code=code, email=request.user.email)
+            invitations = Invitation.objects.filter(code=code, email=request.user.email, status="invited")
 
             if invitations:
-                invitation = invitations[0]
+                invitation = invitations.first()
                 invitation.status = Invitation.ACCEPTED
                 invitation.save()
 
                 team = invitation.team
+                print(team.title)
                 team.members.add(request.user)
                 team.save()
 
                 freelancer = request.user.freelancer
-                freelancer.active_team_id = team.id
+                freelancer.active_team_id = team.pk
                 freelancer.save()
 
                 messages.info(

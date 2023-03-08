@@ -132,30 +132,65 @@ def application_detail(request, project_slug):
 @login_required
 def application_multiple_summary(request):
     applicant_box = ApplicationAddon(request)
-    return render(request, "applications/application_multiple_summary.html", {'applicant_box': applicant_box})
+    context = {
+        'applicant_box': applicant_box
+    }    
+    return render(request, "applications/application_multiple_summary.html", context)
 
 
 @login_required
 @user_is_client
 def add_application(request):
     applicant_box = ApplicationAddon(request)
-    applicant_count = applicant_box.__len__()
-    if request.POST.get('action') == 'accept-applicant':
-        project_id = int(request.POST.get('projectid'))
-        application_id = int(request.POST.get('applicationid'))
+    project_id = int(request.POST.get('project'))
+    application_id = int(request.POST.get('application'))
 
-        application = get_object_or_404(
-            Application, project__id=project_id, id=application_id, project__created_by=request.user)
+    project = get_object_or_404(Project, pk=project_id, created_by=request.user, status=Project.ACTIVE)
+    application = get_object_or_404(Application, project=project, id=application_id)
+    
+    if application.status == 'pending':
         application.status = Application.ACCEPTED
         application.save()
-
         applicant_box.addon(application=application)
 
-        message = 'The applicant was accepted successfully'
-        app_status = application.get_status_display()
-        print(app_status)
-        response = JsonResponse({'message': message, 'app_status': app_status, 'applicant_count':applicant_count})
-        return response
+    elif application.status == 'accepted':
+        application.status = Application.PENDING
+        application.save()
+        applicant_box.remove(application=application_id) 
+
+    applications = Application.objects.filter(project=project)
+    context = {
+        'applicant_box': applicant_box,
+        'applications': applications,
+    }
+    return render(request, "applications/partials/accept_applicant.html", context)
+
+
+# @login_required
+# @user_is_client
+# def add_application(request):
+#     applicant_box = ApplicationAddon(request)
+#     applicant_count = applicant_box.__len__()
+#     if request.POST.get('action') == 'accept-applicant':
+#         project_id = int(request.POST.get('projectid'))
+#         application_id = int(request.POST.get('applicationid'))
+
+#         application = get_object_or_404(
+#             Application, 
+#             project__id=project_id, 
+#             id=application_id, 
+#             project__created_by=request.user
+#         )
+#         application.status = Application.ACCEPTED
+#         application.save()
+
+#         applicant_box.addon(application=application)
+
+#         message = 'The applicant was accepted successfully'
+#         app_status = application.get_status_display()
+#         print(app_status)
+#         response = JsonResponse({'message': message, 'app_status': app_status, 'applicant_count':applicant_count})
+#         return response
 
 
 @login_required
@@ -164,7 +199,11 @@ def remove_application(request):
     applicant_box = ApplicationAddon(request)
     if request.POST.get('action') == 'post':
         application_id = int(request.POST.get('applicationid'))
+        application = get_object_or_404(Application, id=application_id)
+        application.status = Application.PENDING
+        application.save()        
         applicant_box.remove(application=application_id)
+
         subtotal = applicant_box.get_total_price_before_fee_and_discount()
         response = JsonResponse({'subtotal': subtotal})
         return response

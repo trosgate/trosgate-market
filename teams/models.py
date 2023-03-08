@@ -5,19 +5,15 @@ from django.db import models, transaction as db_transaction
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from ckeditor.fields import RichTextField
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.utils import timezone
-from django.core.mail import send_mail
 from . utilities import create_random_code
-from django.core.exceptions import ValidationError
-from uuid import uuid4
 from account.fund_exception import InvitationException
 import secrets
 from account.models import Customer
-from account.fund_exception import FundException
 from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
+from django.utils.text import slugify
+
 # from freelancer.models import FreelancerAccount
 
 
@@ -28,39 +24,6 @@ def code_generator():
         code = generated_code
         break
     return code
-
-# NB ---> create seperate status for each of the fields and display to users
-class Package(models.Model):
-    #
-    # Team statuses
-    STARTER = 'starter'
-    STANDARD = 'standard'
-    LATEST = 'latest'
-    STATUS = (
-        (STARTER, _('Starter')),
-        (STANDARD, _('Standard')),
-        (LATEST, _('Latest')),
-    )
-
-    #
-    # Initial Plan Configuration
-    type = models.CharField(_("Package Type"), unique=True, help_text=_("package type can be eg. BASIC"), max_length=50)
-    verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_("Customize name for the package. If empty, the default names will be displayed"), max_length=50)
-    max_member_per_team = models.PositiveIntegerField(_("Max member Per Team"), default=1, help_text=_("You can only add up to 4 members for the biggest package"), validators=[MinValueValidator(1), MaxValueValidator(5)])
-    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    daily_Handshake_mails_to_clients = models.PositiveIntegerField(_("Daily Contract Mail reminder"), default=0, help_text=_("New feature Coming Soon: Here, freelancer team can send followup/ reminder mail per external contract to client. Daily sending will have min of 1 amd max is 3 mails"), validators=[MinValueValidator(0), MaxValueValidator(3)])
-    price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
-    status = models.CharField(_("Package Label"), max_length=20, choices=STATUS, default=STARTER)
-    is_default = models.BooleanField(_("Make Default"), choices=((False, 'No'), (True, 'Yes')), help_text=_("Only 1 package should have a default set to 'Yes'"), default=False)
-    ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
-
-    def __str__(self):
-        return self.type
-
-    class Meta:
-        ordering = ['ordering']
 
 
 # team should have ability to add proposal extras
@@ -89,7 +52,7 @@ class Team(models.Model):
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
     status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=INACTIVE)
-    package = models.ForeignKey(Package, related_name='teams', on_delete=models.CASCADE)
+    package = models.ForeignKey("account.Package", related_name='teams', on_delete=models.CASCADE)
     package_status = models.CharField(_("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     slug = models.SlugField(_("Slug"), max_length=100, editable=True)
@@ -136,6 +99,10 @@ class Team(models.Model):
             team.members.add(team.created_by)
         return team
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)            
+        super(Team, self).save(*args, **kwargs)
+
 
 # this is for External User Invitations
 class Invitation(models.Model):
@@ -159,18 +126,15 @@ class Invitation(models.Model):
     team = models.ForeignKey(Team, verbose_name=_("Team"), related_name='invitations', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.PROTECT) #CASCADE
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
-    email = models.EmailField(_("Email"),max_length=100, blank=True)
-    code = models.CharField(_("Code"), unique=True, max_length=10, blank=True)
+    email = models.EmailField(_("Email"), max_length=100, blank=True)
+    code = models.CharField(_("Code"), max_length=10, blank=True)
     status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=INVITED)
     type = models.CharField(_("Invite Type"), max_length=20, choices=TYPE, default=FOUNDER)
     sent_on = models.DateTimeField(_("Date"), auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if self.code == "":
-            try:
-                self.code = code_generator()[:6]
-            except:
-                self.code = code_generator()[:6]            
+            self.code = create_random_code()          
         super(Invitation, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -190,6 +154,8 @@ class Invitation(models.Model):
             new_team = Team.add_new_team(
                 title=title, created_by=created_by, package=package,notice=notice
             )
+            new_team.status = 'active'
+            new_team.save()
 
             internal_invite = cls.objects.create(
                 team=new_team, type=type, sender=new_team.created_by, email=new_team.created_by.email, status=status

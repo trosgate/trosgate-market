@@ -1,6 +1,6 @@
 from django.db import transaction as db_transaction
 from django.core.exceptions import ValidationError
-from . models import Customer, Country, TwoFactorAuth
+from . models import Customer, Country, Package, Merchant, TwoFactorAuth
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
 from django.forms import ModelForm
@@ -9,10 +9,12 @@ from datetime import datetime
 from freelancer.models import Freelancer, FreelancerAccount
 from payments.models import PaymentAccount
 from client.models import Client, ClientAccount
-from teams.models import Package, Team, Invitation
+from teams.models import Team, Invitation
 from django.utils.text import slugify
 from notification.mailer import new_user_registration
 from contract.models import Contract
+from django.contrib.sites.models import Site
+from django.shortcuts import get_object_or_404
 
 
 class SearchTypeForm(forms.Form):
@@ -84,14 +86,15 @@ class CustomerRegisterForm(forms.ModelForm):
 
     def clean_short_name(self):
         short_name = self.cleaned_data['short_name'].lower()
-        a = Customer.objects.filter(short_name=short_name)
+        a = Customer.objects.filter(short_name__icontains=short_name)
         if a.count():
             raise forms.ValidationError(_("Username already exists"))
         return short_name
 
+
     def clean_email(self):
         email = self.cleaned_data['email']
-        if Customer.objects.filter(email=email).exists():
+        if Customer.objects.filter(email__icontains=email).exists():
             raise forms.ValidationError(_("Oops! Email taken. Please try another Email"))
 
         if not email.islower():
@@ -118,58 +121,142 @@ class CustomerRegisterForm(forms.ModelForm):
         user.country = self.cleaned_data.get('country')
         user.user_type = self.cleaned_data.get('user_type')
         user.set_password(self.cleaned_data["password1"])
+        user.site = Site.objects.get_current()
         user.is_active = False
         user.save()
 
         if user.user_type == Customer.FREELANCER:
-            freelancer_profile = Freelancer.objects.create(user=user)
-            freelancer_profile.save()
             
-            freelancer_account = FreelancerAccount.objects.create(user=user)
-            freelancer_account.save()
-        
+            FreelancerAccount.objects.get_or_create(user=user)[0]
+            PaymentAccount.objects.get_or_create(user=user)[0]
 
-            freelancer_payment_account = PaymentAccount.objects.create(user=user)
-            freelancer_payment_account.save()
+            package = Package.objects.get_or_create(pk=1, type='Basic')[0]
 
-            try:
-                package = Package.objects.get(pk=1, type='Basic')
-            except Exception as e:
-                print(str(e))
-                package = Package.objects.create(pk=1, type='Basic')
-
-            team = Team.objects.create(
-                # status = "inactive" until signup is confirmed
+            team = Team.objects.get_or_create(
                 title=user.short_name,
                 notice="This is the basic team", 
                 created_by = user,
                 package = package,
                 package_status = Team.DEFAULT,
                 slug = slugify(user.short_name)
-            )
+            )[0]
             team.save()
             team.members.add(user)
             
-            freelancer = freelancer_profile
+            freelancer = Freelancer.objects.get_or_create(user=user)[0]
             freelancer.active_team_id = team.id
             freelancer.save()
 
-            invitation = Invitation.objects.create(
-                # status = "invited" until signup is confirmed
-                team=team, 
-                sender=user, 
-                email=user.email, 
+            Invitation.objects.get_or_create(
+                team=team, sender=user, email=user.email, 
                 type=Invitation.INTERNAL,
-            )
-            invitation.save()
+            )[0]
 
         if user.user_type == Customer.CLIENT:
-            client = Client.objects.create(user=user)
-            client.save()
-
-            client_account = ClientAccount.objects.create(user=user)
-            client_account.save()
+            Client.objects.get_or_create(user=user)[0]
+            ClientAccount.objects.get_or_create(user=user)[0]
             
+        db_transaction.on_commit(lambda: new_user_registration(user, user.email))
+
+        return user
+
+
+class MerchantRegisterForm(forms.ModelForm):
+    business_name = forms.CharField(label='Business name', min_length=4, max_length=30)
+    email = forms.EmailField(label='Email', max_length=100)
+    first_name = forms.CharField(label='First Name',  min_length=2, max_length=50)
+    last_name = forms.CharField(label='Last Name', min_length=2, max_length=50)
+    country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label='Select Business Country')
+    package = forms.IntegerField()
+    password1 = forms.CharField(label='Enter password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
+
+    class Meta:
+        model = Customer
+        fields = ['first_name', 'last_name','email', 'phone', 'country', 'business_name', 'package', 'password1', 'password2']    
+        required = ['first_name', 'last_name','email', 'phone', 'country', 'business_name', 'password1', 'password2']               
+
+
+    def __init__(self, supported_country, *args, **kwargs):
+        super(MerchantRegisterForm, self).__init__(*args, **kwargs)
+        self.fields['country'].queryset = Country.objects.filter(id__in=supported_country)
+
+        self.fields['first_name'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['last_name'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['email'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['phone'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['country'].widget.attrs.update(
+            {'class': 'input-group col-lg-12',})
+        self.fields['business_name'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['package'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['password1'].widget.attrs.update(
+            {'class': 'form-control',})
+        self.fields['password2'].widget.attrs.update(
+            {'class': 'form-control',})
+
+        for field in self.Meta.required:
+            self.fields[field].required = True
+
+
+    def clean_business_name(self):
+        business_name = self.cleaned_data['business_name'].lower()
+        a = Merchant.objects.filter(business_name__iexact=business_name)
+        if a.count():
+            raise forms.ValidationError(_("Business name already taken"))
+        return business_name
+    
+    def clean_country(self):
+        country = self.cleaned_data['country']
+        if not country:
+            raise forms.ValidationError(_("Country of business required"))
+        return country
+    
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone:
+            raise forms.ValidationError(_("Phone number required"))
+        return phone
+
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if Customer.objects.filter(email__icontains=email).exists():
+            raise forms.ValidationError(_("Oops! Email taken. Please try another Email"))
+
+        if not email.islower():
+            raise forms.ValidationError(_("Email characters must all be in lowercase"))
+        return email
+
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError("Passwords don't match")
+        return password2
+
+
+    @db_transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        package = int(self.cleaned_data['package'])
+        selected_package = get_object_or_404(Package, pk=package)
+
+        user = Customer.objects.create_merchant(
+            email=self.cleaned_data.get('email'), 
+            business_name = self.cleaned_data.get("business_name"),
+            password = self.cleaned_data.get("password1"),
+            first_name = self.cleaned_data.get('first_name'),
+            last_name = self.cleaned_data.get('last_name'), 
+            country = self.cleaned_data.get('country'),
+            package=selected_package
+        )
         db_transaction.on_commit(lambda: new_user_registration(user, user.email))
 
         return user

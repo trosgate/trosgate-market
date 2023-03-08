@@ -32,11 +32,11 @@ DEBUG = True
 #DEBUG = False
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-# ALLOWED_HOSTS = ['support.trosgate.com', 'trosgate.com'] 
-# ALLOWED_HOSTS = ['support.trosgate.com', '68.183.137.119', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['*']  
+# ALLOWED_HOSTS = ['68.183.137.119', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
-
+SITE_ID = 1
+SITE_ID_DOMAIN = 'localhost'
 AUTH_USER_MODEL = 'account.Customer'
 
 # Application definition
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # custon Apps for trosgate site
+    'django.contrib.sites',
     'account',
     'control_settings',
     'general_settings',
@@ -86,13 +87,16 @@ MIDDLEWARE = [
     # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'account.middleware.DynamicHostMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
     'analytics.middleware.Middleware',
+    'account.middleware.MerchantGateMiddleware',
 ]
 
 ROOT_URLCONF = 'trosgate.urls'
@@ -149,6 +153,7 @@ DATABASES = {
     }
 }
 
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -200,11 +205,19 @@ LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
 LOGOUT_REDIRECT_URL = "account:homepage"
 
+# Twilio SendGrid
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'apikey'
+# EMAIL_HOST_PASSWORD = "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"
+
+
 #Custom Email Backend for Trosgate software
-EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
  
 ADMINS = (
@@ -240,7 +253,7 @@ CONTRACT_SESSION_ID = "contract"
 CONTRACT_GATEWAY_SESSION_ID = "contractgateway"
 
 # SECURITY HEADERS - below are required in production
-
+PASSWORD_RESET_TIMEOUT = 1209600 #two weeks in seconds
 USE_THOUSAND_SEPARATOR = True
 EMAIL_USE_LOCALTIME = True
 
@@ -255,32 +268,30 @@ if DEBUG == False:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     CSRF_COOKIE_SECURE = True
 
-
-# CORS_ORIGIN_ALLOW_ALL = True
-
-# CORS_ALLOWED_ORIGINS = [
-#     "https://api.flutterwave.com/",
-#     "https://api-m.paypal.com/",
-#     "http://localhost:8080",
-#     "http://127.0.0.1:9000",
-# ]
+# EMAIL PASS LATEST: yqwvhebpxtgqmjph
 
 # CELERY CONFIGURATIONS
-#CELERY_BROKER_URL = 'redis://127.0.0.1:6379' #Either this in settings file, or used as 'broker_url' variable in celery.py
-ACCEPT_CONTENT = ['application/json']
-# accept_content = ['application/json']
-RESULT_SERIALIZER = 'json'
-# result_serializer = 'json'
-TASK_SERIALIZER = 'json'
-# task_serializer = 'json'
-TIMEZONE = 'UTC'
-# timezone = 'UTC'
-## default timezone is "UTC". Activate this if you want a different timzone ###
-# timezone = 'Africa/Accra'
-
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'  #Either this in settings file, or use as 'broker_url' variable in celery.py
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Accra' 
 # STORAGE CHOICE OF CELERY TASKS
-RESULT_BACKEND = 'django-db'
-
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_EXTENDED = True
 # CELERY BEAT CONFIGURATIONS
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
+
+# TO DETERMINE THE CODE LENGTH DURING EXTERNAL INVITATION
+MAXIMUM_INVITE_SIZE = 6
+
+# A domains.map FILE WILL BE STORED IN THIS PATH AND RUN WITH MGT COMMAND
+NGINX_DOMAINS_MAP_FILE = '/etc/nginx/domains.map'
+
+# accounts
+MERCHANT_GATE_ALLOW_LIST = [
+    "/account/logout/",
+    "/tickets/",
+    "/subscriptions/",
+]

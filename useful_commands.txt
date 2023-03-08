@@ -35,7 +35,17 @@ b660e-6daf7
 647f3-7ef01
 c5333-fa8f7
 
-git access_token: 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
+git access_token: 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
+
+............sendgrid api.........................
+#### email_hosting_server_password:
+
+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
+
+#### email_hosting_username:
+apikey 
+
+
 
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 find . -path "*/migrations/*.pyc"  -delete

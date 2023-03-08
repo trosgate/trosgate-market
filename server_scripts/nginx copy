@@ -1,0 +1,75 @@
+upstream default_server {
+    server unix:/webapps/trosgate/trosgate_env/run/gunicorn.sock fail_timeout=0;
+}
+
+server {
+    listen 80 default_server;
+    server_name _;
+    return 301 https://$host$request_uri;
+}
+# Default SSL server block
+server {
+    listen 443 ssl default_server;
+    server_name _;
+
+    # Redirect all requests to the HTTPS version of the site
+    return 301 https://$host$request_uri;
+
+    # SSL configuration goes here
+    access_log /webapps/trosgate/trosgate_env/logs/nginx-access.log;
+    error_log /webapps/trosgate/trosgate_env/logs/nginx-error.log;
+
+    ssl_certificate /etc/letsencrypt/live/gigred.website/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/gigred.website/privkey.pem;
+
+    location /static/ {
+        autoindex on;
+        alias /webapps/trosgate/trosgate_env/trosgate-marketplace-script/staticfiles/;
+    }
+
+    location /media/ {
+        autoindex on;
+        alias /webapps/trosgate/trosgate_env/trosgate-marketplace-script/media/;
+    }
+}
+# Merchant SSL server blocks
+map $http_host $upstream {
+    # Match each merchant's domain
+    default "error"; # Default upstream server for unknown domains
+
+    # Match the known domains in your Django Sites Framework database
+    include /etc/nginx/domains.map #/path/to/domains.map; means I must create this file name
+}
+
+server {
+    listen 443 ssl;
+
+    # Set the upstream server based on the value of the $upstream variable
+    location / {
+        proxy_pass http://$upstream:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Scheme $scheme;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # SSL configuration goes here
+    ssl_certificate /path/to/merchant/certificate;
+    ssl_certificate_key /path/to/merchant/key;
+}
+
+# Default SSL server block for unknown domains
+server {
+    listen 443 ssl;
+    server_name _;
+
+    # Return a 403 Forbidden response for unknown domains
+    return 403;
+
+    # SSL configuration goes here
+    ssl_certificate /path/to/default/certificate;
+    ssl_certificate_key /path/to/default/key;
+}
+
+

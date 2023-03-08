@@ -122,6 +122,7 @@
 													<div class="row">
 														<h6>Hiring More Staff </h6>
 													<div class="table-responsive">
+														<span id="addon-message" style="color:green; text-align:right;" class="float-center">.</span>
 													<table class="table table-striped table-sm">
 														<thead>
 														<tr>
@@ -139,6 +140,7 @@
 															<td><a href="javascript:void(0);" class="btn btn-outline-primary btn-sm mt-2"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} Avail.</a></td>
 															<td><button class="btn btn-outline-primary btn-sm mt-2" type="button"> ${{proposal.salary}}</a></button></td>
 															<td>
+																
 																<div class="form-group">
 																	<select id="select" class="form-control" style="width:auto;">
 																		{% if proposal.team.members.count >= 1 %}<option value="1" selected> 1 </option>{% endif %}
@@ -346,7 +348,7 @@
 																<div class="wt-tabscontenttitle">
 																	<div class="text-center">
 																		<span style="color:green; font-weight:bold;"><i class="fa fa-exclamation-triangle"></i> 
-																			Please login to view reviews connected to this proposal. 
+																			Please login to read reviews. 
 																		</span>
 																	</div>
 																</div>
@@ -376,10 +378,38 @@
 																		<p>“{{review_msg.message|linebreaksbr}}.”</p>
 																	</div>
 																	{% endfor %}
-																{% else %}
+																{% endif %}
+																{% if oneclick_review_msg|length > 0 %}
+																	{% for review_msg in oneclick_review_msg %}	
+																	<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+																		<figure class="wt-userlistingimg">
+																			<img src="{% if review_msg.resolution.oneclick_sale.client.clients.profile_photo %}{{review_msg.resolution.oneclick_sale.client.clients.profile_photo.url}}{% endif %}" alt="image description">
+																		</figure>
+																		<div class="wt-userlistingcontent">
+																			<div class="wt-contenthead">
+																				<div class="wt-title">
+																					<a href="javascript:void(0);"><i class="fa fa-check-circle"></i> {{review_msg.resolution.oneclick_sale.client.get_full_name}}</a>
+																					<p>{{review_msg.title}}</p>
+																				</div>
+																				<ul class="wt-userlisting-breadcrumb">
+																					<li><span><i class="far fa-calendar"> Date: {{review_msg.created_at|date:"M-d-Y"}}</i></span></li>
+																					<li><span><img src="{% if review_msg.resolution.oneclick_sale.client.clients.profile_photo %}{{review_msg.resolution.oneclick_sale.client.country.flag.url}}{% endif %}" alt="img description"> {{review_msg.resolution.oneclick_sale.client.country.name|truncatechars:30}}</span></li>
+																					<li><span>{{review_msg.rating}}/5 <i class="fa fa-star fill" style='color:orange'> Review</i></span></li>
+																				</ul>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="wt-description">
+																		<p>“{{review_msg.message|linebreaksbr}}.”</p>
+																	</div>
+																	{% endfor %}
+																{% endif %}
+																
+																{% if review_status %}
 																<p class='text-center'><strong style="color:blue;" role="alert">This proposal has no reviews at the moment</strong></p>
 																{% endif %}	
 																{% endif %}	
+																	
 																</div>
 															</div>
 														</div>
@@ -535,6 +565,8 @@
 		},
 		success: function (json) {
 			document.getElementById("members-qty").innerHTML = json.member_qty
+			count = $('#select option:selected').text()
+			document.getElementById("addon-message").innerHTML = "Addon bucket modified with" + count + "staff"
 		},
 		error: function (xhr, errmsg, err) {}
 	  });
@@ -567,7 +599,8 @@
 			else{
 				displayMessage.innerHTML = '';
 				displayMessage.innerHTML = json.message;
-				$("#oneClickCheckout").attr("disabled", true);
+				window.location.href = "{% url 'transactions:one_click_transaction' %}"
+				$("#oneClickCheckout").attr("disabled", false);
 			}
 		},
 		error: function (xhr, errmsg, err) {

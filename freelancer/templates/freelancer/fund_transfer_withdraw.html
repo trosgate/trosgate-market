@@ -96,6 +96,7 @@
                                                             <span>Step 2: I understand that once transfered, its Irreversible</span>
                                                             <button id='transfer-button' type="submit" class="wt-btn"> Debit Me </button>
                                                         </div>
+                                                        <a href="{% url 'payments:transfer_transactions' %}" target="_blank"><span style="decoration:none; color:green">View Transfers</span></a>
                                                         <ul class="wt-projectliststyle">
                                                             <div class="wt-title">
                                                                 <h5><span style="color: red; font-weight: bold;"> Our Transfer Policy </span><br></h5>
@@ -153,7 +154,9 @@
                                                         </div>
                                                         <div  class="form-group wt-btnarea">
                                                             <button id='withdrawal-button' type="submit" class="wt-btn"> Withdraw Now </button>
-                                                        </div>											
+                                                        </div>
+                                                        
+                                                        <a href="{% url 'payments:withdrawal_transactions' %}" target="_blank"><span style="decoration:none; color:green">View my Withdrawal history</span></a><br>											
                                                         <ul class="wt-projectliststyle">
                                                             <div class="wt-title">
                                                                 <h5><span style="color: red; font-weight: bold;"> Our withdrawal Policy </span><br></h5>

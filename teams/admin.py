@@ -1,57 +1,5 @@
 from django.contrib import admin
-from .models import Package, Team, Invitation, TeamChat, AssignMember, Tracking
-
-MAX_OBJECTS = 2
-
-
-@admin.register(Package)
-class PackageAdmin(admin.ModelAdmin):  
-    list_display = ['type','price', 'is_default', 'status', 'verbose_type', 'ordering']
-    list_display_links = ['type','status']
-    excludes = ['daily_Handshake_mails_to_clients']
-    readonly_fields = ['type', 'daily_Handshake_mails_to_clients']
-    radio_fields = {'is_default': admin.HORIZONTAL}    
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        is_superuser = request.user.is_superuser
-        disabled_fields = set() 
-
-        if not is_superuser: 
-            disabled_fields |= {
-                'type',
-                'price', 
-                'is_default', 
-                'status', 
-                'verbose_type', 
-                'ordering',
-                'max_member_per_team',
-                'monthly_offer_contracts_per_team',
-                'max_proposals_allowable_per_team',
-                'monthly_projects_applicable_per_team',
-                'daily_Handshake_mails_to_clients'
-            }
-
-        for field in disabled_fields:
-            if field in form.base_fields:
-                form.base_fields[field].disabled = True
-        
-        return form
-
-    def has_add_permission(self, request):
-        if self.model.objects.count() >= MAX_OBJECTS:
-            return False
-        return super().has_add_permission(request)
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+from .models import Team, Invitation, TeamChat, AssignMember, Tracking
 
 
 @admin.register(Team)

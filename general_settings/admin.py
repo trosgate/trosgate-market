@@ -9,9 +9,9 @@ MAX_OBJECTS = 1
 MAX_GATEWAYS = 4
 
 
+
 @admin.register(StorageBuckets)
 class StorageBucketsAdmin(admin.ModelAdmin):
-    model = StorageBuckets
     list_display = ['description', 'storage_type',]
     exclude = ['description']
     radio_fields = {'storage_type': admin.HORIZONTAL}
@@ -37,7 +37,6 @@ class StorageBucketsAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    model = Category
     list_display = ['name', 'preview', 'visible', 'image_tag', ]
     list_filter = ['name']
     search_fields = ['name']
@@ -47,7 +46,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(WebsiteSetting)
 class WebsiteSettingAdmin(admin.ModelAdmin):
-    model = WebsiteSetting
     list_display = ['site_name', 'site_domain', 'tagline', 'site_logo_tag', ]
     list_display_links = ['site_name', 'site_domain']
     readonly_fields = ['site_logo_tag']
@@ -80,7 +78,6 @@ class WebsiteSettingAdmin(admin.ModelAdmin):
 
 @admin.register(AutoLogoutSystem)
 class AutoLogoutSystemAdmin(admin.ModelAdmin):
-    model = AutoLogoutSystem
     list_display = ['preview', 'warning_time_schedule', 'interval']
     list_display_links = ['preview']
     list_editable = ['warning_time_schedule', 'interval']
@@ -103,15 +100,41 @@ class AutoLogoutSystemAdmin(admin.ModelAdmin):
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
-    model = Currency
     list_display = ['name', 'code', 'symbol', 'ordering', 'supported', 'default']
     list_display_links = ['name', 'code']
     list_editable = ['ordering', 'supported', 'default']
     radio_fields = {'supported': admin.HORIZONTAL}
     actions = ['Activate_Currencies', 'Deactivate_Currencies']
     search_fields = ('name', 'code',)
-    list_filter = ('supported',)
+    list_filter = ['supported','default']
     list_per_page = sys.maxsize
+
+    def get_queryset(self, request):
+        qs = super(CurrencyAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs.all()  
+        else:
+            return qs.filter(pk=request.user.country.id) 
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        if not is_superuser:            
+            disabled_fields |= {
+                'name', 
+                'code', 
+                'symbol', 
+                'ordering', 
+                'supported', 
+                'default'               
+            }
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
     def Activate_Currencies(self, request, queryset):
         queryset.update(supported=True)
@@ -120,7 +143,7 @@ class CurrencyAdmin(admin.ModelAdmin):
         queryset.update(supported=False)
 
     def has_add_permission(self, request):
-        if self.model.objects.count():
+        if not request.user.is_superuser:
             return False
         return super().has_add_permission(request)
 

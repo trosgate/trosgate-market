@@ -100,10 +100,10 @@ class ApplicationAddon():
 
         if subtotal > get_level_four_start_amount():
             discount = ((subtotal * get_level_four_rate())/100)
-            print(get_level_four_rate())
+
 
         total_discount = round(discount)
-        print(total_discount)
+        
         return total_discount
 
 

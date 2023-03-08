@@ -24,7 +24,7 @@ class Middleware:
         response = self.get_response(request)
 
         if 'admin' not in request.path:
-            self.stats(request.META['HTTP_USER_AGENT']) 
+            self.stats(request.META.get('HTTP_USER_AGENT')) 
 
         return response
 

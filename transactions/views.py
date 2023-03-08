@@ -12,7 +12,8 @@ from django.utils.text import slugify
 from client.models import Client
 from account.permission import user_is_freelancer, user_is_client
 from account.models import Customer
-from teams.models import Team, Package
+from teams.models import Team
+from account.models import Package
 from proposals.models import Proposal
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.models import PaymentGateway
@@ -37,34 +38,37 @@ from client.models import ClientAccount
 
 
 @login_required
-def proposal_single_summary(request, short_name, proposal_slug):
-    proposal = get_object_or_404(
-        Proposal, created_by__short_name=short_name,  slug=proposal_slug)
-    payments = PaymentGateway.objects.filter(status=True)
+def proposal_direct_hire(request, short_name, proposal_slug):
+    # A page for hiring single freelancer directly
+    # In frontend, the proposal is captured into session when client proceeds 
+    proposal = get_object_or_404(Proposal, created_by__short_name=short_name,  slug=proposal_slug)
 
     context = {
         'proposal': proposal,
-        'payments': payments,
     }
     return render(request, "transactions/proposal_single_summary.html", context)
 
 
 @login_required
-def proposal_multiple_summary(request):
+def proposal_bucket(request):
+    # This function provides a collection of all proposals in bucket
     hiringbox = HiringBox(request)
-    payments = PaymentGateway.objects.filter(status=True)
-    return render(request, "transactions/proposal_multiple_summary.html", {'hiringbox': hiringbox, 'payments': payments})
+    context={
+        'hiringbox': hiringbox
+    }
+    return render(request, "transactions/proposal_bucket.html", context)
 
 
 @login_required
 def add_proposal_to_box(request):
+    # Callable function for adding proposal and
+    # modifying the quantity of freelancer in the box
     hiringbox = HiringBox(request)
 
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
         member_qty = int(request.POST.get('memberqty'))
-        proposal = get_object_or_404(
-            Proposal, id=proposal_id, status=Proposal.ACTIVE)
+        proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
 
         hiringbox.addon(proposal=proposal, member_qty=member_qty)
         memberqty = hiringbox.__len__()
@@ -77,6 +81,8 @@ def add_proposal_to_box(request):
 
 @login_required
 def remove_from_hiring_box(request):
+    # Callable function for removing proposal and
+    # associated quantity of freelancer from box
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
@@ -90,6 +96,8 @@ def remove_from_hiring_box(request):
 
 @login_required
 def modify_from_hiring_box(request):
+    # Callable CRUD function for modifying proposal and
+    # associated quantity of freelancer
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
@@ -106,6 +114,7 @@ def modify_from_hiring_box(request):
 
 @login_required
 def payment_option_with_fees(request):
+    # function for selecting checkout option
     hiringbox = HiringBox(request)
 
     if hiringbox.__len__() < 1:
@@ -124,6 +133,9 @@ def payment_option_with_fees(request):
 
 @login_required
 def payment_fee_structure(request):
+    # Callable function for updating the fees
+    # Adding fee ID as an object to session
+    # Adding to session makes it easy to retrieve selected fee on checkout page
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         gateway_type = int(request.POST.get('gatewaytype'))
@@ -154,6 +166,10 @@ def payment_fee_structure(request):
 
 @login_required
 def final_checkout(request):
+    # Final checkout page
+    # Step 1: Checks if atleast one proposal was selected previously
+    # Step 2: Checks if gateway option was selected previously
+    # If step 1 & 2 are true, user can procced wit checkout
     hiringbox = HiringBox(request)
     num_of_freelancers = hiringbox.__len__()
 
@@ -203,6 +219,11 @@ def final_checkout(request):
 @login_required
 @user_is_client
 def flutter_payment_intent(request):
+    # Callable function for interacting with flutterwave api
+    # Flutterwave particularly require unique id for each client. 
+    # The system generates new code, checks in advance for unique ID from database before saving new one
+    # Per client request, the transaction is initially saved into the database with the status of unpaid
+    # A different callback webhook listens for the success and ,. 
     hiringbox = HiringBox(request)
     discount_value = hiringbox.get_discount_value()
     total_gateway_fee = hiringbox.get_fee_payable()

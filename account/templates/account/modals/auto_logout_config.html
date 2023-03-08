@@ -14,7 +14,7 @@
 			if (warn) {
 				warn.click();
 			}
-		}, {{autoLogoutSystem.warning_time_schedule}} * 3600000); // 60000--means 1min
+		}, {{autoLogoutSystem.warning_time_schedule}} * 3600000); // 3600000--means 1hr
 
 		//auto logout
 		setTimeout(function() {
@@ -22,6 +22,6 @@
 			if (action) {
 				action.click();
 			}
-		}, {{autoLogoutSystem.warning_time_schedule}} * 3900000); //90000 --means 1min + 5 Sec
+		}, {{autoLogoutSystem.warning_time_schedule}} * 3900000); //3900000 --means 1hr + 5min
 
 	</script>	

@@ -6,6 +6,7 @@ from account.models import Customer
 from freelancer.models import Freelancer
 from django.utils.translation import gettext_lazy as _
 
+
 class TeamCreationForm(forms.ModelForm):
 
     class Meta:
@@ -27,19 +28,6 @@ class TeamModifyForm(forms.ModelForm):
 
         self.fields['notice'].widget.attrs.update(
             {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center'})
-
-
-class InvitationForm(forms.ModelForm):
-    email = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control col-6', 'placeholder': 'enter email',}))    
-    class Meta:
-        model = Invitation
-        fields = ['email'] 
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields['email'].widget.attrs.update(
-            {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center'})
 
 
 class TeamChatForm(forms.ModelForm):

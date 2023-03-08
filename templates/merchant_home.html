@@ -1,0 +1,478 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+			{% if home_layout.banner_type == True %}
+			<div class="wt-haslayout wt-bannerholder">
+				<div class="container">
+					<div class="row">
+						<div class="col-12 col-sm-12 col-md-12 col-lg-5">
+							<div class="wt-bannerimages">
+								<figure class="wt-bannermanimg" data-tilt>
+									<img src="{% static 'images/bannerimg/img-01.png' %}" alt="img description">
+									<img src="{% static 'images/bannerimg/img-02.png' %}" class="wt-bannermanimgone" alt="img description">
+									<img src="{% static 'images/bannerimg/img-03.png' %}" class="wt-bannermanimgtwo" alt="img description"> 
+								</figure>
+							</div>
+						</div>
+
+						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-7">
+							<div class="wt-bannercontent">
+								<div class="wt-bannerhead">
+									<div class="wt-title">
+										<h2 style="color:white">{% if home_layout.title_block %}{{home_layout.title_block}}{% endif %}</h2>
+										<h2 style="color:white">in {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
+									</div>
+									<div class="wt-description">
+										<p>{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}}{% endif %}.</p>
+									</div>
+								</div>
+								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
+									<fieldset>
+										<div class="form-group">
+											{{searchform.search_type}}
+										</div>
+									<fieldset>
+								</form>
+								{% if home_layout.video_url or website.embed_video %}
+								<div class="wt-videoholder">
+									<div class="wt-videoshow">
+										<a data-rel="prettyPhoto[video]" href="{% if home_layout.video_url %}{{home_layout.video_url}}{% endif %}"><i class="fa fa-play"></i></a>
+									</div>
+									<div class="wt-videocontent">
+										<span>{% if home_layout.video_title %}{{home_layout.video_title}}{% endif %}<em>How it works &amp; {% if home_layout.video_description %}{{home_layout.video_description}} {% endif %}.</em></span>
+									</div>
+								</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% else %}
+			<header class="bg-red py-5" style="background-color:{% firstof home_layout.banner_color purple %};">
+				<div class="container px-5">
+					<div class="row gx-5 align-items-center justify-content-center">
+						<div class="col-lg-8 col-xl-7 col-xxl-6">
+							<div class="my-5 text-center text-xl-start">
+								<h1 class="display-5 fw-bolder text-white mb-2">{% if home_layout.title_block %}{{home_layout.title_block}} {% endif %}</h1>
+								<p class="lead fw-normal text-white-50 mb-4" style="color:white;">{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}} {% endif %}.</p>
+								<h3 style="color:white">in {% if pypist %}<span class="autoTyper" style="color:yellow;"></span>{% endif %}</h3>
+								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
+									<fieldset>
+										<div class="form-group">
+											{{searchform.search_type}}
+										</div>
+									<fieldset>
+								</form><br>
+								<div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+									<a class="btn btn-{% firstof home_layout.banner_button_one_color blue %} btn-lg px-4 me-sm-3 text-white" href="{% url 'account:login' %}" style="margin:5px;">Get Started</a>
+									<a class="btn btn-outline-{% firstof home_layout.banner_button_two_color blue %} btn-lg px-4" href="{% url 'pages:how_it_works' %}" style="margin:2px;">Learn More</a>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if home_layout.banner_image %}{{home_layout.banner_image.url}}{% endif %}" alt="Hero banner"/></div>
+					</div>
+				</div>
+			</header>
+			{% endif %}
+
+			<!--Main Start-->
+			<main class="wt-haslayout" style="background:white;">
+				<!--Gateways Start-->
+				{% if home_layout.show_gateways == True %}
+				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-sectionhead wt-textcenter">
+									<h3>{% if home_layout.gateway_title %}{{home_layout.gateway_title}}{% endif %}</h3>
+								</div>
+							</div>
+							<div class="wt-categoryexpl">
+								<div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+									<div class="row">
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span><i class="far fa-money-bill-alt fa-4x" style="color:green;"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Stripe Checkout</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span><i class="fa fa-paypal fa-4x" style="color:blue;"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Paypal Checkout</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>												
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span style="color:orange;"><i class="fa fa-balance-scale fa-4x"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Razorpay Checkout</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>	
+										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+												<span><i class="fa fa-mobile fa-4x" style="color:violet;"></i><span><i class="fa fa-check fa-2x" style="color:violet;"></i></span>
+												<div class="wt-insightdetails">
+													<div class="wt-title">
+														<span><strong>Africa's Momo (Flutterwave)</strong></span>
+													</div>													
+												</div>	
+											</div>
+										</div>	
+									</div>
+								</div>	
+							</div>
+						</div>
+					</div>
+				</section>
+				{% endif %}
+
+				<div class="container">
+					<section class="wt-haslayout wt-dbsectionspace">
+						<div class="row justify-content-md-center">				
+							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+								<div class="wt-dashboardbox">
+									<div class="wt-sectionhead wt-textcenter">
+										<h3>Become a Merchant Today</h3>
+									</div>
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+										<div id="packaging" class="wt-dashboardboxcontent wt-packages">
+											<div class="wt-package wt-packagedetails">
+												<div class="wt-packagehead">
+												</div>
+												<div class="wt-packagecontent">
+													<ul class="wt-packageinfo">
+														<li class="wt-packageprices"><span>Price</span></li>
+														<li><span>Group Chat</span></li>
+														<li><span>Fund Transfer - Within Team</span></li>
+														<li><span>Member Per Team</span></li>
+														<li><span>Monthly Contracts Per Team</span></li>
+														<li><span>Max Proposals Per Team</span></li>
+														<li><span>Monthly Application Per Team</span></li>
+													</ul>
+												</div>
+											</div>
+											{% for package in packages %}
+											<div class="wt-package wt-baiscpackage">
+												<div class="wt-packagehead">
+													<h3>{% firstof package.verbose_type package.type %}</h3>
+													<span>{{package.get_status_display}}</span>
+												</div>
+												<div class="wt-packagecontent">
+													<ul class="wt-packageinfo">
+														<li class="wt-packageprice"><span><sup>{{base_currency_symbol}}</sup>{{package.price}}<sub>\ Month</sub></span></li>
+														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+														<li><span>{% if package.max_member_per_team > 0 %} <i class="ti-check"> {{package.max_member_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_member_per_team}} </i>{% endif %}</span></li>
+														<li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">{{package.monthly_offer_contracts_per_team}}</i> {% else %} <i class="ti-na">.</i>{% endif %}</span></li>
+														<li><span>{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">{{package.max_proposals_allowable_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
+														<li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check">{{package.monthly_projects_applicable_per_team}}</i>{% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
+													</ul>
+													<div>
+														<button class="btn btn-success">30 Days Free, no card required</button>
+													</div>
+												</div>
+											</div>
+											{% endfor %}
+											
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+				<div class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>{% if home_layout.category_title %}{{home_layout.category_title}}{% endif %}</h2>
+										<span>{% if home_layout.category_subtitle %}{{home_layout.category_subtitle}}{% endif %}</span>
+									</div>
+								</div>
+							</div>
+							<div class="wt-categoryexpl">
+                			{% for category in categories %}
+								<div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 float-left">
+									<div class="wt-categorycontent">
+										<figure><img src="{{category.icon.url}}" alt="image description"></figure>
+										<div class="wt-cattitle">
+											<h3><a href="javascrip:void(0);">{{category.name}}</a></h3>
+											<span>Items: <em style="color:green;">{{category.proposal_count}}</em></span>
+										</div>
+										<div class="wt-categoryslidup">
+											<p>{{category.preview}}.</p>
+											<a href="{{category.category_absolute_url}}">Explore <i class="fa fa-arrow-right"></i></a>
+										</div>
+									</div>
+								</div>
+                			{% endfor %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Categories End-->
+
+				<!--Company listing starts-->
+				<div class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>{% if home_layout.proposal_title %}{{home_layout.proposal_title}}{% endif %}</h2>
+										<span>{% if home_layout.proposal_subtitle %}{{home_layout.proposal_subtitle}}{% endif %}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>				
+					<div class="wt-companysinfoholder">	
+						<div class="container">
+							<div class="row justify-content-md-center">
+							{% for proposal in proposal_list %}
+								<div class="col-12 col-sm-12 col-md-12 col-lg-3">
+									<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+										<figure class="wt-companysimg">
+										{% if proposal.thumbnail %}
+											<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
+										{% else %}
+											<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" style="height:80px;" alt="img description">
+										{% endif %}
+										</figure>
+										<div class="wt-companysinfo">
+											<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description"></figure>
+											<div class="wt-title">
+												<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_short_name}}{% endif %}</a>
+												<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a>
+											<hr>
+											<ul class="wt-postarticlemeta">
+												<li class="wt-following">
+													<a href="javascript:void(0);">
+														<span><i class="fa fa-balance-scale"></i>{{proposal.aggregated_sales_count}}</span>
+													</a>
+												</li>
+												<li class="wt-following">
+													<a href="javascript:void(0);">
+														<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
+													</a>
+												</li>
+												<li class="wt-following">
+													<a href="javascript:void(0);">
+														<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
+													</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+								{% if not proposal_list %}
+									<p> No featured proposals to show yet </p>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="container">
+					<div class="row justify-content-md-center">
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+							<figure class="wt-mobileimg">
+								<img src="{% if home_layout.promo_image %}{{home_layout.promo_image.url}}{% else %}{% static 'images/work/img-03.jpg' %}{% endif %}" alt="img description">
+							</figure>
+						</div>
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+							<div class="wt-experienceholder">
+								<div class="wt-sectionhead">
+									<div class="wt-sectiontitle">
+										<h3>{% if home_layout.promo_title %}{{home_layout.promo_title}}{% endif %}</h3>
+										<span>{% if home_layout.promo_subtitle %}{{home_layout.promo_subtitle}}{% endif %}</span>
+									</div>
+									<div class="wt-description">
+										<p>{% if home_layout.promo_description %}{{home_layout.promo_description|linebreaksbr}}{% endif %}</p>
+									</div>
+									<div class="wt-btnarea">
+										<a href="{% url 'pages:how_it_works' %}" class="wt-btn">How it Works</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<section class="wt-haslayout wt-main-section">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
+								<div class="wt-sectionhead wt-textcenter">
+									<div class="wt-sectiontitle">
+										<h2>{% if home_layout.project_title %}{{home_layout.project_title}}{% endif %}</h2>
+										<span>{% if home_layout.project_subtitle %}{{home_layout.project_subtitle}}{% endif %}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>		
+					<div class="container">
+						<div class="row justify-content-md-center">
+						{% for project in projects %}
+						<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+							<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+								<div class="wt-proposalsr wt-box-shadow">
+									<div class="wt-proposalsrcontent">
+									<a href=""> 
+										<figure><img src="{% firstof project.created_by.clients.company_logo.url project.created_by.clients.profile_photo.url %}" style="height:60px; width:60px" alt="image"></figure>
+									</a>
+									<h4>{% firstof project.created_by.clients.brand_name project.created_by.get_full_name %}</h4>
+									<span>{{project.title|truncatechars:50}}</span>
+									<div class="wt-title">
+										<div class="wt-proposalhead">
+											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+												<li><span><i class="far fa-money-bill-alt" style="color:green"> {{base_currency}} {{project.amount}}</i></span></li>
+												<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:50}}</span></li>
+												<li><span><i class="fa fa-tag wt-viewjobtag"></i> {{project.category.name|truncatechars:18}}</span></li>
+												<li><a href="{{project.get_project_absolute_url}}" class="btn btn-danger btn-sm text-white"><i class="fa fa-window-restore"></i>&nbsp;Apply</i></a></li>
+											</ul>
+										</div>
+									</div> 
+								</div>
+							</aside>
+						</div>
+						{% endfor %} 
+				</section>
+			
+			</main>	
+			
+			{% include 'dashboard/main_footer.html' %}
+
+	<!-- Add team Popup Start-->
+	<!-- Popup Start-->
+	<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="userregistrationmodal">
+		<div class="modal-dialog" role="document">
+			<div class="wt-modalcontent modal-content">
+				<div class="wt-popuptitle">
+					<h2>Register free Forever</h2>
+					<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
+				</div>
+				<div class="modal-body">
+					<form method="POST", action='.', class="wt-formtheme wt-formpopup" autocomplete="off"> {% csrf_token %}
+						<div class="wt-tabscontenttitle">
+							<h2>Background</h2>
+						</div>
+						<div class="form-group">
+                            {{regform.email.label}}
+                            {{regform.email}}
+                            <span style="color:red;" role="alert">{{ regform.email.errors}}</span>
+                        </div>
+						<div class="form-group">
+                            {{regform.first_name.label}}
+                            {{regform.first_name}}
+                            <span style="color:red;" role="alert">{{ regform.first_name.errors}}</span>
+                        </div> 
+                        <div class="form-group">
+                            {{regform.last_name.label}}
+                            {{regform.last_name}}
+                            <span style="color:red;" role="alert">{{ regform.last_name.errors}}</span>
+                        </div>
+                        <div class="form-group">
+                            {{regform.short_name.label}}
+                            {% render_field regform.short_name class+='form-control' value='' placeholder='Username' hx-post='/verify_username/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#short_name_status' %} 
+                            <span style="color:red;" role="alert">{{ regform.short_name.errors}}</span>
+                            <div id="short_name_status" class="input-group col-lg-12"></div>
+                        </div>
+                        <div class="form-group">
+                            {{regform.phone.label}}
+                            {{regform.phone}}
+                            <span style="color:red;" role="alert">{{ regform.phone.errors}}</span>
+                        </div>
+						<div class="form-group">
+							{{regform.country.label}}
+							{{regform.country}}
+							<span style="color:red;" role="alert">{{ regform.country.errors}}</span>
+						</div>
+						<div class="wt-tabscontenttitle">
+							<h2>Specialty</h2>
+						</div>
+                        <div class="form-group">
+                            {{regform.user_type.label}}
+                            {% render_field regform.user_type class+="form-control" placeholder="Select UserType" hx-get="/user_types/" hx-target="#user_type" %}
+                            <span style="color:red;" role="alert">{{ regform.user_type.errors}}</span> 
+                            <div id="user_type" class="input-group col-lg-12"></div>
+                        </div>
+						<div class="wt-tabscontenttitle">
+							<h2>Security</h2>
+						</div>
+                        <div class="form-group">
+                            {{regform.password1.label}}
+                            {{regform.password1}}
+                            <span style="color:red;" role="alert">{{ regform.password1.errors}}</span>
+                        </div>
+                        <div class="form-group">
+                            {{regform.password2.label}}
+                            {{regform.password2}}
+                            <span style="color:red;" role="alert">{{ regform.password2.errors}}</span>
+                        </div>
+						<span style="color:green;" role="alert">Already have account on {{website.site_name}}?<a href="{% url 'account:login' %}"> Login </span>
+						<div class="form-group wt-btnarea">
+							<button type="submit" class="wt-btn"> Join Now </button>
+						</div>											
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="{% static 'js/typed-2.0.js' %}"></script>
+	<script>
+		let typed = new Typed(".autoTyper", {
+			strings: [{% for typer in pypist %}"{{typer}}",{% endfor %}],
+			typeSpeed: 100,
+			backSpeed: 100,
+			loop: true
+		})
+		
+	</script>
+
+	<script>
+        //Script to add proposal quantity in session             
+        $(document).on('change', '#id_search_type', function (e) {
+        e.preventDefault();
+		mysearchval = $('#id_search_type option:selected').val()
+		//console.log(mysearchval)
+        $.ajax({
+            type: 'POST',
+            url: '{% url "account:searchtype" %}',
+            data: {
+                searchVal: $('#id_search_type option:selected').val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'searching-type'
+            },
+            success: function (json) {
+                if (mysearchval === 'freelancer'){
+					window.location.href = "{% url 'freelancer:freelancer_listing' %}"
+				}
+				else if (mysearchval === 'proposal'){
+					window.location.href = "{% url 'proposals:proposal_list' %}"
+				}
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+        })
+    </script>
+{% endblock %}

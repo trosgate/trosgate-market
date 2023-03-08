@@ -141,101 +141,62 @@
 				</section>
 				{% endif %}
 
-				<div class="wt-haslayout wt-main-section">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-								<div class="wt-sectionhead wt-textcenter">
-									<div class="wt-sectiontitle">
-										<h2>{% if home_layout.category_title %}{{home_layout.category_title}}{% endif %}</h2>
-										<span>{% if home_layout.category_subtitle %}{{home_layout.category_subtitle}}{% endif %}</span>
+				<div class="container">
+					<section class="wt-haslayout wt-dbsectionspace">
+						<div class="row justify-content-md-center">				
+							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+								<div class="wt-dashboardbox">
+									<div id="pricing" class="wt-sectionhead wt-textcenter">
+										<h3>Become a Merchant Today</h3>
+									</div>
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+										<div id="packaging" class="wt-dashboardboxcontent wt-packages">
+											<div class="wt-package wt-packagedetails">
+												<div class="wt-packagehead"></div>
+												<div class="wt-packagecontent">
+													<ul class="wt-packageinfo">
+														<li class="wt-packageprices"><span>Price</span></li>
+														<li><span>Group Chat</span></li>
+														<li><span>Fund Transfer - Within Team</span></li>
+														<li><span>Member Per Team</span></li>
+														<li><span>Monthly Contracts Per Team</span></li>
+														<li><span>Max Proposals Per Team</span></li>
+														<li><span>Monthly Application Per Team</span></li>
+													</ul>
+													<span style="font-weight:bold;">Build Marketplace in minutes</span>
+												</div>
+											</div>
+											{% for package in packages %}
+											<div class="wt-package wt-baiscpackage">
+												<div class="wt-packagehead">
+													<h3>{% firstof package.verbose_type package.get_type_display %}</h3>
+													{% comment %} <span>{{package.get_status_display}}</span> {% endcomment %}
+												</div>
+												<div class="wt-packagecontent">
+													<ul class="wt-packageinfo">
+														<li class="wt-packageprice"><span><sup>{{base_currency_symbol}}</sup> {{package.price}} <sub>\ Month</sub></span></li>
+														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
+														<li><span><em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.max_member_per_team}} </em></span></li>
+														<li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.monthly_offer_contracts_per_team}} </em> {% else %} <i class="ti-na">.</i>{% endif %}</span></li>
+														<li><span>{% if package.max_proposals_allowable_per_team > 0 %} <em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.max_proposals_allowable_per_team}} </em> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
+														<li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.monthly_projects_applicable_per_team}} </em> {% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
+													</ul>
+													<div>
+														<a href="{% url 'account:create_merchant' package.type %}" class="btn btn-success">30 Days Free, No Card</a>
+													</div>
+												</div>
+											</div>
+											{% endfor %}
+											
+										</div>
 									</div>
 								</div>
-							</div>
-							<div class="wt-categoryexpl">
-                			{% for category in categories %}
-								<div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 float-left">
-									<div class="wt-categorycontent">
-										<figure><img src="{{category.icon.url}}" alt="image description"></figure>
-										<div class="wt-cattitle">
-											<h3><a href="javascrip:void(0);">{{category.name}}</a></h3>
-											<span>Items: ({{category.proposal.count}})</span>
-										</div>
-										<div class="wt-categoryslidup">
-											<p>{{category.preview}}.</p>
-											<a href="{{category.category_absolute_url}}">Explore <i class="fa fa-arrow-right"></i></a>
-										</div>
-									</div>
-								</div>
-                			{% endfor %}
 							</div>
 						</div>
-					</div>
+					</section>
 				</div>
-				<!--Categories End-->
-
-				<!--Company listing starts-->
-				<div class="wt-haslayout wt-main-section">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
-								<div class="wt-sectionhead wt-textcenter">
-									<div class="wt-sectiontitle">
-										<h2>{% if home_layout.proposal_title %}{{home_layout.proposal_title}}{% endif %}</h2>
-										<span>{% if home_layout.proposal_subtitle %}{{home_layout.proposal_subtitle}}{% endif %}</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>				
-					<div class="wt-companysinfoholder">	
-						<div class="container">
-							<div class="row justify-content-md-center">
-							{% for proposal in proposal_list %}
-								<div class="col-12 col-sm-12 col-md-12 col-lg-3">
-									<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-										<figure class="wt-companysimg">
-										{% if proposal.thumbnail %}
-											<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
-										{% else %}
-											<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" style="height:80px;" alt="img description">
-										{% endif %}
-										</figure>
-										<div class="wt-companysinfo">
-											<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description"></figure>
-											<div class="wt-title">
-												<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_short_name}}{% endif %}</a>
-												<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a>
-											<hr>
-											<ul class="wt-postarticlemeta">
-												<li class="wt-following">
-													<a href="javascript:void(0);">
-														<span><i class="fa fa-balance-scale"></i>{{proposal.aggregated_sales_count}}</span>
-													</a>
-												</li>
-												<li class="wt-following">
-													<a href="javascript:void(0);">
-														<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
-													</a>
-												</li>
-												<li class="wt-following">
-													<a href="javascript:void(0);">
-														<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
-													</a>
-												</li>
-											</ul>
-										</div>
-									</div>
-								</div>
-							</div>
-							{% endfor %}
-								{% if not proposal_list %}
-									<p> No featured proposals to show yet </p>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-				</div>
+				
 				<div class="container">
 					<div class="row justify-content-md-center">
 						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
@@ -261,45 +222,7 @@
 						</div>
 					</div>
 				</div>
-				<section class="wt-haslayout wt-main-section">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6">
-								<div class="wt-sectionhead wt-textcenter">
-									<div class="wt-sectiontitle">
-										<h2>{% if home_layout.project_title %}{{home_layout.project_title}}{% endif %}</h2>
-										<span>{% if home_layout.project_subtitle %}{{home_layout.project_subtitle}}{% endif %}</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>		
-					<div class="container">
-						<div class="row justify-content-md-center">
-						{% for project in projects %}
-						<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-							<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
-								<div class="wt-proposalsr wt-box-shadow">
-									<div class="wt-proposalsrcontent">
-									<a href=""> 
-										<figure><img src="{% firstof project.created_by.clients.company_logo.url project.created_by.clients.profile_photo.url %}" style="height:60px; width:60px" alt="image"></figure>
-									</a>
-									<h4>{% firstof project.created_by.clients.brand_name project.created_by.get_full_name %}</h4>
-									<span>{{project.title|truncatechars:50}}</span>
-									<div class="wt-title">
-										<div class="wt-proposalhead">
-											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-												<li><span><i class="far fa-money-bill-alt" style="color:green"> {{base_currency}} {{project.amount}}</i></span></li>
-												<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:50}}</span></li>
-												<li><span><i class="fa fa-tag wt-viewjobtag"></i> {{project.category.name|truncatechars:18}}</span></li>
-												<li><a href="{{project.get_project_absolute_url}}" class="btn btn-danger btn-sm text-white"><i class="fa fa-window-restore"></i>&nbsp;Apply</i></a></li>
-											</ul>
-										</div>
-									</div> 
-								</div>
-							</aside>
-						</div>
-						{% endfor %} 
+
 				</section>
 			
 			</main>	
@@ -316,7 +239,7 @@
 					<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
 				</div>
 				<div class="modal-body">
-					<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+					<form method="POST", action='.', class="wt-formtheme wt-formpopup" autocomplete="off"> {% csrf_token %}
 						<div class="wt-tabscontenttitle">
 							<h2>Background</h2>
 						</div>

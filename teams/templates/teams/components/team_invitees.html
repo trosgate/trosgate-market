@@ -1,0 +1,54 @@
+
+{% if messages %}
+<div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:4s">        
+    {% for message in messages %}        
+    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+        <span class="wt-jobalerts">
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                <span> {{ message}} </span>
+            </div>
+        </span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Email</th>
+        <th>Sent on </th>
+        <th>Code Sent</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+        <tbody>
+        {% for invite in invited %}
+            <tr>
+                <td>{{forloop.counter}} </td>
+                <td>{{invite.email}}</td>
+                <td>{{invite.sent_on}}</td>
+                <td>{{invite.code}}</td>
+                <td><span class="badge badge-info badge-sm">{{invite.get_status_display}}</span></td>
+                <td>
+                    <form>
+                        <input type="text" name="invitee" value="{{invite.pk}}" hidden>
+                        <button class="btn btn-danger btn-sm mt-2"
+                            hx-post= "{% url 'teams:remove_invitee' %}"
+                            hx-target="#invited-user">
+                            Remove
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if not invited %}
+    <hr>
+    <div class="text-center"> 
+        <span><strong>No Invited Member to show yet.</strong></span>
+    </div> 
+    {% endif %}	             

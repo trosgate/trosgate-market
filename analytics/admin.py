@@ -14,7 +14,6 @@ from . models import (
 from django.db.models import F, Sum, Count, Avg
 
 
-
 class NewStatsAdmin(admin.ModelAdmin):
     model = NewStats
     list_display = ['description','win', 'mac', 'iph', 'android','oth']

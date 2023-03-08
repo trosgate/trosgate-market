@@ -1,10 +1,4 @@
-{% load static %}
 
-  <!-- Preloader Start -->
-  <div class="preloader-outer">
-    <div class="loader"></div>
-  </div>
-  <!-- Preloader End -->
   <!-- Wrapper Start -->
   <div id="wt-wrapper" class="wt-wrapper wt-haslayout">
     <!-- Content Wrapper Start -->
@@ -62,7 +56,14 @@
                           <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:white;"></i> Balance: &nbsp;{{request.user.clientfunduser.available_balance}}</span></a>
                         </li>
                         {% endif %}
-
+                        {% if request.user.is_authenticated %}
+                        {% if active_team.created_by == request.user %}
+                        <li
+                          class="nav-item text-center">
+                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:white;"></i> Team Bal: &nbsp;{{active_team.team_balance}}</span></a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
                         {% if not request.user.is_authenticated %}
                         <li class="nav-item text-center">
                           <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-white" style="background-color:{% firstof website.button_color home_layout.banner_color purple %};">Login Now</span></a>
@@ -74,12 +75,15 @@
                   
 									<div class="wt-userlogedin">
                     {% if not request.user.is_authenticated %}
-                      
+                      {% if request.parent %}
+                      <a class="btn btn-danger btn-sm" href="#pricing" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Become a Merchant</a>
+                      {% else %}
                       {% if userregistrationmodal %}
-                      <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Join Us</a>
-                      {% else  %}			
-											<a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Signup</a>
-                      {% endif  %}
+                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Join Us</a>
+                      {% else %}
+											  <a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Signup</a>
+                      {% endif %}
+                      {% endif %}
                     
                     {% endif  %}
 
@@ -91,9 +95,12 @@
                       {% if request.user.clients %}
                       <img src="{% if request.user.clients.profile_photo %}{{request.user.clients.profile_photo.url}}{% endif %}" alt="image description"/>
                       {% endif  %}
+                      {% if request.user.merchant %}
+                      <img src="{% if request.user.merchant.profile_photo %}{{request.user.merchant.profile_photo.url}}{% endif %}" alt="image description"/>
+                      {% endif  %}
                     </figure>
                     <div class="wt-username">
-                      <h3><span {% if website.navbar_color %} style="color:white;" {% endif %}>{{request.user.short_name|capfirst}}</span></h3>
+                      <h3><span {% if website.navbar_color %} style="color:white;" {% endif %}>{{request.user.get_short_name|capfirst}}</span></h3>
                       <span {% if website.navbar_color %} style="color:white;" {% endif %}>
                         {% if active_team %} {{active_team.title|slice:10}}
                         {% else %}
@@ -169,4 +176,5 @@
       </header>
       <!--Header End-->
     </div>
+
 

@@ -43,7 +43,7 @@
                             
                             <div class="wt-dashboardboxcontent">                                                               
 
-                            <form method='POST' action=''>{% csrf_token %}
+                            <form method='POST' enctype="multipart/form-data">{% csrf_token %}
                                 {% if proposal.preview == '' or proposal.category == '' or proposal.skill == ''%}
                                 <div class="alert alert-danger text-center" role="alert">
                                     <span style="color:red;" role="alert">All Fields are required</span>
@@ -89,7 +89,7 @@
                                             {{proposalformone.thumbnail}}
                                             <span style="color:red;" role="alert">{{ proposalformone.thumbnail.errors}}</span>
                                         </div>
-                                        <div id="image-box" style='display:block; max-width:10%; max-width:100%;'></div>
+                                        
                                     </div>
                                     </div>
                                         </div>

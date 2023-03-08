@@ -348,7 +348,7 @@
                             success: function (responseTwo) {
                                 console.log(responseTwo)
                                 swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                    window.location.href = '/transaction/congrats/'
+                                    window.location.href = "{% url 'transactions:application_transaction' %}"
                                 });                        
                             }
                         });

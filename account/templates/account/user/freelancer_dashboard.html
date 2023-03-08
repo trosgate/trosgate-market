@@ -138,7 +138,7 @@
 						<div class="wt-insightdetails">
 							<div class="wt-title">
 							{% if active_team.status == 'active' %}
-							<a href="{{active_team.get_team_detail_absolute_url}}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
+							<a href="{% url 'teams:team_single' %}"><button type="button" class="btn btn-success btn-sm"><i class="fa fa-folder-open" aria-hidden="true"></i> Details</button></a>
 							{% elif active_team.status == 'inactive'%}	
 							<a href="{{active_team.get_team_preview_url}}"><button type="button" class="btn btn-success  btn-sm" target="_blank"><i class="fa fa-folder-open" aria-hidden="true"></i> Preview</button></a> 
 							{% endif %}	
