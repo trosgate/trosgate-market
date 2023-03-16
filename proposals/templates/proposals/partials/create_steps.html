@@ -1,0 +1,295 @@
+{% comment %} <form method="post" hx-post="/my-form/" hx-include="#step-1-form, #step-2-form, #step-3-form"> {% endcomment %}
+
+<div id="step-1-form">
+    {% if variable == 'stepOne' %}
+    <form method="post">
+    {% csrf_token %}
+    
+    <div class="wt-jobdescription wt-tabsinfo">
+        <div class="wt-jobdetails wt-tabsinfo">
+            <div class="wt-tabscontenttitle">
+                <h2>Introduction</h2>
+            </div>      
+            <div class="form-row">
+                
+                <div class="form-group">
+                    {{proposalformone.title.label}}
+                    {{proposalformone.title}}
+                    <span style="color:red;" role="alert">{{ proposalformone.title.errors}}</span>
+                </div> 
+                <div class="form-group">
+                    {{proposalformone.preview.label}}
+                    {{proposalformone.preview}}
+                    <span style="color:red;" role="alert">{{ proposalformone.preview.errors}}</span>
+                </div>
+                <div class="form-group">
+                    {{proposalformone.category.label}}
+                    {{proposalformone.category}}
+                    <span style="color:red;" role="alert">{{ proposalformone.category.errors}}</span>
+                </div>
+            </div> 
+        </div>  
+        {% if messages %}
+            <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                {% for message in messages %}        
+                <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                    <span class="wt-jobalerts">
+                        <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                            <span> {{ message}} </span>
+                        </div>
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="text-center">
+            <button type="button" class="wt-btn"
+                hx-post="{% url 'proposals:proposal_step_one' %}"
+                hx-target="#step-1-form"
+                style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                Next Step
+            </button>
+        </div>
+    </div>
+    </form>
+    {% endif %}
+</div>
+
+
+<div id="step-2-form">
+{% if variable == 'stepTwo' %}
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="wt-jobdescription wt-tabsinfo">
+            <div class="wt-jobdetails wt-tabsinfo">
+                <div class="wt-tabscontenttitle">
+                    <h2>Description</h2>
+                </div>      
+                <div class="form-row">
+
+                    <div class="form-group">
+                        {{proposalformtwo.description.label}}
+                        {{proposalformtwo.description}}
+                        <span style="color:red;" role="alert">{{ proposalformtwo.description.errors}}</span>
+                    </div>
+                    <div class="form-group">
+                        {{proposalformtwo.sample_link.label}}
+                        {{proposalformtwo.sample_link}}
+                        <span style="color:red;" role="alert">{{ proposalformtwo.sample_link.errors}}</span>
+                    </div>
+                </div> 
+            </div>  
+            {% if messages %}
+                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                    {% for message in messages %}        
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                        <span class="wt-jobalerts">
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                                <span> {{ message}} </span>
+                            </div>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="text-center">
+                <button type="submit" class="wt-btn"
+                    hx-get="{% url 'proposals:proposal_step_one' %}"
+                    hx-target="#step-1-form"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                    Prev Step
+                </button>
+                <button id="describeBtn" type="submit" class="wt-btn"
+                    hx-post="{% url 'proposals:proposal_step_two' %}"
+                    hx-target="#step-1-form"
+                    htmx:serialize='all'
+                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                    Next Step
+                </button>
+            </div>
+        </form>
+    </div>
+
+{% endif %}
+
+
+<div id="step-3-form">
+{% if variable == 'stepThree' %}
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="wt-jobdescription wt-tabsinfo">
+            <div class="wt-jobdetails wt-tabsinfo">
+                <div class="wt-tabscontenttitle">
+                    <h2>Proposal Faqs</h2>
+                </div>      
+                <div class="form-row">
+                    <div class="form-group">
+                        {{proposalformthree.faq_one.label}}
+                        {{proposalformthree.faq_one}}
+                        <span style="color:red;" role="alert">{{ proposalformthree.faq_one.errors}}</span>	
+                    </div>
+
+                    <div class="form-group">
+                        {{proposalformthree.faq_one_description.label}}
+                        {{proposalformthree.faq_one_description}}
+                        <span style="color:red;" role="alert">{{ proposalformthree.faq_one_description.errors}}</span>	
+                    </div>
+                    <div class="form-group">
+                        {{proposalformthree.faq_two.label}}
+                        {{proposalformthree.faq_two}}
+                        <span style="color:red;" role="alert">{{ proposalformthree.faq_two.errors}}</span>	
+                    </div>
+
+                    <div class="form-group">
+                        {{proposalformthree.faq_two_description.label}}
+                        {{proposalformthree.faq_two_description}}
+                        <span style="color:red;" role="alert">{{ proposalformthree.faq_two_description.errors}}</span>	
+                    </div>
+                </div> 
+            </div>  
+            {% if messages %}
+                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                    {% for message in messages %}        
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                        <span class="wt-jobalerts">
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                                <span> {{ message}} </span>
+                            </div>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="text-center">
+                <button type="submit" class="wt-btn"
+                    hx-get="{% url 'proposals:proposal_step_two' %}"
+                    hx-target="#step-1-form"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                    Prev Step
+                </button>
+                <button type="submit" class="wt-btn"
+                    hx-post="{% url 'proposals:proposal_step_three' %}"
+                    hx-target="#step-1-form"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                    Next Step
+                </button>
+            </div>
+        </form>
+    </div>
+{% endif %}
+
+
+<div id="step-4-form">
+{% if variable == 'stepFour' %}
+    <form method="post" hx-encoding="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="wt-jobdescription wt-tabsinfo">
+            <div class="wt-jobdetails wt-tabsinfo">
+                <div class="wt-tabscontenttitle">
+                    <h2>Attributes</h2>
+                </div>      
+                <div class="form-row">
+                    <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <th>Salary</th>
+                            <th>{{proposalformfour.salary}}</th>
+                        </tr>
+                        <tr>
+                            <th>Level</th>
+                            <th>{{proposalformfour.service_level}}</th>
+                        </tr>												
+                        <tr>
+                            <th>Duration</th>
+                            <th>{{proposalformfour.dura_converter}}</th>
+                        </tr>
+                        <tr>
+                            <th>Revision</th>
+                            <th>{{proposalformfour.revision}}</th>
+                        </tr>
+                    </table> 
+                    <div class="form-group">
+                        {{proposalformfour.skill.label}}
+                        {{proposalformfour.skill}}
+                        <span style="color:red;" role="alert">{{ proposalformfour.skill.errors}}</span>	
+                    </div>
+
+                    <div class="form-group">
+                        {{proposalformfour.thumbnail.label}}
+                        {{proposalformfour.thumbnail}}
+                        <span style="color:red;" role="alert">{{ proposalformfour.thumbnail.errors}}</span>	
+                    </div>
+                </div> 
+            </div>  
+            {% if messages %}
+                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                    {% for message in messages %}        
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                        <span class="wt-jobalerts">
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                                <span> {{ message}} </span>
+                            </div>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="text-center">
+                <button type="submit" class="wt-btn"
+                    hx-get="{% url 'proposals:proposal_step_three' %}"
+                    hx-target="#step-1-form"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                    Prev Step
+                </button>
+                <button type="submit" class="wt-btn"
+                    hx-post="{% url 'proposals:proposal_step_four' %}"
+                    hx-target="#step-1-form"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
+                    Save and View
+                </button>
+            </div>
+        </form>
+    </div>
+{% endif %}
+
+
+{% if variable == 'stepFive' %}
+<div class="wt-categoryexpl">
+    <div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+                    <span><i class="fa fa-arrow-left fa-4x" style="color:green;"></i></span>
+                    <div class="wt-insightdetails">
+                        													
+                        <a href="{% url 'account:dashboard' %}" class="wt-btn" style="font-weight: bold;">
+                            Check Later
+                        </a>
+                    </div>	
+                </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+                    <span><i class="fa fa-link fa-4x" style="color:blue;"></i></span>
+                    <div class="wt-insightdetails">
+                        													
+                        <a href="{{proposal.proposal_absolute_url}}" class="wt-btn" style="font-weight: bold;">
+                            Preview
+                        </a>
+                    </div>	
+                </div>
+            </div>												
+            	
+        </div>
+    </div>	
+</div>
+{% endif %}

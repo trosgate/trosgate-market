@@ -9,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 import sys
 from django.contrib.admin.models import LogEntry
 import warnings
+from account.management.commands import refresh
+from django.core.management import call_command
 
 
 MAX_PACKAGE = 3
@@ -54,6 +56,7 @@ class CustomerChangeForm(forms.ModelForm):
 class CustomerAdmin(BaseUserAdmin,):  
     form = CustomerChangeForm
     add_form = CustomerCreationForm
+    actions = ['refresh']
 
     list_display = ['id', 'get_short_name', 'email', 'is_superuser','user_type', 'is_active', 'last_login']
     readonly_fields = ['date_joined', 'user_type', 'last_login']
@@ -84,19 +87,23 @@ class CustomerAdmin(BaseUserAdmin,):
         else:
             return qs.filter(pk=request.user.id, is_staff=True)  
 
+
     def has_delete_permission(self, request, obj=None):
         return False
-        
+
+
     def get_actions(self, request):
         actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
 
+
     def has_add_permission(self, request):
         if not request.user.is_superuser:
             return False
         return super().has_add_permission(request)
+
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -163,6 +170,12 @@ class CustomerAdmin(BaseUserAdmin,):
                 form.base_fields[field].disabled = True
         
         return form
+
+
+    def refresh(self, request, queryset):
+        call_command('refresh')
+        self.message_user(request, 'Refresh command was sent successfully')
+    refresh.short_description = 'Run refresh Command'
 
 
 @admin.register(LogEntry)

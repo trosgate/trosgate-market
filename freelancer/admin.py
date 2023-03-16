@@ -13,10 +13,10 @@ MAX_OBJECTS = 0
 @admin.register(Freelancer)
 class FreelancerAdmin(admin.ModelAdmin):
     model = Freelancer
-    list_display = ['image_tag', 'user', 'tagline']
+    list_display = ['merchant', 'image_tag', 'user', 'tagline']
     list_display_links = ('image_tag', 'user',)    
     readonly_fields = [
-        'gender', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',
+        'gender', 'merchant', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',
         'brand_name', 'tagline','description', 'skill', 'business_size', 'department',
         'company_name','job_position', 'start_date', 'end_date', 'job_description',
         'company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',
@@ -27,7 +27,7 @@ class FreelancerAdmin(admin.ModelAdmin):
     ]
     search_fields = ('user__short_name','gender','tagline',)
     fieldsets = (
-        ('Personal info', {'fields': ('gender', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
+        ('Personal info', {'fields': ('gender', 'merchant', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',)}),
         ('Interest and Description', {'fields': ('brand_name', 'tagline','description', 'business_size', 'department',)}),
         ('Skill and Specialty', {'fields': (
             'skill', 'keyskill_one', 'key_skill_one_score', 'keyskill_two','key_skill_two_score','keyskill_three',
@@ -66,10 +66,10 @@ class FreelancerAdmin(admin.ModelAdmin):
 @admin.register(FreelancerAccount)
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
-    list_display = ['id', 'user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
-    readonly_fields = ['user', 'created_at', 'pending_balance', 'available_balance','lock_fund', 'admin_action']
+    list_display = ['merchant', 'user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
+    readonly_fields = ['merchant', 'user', 'created_at', 'pending_balance', 'available_balance','lock_fund', 'admin_action']
     list_select_related = ('user',)
-    list_display_links = ['id', 'user']
+    list_display_links = ['merchant', 'user']
     actions = ['unlock_single_or_bulk_account']
 
     def get_urls(self):
@@ -196,15 +196,15 @@ class FreelancerAccountAdmin(admin.ModelAdmin):
 @admin.register(FreelancerAction)
 class FreelancerActionAdmin(admin.ModelAdmin):
     model = FreelancerAction    
-    list_display = ['reference', 'account', 'team', 'action_choice', 'debit_amount', 'withdraw_amount']
+    list_display = ['reference', 'merchant', 'account', 'team', 'action_choice', 'debit_amount', 'withdraw_amount']
     list_display_links = ['reference','account']
     search_fields = ['team__title', 'position']
     list_filter = ['action_choice']
-    readonly_fields = ['account','team', 'reference', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
+    readonly_fields = ['merchant', 'account','team', 'reference', 'manager', 'gateway', 'action_choice','team_staff', 'transfer_status', 'debit_amount', 'withdraw_amount', 'narration','created_at', 'transfer_status']
     list_per_page = 20
     
     fieldsets = (
-        ('Background', {'fields': ('account','team', 'manager','action_choice','created_at', 'transfer_status', 'reference',)}),
+        ('Background', {'fields': ('account', 'merchant', 'team', 'manager','action_choice','created_at', 'transfer_status', 'reference',)}),
         ('Other Transfer Info', {'fields': ('team_staff', 'debit_amount',)}),
         ('Other Withdrawal Info', {'fields': ('gateway', 'withdraw_amount', 'narration',)}),
     )    

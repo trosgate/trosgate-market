@@ -1,0 +1,141 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+
+
+<div class="wt-haslayout wt-innerbannerholder">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                <div class="wt-innerbannercontent">
+                    <div class="wt-title">
+                        <h2>New Proposal</h2></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wt-proposalholder">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                    <div class="wt-dashboardbox">
+                        
+                    {% comment %} {% if can_create_new_proposal %} {% endcomment %}
+                    <div class="wt-dashboardboxcontent">                                                               
+
+                        {% include 'proposals/partials/create_steps.html' %}
+                    </div>
+                    {% comment %} {% else %}
+                    <div class="wt-btnarea text-center alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                            {% if active_team.package.type == 'Basic' and active_team.created_by == request.user %} 
+                            Maximum proposal threshold reached but you can change that. <a href="{% url 'teams:packages' %}"> Please upgrade </a>
+                            {% elif active_team.package.type == 'Basic' and active_team.created_by != request.user %} 
+                            Please prompt your team founder to upgrade
+                            {% elif active_team.package.type == 'Team' %}
+                            Maximum proposal limit reached for this Team
+                            {% endif %}
+                        </span>
+                    </div>	
+                    {% endif %} {% endcomment %}
+                </div>
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="wt-textcenter">
+                    <span>Copyright @ {{request.site.name|capfirst}}</span>
+                </div>
+            </div>
+        </div>
+
+
+        
+    {% endblock content %}
+    {% block scripts %}
+    
+  
+    {% endblock scripts %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

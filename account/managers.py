@@ -4,7 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.models import Site
 from django.conf import settings
 from django.apps import apps
-
+from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 
 
 class UserManager(BaseUserManager):
@@ -32,7 +33,6 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('user_type', 'admin')
         extra_fields.setdefault('is_superuser', False)
-        curr_site = Site.objects.get_current()
         return self.create_user(email, first_name=first_name, last_name=last_name, password=password, **extra_fields)
 
 
@@ -74,21 +74,70 @@ class UserManager(BaseUserManager):
         return customer
     
 
-    def create_freelancer(self, email, team, password=None, **extra_fields):
-        if not package:
-            raise ValueError(_('Unknown package selected'))
-         
-        team_instance = Team.objects.create(name=f"{email}'s team'")
-        extra_fields.setdefault('team', team_instance)
-        extra_fields.setdefault('is_freelancer', True)
+    def create_merchant_user(self, email, password, short_name, first_name, last_name, country, **extra_fields):
+        # Create merchant with the received information
+        merchantapp = apps.get_model('account', 'Merchant')
+        freelancerapp = apps.get_model('freelancer', 'Freelancer')
+        freelanceraccountapp = apps.get_model('freelancer', 'FreelancerAccount')
+        paymentapp = apps.get_model('payments', 'PaymentAccount')
+        teamsapp = apps.get_model('teams', 'Team') 
+        invitationapp = apps.get_model('teams', 'Invitation') 
         
-        site = Site.objects.get_current()
+        clientapp = apps.get_model('client', 'Client')
+        clientaccountapp = apps.get_model('client', 'ClientAccount')
+
+        curr_site = Site.objects.get_current()
+        merchant = get_object_or_404(merchantapp, site=curr_site)
+
+        if not merchant:
+            raise ValueError(_('Something went wrong. Please try again'))
+        
+        if not first_name:
+            raise ValueError(_('Something went wrong. Please try again'))
+        
+        extra_fields.setdefault('site', curr_site)
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_active', False)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('site', site)
-        extra_fields.setdefault('user_type', 'merchant')
+        extra_fields.setdefault('is_superuser', False)   
+         
+        if merchant and extra_fields.setdefault('user_type') == 'freelancer':
+            extra_fields.setdefault('user_type', 'freelancer')
+            
+            user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)
+            freelanceraccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
+            paymentapp.objects.get_or_create(merchant=merchant, user=user)[0]
 
+            title = f'{user.short_name} Team'
+            team = teamsapp.objects.get_or_create(
+                title=title,
+                notice=f"This is the team for {user.short_name}", 
+                merchant=merchant,
+                created_by = user,
+                slug = slugify(user.short_name)
+            )[0]
+            team.save()
+            team.members.add(user)
+            
+            freelancer = freelancerapp.objects.get_or_create(
+                merchant=merchant, user=user, active_team_id=team.id
+            )[0]
+            freelancer.active_team_id = team.id
+            freelancer.save()
 
-        return
+            invitation = invitationapp.objects.get_or_create(
+                merchant=merchant, team=team, sender=user, 
+                email=user.email, type=invitationapp.INTERNAL,
+            )[0]
+        
+            return user, team, freelancer, invitation
+        
+
+        if merchant and extra_fields.setdefault('user_type') == 'client':
+            extra_fields.setdefault('user_type', 'client')
+            user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)            
+            client = clientapp.objects.get_or_create(merchant=merchant, user=user)[0]
+            client_acct = clientaccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
+
+            return user, client, client_acct
+    
 

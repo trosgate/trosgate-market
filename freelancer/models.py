@@ -39,6 +39,7 @@ class Freelancer(models.Model):
     )
     # freelancer details
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("User"), related_name="freelancer", on_delete=models.CASCADE)
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='freelancemerchant', on_delete=models.PROTECT)    
     gender = models.CharField(_("Gender"), max_length=10, choices=GENDER)
     tagline = models.CharField(_("Tagline"), max_length=100, blank=True)
     description = models.TextField(_("Description"), max_length=2000, blank=True, error_messages={"name": {"max_length": _("Ensure a maximum character of 2000 for description field")}},)
@@ -157,6 +158,7 @@ class Freelancer(models.Model):
 
 class FreelancerAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='fundtransferuser', on_delete=models.PROTECT,)
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='freelanceaccmerchant', on_delete=models.PROTECT)    
     reference = models.UUIDField(unique=True, verbose_name="Reference Number", editable=False, default=uuid.uuid4,)
     pending_balance = models.PositiveIntegerField(_("Pending Balance"), default=0,)
     available_balance = models.PositiveIntegerField(_("Account Balance"), default=0, help_text=_("Min of $20 and Max of $500 per transaction"),)
@@ -415,7 +417,7 @@ class FreelancerAction(models.Model):
         (TRANSFER, _("Transfer")),
         (WITHDRAWAL, _("Withdrawal")),
     )
-
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='actionmerchant', on_delete=models.PROTECT)        
     account = models.ForeignKey(FreelancerAccount, verbose_name=_("Account"), related_name="fundmanageraccount", on_delete=models.PROTECT)
     gateway = models.ForeignKey('general_settings.PaymentGateway', verbose_name=_("Payment Account"), related_name="paymentaccount", blank=True, null=True, on_delete=models.SET_NULL)
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Manager"), related_name="fundtransferor", on_delete=models.PROTECT)

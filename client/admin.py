@@ -8,15 +8,15 @@ MAX_OBJECTS = 1
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     model = Client
-    list_display = ['user', 'gender', 'tagline', 'image_tag']
+    list_display = ['user', 'merchant', 'gender', 'tagline', 'image_tag']
     list_display_links = ['user', 'gender',]
     readonly_fields = [
-        'gender', 'address','profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 'company_logo', 'logo_tag',
+        'gender', 'merchant', 'address','profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 'company_logo', 'logo_tag',
         'employees', 'announcement','brand_name', 'tagline', 'description', 'business_size'
         ]
     search_fields = ['user__short_name', 'gender', 'tagline']
     fieldsets = (
-        ('Personal info', {'fields': ('gender', 'address','profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 'company_logo', 'logo_tag')}),
+        ('Personal info', {'fields': ('merchant', 'gender', 'address','profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 'company_logo', 'logo_tag')}),
         ('Emploees', {'fields': ('employees', 'announcement',)}),
         ('Brand and Description', {'fields': ('brand_name', 'tagline', 'description', 'business_size', 'department',)}),
     )
@@ -42,12 +42,13 @@ class ClientAdmin(admin.ModelAdmin):
         else:
             return qs.filter(pk=0)
 
+
 @admin.register(ClientAccount)
 class ClientAccountAdmin(admin.ModelAdmin):
     model = ClientAccount
-    list_display = ['id', 'user', 'created_at', 'modified_on', 'available_balance']
-    list_display_links = None
-    readonly_fields = ['user', 'created_at', 'modified_on', 'debug_balance', 'available_balance']
+    list_display = ['id', 'user', 'merchant', 'created_at', 'modified_on', 'available_balance']
+    list_display_links = ['user', 'merchant',]
+    readonly_fields = ['user', 'merchant', 'created_at', 'modified_on', 'debug_balance', 'available_balance']
     exclude = ('debug_balance',)
     search_fields = ['id', 'user__short_name']
 
@@ -69,7 +70,7 @@ class ClientAccountAdmin(admin.ModelAdmin):
 class ClientActionAdmin(admin.ModelAdmin):
     model = ClientAction
     list_display = ['account', 'reference', 'gateway', 'created_at', 'amount', 'deposit_fee', 'status']
-    readonly_fields = ['account','reference', 'gateway', 'narration', 'created_at', 'amount', 'deposit_fee', 'status']
+    readonly_fields = ['merchant', 'account','reference', 'gateway', 'narration', 'created_at', 'amount', 'deposit_fee', 'status']
     search_fields = ['account__user__first_name', 'account__user__last_name', 'reference', 'gateway']
 
     def has_add_permission(self, request):

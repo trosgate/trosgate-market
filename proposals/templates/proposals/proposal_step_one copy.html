@@ -41,7 +41,7 @@
                                 </div>
                             </div>
                             
-                        {% if can_create_new_proposal %}
+                        {% comment %} {% if can_create_new_proposal %} {% endcomment %}
                             <div class="wt-dashboardboxcontent">                                                               
 
                             <form id='proposalForm' method='POST' enctype="multipart/form-data">{% csrf_token %}
@@ -87,7 +87,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% if proposalstepone.progress != 100 %}
+                                    {% comment %} {% if proposalstepone.progress != 100 %} {% endcomment %}
                                     <div class="wt-attachmentsholder">
                                         <div class="wt-tabscontenttitle">
                                             <h2>Thumbnail</h2>
@@ -98,7 +98,7 @@
                                         </div>
                                         <div id="image-box" style='display:block; max-width:10%; max-width:100%;'></div>
                                     </div>
-                                    {% endif %}
+                                    {% comment %} {% endif %} {% endcomment %}
                                     </div>
                                         </div>
                                             </div>
@@ -112,7 +112,7 @@
                                     </div>  
                                 </form>
                             </div>
-                            {% else %}
+                            {% comment %} {% else %}
                             <div class="wt-btnarea text-center alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                 <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
                                     {% if active_team.package.type == 'Basic' and active_team.created_by == request.user %} 
@@ -124,7 +124,7 @@
                                     {% endif %}
                                 </span>
                             </div>	
-                            {% endif %}
+                            {% endif %} {% endcomment %}
                         </div>
                     </div>
                 </div>					

@@ -2,10 +2,11 @@ from django.contrib import admin
 from .models import Proposal, ProposalSupport, ProposalChat
 from django import forms
 
+
 @admin.register(Proposal)
 class ProposalAdmin(admin.ModelAdmin):
     model = Proposal
-    list_display = ['image_tag', 'title', 'team','category', 'salary', 'percent_progress', 'status', 'published']
+    list_display = ['image_tag', 'title', 'team','category', 'salary', 'status', 'published']
     list_display_links = ['image_tag', 'title']
     list_editable = [ 'status','published']
     search_fields = ['team__title', 'title', 'category__name']
@@ -13,12 +14,12 @@ class ProposalAdmin(admin.ModelAdmin):
         'created_by','image_tag', 'sample_link', 'skill','description',
         'team', 'category','reference', 'published', 'faq_three', 'faq_three_description',
         'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 
-        'salary','service_level', 'revision', 'dura_converter', 'progress', 'thumbnail',
+        'salary','service_level', 'revision', 'dura_converter', 'thumbnail','merchant'
     ]
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
-        ('Basic Info', {'fields': ('created_by',)}),
-        ('Classification', {'fields': ('team', 'category','reference', 'published','progress',)}),
+        ('Basic Info', {'fields': ('created_by','merchant','team', )}),
+        ('Classification', {'fields': ('category','reference', 'published',)}),
         ('Description', {'fields': ('description', 'sample_link', 'skill',)}),
         ('FAQs', {'fields': ('faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'faq_three', 'faq_three_description',)}),
         ('Attributes', {'fields': ('salary','service_level', 'revision', 'dura_converter', 'thumbnail',)}),   
@@ -35,14 +36,14 @@ class ProposalAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+    # def get_actions(self, request):
+    #     actions = super().get_actions(request)
+    #     if 'delete_selected' in actions:
+    #         del actions['delete_selected']
+    #     return actions
 
 
 class ProposalSupportInline(admin.StackedInline):

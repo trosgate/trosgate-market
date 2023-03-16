@@ -84,9 +84,10 @@ class CustomerRegisterForm(forms.ModelForm):
         for field in self.Meta.required:
             self.fields[field].required = True
 
+
     def clean_short_name(self):
         short_name = self.cleaned_data['short_name'].lower()
-        a = Customer.objects.filter(short_name__icontains=short_name)
+        a = Customer.objects.filter(short_name__isnull=True, short_name__iexact=short_name)
         if a.count():
             raise forms.ValidationError(_("Username already exists"))
         return short_name
@@ -94,7 +95,7 @@ class CustomerRegisterForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if Customer.objects.filter(email__icontains=email).exists():
+        if Customer.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError(_("Oops! Email taken. Please try another Email"))
 
         if not email.islower():
@@ -113,50 +114,21 @@ class CustomerRegisterForm(forms.ModelForm):
     @db_transaction.atomic
     def save(self):
         user = super().save(commit=False)
-        user.email = self.cleaned_data.get('email')
-        user.short_name = self.cleaned_data.get('short_name')
-        user.first_name = self.cleaned_data.get('first_name')
-        user.last_name = self.cleaned_data.get('last_name')
-        user.phone = self.cleaned_data.get('phone')
-        user.country = self.cleaned_data.get('country')
-        user.user_type = self.cleaned_data.get('user_type')
-        user.set_password(self.cleaned_data["password1"])
-        user.site = Site.objects.get_current()
-        user.is_active = False
-        user.save()
-
-        if user.user_type == Customer.FREELANCER:
-            
-            FreelancerAccount.objects.get_or_create(user=user)[0]
-            PaymentAccount.objects.get_or_create(user=user)[0]
-
-            package = Package.objects.get_or_create(pk=1, type='Basic')[0]
-
-            team = Team.objects.get_or_create(
-                title=user.short_name,
-                notice="This is the basic team", 
-                created_by = user,
-                package = package,
-                package_status = Team.DEFAULT,
-                slug = slugify(user.short_name)
-            )[0]
-            team.save()
-            team.members.add(user)
-            
-            freelancer = Freelancer.objects.get_or_create(user=user)[0]
-            freelancer.active_team_id = team.id
-            freelancer.save()
-
-            Invitation.objects.get_or_create(
-                team=team, sender=user, email=user.email, 
-                type=Invitation.INTERNAL,
-            )[0]
-
-        if user.user_type == Customer.CLIENT:
-            Client.objects.get_or_create(user=user)[0]
-            ClientAccount.objects.get_or_create(user=user)[0]
-            
-        db_transaction.on_commit(lambda: new_user_registration(user, user.email))
+        try:
+            user = Customer.objects.create_merchant_user(
+                email=self.cleaned_data.get('email'), 
+                first_name = self.cleaned_data.get("first_name"),
+                last_name = self.cleaned_data.get('last_name'), 
+                short_name = self.cleaned_data.get('short_name'),
+                country = self.cleaned_data.get('country'),
+                user_type = self.cleaned_data.get('user_type'),
+                phone = self.cleaned_data.get('phone'),
+                password = self.cleaned_data.get("password1"),
+            )
+            db_transaction.on_commit(lambda: new_user_registration(user))
+        except Exception as e:
+            error = str(e)
+            raise ValidationError(f"{error}")
 
         return user
 
@@ -210,13 +182,15 @@ class MerchantRegisterForm(forms.ModelForm):
         if a.count():
             raise forms.ValidationError(_("Business name already taken"))
         return business_name
-    
+
+
     def clean_country(self):
         country = self.cleaned_data['country']
         if not country:
             raise forms.ValidationError(_("Country of business required"))
         return country
-    
+
+
     def clean_phone(self):
         phone = self.cleaned_data['phone']
         if not phone:

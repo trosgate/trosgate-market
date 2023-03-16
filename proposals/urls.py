@@ -7,7 +7,8 @@ app_name = 'proposals'
 
 urlpatterns = [     
     #Urls for proposals table
-    path('', views.proposal_listing, name='proposal_list'),
+    path('', views.create_proposal, name='create_proposal'),
+    path('list', views.proposal_listing, name='proposal_list'),
     path('proposal_filter/', views.proposal_filter, name='proposal_filter'),
     path('active-proposals/', views.active_proposal, name='active_proposal'),
     path('review-proposals/', views.review_proposal, name='review_proposal'),

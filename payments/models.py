@@ -17,6 +17,7 @@ class PaymentAccount(models.Model):
         (BANK, _('Bank Account')),
     )  
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='paymentaccount', on_delete=models.PROTECT,)
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='paymentaccountmerchant', on_delete=models.PROTECT,)
     primary_account_type = models.ForeignKey('general_settings.PaymentGateway', verbose_name=_('Account Type'), related_name='paymntaccountgateway', null=True, blank=True, on_delete=models.SET_NULL,)
     
     paypal_account = encrypt(models.CharField(_("Bearer Account/Email"), max_length=100, help_text=_(

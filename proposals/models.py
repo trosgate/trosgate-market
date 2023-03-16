@@ -14,6 +14,8 @@ from uuid import uuid4
 from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta
 from contract.models import InternalContract
+from django.urls import reverse
+
 
 def proposal_images_path(instance, filename):
     return "proposal/%s/%s" % (instance.team.title, filename)
@@ -81,7 +83,7 @@ class Proposal(models.Model):
     sample_link = models.URLField(_("Sample Website"), max_length=2083, help_text=_("the link must be a verified url"), null=True, blank=True)
     status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=REVIEW)
     # Main body content
-    description = RichTextField(verbose_name=_("Description"), max_length=3500, error_messages={"name": {"max_length": _("Description field is required")}},)
+    description = models.TextField(verbose_name=_("Description"), max_length=3500, error_messages={"name": {"max_length": _("Description field is required")}},)
     faq_one = models.CharField(_("FAQ #1"), max_length=100)
     faq_one_description = models.TextField(_("FAQ #1 Details"), max_length=255)
     faq_two = models.CharField(_("FAQ #2"), max_length=100, null=True, blank=True)
@@ -94,13 +96,13 @@ class Proposal(models.Model):
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     dura_converter = models.CharField(_("Duration"), max_length=100, choices=DURATION_CONVERTER, default=ONE_DAY)
     thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
-    progress = models.PositiveIntegerField(_("% Progress"), default=0, help_text=_("Proposal Progress"), validators=[MinValueValidator(10), MaxValueValidator(100)])
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     published = models.BooleanField(_("Published"), choices=((False, 'Private'), (True, 'Public')), default=False)
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="proposalauthor", on_delete=models.CASCADE)
     reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='proposalmerchant', on_delete=models.PROTECT)
     objects = models.Manager()
     active = ActiveProposals()
 
@@ -116,6 +118,10 @@ class Proposal(models.Model):
         return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.thumbnail))
 
     image_tag.short_description = 'thumbnail'
+
+    # absolute url for tender detail page
+    def proposal_absolute_url(self):
+        return reverse('proposals:proposal_preview', kwargs={'short_name': self.created_by.short_name, 'proposal_slug':self.slug})
 
     def tracking_time(self):
         return sum(tracker.minutes for tracker in self.trackings.all())

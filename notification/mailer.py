@@ -52,7 +52,7 @@ def two_factor_auth_mailer(user, pass_code):
 
 #
 # Utility function for sending new signup
-def new_user_registration(user, user_email):
+def new_user_registration(user):
     from_email = get_from_email()
     subject = 'Activate your Account'
     subtitle = f'Welcome to {website_name()}'
@@ -74,7 +74,7 @@ def new_user_registration(user, user_email):
         'token': account_activation_token.make_token(user),        
     })
 
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [user_email])
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 

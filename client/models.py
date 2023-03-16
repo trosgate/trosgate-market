@@ -8,8 +8,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from account.fund_exception import FundException
 from general_settings.fund_control import get_max_deposit, get_min_deposit, get_max_depositor_balance, get_min_depositor_balance
-# from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+
 
 
 class Client(models.Model):
@@ -26,6 +26,12 @@ class Client(models.Model):
         verbose_name=_("Client"), 
         related_name="clients", 
         on_delete=models.CASCADE
+    )
+    merchant = models.ForeignKey(
+        'account.Merchant', 
+        verbose_name=_('Merchant'), 
+        related_name='clientmerchant', 
+        on_delete=models.PROTECT
     )
     gender = models.CharField(
         _("Gender"), 
@@ -138,7 +144,17 @@ class Client(models.Model):
 
 
 class ClientAccount(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='clientfunduser', on_delete=models.PROTECT,)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, 
+        related_name='clientfunduser', 
+        on_delete=models.PROTECT,
+    )
+    merchant = models.ForeignKey(
+        'account.Merchant', 
+        verbose_name=_('Merchant'), 
+        related_name='clientactmerchant', 
+        on_delete=models.PROTECT
+    )    
     debug_balance = models.PositiveIntegerField(_("Pending Balance"), default=0)
     available_balance = models.PositiveIntegerField(_("Account Balance"), default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -230,7 +246,18 @@ class ClientAccount(models.Model):
 
 
 class ClientAction(models.Model):
-    account = models.ForeignKey(ClientAccount, verbose_name=_("Account"), related_name="clientfundaccount", on_delete=models.PROTECT)
+    account = models.ForeignKey(
+        ClientAccount, 
+        verbose_name=_("Account"), 
+        related_name="clientfundaccount", 
+        on_delete=models.PROTECT
+    )
+    merchant = models.ForeignKey(
+        'account.Merchant', 
+        verbose_name=_('Merchant'), 
+        related_name='merchantaction', 
+        on_delete=models.PROTECT
+    )    
     narration = models.CharField(_("Narration"), max_length=100, blank=True, null=True)
     amount = models.PositiveIntegerField(_("Amount"), default=0,)
     deposit_fee = models.PositiveIntegerField(_("Deposit Fee"), default=0,)

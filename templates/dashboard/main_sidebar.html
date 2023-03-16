@@ -22,6 +22,9 @@
 							{% if request.user.clients %}
 							<img src="{% if request.user.clients.profile_photo %}{{request.user.clients.profile_photo.url}}{% endif %}" alt="image description"/>
 							{% endif  %}
+							{% if request.user.merchant %}
+							<img src="{% if request.user.merchant.profile_photo %}{{request.user.merchant.profile_photo.url}}{% endif %}" alt="image description"/>
+							{% endif  %}
 						</figure>
 						<div class="wt-title">
 							<h2><a href="{{freelancer_profile.freelancer_profile_absolute_url}}"> {{request.user.short_name}}</a></h2>
@@ -29,7 +32,7 @@
 						<div class="wt-btnarea">
 							{% if request.user.freelancer %}
 							{% if active_team.status == 'active' %}
-							<a href="{% url 'proposals:proposal_step_one' %}" class="wt-btn">Proposal</a>
+							<a href="{% url 'proposals:create_proposal' %}" class="wt-btn">Proposal</a>
 							{% endif %}
 							{% elif request.user.clients %}
 							<a href="{% url 'projects:create_project' %}" class="wt-btn">New Job</a>

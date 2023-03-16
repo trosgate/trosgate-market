@@ -95,8 +95,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
-    'analytics.middleware.Middleware',
     'account.middleware_test.MerchantGateMiddleware',
+    'analytics.middleware.Middleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'account.backend.CustomAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 
@@ -292,7 +297,10 @@ NGINX_DOMAINS_MAP_FILE = '/etc/nginx/domains.map'
 
 # accounts
 MERCHANT_GATE_ALLOW_LIST = [
-    "/account/logout/",
-    "/tickets/",
-    "/subscriptions/",
+    "/logout/",
+    "/marketing/support",
+    "/marketing/articles",
+    "/pages/how-it-works",
+    "/pages/about-us",
+    "/pages/terms-and-conditions",
 ]

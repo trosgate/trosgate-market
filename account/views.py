@@ -44,14 +44,14 @@ from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 from control_settings.utilities import homepage_layout
 from contract.models import Contract
-from django.conf import UserSettingsHolder
+from .backend import CustomAuthBackend
 
 
 @login_required
 def remove_message(request):
     return HttpResponse("")
 
-    
+
 def subscribers(request):
     return render(request, 'account/subscriber.html', {})
 
@@ -161,13 +161,13 @@ def searchtype(request):
         return JsonResponse({'searchvalue':searchvalue})
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def loginView(request):
 
     # Admin is exempted from two step verification via sms
     # Otherwise if there is server error in sms sending, admin is also lock out 
-    # To still make it secure, user must be STAFF and must be ACTIVE before login 
-    session = request.session
+    # TODO to have a token authenticator separate for admin and staffs
+    #  
 
     loginform = UserLoginForm(request.POST or None)
     if request.method == 'POST':
@@ -175,72 +175,13 @@ def loginView(request):
         password = request.POST.get('password')
         
         user = authenticate(request, email=email, password=password)
-
-        if user is not None and user.is_admin:
-             
-            login(request, user)
-
-            messages.info(request, f'Welcome back {user.get_short_name()}')
-
-            return redirect('/admin')
-
-        # Checks for freelancer and redirect to 2FA or otherwise
-        if user is not None and user.is_freelancer and get_sms_feature():
-
-            if "twofactoruser" not in session:
-                session["twofactoruser"] = {"user_pk": user.pk}
-                session.modified = True
-                return redirect('account:two_factor_auth')
-
-            return redirect('account:two_factor_auth')
-
-        if user is not None and user.is_freelancer and not get_sms_feature():
-            
-            login(request, user)
-
-            messages.info(request, f'Welcome back {user.get_short_name()}')
-
-            return redirect('account:dashboard')
-                            
-        if user is not None and user.is_merchant and get_sms_feature():
-
-            if "twofactoruser" not in session:
-                session["twofactoruser"] = {"user_pk": user.pk}
-                session.modified = True
-                return redirect('account:two_factor_auth')
-
-            return redirect('account:two_factor_auth')
-
-        if user is not None and user.is_merchant and not get_sms_feature():
-            
-            login(request, user)
-
-            messages.info(request, f'Welcome back {user.get_short_name()}')
-
-            return redirect('account:dashboard')                    
-
-        if user is not None and request.user.is_client and get_sms_feature():
-
-            if "twofactoruser" not in session:
-                session["twofactoruser"] = {"user_pk": user.pk}
-                session.modified = True
-                return redirect('account:two_factor_auth')
-
-            return redirect('account:two_factor_auth')
-
-        if user is not None and request.user.is_client and not get_sms_feature():            
-            
-            login(request, user)
-
-            messages.info(request, f'Welcome back {user.get_short_name()}')
-
-            return redirect('account:dashboard')
-        # else:
-        messages.error(request, f'Invalid email or Password.')           
+        auth_backend = CustomAuthBackend()
+        return auth_backend.user_type_redirect(request, user)  
         
     else:
         loginform = UserLoginForm()
-            
+
+
     context = {
         'loginform': loginform
     }
@@ -276,15 +217,9 @@ def two_factor_auth(request):
         if pass_code == received_code:
             returned_user.save()
 
-            login(request, user)
+            login(request, user, backend='account.backend.CustomAuthBackend')
 
-            messages.info(request, f'Welcome back {request.user.short_name}')
-
-            invitation = Invitation.objects.filter(email=request.user.email, status=Invitation.INVITED)
-
-            if invitation:
-                messages.info(
-                    request, f'Hi "{request.user.short_name}", you have a pending team invite. Please check your inbox for verification code')
+            messages.info(request, f'Welcome back {request.user.get_short_name()}')
 
             return redirect("account:dashboard")
 
@@ -460,6 +395,10 @@ def user_dashboard(request):
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
         base_currency = get_base_currency_symbol()
+        # current_site = get_current_site(request)
+        # print('User:', 'Sitee ID:', current_site,'Merchant ID:', request.user.site)
+
+        # print(path)
         context = {
             'open_projects': open_projects,
             'closed_projects': closed_projects,
@@ -472,11 +411,11 @@ def user_dashboard(request):
 
 
     if request.user.is_merchant:
+        curr_site = Site.objects.get_current()
         merchant_profile = Merchant.objects.get(merchant=request.user)
-        merchant_p = Merchant.objects.all().count()
-        merchant_d = Merchant.curr_merchant.all().count()
-        # print('merchant_p :', merchant_p, request.site)
-        # print('merchant_d :', merchant_d)
+        merchant_prof = Merchant.objects.get(site=curr_site)
+        print('merchant_prof', merchant_prof, merchant_prof.package.type)
+
         # proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
         # open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
         # closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
@@ -494,6 +433,6 @@ def user_dashboard(request):
 
 
     if request.user.is_admin:
-        messages.info(request, f'Welcome back {request.user.short_name}')
+        messages.info(request, f'Welcome back {request.user.get_short_name()}')
 
         return redirect('/admin/')

@@ -82,9 +82,8 @@ class MerchantGateMiddleware:
         request.merchant = None
         if request.user.is_authenticated and request.user.user_type == 'merchant':
 
-            sitee = Site.objects.get_current()
-            request.merchant = Merchant.curr_merchant.first()
-            print('request.sitee :', sitee, request.merchant.site)
+            request.merchant = Merchant.objects.filter(merchant=request.user).first()
+            
             gate_url = reverse("account:dashboard") # subscriptions:complete
             if (
                 request.merchant.type in Merchant.ACTIVE_TYPES
@@ -95,6 +94,7 @@ class MerchantGateMiddleware:
 
             return HttpResponseRedirect(gate_url)
         return self.get_response(request)
+
 
     def is_granted_passage(self, path):
         """Check if the request is allowed against the allow list."""

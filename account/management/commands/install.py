@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from account.models import Country, Customer
+from account.models import Country, Package, Customer
 from general_settings . models import (
     WebsiteSetting, Category, Department, Size, PaymentsControl, 
     SubscriptionGateway, DepositControl, ProposalGuides, Mailer,
@@ -9,7 +9,7 @@ from general_settings . models import (
     AutoLogoutSystem, ExachangeRateAPI
 )
 from control_settings.models import LayoutSetting
-from teams . models import Package, Team, Invitation
+from teams . models import Team, Invitation
 from proposals . models import Proposal
 from projects.models import Project
 from analytics.models import NewStats

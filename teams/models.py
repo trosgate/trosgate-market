@@ -45,14 +45,15 @@ class Team(models.Model):
         (ACTIVE, 'Active')
     )
 
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='teammerchant', on_delete=models.PROTECT)
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
+    
     title = models.CharField(_("Title"), max_length=100, unique=True)
     notice = models.TextField(_("Notice"), max_length=500)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
     status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=INACTIVE)
-    package = models.ForeignKey("account.Package", related_name='teams', on_delete=models.CASCADE)
     package_status = models.CharField(_("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     slug = models.SlugField(_("Slug"), max_length=100, editable=True)
@@ -122,7 +123,7 @@ class Invitation(models.Model):
         (INVITED, _('Invited')),
         (ACCEPTED, _('Accepted'))
     )
-
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='merchantinvite', on_delete=models.PROTECT)
     team = models.ForeignKey(Team, verbose_name=_("Team"), related_name='invitations', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.PROTECT) #CASCADE
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
