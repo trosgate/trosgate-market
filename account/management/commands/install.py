@@ -38,104 +38,104 @@ class Command(BaseCommand):
         
         # INITIAL DATABASE POPULATOR STARTS
         if not Country.objects.count():
-            call_command("loaddata", "db_countries.json")
+            call_command("loaddata", "fixures/db_countries.json")
 
         if not NewStats.objects.count():
-            call_command("loaddata", "db_statistics.json")
+            call_command("loaddata", "fixures/db_statistics.json")
 
         if not AutoTyPist.objects.count():
-            call_command("loaddata", "db_autotypist.json")
+            call_command("loaddata", "fixures/db_autotypist.json")
 
         if not Customer.objects.count():
-            call_command("loaddata", "db_admin_auth.json")
+            call_command("loaddata", "fixures/db_admin_auth.json")
 
         if not LayoutSetting.objects.count():
-            call_command("loaddata", "db_layout.json")
+            call_command("loaddata", "fixures/db_layout.json")
 
         if not WebsiteSetting.objects.count():
-            call_command("loaddata", "db_admin_settings.json")
+            call_command("loaddata", "fixures/db_admin_settings.json")
 
         if not StorageBuckets.objects.count():
-            call_command("loaddata", "db_storage.json")
+            call_command("loaddata", "fixures/db_storage.json")
 
         if not TestEmail.objects.count():
-            call_command("loaddata", "db_testmail.json")
+            call_command("loaddata", "fixures/db_testmail.json")
 
         if not PaymentAPIs.objects.count():
-            call_command("loaddata", "db_paymentapis.json")
+            call_command("loaddata", "fixures/db_paymentapis.json")
 
         if not AutoLogoutSystem.objects.count():
-            call_command("loaddata", "db_autologout.json")
+            call_command("loaddata", "fixures/db_autologout.json")
 
         if not PaymentGateway.objects.count():
-            call_command("loaddata", "db_payment_gateways.json")
+            call_command("loaddata", "fixures/db_payment_gateways.json")
 
         if not SubscriptionGateway.objects.count():
-            call_command("loaddata", "db_subscriptionplan.json")
+            call_command("loaddata", "fixures/db_subscriptionplan.json")
 
         if not DepositGateway.objects.count():
-            call_command("loaddata", "db_deposit.json")
+            call_command("loaddata", "fixures/db_deposit.json")
 
         if not Category.objects.count():
-            call_command("loaddata", "db_categories.json")
+            call_command("loaddata", "fixures/db_categories.json")
 
         if not Skill.objects.count():
-            call_command("loaddata", "db_skills.json")
+            call_command("loaddata", "fixures/db_skills.json")
 
         if not Size.objects.count():
-            call_command("loaddata", "db_business_size.json")
+            call_command("loaddata", "fixures/db_business_size.json")
 
         if not Department.objects.count():
-            call_command("loaddata", "db_department.json")
+            call_command("loaddata", "fixures/db_department.json")
         
         if not ProposalGuides.objects.count():
-            call_command("loaddata", "db_instructions.json")
+            call_command("loaddata", "fixures/db_instructions.json")
 
         if not DiscountSystem.objects.count():
-            call_command("loaddata", "db_discount_system.json")
+            call_command("loaddata", "fixures/db_discount_system.json")
 
         if not HiringFee.objects.count():
-            call_command("loaddata", "db_freelancer_fee.json")
+            call_command("loaddata", "fixures/db_freelancer_fee.json")
 
         if not Currency.objects.count():
-            call_command("loaddata", "db_currencies.json")
+            call_command("loaddata", "fixures/db_currencies.json")
         
         if not ExachangeRateAPI.objects.count():
-            call_command("loaddata", "db_currexchangerate.json")
+            call_command("loaddata", "fixures/db_currexchangerate.json")
 
         if not PaymentsControl.objects.count():
-            call_command("loaddata", "db_fund_control.json")
+            call_command("loaddata", "fixures/db_fund_control.json")
 
         if not DepositControl.objects.count():
-            call_command("loaddata", "db_deposit_control.json")
+            call_command("loaddata", "fixures/db_deposit_control.json")
 
         if not Payday.objects.count():
-            call_command("loaddata", "db_payday.json")
+            call_command("loaddata", "fixures/db_payday.json")
 
         if not Mailer.objects.count():
-            call_command("loaddata", "db_mailer.json")
+            call_command("loaddata", "fixures/db_mailer.json")
 
         if not Package.objects.count():
-            call_command("loaddata", "db_packages.json")
+            call_command("loaddata", "fixures/db_packages.json")
 
-        if not TermsAndConditions.objects.count():
-            call_command("loaddata", "db_termsandcond.json")
+        # if not TermsAndConditions.objects.count():
+        #     call_command("loaddata", "db_termsandcond.json")
 
         if not Hiring.objects.count():
-            call_command("loaddata", "db_howitworkhiring.json")
+            call_command("loaddata", "fixures/db_howitworkhiring.json")
         
         if not Freelancing.objects.count():
-            call_command("loaddata", "db_howitworkfreelancing.json")
+            call_command("loaddata", "fixures/db_howitworkfreelancing.json")
 
         if not AboutUsPage.objects.count():
-            call_command("loaddata", "db_aboutus.json")
+            call_command("loaddata", "fixures/db_aboutus.json")
 
         # INITIAL DATABASE POPULATOR ENDS
 
         # FIXURE OBJECTS INSERTION STARTS FROM HERE
 
-        # if not Freelancer.objects.count():
-        #     call_command("loaddata", "db_freelancer_auth.json")
+        if not Freelancer.objects.count():
+            call_command("loaddata", "fixures/db_freelancer_auth.json")
 
         # customers = Customer.objects.filter(user_type='freelancer')
         # teams = Team.objects.all()
