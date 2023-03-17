@@ -1,0 +1,36 @@
+<!-- Add the following script tag to your <head> section to load Stripe JS library -->
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <!-- Add the following HTML form for collecting payment details -->
+  <form hx-post="{% url 'stripe_checkout' %}" hx-trigger="submit" hx-target="#payment-form" hx-vals=".validate">
+    {% csrf_token %}
+    <input type="hidden" name="amount" value="{{ amount }}" />
+    <input type="hidden" name="currency" value="{{ currency }}" />
+    <div>
+      <label for="name">Name on card</label>
+      <input type="text" name="name" required class="validate" />
+      <span class="error" hx-target="#name-error"></span>
+    </div>
+    <div>
+      <label for="card_number">Card number</label>
+      <input type="text" name="card_number" required class="validate" />
+      <span class="error" hx-target="#card-number-error"></span>
+    </div>
+    <div>
+      <label for="expiry_month">Expiry month</label>
+      <input type="text" name="expiry_month" required class="validate" />
+      <span class="error" hx-target="#expiry-month-error"></span>
+    </div>
+    <div>
+      <label for="expiry_year">Expiry year</label>
+      <input type="text" name="expiry_year" required class="validate" />
+      <span class="error" hx-target="#expiry-year-error"></span>
+    </div>
+    <div>
+      <label for="cvv">CVV</label>
+      <input type="text" name="cvv" required class="validate" />
+      <span class="error" hx-target="#cvv-error"></span>
+    </div>
+    <button type="submit">Pay Now</button>
+  </form>
+    
