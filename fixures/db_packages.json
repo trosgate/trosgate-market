@@ -1,34 +1,50 @@
 [
     {
-      "pk": 1, 
-      "model": "teams.Package", 
-      "fields": {
-        "type": "Basic", 
-        "max_member_per_team": "1", 
-        "monthly_offer_contracts_per_team": "10", 
-        "max_proposals_allowable_per_team": "5",
-        "monthly_projects_applicable_per_team": "10",
-        "daily_Handshake_mails_to_clients": "0",
-        "price": "0",
-        "status": "STARTER",
-        "is_default": true,
-        "ordering": 1
-      }
-    }, 
+        "model": "account.package",
+        "pk": 1,
+        "fields": {
+            "type": "Basic",
+            "verbose_type": "Startup",
+            "max_member_per_team": 2,
+            "monthly_offer_contracts_per_team": 0,
+            "max_proposals_allowable_per_team": 5,
+            "monthly_projects_applicable_per_team": 10,
+            "daily_Handshake_mails_to_clients": 0,
+            "price": 5,
+            "is_default": true,
+            "ordering": 1
+        }
+    },
     {
-      "pk": 2, 
-      "model": "teams.Package", 
-      "fields": {
-        "type": "Team", 
-        "max_member_per_team": "2", 
-        "monthly_offer_contracts_per_team": "25", 
-        "max_proposals_allowable_per_team": "15",
-        "monthly_projects_applicable_per_team": "25",
-        "daily_Handshake_mails_to_clients": "0",
-        "price": "10",
-        "status": "MOST_ORDERED",
-        "is_default": false,
-        "ordering": 2
-      }
+        "model": "account.package",
+        "pk": 2,
+        "fields": {
+            "type": "Team",
+            "verbose_type": "Agency",
+            "max_member_per_team": 3,
+            "monthly_offer_contracts_per_team": 20,
+            "max_proposals_allowable_per_team": 20,
+            "monthly_projects_applicable_per_team": 20,
+            "daily_Handshake_mails_to_clients": 0,
+            "price": 20,
+            "is_default": false,
+            "ordering": 2
+        }
+    },
+    {
+        "model": "account.package",
+        "pk": 3,
+        "fields": {
+            "type": "Enterprise",
+            "verbose_type": "Enterprise",
+            "max_member_per_team": 5,
+            "monthly_offer_contracts_per_team": 50,
+            "max_proposals_allowable_per_team": 50,
+            "monthly_projects_applicable_per_team": 50,
+            "daily_Handshake_mails_to_clients": 0,
+            "price": 30,
+            "is_default": false,
+            "ordering": 3
+        }
     }
-] 
+]

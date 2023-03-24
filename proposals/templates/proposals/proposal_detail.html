@@ -15,14 +15,14 @@
 								<ol class="wt-breadcrumb">
 									<li><a href="{% url 'account:dashboard' %}" class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o"></i> Dashboard</a></li>
 									{% if active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'active' %}
-									<li><a href="{% url 'proposals:modify_proposal_step_one' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
+									<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
 									<li><a href="{% url 'proposals:archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Archive</a></li>
 									{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'review' %}
 									<li><a href="javascript:void(0);" class="btn btn-success btn-sm"><i class="fas fa-spinner fa-spin"></i> Reviewing</a></li>
 									{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'archived' %}
 									<li><a href="{% url 'proposals:reactivate_archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm"><i class="fa fa-window-restore"></i> Restore</a></li>
 									{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'modify' %}
-									<li><a href="{% url 'proposals:modify_proposal_step_one' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
+									<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
 									{% endif %}
 								</ol>
 								{% endif %}

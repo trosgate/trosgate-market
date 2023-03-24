@@ -1,311 +1,308 @@
+
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-primary px-5 d-none d-lg-block">
+        <div class="row gx-0">
+            <div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center" style="height: 45px;">
+                    <small class="me-3 text-light"><i class="fa fa-building me-2"></i>&nbsp; 123 Street, New York, USA &nbsp;&nbsp;</small>
+                    <small class="me-3 text-light"><i class="fa fa-phone me-2"></i>&nbsp; +012 345 6789 &nbsp;&nbsp;</small>
+                    <small class="me-3 text-light"><i class="fa fa-envelope-open me-2"></i>&nbsp; info@example.com &nbsp;&nbsp;</small>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center text-lg-end">
+                <div class="d-inline-flex align-items-center" style="height: 45px;">
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-twitter fw-normal"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-facebook-f fw-normal"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-linkedin-in fw-normal"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-instagram fw-normal"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href=""><i class="fab fa-youtube fw-normal"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
 {% extends "dashboard/main_base.html" %}
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
 
-			{% if home_layout.banner_type == True %}
-			<div class="wt-haslayout wt-bannerholder">
-				<div class="container">
-					<div class="row">
-						<div class="col-12 col-sm-12 col-md-12 col-lg-5">
-							<div class="wt-bannerimages">
-								<figure class="wt-bannermanimg" data-tilt>
-									<img src="{% static 'images/bannerimg/img-01.png' %}" alt="img description">
-									<img src="{% static 'images/bannerimg/img-02.png' %}" class="wt-bannermanimgone" alt="img description">
-									<img src="{% static 'images/bannerimg/img-03.png' %}" class="wt-bannermanimgtwo" alt="img description"> 
-								</figure>
-							</div>
-						</div>
-
-						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-7">
-							<div class="wt-bannercontent">
-								<div class="wt-bannerhead">
-									<div class="wt-title">
-										<h2 style="color:white">{% if home_layout.title_block %}{{home_layout.title_block}}{% endif %}</h2>
-										<h2 style="color:white">in {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
+		
+		{% if request.parent %}
+		<header class="bg-red py-5" style="background-color:{% firstof home_layout.banner_color purple %};">
+			<div class="container px-5">
+				<div class="row gx-5 align-items-center justify-content-center">
+					<div class="col-lg-8 col-xl-7 col-xxl-6">
+						<div class="my-5 text-center text-xl-start">
+							<h1 class="display-5 fw-bolder text-white mb-2">{% if home_layout.title_block %}{{home_layout.title_block}} {% endif %}</h1>
+							<p class="lead fw-normal text-white-50 mb-4" style="color:white;">{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}} {% endif %}.</p>
+							<h3 style="color:white">in {% if pypist %}<span class="autoTyper" style="color:yellow;"></span>{% endif %}</h3>
+							<form class="wt-formtheme wt-formbanner">{% csrf_token %}
+								<fieldset>
+									<div class="form-group">
+										{{searchform.search_type}}
 									</div>
-									<div class="wt-description">
-										<p>{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}}{% endif %}.</p>
-									</div>
-								</div>
-								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
-									<fieldset>
-										<div class="form-group">
-											{{searchform.search_type}}
-										</div>
-									<fieldset>
-								</form>
-								{% if home_layout.video_url or website.embed_video %}
-								<div class="wt-videoholder">
-									<div class="wt-videoshow">
-										<a data-rel="prettyPhoto[video]" href="{% if home_layout.video_url %}{{home_layout.video_url}}{% endif %}"><i class="fa fa-play"></i></a>
-									</div>
-									<div class="wt-videocontent">
-										<span>{% if home_layout.video_title %}{{home_layout.video_title}}{% endif %}<em>How it works &amp; {% if home_layout.video_description %}{{home_layout.video_description}} {% endif %}.</em></span>
-									</div>
-								</div>
-								{% endif %}
+								<fieldset>
+							</form><br>
+							<div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+								<a class="btn btn-{% firstof home_layout.banner_button_one_color blue %} btn-lg px-4 me-sm-3 text-white" href="{% url 'account:login' %}" style="margin:5px;">Get Started</a>
+								<a class="btn btn-outline-{% firstof home_layout.banner_button_two_color blue %} btn-lg px-4" href="{% url 'pages:how_it_works' %}" style="margin:2px;">Learn More</a>
 							</div>
 						</div>
 					</div>
+					<div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if home_layout.banner_image %}{{home_layout.banner_image.url}}{% endif %}" alt="Hero banner"/></div>
 				</div>
 			</div>
-			{% else %}
-			<header class="bg-red py-5" style="background-color:{% firstof home_layout.banner_color purple %};">
-				<div class="container px-5">
-					<div class="row gx-5 align-items-center justify-content-center">
-						<div class="col-lg-8 col-xl-7 col-xxl-6">
-							<div class="my-5 text-center text-xl-start">
-								<h1 class="display-5 fw-bolder text-white mb-2">{% if home_layout.title_block %}{{home_layout.title_block}} {% endif %}</h1>
-								<p class="lead fw-normal text-white-50 mb-4" style="color:white;">{% if home_layout.subtitle_block %}{{home_layout.subtitle_block}} {% endif %}.</p>
-								<h3 style="color:white">in {% if pypist %}<span class="autoTyper" style="color:yellow;"></span>{% endif %}</h3>
-								<form class="wt-formtheme wt-formbanner">{% csrf_token %}
-									<fieldset>
-										<div class="form-group">
-											{{searchform.search_type}}
-										</div>
-									<fieldset>
-								</form><br>
-								<div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
-									<a class="btn btn-{% firstof home_layout.banner_button_one_color blue %} btn-lg px-4 me-sm-3 text-white" href="{% url 'account:login' %}" style="margin:5px;">Get Started</a>
-									<a class="btn btn-outline-{% firstof home_layout.banner_button_two_color blue %} btn-lg px-4" href="{% url 'pages:how_it_works' %}" style="margin:2px;">Learn More</a>
-								</div>
-							</div>
-						</div>
-						<div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if home_layout.banner_image %}{{home_layout.banner_image.url}}{% endif %}" alt="Hero banner"/></div>
-					</div>
-				</div>
-			</header>
-			{% endif %}
+		</header>
+		{% endif %}
 
-			<!--Main Start-->
-			<main class="wt-haslayout" style="background:white;">
-				<!--Gateways Start-->
-				{% if home_layout.show_gateways == True %}
-				<section class="wt-haslayout wt-main-section">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-								<div class="wt-sectionhead wt-textcenter">
-									<h3>{% if home_layout.gateway_title %}{{home_layout.gateway_title}}{% endif %}</h3>
-								</div>
-							</div>
-							<div class="wt-categoryexpl">
-								<div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
-									<div class="row">
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span><i class="far fa-money-bill-alt fa-4x" style="color:green;"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Stripe Checkout</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span><i class="fa fa-paypal fa-4x" style="color:blue;"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Paypal Checkout</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>												
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span style="color:orange;"><i class="fa fa-balance-scale fa-4x"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Razorpay Checkout</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>	
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span><i class="fa fa-mobile fa-4x" style="color:violet;"></i><span><i class="fa fa-check fa-2x" style="color:violet;"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Africa's Momo (Flutterwave)</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>	
-									</div>
-								</div>	
-							</div>
-						</div>
-					</div>
-				</section>
-				{% endif %}
-
-				<div class="container">
-					<section class="wt-haslayout wt-dbsectionspace">
-						<div class="row justify-content-md-center">				
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
-								<div class="wt-dashboardbox">
-									<div id="pricing" class="wt-sectionhead wt-textcenter">
-										<h3>Become a Merchant Today</h3>
-									</div>
-									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-										<div id="packaging" class="wt-dashboardboxcontent wt-packages">
-											<div class="wt-package wt-packagedetails">
-												<div class="wt-packagehead"></div>
-												<div class="wt-packagecontent">
-													<ul class="wt-packageinfo">
-														<li class="wt-packageprices"><span>Price</span></li>
-														<li><span>Group Chat</span></li>
-														<li><span>Fund Transfer - Within Team</span></li>
-														<li><span>Member Per Team</span></li>
-														<li><span>Monthly Contracts Per Team</span></li>
-														<li><span>Max Proposals Per Team</span></li>
-														<li><span>Monthly Application Per Team</span></li>
-													</ul>
-													<span style="font-weight:bold;">Build Marketplace in minutes</span>
-												</div>
-											</div>
-											{% for package in packages %}
-											<div class="wt-package wt-baiscpackage">
-												<div class="wt-packagehead">
-													<h3>{% firstof package.verbose_type package.get_type_display %}</h3>
-													{% comment %} <span>{{package.get_status_display}}</span> {% endcomment %}
-												</div>
-												<div class="wt-packagecontent">
-													<ul class="wt-packageinfo">
-														<li class="wt-packageprice"><span><sup>{{base_currency_symbol}}</sup> {{package.price}} <sub>\ Month</sub></span></li>
-														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
-														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
-														<li><span><em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.max_member_per_team}} </em></span></li>
-														<li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.monthly_offer_contracts_per_team}} </em> {% else %} <i class="ti-na">.</i>{% endif %}</span></li>
-														<li><span>{% if package.max_proposals_allowable_per_team > 0 %} <em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.max_proposals_allowable_per_team}} </em> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
-														<li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <em class="badge badge-success badge-sm" style="background:green; color:white; border-radius:50%;">{{package.monthly_projects_applicable_per_team}} </em> {% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
-													</ul>
-													<div>
-														<a href="{% url 'account:create_merchant' package.type %}" class="btn btn-success">30 Days Free, No Card</a>
-													</div>
-												</div>
-											</div>
-											{% endfor %}
-											
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</section>
-				</div>
-				
+		
+		<!--Main Start-->
+		<main class="wt-haslayout" style="background:white;">
+			<!--Gateways Start-->
+			{% if home_layout.show_gateways == True %}
+			<section class="wt-haslayout wt-main-section">
 				<div class="container">
 					<div class="row justify-content-md-center">
-						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
-							<figure class="wt-mobileimg">
-								<img src="{% if home_layout.promo_image %}{{home_layout.promo_image.url}}{% else %}{% static 'images/work/img-03.jpg' %}{% endif %}" alt="img description">
-							</figure>
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-sectionhead wt-textcenter">
+								<h3>{% if home_layout.gateway_title %}{{home_layout.gateway_title}}{% endif %}</h3>
+							</div>
 						</div>
-						<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
-							<div class="wt-experienceholder">
-								<div class="wt-sectionhead">
-									<div class="wt-sectiontitle">
-										<h3>{% if home_layout.promo_title %}{{home_layout.promo_title}}{% endif %}</h3>
-										<span>{% if home_layout.promo_subtitle %}{{home_layout.promo_subtitle}}{% endif %}</span>
+						<div class="wt-categoryexpl">
+							<div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+								<div class="row">
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<span><i class="far fa-money-bill-alt fa-4x" style="color:green;"></i></span>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Stripe Checkout</strong></span>
+												</div>													
+											</div>	
+										</div>
 									</div>
-									<div class="wt-description">
-										<p>{% if home_layout.promo_description %}{{home_layout.promo_description|linebreaksbr}}{% endif %}</p>
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<span><i class="fa fa-paypal fa-4x" style="color:blue;"></i></span>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Paypal Checkout</strong></span>
+												</div>													
+											</div>	
+										</div>
+									</div>												
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<span style="color:orange;"><i class="fa fa-balance-scale fa-4x"></i></span>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Razorpay Checkout</strong></span>
+												</div>													
+											</div>	
+										</div>
+									</div>	
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<span><i class="fa fa-mobile fa-4x" style="color:violet;"></i><span><i class="fa fa-check fa-2x" style="color:violet;"></i></span>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<span><strong>Africa's Momo (Flutterwave)</strong></span>
+												</div>													
+											</div>	
+										</div>
+									</div>	
+								</div>
+							</div>	
+						</div>
+					</div>
+				</div>
+			</section>
+			{% endif %}
+
+
+			<!-- Pricing Plan Start -->
+			<div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
+				<div class="container py-5">
+					<div id="pricing" class="wt-sectionhead wt-textcenter">
+						<h3>Become a Merchant Today</h3>
+					</div>
+					<div class="row g-0">
+						{% for package in packages %}
+						{% if package.type == 'Basic' %}
+						<div class="col-lg-4 wow slideInUp" data-wow-delay="0.6s">
+							<div class="bg-light rounded">
+								<div class="border-bottom py-4 px-5 mb-4">
+									<h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+									<small class="text-uppercase">For Small Size Business</small>
+								</div>
+								
+								<div class="p-5 pt-0">
+									<h1 class="display-5 mb-3"> 
+										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+											class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+									</h1>
+									
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Offering:</span>
 									</div>
-									<div class="wt-btnarea">
-										<a href="{% url 'pages:how_it_works' %}" class="wt-btn">How it Works</a>
+									<div class="d-flex justify-content-between mb-3">
+										<span>SSL Certificate</span>{% if package.ssl_activation %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
 									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Change Domain</span>{% if package.can_change_domain %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Max Staff</span>{% if package.max_num_of_staff %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_num_of_staff}} </span>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Total Sitewide Users</span>{% if package.max_users_sitewide %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_users_sitewide}} </span>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Marketing:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Upselling Subscription</span>{% if package.can_upsell_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Multiple Teams Per Freelancer</span>{% if package.multiple_freelancer_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Ticket System</span><i class="fa fa-check text-primary pt-1"></i>
+									</div>
+									
+									<a href="{% url 'account:create_merchant' package.type %}" class="btn btn-primary py-2 px-4 mt-4">30 Days Free, No Card</a>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						{% if package.type == 'Team' %}
+						<div class="col-lg-4 wow slideInUp" data-wow-delay="0.3s">
+							<div class="bg-white rounded shadow position-relative" style="z-index: 1;">
+								<div class="border-bottom py-4 px-5 mb-4">
+									<h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+									<small class="text-uppercase">For Medium Size Business</small>
+								</div>
+								<div class="p-5 pt-0">
+									<h1 class="display-5 mb-3">
+										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+											class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+									</h1>
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Offering:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>SSL Certificate</span>{% if package.ssl_activation %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Change Domain</span>{% if package.can_change_domain %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Max Staff</span>{% if package.max_num_of_staff %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_num_of_staff}} </span>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Total Sitewide Users</span>{% if package.max_users_sitewide %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_users_sitewide}} </span>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Marketing:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Upselling Subscription</span>{% if package.can_upsell_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Multiple Teams Per Freelancer</span>{% if package.multiple_freelancer_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Ticket System</span><i class="fa fa-check text-primary pt-1"></i>
+									</div>
+									<a href="{% url 'account:create_merchant' package.type %}" class="btn btn-primary py-2 px-4 mt-4">30 Days Free, No Card</a>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						{% if package.type == 'Enterprise' %}
+						<div class="col-lg-4 wow slideInUp" data-wow-delay="0.9s">
+							<div class="bg-light rounded">
+								<div class="border-bottom py-4 px-5 mb-4">
+									<h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+									<small class="text-uppercase">For Large Size Business</small>
+								</div>
+								<div class="p-5 pt-0">
+									<h1 class="display-5 mb-3">
+										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+											class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+									</h1>
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Offering:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>SSL Certificate</span>{% if package.ssl_activation %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Change Domain</span>{% if package.can_change_domain %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Max Staff</span>{% if package.max_num_of_staff %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_num_of_staff}} </span>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Total Sitewide Users</span>{% if package.max_users_sitewide %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_users_sitewide}} </span>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Marketing:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Upselling Subscription</span>{% if package.can_upsell_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Multiple Teams Per Freelancer</span>{% if package.multiple_freelancer_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="ti-na text-danger pt-1"></i>{% endif %}
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Ticket System</span><i class="fa fa-check text-primary pt-1"></i>
+									</div>
+									<a href="{% url 'account:create_merchant' package.type %}" class="btn btn-primary py-2 px-4 mt-4">30 Days Free, No Card</a>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			<!-- Pricing Plan End -->
+
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+						<figure class="wt-mobileimg">
+							<img src="{% if home_layout.promo_image %}{{home_layout.promo_image.url}}{% else %}{% static 'images/work/img-03.jpg' %}{% endif %}" alt="img description">
+						</figure>
+					</div>
+					<div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+						<div class="wt-experienceholder">
+							<div class="wt-sectionhead">
+								<div class="wt-sectiontitle">
+									<h3>{% if home_layout.promo_title %}{{home_layout.promo_title}}{% endif %}</h3>
+									<span>{% if home_layout.promo_subtitle %}{{home_layout.promo_subtitle}}{% endif %}</span>
+								</div>
+								<div class="wt-description">
+									<p>{% if home_layout.promo_description %}{{home_layout.promo_description|linebreaksbr}}{% endif %}</p>
+								</div>
+								<div class="wt-btnarea">
+									<a href="{% url 'pages:how_it_works' %}" class="wt-btn">How it Works</a>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-
-				</section>
-			
-			</main>	
-			
-			{% include 'dashboard/main_footer.html' %}
-
-	<!-- Add team Popup Start-->
-	<!-- Popup Start-->
-	<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="userregistrationmodal">
-		<div class="modal-dialog" role="document">
-			<div class="wt-modalcontent modal-content">
-				<div class="wt-popuptitle">
-					<h2>Register free Forever</h2>
-					<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
-				</div>
-				<div class="modal-body">
-					<form method="POST", action='.', class="wt-formtheme wt-formpopup" autocomplete="off"> {% csrf_token %}
-						<div class="wt-tabscontenttitle">
-							<h2>Background</h2>
-						</div>
-						<div class="form-group">
-                            {{regform.email.label}}
-                            {{regform.email}}
-                            <span style="color:red;" role="alert">{{ regform.email.errors}}</span>
-                        </div>
-						<div class="form-group">
-                            {{regform.first_name.label}}
-                            {{regform.first_name}}
-                            <span style="color:red;" role="alert">{{ regform.first_name.errors}}</span>
-                        </div> 
-                        <div class="form-group">
-                            {{regform.last_name.label}}
-                            {{regform.last_name}}
-                            <span style="color:red;" role="alert">{{ regform.last_name.errors}}</span>
-                        </div>
-                        <div class="form-group">
-                            {{regform.short_name.label}}
-                            {% render_field regform.short_name class+='form-control' value='' placeholder='Username' hx-post='/verify_username/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#short_name_status' %} 
-                            <span style="color:red;" role="alert">{{ regform.short_name.errors}}</span>
-                            <div id="short_name_status" class="input-group col-lg-12"></div>
-                        </div>
-                        <div class="form-group">
-                            {{regform.phone.label}}
-                            {{regform.phone}}
-                            <span style="color:red;" role="alert">{{ regform.phone.errors}}</span>
-                        </div>
-						<div class="form-group">
-							{{regform.country.label}}
-							{{regform.country}}
-							<span style="color:red;" role="alert">{{ regform.country.errors}}</span>
-						</div>
-						<div class="wt-tabscontenttitle">
-							<h2>Specialty</h2>
-						</div>
-                        <div class="form-group">
-                            {{regform.user_type.label}}
-                            {% render_field regform.user_type class+="form-control" placeholder="Select UserType" hx-get="/user_types/" hx-target="#user_type" %}
-                            <span style="color:red;" role="alert">{{ regform.user_type.errors}}</span> 
-                            <div id="user_type" class="input-group col-lg-12"></div>
-                        </div>
-						<div class="wt-tabscontenttitle">
-							<h2>Security</h2>
-						</div>
-                        <div class="form-group">
-                            {{regform.password1.label}}
-                            {{regform.password1}}
-                            <span style="color:red;" role="alert">{{ regform.password1.errors}}</span>
-                        </div>
-                        <div class="form-group">
-                            {{regform.password2.label}}
-                            {{regform.password2}}
-                            <span style="color:red;" role="alert">{{ regform.password2.errors}}</span>
-                        </div>
-						<span style="color:green;" role="alert">Already have account on {{website.site_name}}?<a href="{% url 'account:login' %}"> Login </span>
-						<div class="form-group wt-btnarea">
-							<button type="submit" class="wt-btn"> Join Now </button>
-						</div>											
-					</form>
-				</div>
 			</div>
-		</div>
-	</div>
-	
+
+			</section>
+		
+		</main>	
+		
+		{% include 'dashboard/main_footer.html' %}
+
+
 	<script src="{% static 'js/typed-2.0.js' %}"></script>
 	<script>
 		let typed = new Typed(".autoTyper", {
@@ -317,30 +314,4 @@
 		
 	</script>
 
-	<script>
-        //Script to add proposal quantity in session             
-        $(document).on('change', '#id_search_type', function (e) {
-        e.preventDefault();
-		mysearchval = $('#id_search_type option:selected').val()
-		//console.log(mysearchval)
-        $.ajax({
-            type: 'POST',
-            url: '{% url "account:searchtype" %}',
-            data: {
-                searchVal: $('#id_search_type option:selected').val(),
-                csrfmiddlewaretoken: "{{csrf_token}}",
-                action: 'searching-type'
-            },
-            success: function (json) {
-                if (mysearchval === 'freelancer'){
-					window.location.href = "{% url 'freelancer:freelancer_listing' %}"
-				}
-				else if (mysearchval === 'proposal'){
-					window.location.href = "{% url 'proposals:proposal_list' %}"
-				}
-            },
-            error: function (xhr, errmsg, err) {}
-        });
-        })
-    </script>
 {% endblock %}

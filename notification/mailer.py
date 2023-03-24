@@ -2,10 +2,11 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text
 from account.tokens import account_activation_token
 from django.conf import settings
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from general_settings.backends import get_from_email
 from general_settings.models import WebsiteSetting
+from django.apps import apps
 from general_settings.utilities import (
     website_name,
     get_protocol_with_domain_path,
@@ -30,6 +31,7 @@ def send_test_mail(to_email):
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 
+
 #
 # Utility function for sending login token via mail
 def two_factor_auth_mailer(user, pass_code):
@@ -52,7 +54,9 @@ def two_factor_auth_mailer(user, pass_code):
 
 #
 # Utility function for sending new signup
-def new_user_registration(user):
+def new_user_registration(user_pk):
+    userapp = apps.get_model('account', 'Customer')
+    user = userapp.objects.get(pk=user_pk)
     from_email = get_from_email()
     subject = 'Activate your Account'
     subtitle = f'Welcome to {website_name()}'

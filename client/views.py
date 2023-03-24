@@ -15,7 +15,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from account.fund_exception import FundException
-from general_settings.models import PaymentGateway
+from payments.models import PaymentGateway
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code

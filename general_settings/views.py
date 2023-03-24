@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
-from .models import Category, WebsiteSetting, PaymentAPIs, CurrencyConverter, Currency
+from .models import Category, WebsiteSetting, CurrencyConverter, Currency
+from payments.models import PaymentAPIs
 from proposals.models import Proposal
 from django.http import JsonResponse
 from general_settings.currency import CurrencyCalculator, get_base_currency_code, get_exchange_rates_key 

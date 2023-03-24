@@ -87,8 +87,8 @@ MIDDLEWARE = [
     # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'account.middleware_test.DynamicHostMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'account.middleware_test.DynamicHostMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
@@ -119,7 +119,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # custom processors
-                'proposals.context_processors.published_proposal',
+                'account.context_processors.active_merchant',
                 'teams.context_processors.active_team',
                 'general_settings.context_processors.categories',
                 'general_settings.context_processors.website',
@@ -304,3 +304,20 @@ MERCHANT_GATE_ALLOW_LIST = [
     "/pages/about-us",
     "/pages/terms-and-conditions",
 ]
+
+
+CACHE_TTL = 60 * 60 # 1 HOUR CACHE TIMEHOUT
+# CACHES = {
+#     'custom_cache': {
+#         'BACKEND': 'path.to.CustomCache',
+#         'TIMEOUT': 3600,
+#         'OPTIONS': {
+#             'VERSION': 1,
+#         },
+#     },
+# }
+
+# # Use the custom cache backend as the default cache backend
+# CACHE_MIDDLEWARE_ALIAS = 'custom_cache'
+# CACHE_MIDDLEWARE_SECONDS = 3600
+# CACHE_MIDDLEWARE_KEY_PREFIX = 'myapp'

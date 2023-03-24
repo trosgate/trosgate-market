@@ -22,7 +22,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from datetime import datetime, timezone, timedelta
 from notification.utilities import create_notification
 from . application import ApplicationAddon
-from general_settings.models import PaymentGateway, Currency
+from general_settings.models import Currency
+from payments.models import PaymentGateway
+
 from general_settings.forms import CurrencyForm
 from django.views.decorators.csrf import csrf_exempt
 from transactions.models import Purchase, ApplicationSale, ProposalSale, ContractSale

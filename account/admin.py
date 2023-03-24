@@ -61,12 +61,12 @@ class CustomerAdmin(BaseUserAdmin,):
     list_display = ['id', 'get_short_name', 'email', 'is_superuser','user_type', 'is_active', 'last_login']
     readonly_fields = ['date_joined', 'user_type', 'last_login']
     list_display_links = ['get_short_name']
-    list_filter = ['user_type', 'is_superuser', 'is_assistant',]
+    list_filter = ['user_type', 'is_superuser', 'is_assistant','site']
     fieldsets = (
         ('Personal Information', {'fields': ('email', 'short_name', 'first_name', 'last_name', 'phone', 'country', 'password',)}),
         ('All User Permissions', {'fields': ('user_type','is_active','is_staff',)}),
         ('Company Roles', {'fields': ('is_assistant', 'is_superuser',)}),
-        ('Activity Log', {'fields': ('site', 'date_joined', 'last_login',)}),
+        ('Activity Log', {'fields': ('site', 'active_merchant_id', 'date_joined', 'last_login',)}),
     )
     add_fieldsets = (
         (None, {
@@ -220,7 +220,7 @@ class CountryAdmin(admin.ModelAdmin):
     list_editable = ['ordering', 'supported']
     radio_fields = {'supported': admin.HORIZONTAL}
     actions = ['Activate_Countries', 'Deactivate_Countries']
-    search_fields = ('name', 'country_code',)
+    search_fields = ('name', 'country_code')
     list_filter = ('supported',)
     list_per_page = sys.maxsize
 
@@ -245,8 +245,14 @@ class PackageAdmin(admin.ModelAdmin):
     list_display = ['type','price', 'is_default', 'verbose_type', 'ordering']
     list_display_links = ['type','verbose_type']
     excludes = ['daily_Handshake_mails_to_clients']
-    readonly_fields = ['daily_Handshake_mails_to_clients']
-    radio_fields = {'is_default': admin.HORIZONTAL}    
+    readonly_fields = ['ssl_activation','daily_Handshake_mails_to_clients']
+    radio_fields = {
+        'is_default': admin.HORIZONTAL, 
+        'can_change_domain':admin.HORIZONTAL,
+        'can_upsell_teams':admin.HORIZONTAL,
+        'ssl_activation':admin.HORIZONTAL,
+        'multiple_freelancer_teams':admin.HORIZONTAL,
+    }    
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -262,6 +268,7 @@ class PackageAdmin(admin.ModelAdmin):
                 'status', 
                 'verbose_type', 
                 'ordering',
+                'max_num_of_staff',
                 'max_member_per_team',
                 'monthly_offer_contracts_per_team',
                 'max_proposals_allowable_per_team',
@@ -324,8 +331,8 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
 
 @admin.register(Merchant)
 class MerchantAdmin(admin.ModelAdmin):   
-    list_display = ['business_name', 'merchant', 'type', 'site', 'created_at']
-    readonly_fields = ['merchant','created_at'] #'business_name', 'merchant'
+    list_display = ['business_name', 'merchant', 'type', 'package', 'created_at']
+    readonly_fields = ['business_name', 'merchant', 'package', 'members', 'created_at']
     radio_fields = {'type': admin.HORIZONTAL}    
     # list_display_links = None
 

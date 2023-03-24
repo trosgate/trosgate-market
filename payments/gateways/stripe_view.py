@@ -26,7 +26,7 @@ def stripe_checkout(request):
         currency=currency, 
         description=description, 
         customer_email=customer_email, 
-        success_url=success_url, 
+        success_url=success_url,
         cancel_url=cancel_url
     )
     

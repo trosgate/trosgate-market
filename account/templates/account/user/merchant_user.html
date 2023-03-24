@@ -1,0 +1,69 @@
+{% extends "dashboard/main_base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+<!--Main Start-->
+	<main id="ticket-list" class="wt-main wt-haslayout">
+
+		<div class="wt-proposalholder">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-12">
+						<div class="wt-sectionhead wt-textcenter">
+							<div class="wt-sectiontitle">
+								<h3>User Manager</h3>
+								<form class="form-group text-center">{% csrf_token %}
+									<input type="text"
+										hx-post=""
+										hx-trigger="keyup changed delay:500ms"
+										hx-target="#search-tickets" 
+										class="form-control-sm col-md-6"
+										name="search" 
+										placeholder="start typing something ...."
+										autocomplete="off">
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>				
+
+			<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
+						<tr>
+							<th>#</th>
+							<th>Names</th>
+							<th>Email</th>
+							<th>Type</th>
+							<th>Date Joined</th>
+							<th>Last Login</th>
+							<th>Status</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					
+					<tbody id="user-manager">
+						{% include 'account/partials/merchant_users.html' %}
+					</tbody>
+				</table>
+				{% if not users %}       
+				<div class="text-center">
+					<span style="font-weight: bold;"> You donnot have any freelancer or client</span>
+				</div>
+				{% endif %}  
+			</div>
+		</div>
+
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	
+	</main>
+
+	{% endblock %}

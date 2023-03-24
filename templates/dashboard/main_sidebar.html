@@ -27,7 +27,7 @@
 							{% endif  %}
 						</figure>
 						<div class="wt-title">
-							<h2><a href="{{freelancer_profile.freelancer_profile_absolute_url}}"> {{request.user.short_name}}</a></h2>
+							<h2><a href="{{freelancer_profile.freelancer_profile_absolute_url}}"> {{request.user.get_short_name}}</a></h2>
 						</div>
 						<div class="wt-btnarea">
 							{% if request.user.freelancer %}

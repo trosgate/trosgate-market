@@ -84,6 +84,8 @@ class DynamicHostMiddleware:
         else:
             request.parent = None
 
+        request.tenant = self.is_merchant_family(request, site)
+
         # Configure the SSL block for the domain
         ssl_block = f"""
             ssl_certificate {ssl_certificate};
@@ -129,7 +131,13 @@ class DynamicHostMiddleware:
 
         return response, server_block, default_server_block, upstream
 
-
+    def is_merchant_family(self, request, site):
+        """Check and assign object to Merchant."""
+        if not request.user.is_authenticated:
+            return Merchant.objects.filter(site=site).first()
+        elif request.user.is_authenticated and not request.user.is_admin:
+            return request.user.active_merchant_id
+        
 
 class MerchantGateMiddleware:
     """
@@ -146,11 +154,10 @@ class MerchantGateMiddleware:
 
     def __call__(self, request):
         request.merchant = None
-        if request.user.is_authenticated and request.user.user_type == 'merchant':
+        if request.user.is_authenticated and request.user.is_merchant:
 
-            sitee = Site.objects.get_current()
-            request.merchant = Merchant.curr_merchant.first()
-            print('request.sitee :', sitee, request.merchant.site)
+            request.merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
+            
             gate_url = reverse("account:dashboard") # subscriptions:complete
             if (
                 request.merchant.type in Merchant.ACTIVE_TYPES

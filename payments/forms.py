@@ -3,7 +3,42 @@ from django import forms
 from account.fund_exception import FundException
 from notification.mailer import send_credit_to_team, send_withdrawal_marked_failed_email
 from django.utils.translation import gettext_lazy as _
-from general_settings.models import PaymentGateway
+from .models import PaymentGateway
+import datetime
+from .checkout_card import CreditCard
+
+CARD_TYPES = [
+    ('', ''),
+    ('visa', 'Visa'),
+    ('master', 'Master'),
+    ('discover', 'Discover'),
+    ('american_express', 'American Express'),
+    ('diners_club', 'Diners Club'),
+    ('maestro', 'Maestro'),
+    ]
+
+today = datetime.date.today()
+MONTH_CHOICES = [(m, datetime.date(today.year, m, 1).strftime('%b')) for m in range(1, 13)]
+YEAR_CHOICES = [(y, y) for y in range(today.year, today.year + 21)]
+
+
+class CheckoutCardForm(forms.Form):
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
+    package = forms.CharField(required=False)
+    card_type = forms.ChoiceField(choices=CARD_TYPES, required=False)
+    month = forms.ChoiceField(choices=MONTH_CHOICES)
+    year = forms.ChoiceField(choices=YEAR_CHOICES)
+    number = forms.CharField(required=False)
+    verification_value = forms.CharField(label='CVV', required=False)
+
+    def clean(self):
+        data = self.cleaned_data
+        credit_card = CreditCard(**data)
+        if not credit_card.is_valid():
+            raise forms.ValidationError('Payment card validation failed')
+        return data
+
 
 class PaymentAccountForm(forms.ModelForm):
     class Meta:

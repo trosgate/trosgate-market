@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Proposal, ProposalChat
 from teams.models import Team
 from django.contrib.auth.decorators import login_required
-from .forms import ProposalStepOneForm, ModifyProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalChatForm
+from .forms import ProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalChatForm
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -19,7 +19,6 @@ from general_settings.currency import get_base_currency_symbol, get_base_currenc
 from teams.controller import PackageController
 from account.models import Customer
 from client.models import Client
-from django_htmx.http import trigger_client_event
 from resolution.reviews import (
     proposal_review_average, 
     contract_review_average,
@@ -49,7 +48,8 @@ def proposal_listing(request):
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
     skills = Skill.objects.all().distinct()
-    proposals = Proposal.active.all().distinct()
+    proposals = Proposal.objects.filter(merchant=request.tenant, status='active').distinct()
+    print('request.tenant::', proposals)
     base_currency = get_base_currency_symbol()
     all_proposals = proposals.count()
     
@@ -96,7 +96,7 @@ def proposal_filter(request):
     three_fifty_dollar_to_500_dollar = request.GET.get('three_fifty_dollar_to_500_dollar[]', '')
     above_500_dollar = request.GET.get('above_500_dollar[]', '')
 
-    proposals = Proposal.active.all()
+    proposals = Proposal.objects.filter(merchant=request.tenant)
     all_proposals = proposals.count()
     #Country
     if len(country) > 0:
@@ -150,7 +150,7 @@ def proposal_filter(request):
 
     search_count = len(proposals)
     totalcount = f'<div id="proposalTotal" class="alert alert-info text-center" role="alert" style="color:black;">{search_count} of {all_proposals} search results found</div>'
-    returned_proposal = render_to_string('proposals/ajax/proposal_search.html', {'proposals':proposals, 'base_currency':base_currency})
+    returned_proposal = render_to_string('proposals/partials/proposal_search.html', {'proposals':proposals, 'base_currency':base_currency})
     
     if len(proposals) > 0: 
         return JsonResponse({'proposals': returned_proposal, 'base_currency':base_currency, 'totalcount':totalcount})
@@ -162,22 +162,10 @@ def proposal_filter(request):
 @login_required
 @user_is_freelancer
 def create_proposal(request):
-
-    if request.method == 'POST':
-        proposalformone = ProposalStepOneForm(request.POST or None)
-
-        if proposalformone.is_valid():
-            # Store form data in session
-            request.session['post_step_one'] = proposalformone.cleaned_data
-            return redirect("proposals:proposal_step_two")
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        # Get initial form data from session if available
-        initial_data = request.session.get('post_step_one', {})
-        print('initial_data :', initial_data)
-        proposalformone = ProposalStepOneForm(initial=initial_data)
-    return render(request, 'proposals/proposal.html', {'proposalformone': proposalformone, 'variable': 'stepOne'})
+    proposalformone = ProposalStepOneForm(request.POST or None)
+    initial_data = request.session.get('post_step_one', {})
+    proposalformone = ProposalStepOneForm(initial=initial_data)
+    return render(request, 'proposals/proposal_create.html', {'proposalformone': proposalformone, 'variable': 'stepOne'})
 
 
 @login_required
@@ -328,147 +316,116 @@ def proposal_step_four(request):
     return render(request, 'proposals/partials/create_steps.html', {'proposalformfour': proposalformfour, 'variable': 'stepFour'})
 
 
-
 @login_required
 @user_is_freelancer
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def modify_proposal_step_one(request, proposal_id, proposal_slug):
+def modify_proposals(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
 
-    description = proposal.description
-
-    proposalformone = ModifyProposalStepOneForm(request.POST or None, request.FILES or None, instance=proposal)
-
-    if proposalformone.is_valid():
-        proposalformone.save()
-        
-        if description == '':
-            proposal.progress = int(30)
-            proposal.save()
-
-        return redirect("proposals:modify_proposal_step_two", proposal_id=proposal.id, proposal_slug=proposal.slug)
-
-    else:
-        proposalformone = ModifyProposalStepOneForm(instance = proposal)           
+    proposalformone = ProposalStepOneForm(instance = proposal)           
 
     context = {
         'proposalformone': proposalformone,
         'proposal': proposal,
+        'variable': 'stepOne'
     }
-    return render(request, 'proposals/proposal_step_one_update.html', context)
-
+    return render(request, 'proposals/proposal_edit.html', context)
 
 
 @login_required
 @user_is_freelancer
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def modify_proposal_step_one(request, proposal_id, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
+
+    proposalformone = ProposalStepOneForm(request.POST or None, instance=proposal)
+
+    if proposalformone.is_valid():
+        proposalformone.save()
+
+        messages.info(request, 'Changed successfully.')
+
+    else:
+        proposalformone = ProposalStepOneForm(instance = proposal)           
+
+    context = {
+        'proposalformone': proposalformone,
+        'proposal': proposal,
+        'variable': 'stepOne'
+    }
+    return render(request, 'proposals/partials/modify_steps.html', context)
+
+
+@login_required
+@user_is_freelancer
 def modify_proposal_step_two(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
-
-    faq_one = proposal.faq_one
-    faq_one_description = proposal.faq_one_description
-    faq_two = proposal.faq_two
-    faq_two_description = proposal.faq_two_description
-    faq_three = proposal.faq_three
-    faq_three_description = proposal.faq_three_description
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformtwo = ProposalStepTwoForm(request.POST or None, instance=proposal)
 
     if proposalformtwo.is_valid():
         proposalformtwo.save()
 
-        if faq_one == '' or faq_one_description == '' or faq_two == '' or faq_two_description == '' or faq_three == '' or faq_three_description == '':
-            proposal.progress = int(70)
-            proposal.save()
-
-        return redirect("proposals:modify_proposal_step_three", proposal_id=proposal.id, proposal_slug=proposal.slug)
+        messages.info(request, 'Changed successfully.')
 
     else:
         proposalformtwo = ProposalStepTwoForm(instance = proposal)           
 
     context = {
         'proposalformtwo': proposalformtwo,
-        'proposal': proposal,        
+        'proposal': proposal,
+        'variable': 'stepTwo'        
     }
-    return render(request, 'proposals/proposal_step_two_update.html', context)
+    return render(request, 'proposals/partials/modify_steps.html', context)
 
 
 @login_required
 @user_is_freelancer
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def modify_proposal_step_three(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
-
-    salary = proposal.salary
-    service_level = proposal.service_level
-    revision = proposal.revision
-    dura_converter = proposal.dura_converter
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformthree = ProposalStepThreeForm(request.POST or None, instance=proposal)
 
     if proposalformthree.is_valid():
         proposalformthree.save()
 
-        if salary == '' or service_level == '' or revision == '' or dura_converter == '':
-            proposal.progress = int(85)
-            proposal.save()
-
-        return redirect("proposals:modify_proposal_step_four", proposal_id=proposal.id, proposal_slug=proposal.slug)
+        messages.info(request, 'Changed successfully.')
 
     else:
         proposalformthree = ProposalStepThreeForm(instance = proposal)           
 
     context = {
         'proposalformthree': proposalformthree,
-        'proposal': proposal,        
+        'proposal': proposal,
+        'variable': 'stepThree'        
     }
-    return render(request, 'proposals/proposal_step_three_update.html', context)
+    return render(request, 'proposals/partials/modify_steps.html', context)
 
 
 @login_required
 @user_is_freelancer
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def modify_proposal_step_four(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
 
-    description = proposal.description
-    faq_one = proposal.faq_one
-    faq_one_description = proposal.faq_one_description
-    faq_two = proposal.faq_two
-    faq_two_description = proposal.faq_two_description
-    faq_three = proposal.faq_three
-    faq_three_description = proposal.faq_three_description
-    salary = proposal.salary
-    service_level = proposal.service_level
-    revision = proposal.revision
-    dura_converter = proposal.dura_converter
-
-    proposalformfour = ProposalStepFourForm(request.POST or None, instance=proposal)
+    proposalformfour = ProposalStepFourForm(request.POST or None, request.FILES or None, instance=proposal)
 
     if proposalformfour.is_valid():
         proposalformfour.save()
 
-        if proposal.title != '' and proposal.preview != '' and proposal.category != '' and proposal.skill is not None and description != '' and faq_one != '' and faq_one_description != '' and faq_two != '' and faq_two_description != '' and faq_three != '' and faq_three_description != '' and salary != '' and service_level != '' and revision != '' and dura_converter != '':
-            proposal.progress = int(100)
-            proposal.status = Proposal.ACTIVE
-            proposal.save()
-
-        messages.success(request, 'The Changes were saved successfully!')
-
-        return redirect("proposals:active_proposal")
+        messages.info(request, 'Changed successfully')
 
     else:
         proposalformfour = ProposalStepFourForm(instance = proposal)           
 
     context = {
         'proposalformfour': proposalformfour,
-        'proposal': proposal,        
+        'proposal': proposal,
+        'variable': 'stepFour'        
     }
-    return render(request, 'proposals/proposal_step_four_update.html', context)
+    return render(request, 'proposals/partials/modify_steps.html', context)
 
 
 #This page shows proposals with review status
@@ -476,7 +433,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
 @user_is_freelancer
 def review_proposal(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposal = team.proposalteam.filter(status = Proposal.REVIEW)
+    proposal = team.proposalteam.filter(merchant=request.tenant, status = Proposal.REVIEW)
 
     context = {
         'team':team,
@@ -489,7 +446,7 @@ def review_proposal(request):
 @user_is_freelancer
 def active_proposal(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
-    proposal = team.proposalteam.filter(status = Proposal.ACTIVE)
+    proposal = team.proposalteam.filter(merchant=request.tenant, status = Proposal.ACTIVE)
 
     context = {
         'team':team,
@@ -502,7 +459,7 @@ def active_proposal(request):
 @user_is_freelancer
 def archive_proposal_page(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
-    proposal = team.proposalteam.filter(status = Proposal.ARCHIVE)
+    proposal = team.proposalteam.filter(merchant=request.tenant, status = Proposal.ARCHIVE)
 
     context = {
         'team': team,
@@ -515,7 +472,7 @@ def archive_proposal_page(request):
 @user_is_freelancer
 def archive_proposal(request, short_name, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    Proposal.objects.filter(team=team, created_by__short_name=short_name, slug=proposal_slug).update(status = Proposal.ARCHIVE)
+    Proposal.objects.filter(merchant=request.tenant, team=team, created_by__short_name=short_name, slug=proposal_slug).update(status = Proposal.ARCHIVE)
 
     messages.success(request, 'The proposal was archived successfully!')
 
@@ -526,7 +483,7 @@ def archive_proposal(request, short_name, proposal_slug):
 @user_is_freelancer
 def reactivate_archive_proposal(request, short_name, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    Proposal.objects.filter(team=team, created_by__short_name=short_name, slug=proposal_slug, status = Proposal.ARCHIVE).update(status = Proposal.ACTIVE)
+    Proposal.objects.filter(merchant=request.tenant, team=team, created_by__short_name=short_name, slug=proposal_slug, status = Proposal.ARCHIVE).update(status = Proposal.ACTIVE)
 
     messages.success(request, 'The archived proposal was re-activated successfully!')
 
@@ -537,7 +494,7 @@ def reactivate_archive_proposal(request, short_name, proposal_slug):
 @user_is_freelancer
 def proposal_preview(request, short_name, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, team=team)
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, created_by__short_name=short_name, team=team)
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)
     
     team_members = proposal.team.members.all()
@@ -552,7 +509,7 @@ def proposal_preview(request, short_name, proposal_slug):
 
 
 def proposal_detail(request, short_name, proposal_slug):
-    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)   
     other_proposals = Proposal.active.exclude(pk=proposal.id)[:4]    
     team_members = proposal.team.members.all()
@@ -637,15 +594,15 @@ def proposal_chat_messages(request, short_name, proposal_slug):
     proposal=None
     if request.user.user_type == Customer.FREELANCER:    
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-        proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team, created_by__short_name=short_name)
+        proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, team=team, created_by__short_name=short_name)
 
     elif request.user.user_type == Customer.CLIENT:
-        proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name)
+        proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, created_by__short_name=short_name)
 
     proposalchatform = ProposalChatForm()
-    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
+    chats = ProposalChat.objects.filter(merchant=request.tenant, proposal=proposal, team=proposal.team)
     chat_count = chats.count()
-    print(chat_count)
+
     context = {
         'proposalchatform':proposalchatform,
         'proposal':proposal,
@@ -658,8 +615,8 @@ def proposal_chat_messages(request, short_name, proposal_slug):
 
 @login_required
 def create_message(request, proposal_id):
-    proposal = get_object_or_404(Proposal, pk=proposal_id)
-    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, pk=proposal_id)
+    chats = ProposalChat.objects.filter(merchant=request.tenant,proposal=proposal, team=proposal.team)
 
     content = request.POST.get('content', '')
     if content != '':
@@ -681,8 +638,8 @@ def create_message(request, proposal_id):
 
 @login_required
 def fetch_messages(request, proposal_id):
-    proposal = get_object_or_404(Proposal, pk=proposal_id)
-    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
+    proposal = get_object_or_404(Proposal, merchant=request.tenant, pk=proposal_id)
+    chats = ProposalChat.objects.filter(merchant=request.tenant, proposal=proposal, team=proposal.team)
 
     context = {
         'proposal':proposal,

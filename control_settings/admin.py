@@ -2,13 +2,13 @@ import sys
 from django.contrib import admin
 from . models import (
     PaydayController, PaymentsController, DepositController, DepositSetting,
-    GatewaySetting, HiringSetting, PaymentAPISetting, DiscountSettings,
+    HiringSetting, DiscountSettings,
     MailerSetting, TestMailSetting, SubscriptionSetting, ExchangeRateSetting,
-    LayoutSetting
+    LayoutSetting, GatewaySetting, PaymentAPISetting
 )
 
 MAX_OBJECTS = 1
-MAX_GATEWAYS = 4
+MAX_GATEWAYS = 6
 
 
 @admin.register(LayoutSetting)
@@ -153,45 +153,11 @@ class ExachangeRateAPIAdmin(admin.ModelAdmin):
 @admin.register(GatewaySetting)
 class PaymentGatewayAdmin(admin.ModelAdmin):
     list_display = ['name', 'default', 'processing_fee', 'status', 'ordering']
-    list_editable = ['processing_fee', 'default', 'status', 'ordering']
-    readonly_fields = ['name']
+    list_editable = ['processing_fee', 'status', 'ordering']
+    list_display_links = ['name', 'default']
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_GATEWAYS:
-            return False
-        return super().has_add_permission(request)
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
-
-
-@admin.register(HiringSetting)
-class HiringFeeAdmin(admin.ModelAdmin):
-    list_display = ['preview', 'contract_percentage',
-                    'proposal_percentage', 'application_percentage']
-    list_display_links = ['preview']
-    readonly_fields = ['contract_percentage',
-                       'proposal_percentage', 'application_percentage']
-    fieldsets = (
-        ('External Contract Fee - It is single fee because freelancer did the hard job of getting client', {'fields': ('extcontract_fee_percentage',)}),
-        ('Internal Contract Fee Structure', {'fields': (
-            'contract_fee_percentage', 'contract_fee_extra', 'contract_delta_amount',)}),
-        ('Proposal Fee Structure', {'fields': (
-            'proposal_fee_percentage', 'proposal_fee_extra', 'proposal_delta_amount',)}),
-        ('Application Fee Structure', {'fields': (
-            'application_fee_percentage', 'application_fee_extra', 'application_delta_amount',)}),
-
-    )
-
-    def has_add_permission(self, request):
-        if self.model.objects.count() >= MAX_OBJECTS:
             return False
         return super().has_add_permission(request)
 
@@ -224,6 +190,40 @@ class PaymentAPIsAdmin(admin.ModelAdmin):
          'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
         ('Razorpay API', {
          'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
+    )
+
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_OBJECTS:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
+@admin.register(HiringSetting)
+class HiringFeeAdmin(admin.ModelAdmin):
+    list_display = ['preview', 'contract_percentage',
+                    'proposal_percentage', 'application_percentage']
+    list_display_links = ['preview']
+    readonly_fields = ['contract_percentage',
+                       'proposal_percentage', 'application_percentage']
+    fieldsets = (
+        ('External Contract Fee - It is single fee because freelancer did the hard job of getting client', {'fields': ('extcontract_fee_percentage',)}),
+        ('Internal Contract Fee Structure', {'fields': (
+            'contract_fee_percentage', 'contract_fee_extra', 'contract_delta_amount',)}),
+        ('Proposal Fee Structure', {'fields': (
+            'proposal_fee_percentage', 'proposal_fee_extra', 'proposal_delta_amount',)}),
+        ('Application Fee Structure', {'fields': (
+            'application_fee_percentage', 'application_fee_extra', 'application_delta_amount',)}),
+
     )
 
     def has_add_permission(self, request):

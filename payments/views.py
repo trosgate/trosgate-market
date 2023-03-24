@@ -6,11 +6,61 @@ from account.permission import user_is_freelancer
 from teams.forms import TeamCreationForm
 from teams.models import Team, Invitation
 from .models import PaymentAccount, PaymentRequest
-from .forms import PaymentAccountForm
+from .forms import CheckoutCardForm, PaymentAccountForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from general_settings.models import PaymentGateway
+from .models import PaymentGateway
 from general_settings.currency import get_base_currency_symbol
+from .checkout_card import CreditCard
+
+
+
+
+# def paypal(request):
+#     amount = 1
+#     response = None
+#     if request.method == 'POST':
+#         form = CheckoutCardForm(request.POST)
+#         if form.is_valid():
+#             data = form.cleaned_data
+#             credit_card = CreditCard(**data)
+#             merchant = get_gateway("pay_pal")
+#             try:
+#                 merchant.validate_card(credit_card)
+#             except CardNotSupported:
+#                 response = "Credit Card Not Supported"
+#             # response = merchant.purchase(amount, credit_card, options={'request': request})
+#             response = merchant.recurring(amount, credit_card, options={'request': request})
+#     else:
+#         form = CreditCardForm(initial=GATEWAY_INITIAL['paypal'])
+#     return render(request, 'app/index.html', {'form': form,
+#                                               'amount': amount,
+#                                               'response': response,
+#                                               'title': 'Paypal'})
+
+
+# def stripe(request):
+#     amount = 1
+#     response= None
+#     if request.method == 'POST':
+#         form = CheckoutCardForm(request.POST)
+#         if form.is_valid():
+#             data = form.cleaned_data
+#             credit_card = CreditCard(**data)
+#             merchant = get_gateway("stripe")
+#             response = merchant.purchase(amount,credit_card)
+#     else:
+#         form = CreditCardForm(initial=GATEWAY_INITIAL['stripe'])
+#     return render(request, 'app/index.html',{'form': form,
+#                                              'amount':amount,
+#                                              'response':response,
+#                                              'title':'Stripe Payment'})
+
+
+
+
+
+
 
 
 @login_required

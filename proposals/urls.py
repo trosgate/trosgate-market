@@ -24,6 +24,7 @@ urlpatterns = [
     path('faq/', views.proposal_step_three, name='proposal_step_three'),
     path('attribute/', views.proposal_step_four, name='proposal_step_four'),
 
+    path('change/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposals, name='modify_proposals'),
     path('introduction/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_one, name='modify_proposal_step_one'),
     path('background/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_two, name='modify_proposal_step_two'),
     path('faq/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_three, name='modify_proposal_step_three'),

@@ -45,6 +45,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from control_settings.utilities import homepage_layout
 from contract.models import Contract
 from .backend import CustomAuthBackend
+from .permission import user_is_merchant
 
 
 @login_required
@@ -110,7 +111,7 @@ def homepage(request):
     base_currency = get_base_currency_symbol()
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
-    proposals = Proposal.active.filter(published=True).distinct()[0:12]
+    proposals = Proposal.objects.filter(merchant=request.tenant, published=True).distinct()[0:12]   
     projects = Project.public.all().distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
     supported_country = Country.objects.filter(supported=True)    
@@ -123,7 +124,6 @@ def homepage(request):
 
     if request.user.is_authenticated and request.user.user_type == Customer.ADMIN:
         messages.info(request, f'Welcome back {request.user.short_name}')
-
         return redirect('/admin')
 
     supported_country = Country.objects.filter(supported=True)
@@ -152,7 +152,10 @@ def homepage(request):
         'searchform': searchform,
         'home_layout': home_layout,
     }
-    return render(request, 'homepage.html', context)
+    if request.parent:
+        return render(request, 'homepage.html', context)
+    else:
+        return render(request, 'merchant_home.html', context)
 
 
 def searchtype(request):
@@ -286,29 +289,29 @@ def account_activate(request, uidb64, token):
         user = Customer.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, request.user.DoesNotExist):
         user = None
-    try:
-        package = Package.objects.get(pk=1, type='Basic')
-    except Exception as e:
-        print(str(e))
-        package = Package.objects.create(pk=1, type='Basic')
+    # try:
+    #     package = Package.objects.get(pk=1, type='Basic')
+    # except Exception as e:
+    #     print(str(e))
+    #     package = Package.objects.create(pk=1, type='Basic')
     
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
        
-        Team.objects.filter(
-            title=user.short_name, created_by=user, 
-            status = Team.INACTIVE, package = package, 
-        ).update(status = Team.ACTIVE)
+        # Team.objects.filter(
+        #     title=user.short_name, created_by=user, 
+        #     status = Team.INACTIVE, package = package, 
+        # ).update(status = Team.ACTIVE)
 
-        Invitation.objects.filter(
-            email=user.email, sender=user, 
-            team__package=package, status = Invitation.INVITED
-        ).update(status = Invitation.ACCEPTED)
+        # Invitation.objects.filter(
+        #     email=user.email, sender=user, 
+        #     team__package=package, status = Invitation.INVITED
+        # ).update(status = Invitation.ACCEPTED)
 
-        Contract.objects.filter(
-            client__email=user.email, reaction=Contract.AWAITING
-        ).update(reaction=Contract.ACCEPTED)
+        # Contract.objects.filter(
+        #     client__email=user.email, reaction=Contract.AWAITING
+        # ).update(reaction=Contract.ACCEPTED)
             
         return redirect('account:login')
     else:
@@ -332,7 +335,7 @@ def user_dashboard(request):
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
             contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
-            proposals = Proposal.objects.filter(team=user_active_team, progress__lte=99)
+            proposals = Proposal.objects.filter(merchant=request.tenant, team=user_active_team)
         except:
             user_active_team = None
         try:
@@ -374,6 +377,10 @@ def user_dashboard(request):
         else:
             teamform = TeamCreationForm()
 
+        merchant = Proposal.objects.filter(team=user_active_team)
+        print('merchant::', merchant)
+        print('tenant::', request.tenant)
+        print('count ::', merchant.count())
         context = {
             'proposals': proposals,
             'open_projects': open_projects,
@@ -390,15 +397,12 @@ def user_dashboard(request):
 
     if request.user.is_client:
         client_profile = Client.objects.get(user=request.user)
-        proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
+        proposals = Proposal.objects.filter(merchant=request.tenant, status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
         base_currency = get_base_currency_symbol()
-        # current_site = get_current_site(request)
-        # print('User:', 'Sitee ID:', current_site,'Merchant ID:', request.user.site)
-
-        # print(path)
+      
         context = {
             'open_projects': open_projects,
             'closed_projects': closed_projects,
@@ -411,23 +415,15 @@ def user_dashboard(request):
 
 
     if request.user.is_merchant:
-        curr_site = Site.objects.get_current()
-        merchant_profile = Merchant.objects.get(merchant=request.user)
-        merchant_prof = Merchant.objects.get(site=curr_site)
-        print('merchant_prof', merchant_prof, merchant_prof.package.type)
+        
+        merchant_profile = get_object_or_404(Merchant, pk=request.user.active_merchant_id, members__in=[request.user])
+ 
+        print('yes yes yes', request.tenant)
 
-        # proposals = Proposal.objects.filter(status=Proposal.ACTIVE, progress=100)
-        # open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
-        # closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
-        # contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
-        # base_currency = get_base_currency_symbol()
+        print('no no no', request.merchant)
         context = {
             'merchant_profile': merchant_profile,
-            # 'closed_projects': closed_projects,
-            # 'proposals': proposals,
-            # 'contracts': contracts,
-            # 'client_profile': client_profile,
-            # 'base_currency': base_currency,
+
         }
         return render(request, 'account/user/merchant_dashboard.html', context)
 
@@ -436,3 +432,116 @@ def user_dashboard(request):
         messages.info(request, f'Welcome back {request.user.get_short_name()}')
 
         return redirect('/admin/')
+
+
+@login_required
+@user_is_merchant
+def merchant_user(request):
+    users = Customer.objects.filter(site=request.merchant.site)
+    context = {
+        'users': users,
+    }
+    return render(request, 'account/user/merchant_user.html', context)
+
+
+@login_required
+@user_is_merchant
+def block_or_unblock(request):
+    user_id = request.POST.get('userblockunblock')
+    myuser = get_object_or_404(Customer, site=request.merchant.site, pk=user_id)
+    
+    if myuser.is_active == True:
+        myuser.is_active = False
+        myuser.save()
+    else:
+        myuser.is_active = True
+        myuser.save()
+
+    users = Customer.objects.filter(site=request.merchant.site)
+    context = {
+        'users': users,
+    }
+    return render(request, 'account/partials/merchant_users.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

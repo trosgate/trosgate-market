@@ -1,0 +1,80 @@
+{% load static %}
+	<div class="wt-proposalholder">
+		<div class="row justify-content-md-center">
+			<div class="wt-categoryexpl">
+				<div class="col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4 float-left">
+					<div class="wt-categorycontent">
+						<figure class="text-center">
+							<span style="color:rgb(45, 65, 17);"><i class="fa fa-user fa-3x"></i></span>
+						</figure>
+						<div class="wt-cattitle">
+							<h3><a href="javascript:void(0);"> Manage Users </a></h3>
+						</div>
+						<div class="wt-categoryslidup">
+							<p>Total of <span style="color:rgb(45, 65, 17);">{{active_merchant.members.all.count}}</span> user{{active_merchant.members.all.count|pluralize}} available</p>
+							<a href="{% url 'account:merchant_user' %}"> Open Users <i class="fa fa-arrow-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4 float-left">
+					<div class="wt-categorycontent">
+						<figure>
+							<span style="color:rgb(128, 11, 110);"><i class="fa fa-group fa-3x"></i></span>
+						</figure>
+						<div class="wt-cattitle">
+							<h3><a href="javascrip:void(0);">Manage Teams</a></h3>
+						</div>
+						<div class="wt-categoryslidup">
+							<p>Having challenge on field? Hold meetings and share idea with your team members</p>
+							<a href=""> Chat your team <i class="fa fa-arrow-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4 float-left">
+					<div class="wt-categorycontent">
+						<figure>
+							<span style="color:rgb(45, 65, 17);"><i class="fa fa-folder-open fa-3x"></i></span>
+						</figure>
+						<div class="wt-cattitle">
+							<h3><a href="javascrip:void(0);">Manage my Jobs</a></h3>
+						</div>
+						<div class="wt-categoryslidup">
+							<p>View the status, summary statistics of your assigned job and details</p>
+							<a href="" style="color:green;"> <i class="fa fa-arrow-left"> </i> Status</a>|
+							<a href=""> Details <i class="fa fa-arrow-right"></i></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder" role="dialog" id="profileexperiencemodal">
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="wt-signupholder">
+					<div class="col-12 col-sm-12 col-md-12 col-lg-6 pull-right">
+						<div class="wt-signupcontent">
+							<div class="wt-title">
+								<h2>{% if website.team_banner_title %}{{website.team_banner_title}}{% else %} Your Workspace {% endif %}</h2>
+							</div>
+							<div class="wt-description">
+								{% if website.team_banner_preview %}
+								<p>{{website.team_banner_preview}}</p>
+								{% else %} 
+								<p>{{request.merchant}} Working remotely with your team shouldn't be nightmare. Create teams, bring your team online and supervise them. </p>
+								{% endif %}
+							</div>
+							<div class="wt-btnarea">
+								<a href="javascript:void(0);" class="wt-btn" data-toggle="modal" data-target="#teammodal"  style="background-color:rgb(29, 118, 90); font-weight: bold;">
+									<i class="fa fa-handshake-o" aria-hidden="true"> Add Staff</i>
+								</a>
+								<a href="" target="_blank" class="wt-btn" style="background-color:rgb(128, 11, 110);; font-weight: bold;">
+									<i class="fa fa-eye"> View Monitor</i>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>

@@ -1,0 +1,27 @@
+
+{% for user in users %}
+<tr>
+    <tr>
+        <td class="text-center">{{forloop.counter}}</td>
+        <td class="text-left">{{user.get_full_name}}</td>  
+        <td class="text-left">{{user.email}}</td>  
+        <td>{{user.get_user_type_display}}</td>  
+        <td>{{user.date_joined|date:'M-d-Y'}}</td>  
+        <td>{{user.last_login}}</td>  
+        <td>{% if user.is_active %} <i class="fa fa-check" style="color:green;"></i> {% else %} <i class="fa fa-close" style="color:red;"></i>{% endif %}</td>  
+
+        <td>
+            <form>{% csrf_token %}
+                <input type="text" name="userblockunblock" value="{{user.pk}}" id="{{user.pk}}" hidden>
+                <button type="button" class="badge badge-{% if user.is_active %}success{% else %}danger{% endif %} badge"
+                    hx-post="{% url 'account:block_or_unblock' %}"
+                    hx-target="#user-manager"
+                    hx-confirm="By proceeding, you agree that an inactive user will be active. Same way active user will be inactive and cannot login until you activate again.">
+                    {% if user.is_active %}Activated{% else %}Deactivated{% endif %}
+                </button>
+            </form>
+        </td>
+        
+    </tr>
+</tr>
+{% endfor %}

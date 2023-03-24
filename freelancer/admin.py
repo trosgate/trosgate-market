@@ -225,6 +225,3 @@ class FreelancerActionAdmin(admin.ModelAdmin):
         return actions
 
 
-# admin.site.register(Freelancer, FreelancerAdmin)
-# admin.site.register(FreelancerAccount, FreelancerAccountAdmin)
-# admin.site.register(FreelancerAction, FreelancerActionAdmin)

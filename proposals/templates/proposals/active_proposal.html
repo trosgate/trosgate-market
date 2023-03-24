@@ -42,7 +42,7 @@
 
 											{% if team and proposals.status == 'active' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fa fa-info"></i> Details</a>
-											<a href="{% url 'proposals:modify_proposal_step_one' proposals.id proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a></div>
+											<a href="{% url 'proposals:modify_proposals' proposals.id proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a></div>
 											{% elif team and proposals.status == 'review' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fas fa-spinner fa-spin"></i> Details</a></div>
 											{% elif team and proposals.status == 'archived' %}
@@ -50,7 +50,7 @@
 											<div class="wt-btnarea"><a href="{% url 'proposals:reactivate_archive_proposal' proposals.created_by.short_name proposals.slug %}" class="btn btn-danger"><i class="fa fa-window-restore"></i> Restore</a></div>
 											{% elif team and proposals.status == 'modify' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fa fa-info"></i> Details</a></div>
-											<div class="wt-btnarea"><a href="{% url 'proposals:modify_proposal_step_one' proposals.id proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a></div>
+											<div class="wt-btnarea"><a href="{% url 'proposals:modify_proposals' proposals.id proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a></div>
 											{% endif %}
 											
 											<div class="wt-hireduserstatus">

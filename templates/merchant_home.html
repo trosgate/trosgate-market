@@ -1,3 +1,4 @@
+
 {% extends "dashboard/main_base.html" %}
 {% load static %}
 {% load widget_tweaks %}
@@ -80,122 +81,7 @@
 
 			<!--Main Start-->
 			<main class="wt-haslayout" style="background:white;">
-				<!--Gateways Start-->
-				{% if home_layout.show_gateways == True %}
-				<section class="wt-haslayout wt-main-section">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-								<div class="wt-sectionhead wt-textcenter">
-									<h3>{% if home_layout.gateway_title %}{{home_layout.gateway_title}}{% endif %}</h3>
-								</div>
-							</div>
-							<div class="wt-categoryexpl">
-								<div class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
-									<div class="row">
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span><i class="far fa-money-bill-alt fa-4x" style="color:green;"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Stripe Checkout</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span><i class="fa fa-paypal fa-4x" style="color:blue;"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Paypal Checkout</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>												
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span style="color:orange;"><i class="fa fa-balance-scale fa-4x"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Razorpay Checkout</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>	
-										<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-											<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
-												<span><i class="fa fa-mobile fa-4x" style="color:violet;"></i><span><i class="fa fa-check fa-2x" style="color:violet;"></i></span>
-												<div class="wt-insightdetails">
-													<div class="wt-title">
-														<span><strong>Africa's Momo (Flutterwave)</strong></span>
-													</div>													
-												</div>	
-											</div>
-										</div>	
-									</div>
-								</div>	
-							</div>
-						</div>
-					</div>
-				</section>
-				{% endif %}
-
-				<div class="container">
-					<section class="wt-haslayout wt-dbsectionspace">
-						<div class="row justify-content-md-center">				
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
-								<div class="wt-dashboardbox">
-									<div class="wt-sectionhead wt-textcenter">
-										<h3>Become a Merchant Today</h3>
-									</div>
-									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-										<div id="packaging" class="wt-dashboardboxcontent wt-packages">
-											<div class="wt-package wt-packagedetails">
-												<div class="wt-packagehead">
-												</div>
-												<div class="wt-packagecontent">
-													<ul class="wt-packageinfo">
-														<li class="wt-packageprices"><span>Price</span></li>
-														<li><span>Group Chat</span></li>
-														<li><span>Fund Transfer - Within Team</span></li>
-														<li><span>Member Per Team</span></li>
-														<li><span>Monthly Contracts Per Team</span></li>
-														<li><span>Max Proposals Per Team</span></li>
-														<li><span>Monthly Application Per Team</span></li>
-													</ul>
-												</div>
-											</div>
-											{% for package in packages %}
-											<div class="wt-package wt-baiscpackage">
-												<div class="wt-packagehead">
-													<h3>{% firstof package.verbose_type package.type %}</h3>
-													<span>{{package.get_status_display}}</span>
-												</div>
-												<div class="wt-packagecontent">
-													<ul class="wt-packageinfo">
-														<li class="wt-packageprice"><span><sup>{{base_currency_symbol}}</sup>{{package.price}}<sub>\ Month</sub></span></li>
-														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
-														<li><span>{% if package.max_member_per_team > 1 %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
-														<li><span>{% if package.max_member_per_team > 0 %} <i class="ti-check"> {{package.max_member_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_member_per_team}} </i>{% endif %}</span></li>
-														<li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">{{package.monthly_offer_contracts_per_team}}</i> {% else %} <i class="ti-na">.</i>{% endif %}</span></li>
-														<li><span>{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">{{package.max_proposals_allowable_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
-														<li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check">{{package.monthly_projects_applicable_per_team}}</i>{% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
-													</ul>
-													<div>
-														<button class="btn btn-success">30 Days Free, no card required</button>
-													</div>
-												</div>
-											</div>
-											{% endfor %}
-											
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</section>
-				</div>
+				
 				<div class="wt-haslayout wt-main-section">
 					<div class="container">
 						<div class="row justify-content-md-center">
@@ -246,7 +132,7 @@
 					<div class="wt-companysinfoholder">	
 						<div class="container">
 							<div class="row justify-content-md-center">
-							{% for proposal in proposal_list %}
+							{% for proposal in proposals %}
 								<div class="col-12 col-sm-12 col-md-12 col-lg-3">
 									<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 										<figure class="wt-companysimg">
@@ -284,7 +170,7 @@
 								</div>
 							</div>
 							{% endfor %}
-								{% if not proposal_list %}
+								{% if not proposals %}
 									<p> No featured proposals to show yet </p>
 								{% endif %}
 							</div>

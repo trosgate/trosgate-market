@@ -42,12 +42,26 @@ class PaypalCheckout:
             },
         })
         if payment.create():
+            # Save the PayPal payment ID in the session
+            payment_id = payment.id
+            request.session["paypal_payment_id"] = payment_id
+
+            # Extract the PayPal payment approval URL from the payment object
             for link in payment.links:
-                if link.rel == "approval_url":
-                    return link.href
+                if link.method == "REDIRECT":
+                    approval_url = str(link.href)
+                    return {"url": approval_url}
         else:
             # Handle any PayPal errors here
             return None
+
+        # if payment.create():
+        #     for link in payment.links:
+        #         if link.rel == "approval_url":
+        #             return link.href
+        # else:
+        #     # Handle any PayPal errors here
+        #     return None
             
     def create_recurrent(self, amount, currency="USD", description="", customer_email=None, success_url=None, cancel_url=None, interval="MONTH"):
             plan = paypalrestsdk.Plan({
@@ -109,3 +123,26 @@ class PaypalCheckout:
             else:
                 # Handle any PayPal plan creation errors here
                 return f"Error creating PayPal plan: {plan.error}"
+
+    def webhook(self, request):
+        # Verify the webhook request
+        try:
+            event = paypalrestsdk.WebhookEvent(request.body, request.META["HTTP_PAYPAL_SIGNATURE"])
+        except ValueError:
+            # Invalid payload
+            return HttpResponse(status=400)
+        except paypalrestsdk.exceptions.UnauthorizedAccess:
+            # Invalid signature
+            return HttpResponse(status=401)
+
+        # Handle the event based on its type
+        if event.event_type == "PAYMENT.SALE.COMPLETED":
+            sale = paypalrestsdk.Sale.find(event.resource["parent_payment"])
+            # Process the completed sale here
+            return HttpResponse(status=200)
+        elif event.event_type == "PAYMENT.SALE.DENIED":
+            # Handle the denied sale here
+            return HttpResponse(status=200)
+        else:
+            # Ignore unknown events
+            return HttpResponse(status=200)

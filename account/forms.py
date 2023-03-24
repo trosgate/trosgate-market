@@ -10,8 +10,6 @@ from freelancer.models import Freelancer, FreelancerAccount
 from payments.models import PaymentAccount
 from client.models import Client, ClientAccount
 from teams.models import Team, Invitation
-from django.utils.text import slugify
-from notification.mailer import new_user_registration
 from contract.models import Contract
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
@@ -115,7 +113,7 @@ class CustomerRegisterForm(forms.ModelForm):
     def save(self):
         user = super().save(commit=False)
         try:
-            user = Customer.objects.create_merchant_user(
+            Customer.objects.create_merchant_user(
                 email=self.cleaned_data.get('email'), 
                 first_name = self.cleaned_data.get("first_name"),
                 last_name = self.cleaned_data.get('last_name'), 
@@ -125,7 +123,7 @@ class CustomerRegisterForm(forms.ModelForm):
                 phone = self.cleaned_data.get('phone'),
                 password = self.cleaned_data.get("password1"),
             )
-            db_transaction.on_commit(lambda: new_user_registration(user))
+
         except Exception as e:
             error = str(e)
             raise ValidationError(f"{error}")
@@ -219,19 +217,20 @@ class MerchantRegisterForm(forms.ModelForm):
     @db_transaction.atomic
     def save(self):
         user = super().save(commit=False)
-        package = int(self.cleaned_data['package'])
-        selected_package = get_object_or_404(Package, pk=package)
-
-        user = Customer.objects.create_merchant(
-            email=self.cleaned_data.get('email'), 
-            business_name = self.cleaned_data.get("business_name"),
-            password = self.cleaned_data.get("password1"),
-            first_name = self.cleaned_data.get('first_name'),
-            last_name = self.cleaned_data.get('last_name'), 
-            country = self.cleaned_data.get('country'),
-            package=selected_package
-        )
-        db_transaction.on_commit(lambda: new_user_registration(user, user.email))
+        try:
+            selected_package = Package.objects.get(pk=int(self.cleaned_data['package']))
+            Customer.objects.create_merchant(
+                email=self.cleaned_data.get('email'), 
+                business_name = self.cleaned_data.get("business_name"),
+                password = self.cleaned_data.get("password1"),
+                first_name = self.cleaned_data.get('first_name'),
+                last_name = self.cleaned_data.get('last_name'), 
+                country = self.cleaned_data.get('country'),
+                package=selected_package
+            )
+        except Exception as e:
+            error = str(e)
+            raise ValidationError(f"{error}")
 
         return user
 

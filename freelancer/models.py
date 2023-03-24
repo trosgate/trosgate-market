@@ -419,7 +419,7 @@ class FreelancerAction(models.Model):
     )
     merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='actionmerchant', on_delete=models.PROTECT)        
     account = models.ForeignKey(FreelancerAccount, verbose_name=_("Account"), related_name="fundmanageraccount", on_delete=models.PROTECT)
-    gateway = models.ForeignKey('general_settings.PaymentGateway', verbose_name=_("Payment Account"), related_name="paymentaccount", blank=True, null=True, on_delete=models.SET_NULL)
+    gateway = models.ForeignKey('payments.PaymentGateway', verbose_name=_("Payment Account"), related_name="paymentaccount", blank=True, null=True, on_delete=models.SET_NULL)
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Manager"), related_name="fundtransferor", on_delete=models.PROTECT)
     team_staff = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Staff"), related_name='fundtransferee', blank=True, null=True, on_delete=models.SET_NULL)
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='fundtransferteam', on_delete=models.PROTECT)

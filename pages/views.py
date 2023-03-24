@@ -34,7 +34,8 @@ from general_settings.fees_and_charges import (
     get_extra_proposal_value,
     get_extra_contract_value   
 )
-from general_settings.models import PaymentGateway, Payday
+from payments.models import PaymentGateway
+from general_settings.models import Payday
 from account.models import Package
 from control_settings.utilities import homepage_layout
 from analytics.analytic import (

@@ -4,10 +4,11 @@ from account.models import Country, Package, Customer
 from general_settings . models import (
     WebsiteSetting, Category, Department, Size, PaymentsControl, 
     SubscriptionGateway, DepositControl, ProposalGuides, Mailer,
-    Skill, DiscountSystem, PaymentGateway, DepositGateway, HiringFee, 
-    Currency, Payday, StorageBuckets, TestEmail, PaymentAPIs,
+    Skill, DiscountSystem, DepositGateway, HiringFee, 
+    Currency, Payday, StorageBuckets, TestEmail, 
     AutoLogoutSystem, ExachangeRateAPI
 )
+from payments.models import PaymentAPIs, PaymentGateway
 from control_settings.models import LayoutSetting
 from teams . models import Team, Invitation
 from proposals . models import Proposal
@@ -46,8 +47,8 @@ class Command(BaseCommand):
         if not AutoTyPist.objects.count():
             call_command("loaddata", "fixures/db_autotypist.json")
 
-        if not Customer.objects.count():
-            call_command("loaddata", "fixures/db_admin_auth.json")
+        # if not Customer.objects.count():
+        #     call_command("loaddata", "fixures/db_admin_auth.json")
 
         if not LayoutSetting.objects.count():
             call_command("loaddata", "fixures/db_layout.json")
@@ -61,8 +62,8 @@ class Command(BaseCommand):
         if not TestEmail.objects.count():
             call_command("loaddata", "fixures/db_testmail.json")
 
-        if not PaymentAPIs.objects.count():
-            call_command("loaddata", "fixures/db_paymentapis.json")
+        # if not PaymentAPIs.objects.count():
+        #     call_command("loaddata", "fixures/db_paymentapis.json")
 
         if not AutoLogoutSystem.objects.count():
             call_command("loaddata", "fixures/db_autologout.json")
@@ -118,8 +119,8 @@ class Command(BaseCommand):
         if not Package.objects.count():
             call_command("loaddata", "fixures/db_packages.json")
 
-        # if not TermsAndConditions.objects.count():
-        #     call_command("loaddata", "db_termsandcond.json")
+        if not TermsAndConditions.objects.count():
+            call_command("loaddata", "db_termsandcond.json")
 
         if not Hiring.objects.count():
             call_command("loaddata", "fixures/db_howitworkhiring.json")
@@ -134,8 +135,8 @@ class Command(BaseCommand):
 
         # FIXURE OBJECTS INSERTION STARTS FROM HERE
 
-        if not Freelancer.objects.count():
-            call_command("loaddata", "fixures/db_freelancer_auth.json")
+        # if not Freelancer.objects.count():
+        #     call_command("loaddata", "fixures/db_freelancer_auth.json")
 
         # customers = Customer.objects.filter(user_type='freelancer')
         # teams = Team.objects.all()

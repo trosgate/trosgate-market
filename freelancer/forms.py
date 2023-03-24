@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from .models import Freelancer, FreelancerAction, FreelancerAccount
-from general_settings.models import Department, Size, PaymentGateway
+from general_settings.models import Department, Size
+from payments.models import PaymentGateway
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.forms import ModelForm
@@ -129,7 +130,6 @@ class FreelancerForm(forms.ModelForm):
             self.fields[field].required = True
 
 
-
 class FundTransferForm(forms.ModelForm):
 
     team_staff = forms.ModelChoiceField(queryset=Freelancer.objects.all(), empty_label='Select Receiver')
@@ -162,7 +162,7 @@ class WithdrawalForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(WithdrawalForm, self).__init__(*args, **kwargs)
-        self.fields['gateway'].queryset = PaymentGateway.objects.filter(status=True).exclude(name="Balance")
+        self.fields['gateway'].queryset = PaymentGateway.objects.filter(status=True).exclude(name="balance")
 
         self.fields['gateway'].widget.attrs.update(
             {'class': 'form-control col-12 float-left', 'placeholder': ''})

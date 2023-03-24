@@ -1,9 +1,9 @@
 [
     {
-        "model": "general_settings.paymentgateway",
+        "model": "payments.paymentgateway",
         "pk": 1,
         "fields": {
-            "name": "Balance",
+            "name": "balance",
             "status": true,
             "default": true,
             "processing_fee": 0,
@@ -11,7 +11,7 @@
         }
     },
     {
-        "model": "general_settings.paymentgateway",
+        "model": "payments.paymentgateway",
         "pk": 2,
         "fields": {
             "name": "PayPal",
@@ -22,10 +22,10 @@
         }
     },
     {
-        "model": "general_settings.paymentgateway",
+        "model": "payments.paymentgateway",
         "pk": 3,
         "fields": {
-            "name": "Stripe",
+            "name": "stripe",
             "status": true,
             "default": false,
             "processing_fee": 10,
@@ -33,10 +33,10 @@
         }
     },
     {
-        "model": "general_settings.paymentgateway",
+        "model": "payments.paymentgateway",
         "pk": 4,
         "fields": {
-            "name": "Flutterwave",
+            "name": "flutterwave",
             "status": true,
             "default": false,
             "processing_fee": 12,
@@ -44,14 +44,25 @@
         }
     },
     {
-        "model": "general_settings.paymentgateway",
+        "model": "payments.paymentgateway",
         "pk": 5,
         "fields": {
-            "name": "Razorpay",
+            "name": "razorpay",
             "status": true,
             "default": false,
             "processing_fee": 15,
             "ordering": 5
+        }
+    },
+    {
+        "model": "payments.paymentgateway",
+        "pk": 6,
+        "fields": {
+            "name": "mtn_momo",
+            "status": true,
+            "default": false,
+            "processing_fee": 15,
+            "ordering": 6
         }
     }
 ]

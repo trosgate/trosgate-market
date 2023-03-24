@@ -1,308 +1,263 @@
 {% extends "dashboard/main_base.html" %}
+{% load widget_tweaks %}
+{% block content %}
 {% load static %}
-{% block content%}
 {% include 'dashboard/main_sidebar.html' %}
 
-			<!--Main Start-->
-			<main id="wt-main" class="wt-main wt-haslayout">
+<!--Main Start-->
+	<main id="ticket-list" class="wt-main wt-haslayout">
+		
+		{% include 'account/partials/merchant_dashboard.html' %}
+		
+		{% comment %} style="transform: rotate(4deg);" {% endcomment %}
 
-			<!--More Details Start-->
-			<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
-				<div class="row">
+		<!--More Details Start-->
+		<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+			<div class="row">
+				
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span style="color:red;"><i class="fa fa-gear fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Manage Settings<i class="fa fa-check text-success pt-1"></i></h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span style="color:orange;"><i class="fa fa-building fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Theme Settings<i class="fa fa-close text-danger pt-1"></i></h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span style="color:green;"><i class="far fa-money-bill-alt fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Payment Settings<i class="fa fa-close text-danger pt-1"></i></h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>												
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span class="wt-pakagespinner"><i class="fa fa-spinner wt-uploading"></i> D29 : H06 : M38 : S42</span>
+						<figure class="wt-userlistingimg">
+							<img src="{% static 'images/thumbnail/img-21.png' %}" alt="image description" class="mCS_img_loaded">
+						</figure>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Check Package Expiry</h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>						
+				
+			</div>
+		</section>
+		<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span style="color:green;"><i class="fa fa-folder-open fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Manage Proposal</h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span style="color:gold;"><i class="fa fa-envelope fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Manage Jobs</h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox">
+						<span style="color:blue;"><i class="fa fa-book fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Manage Contracts</h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>												
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+					<div class="wt-insightsitem wt-dashboardbox wt-insightnoticon">
+						<span style="color:purple;"><i class="fa fa-ticket fa-4x"></i><br><br></span>
+						<div class="wt-insightdetails">
+							<div class="wt-title">
+								<h3>Manage Tickets</h3>
+								<a href="javascript:void(0)">Click To View</a>
+							</div>													
+						</div>	
+					</div>
+				</div>												
 					
-					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-						<div class="wt-insightsitem wt-dashboardbox">
-							<figure class="wt-userlistingimg">
-								<img src="{% static 'images/thumbnail/img-20.png'%}" alt="image description" class="mCS_img_loaded">
-							</figure>
-							<div class="wt-insightdetails">
-								<div class="wt-title">
-									<h3>Brand Profile</h3>
-									<a href="{{client_profile.modify_client_get_absolute_url}}">Click To Update</a> |
-									<a href="{{client_profile.client_profile_get_absolute_url}}"target='_blank'>Click To Preview</a>
-								</div>													
-							</div>	
-						</div>
-					</div>												
-					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-						<div class="wt-insightsitem wt-dashboardbox">
-							<figure class="wt-userlistingimg">
-								<img src="{% static 'images/thumbnail/img-19.png'%}" alt="image description" class="mCS_img_loaded">
-							</figure>
-							<div class="wt-insightdetails">
-								<div class="wt-title">
-									<h3>Admin Notice<small><sup class="badge badge-danger badge-sm text-white">New</sup></small></h3>
-									<a href="{% url 'marketing:notice' %}" target='_new'>Click To View</a>
-								</div>													
-							</div>	
-						</div>
+			</div>
+		</section>
+		<!--More Details End-->
+
+		<div class="wt-proposalholder mt-6">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
+	{% comment %} <div id="callable" class="table-responsive"  
+			hx-get="{% url 'tickets:callable_ticket' %}" 
+			hx-trigger="every 1s" 
+			hx-swap="innerhtml"
+			style="display:none"> 
+			callable
+		{% include 'tickets/partials/dashboard_tables.html' %}
+	</div> {% endcomment %}		
+	</main>
+
+	<!-- Add team Popup Start-->
+	<!-- Popup Start-->
+	<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="teammodal">
+		<div class="modal-dialog" role="document">
+			<div class="wt-modalcontent modal-content">
+				<div class="wt-popuptitle">
+					<h2>Create virtual Space (<a href="" style="color:green"><i class="fas fa-sync fa-spin"></i> Refresh</a>)</h2>
+					
+					<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close" style="color:red;"></i></a><br><br>
+					<div id='registerError'></div>	
+				</div>
+				<div class="modal-body">
+				<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
+					<div class="form-group">
+						{{regform.first_name.label}}
+						{{regform.first_name}}
+						<span style="color:red;" role="alert">{{ regform.first_name.errors}}</span>
+					</div> 
+					<div class="form-group">
+						{{regform.last_name.label}}
+						{{regform.last_name}}
+						<span style="color:red;" role="alert">{{ regform.last_name.errors}}</span>
+					</div>
+					<div class="form-group">
+						{{regform.short_name.label}}
+						{% render_field regform.short_name class+='form-control' hx-post='/verify_username/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#short_name_status' %} 
+						<span style="color:red;" role="alert">{{ regform.short_name.errors}}</span>
+						<div id="short_name_status" class="input-group col-lg-12"></div>
+					</div>
+					<div class="form-group">
+						{{regform.email.label}}
+						{{regform.email}}
+						<span style="color:red;" role="alert">{{ regform.email.errors}}</span>
 					</div>	
-					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
-						<div class="wt-insightsitem wt-dashboardbox">
-							<figure class="wt-userlistingimg">
-								<img src="{% static 'images/thumbnail/img-21.png'%}" alt="image description" class="mCS_img_loaded">
-							</figure>
-							<div class="wt-insightdetails">
-								<div class="wt-title">
-									<h3>Applicants</h3>
-									<a href="{% url 'applications:application_multiple_summary' %}">Click To View</a> 
-									{% comment %} <a href="{{client_profile.client_profile_get_absolute_url}}"target='_blank'>Click To Preview</a> {% endcomment %}
-								</div>													
-							</div>	
-						</div>
-					</div>																	
-				</div>
-			</section>
-			<div class="wt-haslayout wt-innerbannerholder">
-                <div class="container">
-                    <div class="row justify-content-md-center">
-                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-                            <div class="wt-innerbannercontent">
-                            <div class="wt-title"><h2>{{request.site.name}} - S</h2></div>
-                                <ol class="wt-breadcrumb">
-                                    <li class="wt-active">{{request.merchant.name}} - M</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-			<div class="wt-proposalholder">
-				<div class="container">
-					<div class="row justify-content-md-center">
-						<div class="col-12">
-							<div class="wt-sectionhead wt-textcenter">
-								<div class="wt-sectiontitle">
-									<h2>Open Projects</h2>
-									<div class="alert alert-info" role="alert">
-										<span style="color: green; font-weight: bold;"> These projects are open for applications</span>
-									</div>
-								</div>
-							</div>
-						</div>
+					<div class="form-group">
+						{{regform.phone.label}}
+						{{regform.phone}}
+						<span style="color:red;" role="alert">{{ regform.phone.errors}}</span>
 					</div>
-				</div>				
-
-				<div class="table-responsive">
-					<table class="table table-striped table-sm">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Your Posted Jobs</th>
-								<th>Open Until</th>
-								<th>Applicants</th>
-								<th>Project</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						
-						<tbody>
-							{% for project in open_projects %}
-							<tr>
-								<tr>
-								<td>{{forloop.counter}}</td> 
-								<td>{{project.title|truncatechars:200}}</a></td>
-								<td><class="wt-hireduserstatus">{{project.duration}}</td>
-								<td><class="wt-hireduserstatus"> {{ project.applications.count }} </td>
-								<td><a class="btn btn-outline-info btn-sm mt-2" href="{{project.get_project_absolute_url}}">Preview</a></td>
-								<td><a class="btn btn-outline-success btn-sm mt-2" href="{% url 'applications:application_detail' project.slug %}"> Messages </a></td>
-								</tr>
-							</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-					{% if not open_projects %}
-					<hr>
-						<div class="text-center">
-							<span style="font-weight: bold;"> Ooops! No Applications to show at the moment</span>
-						</div>
-						{% endif %}
+					<div class="form-group wt-btnarea">
+						<button id="registerNow" type="button" class="wt-btn"> Invite to team </button>
+					</div>	
+															
+				</form>
 				</div>
 			</div>
-			{% if closed_projects|length > 0 %}
-			<div class="wt-proposalholder">
-				<div class="container">
-					<div class="row justify-content-md-center">
-						<div class="col-12">
-							<div class="wt-sectionhead wt-textcenter">
-								<div class="wt-sectiontitle">
-									<h2>Closed Projects</h2>
-									<div class="alert alert-info" role="alert">
-										<span style="color: green; font-weight: bold;"> You can re-open these projects when you preview to modify the deadlines</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>				
+		</div>
+	</div>
+	
+	{% endblock %}
 
-				<div class="table-responsive">
-					<table class="table table-striped table-sm">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Your Posted Jobs</th>
-								<th>Applicants</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						
-						<tbody>
-							{% for project in closed_projects %}
-							<tr>
-								<tr>
-								<td>{{forloop.counter}}</td> 
-								<td>{{project.title|truncatechars:200}}</a></td>
-								<td><a class="btn btn-outline-success btn-sm mt-2" href="{% url 'applications:application_detail' project.slug %}"><i class="fa fa-arrow-up"></i> {{ project.applications.count }} applied </a></td>
-								<td><a class="btn btn-outline-info btn-sm mt-2" href="{{project.get_reopen_project_absolute_url}}"><i class="fa fa-window-restore"></i> Re-Open</a></td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-					{% if not closed_projects %}
-					<hr>
-					<div class="text-center">
-						<span style="color: blue; font-weight: bold;"> Ooops! No Applications to show at the moment</span>
-					</div>
-					{% endif %}
-				</div>
-			</div>
-			{% endif %}
+	{% block scripts %}
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	
+	<script> 
+		$(document).on('click', '#refreshform', function (e) {
+			e.preventDefault();
+			$("#refreshform").load(window.location.href + " #refreshform" );
+		});
+	</script>
 
-				<!--Company listing starts-->
-				<div class="wt-proposalholder">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-12">
-								<div class="wt-sectionhead wt-textcenter">
-									<div class="wt-sectiontitle">
-										<h2>Contracts</h2>
-										<div class="alert alert-info" role="alert">
-											<span style="color: green; font-weight: bold;"> All Your Internal contracts Created</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>				
+	<script>
+		//Script to add new user            
+		$(document).on('click', '#registerNow', function (e) {
+		e.preventDefault();
 
-					<div class="table-responsive">
-						<table class="table table-striped table-sm">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Contract #</th>
-									<th>Awarded Team</th>
-									<th>Created On</th>
-									<th>Budget($)</th>
-									<th>Reaction</th>
-									<th>Message</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
-							
-							<tbody>
-								{% for contract in contracts %}
-								<tr>
-									<td>{{forloop.counter}} </td>
-									<td>{{contract.reference}}</td>
-									<td>{{contract.team.title}}</td>
-									<td>{{contract.date_created|date:"M-d-Y"}}</td>
-									<td>{{contract.grand_total}}</td>
-									<td>{{contract.get_reaction_display}}</td>
-									<td>
-										<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-folder-open"> Chat Team</i></a>
-									</td>
-									<td> 
-										<a href="{% url 'contract:internal_contract_detail' contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
-									</td> 
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-						{% if not contracts %}
-						<hr>
-						<div class="text-center">
-							<span style="color: blue; font-weight: bold;"> Ooops! No contract has been connected to you Yet.</span>
-						</div>
-						{% endif %}
-					</div>
-					{% if contracts|length > 5 %}
-					<div class="wt-commentsbtn">
-						<a href="{% url 'contract:internal_contract_list' %}" class="wt-btn"> View More</a>
-					</div>
-					{% endif %}
-				</div>
-				<div class="wt-proposalholder">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-12">
-								<div class="wt-sectionhead wt-textcenter">
-									<div class="wt-sectiontitle">
-										<h2>Proposals</h2>
-										<div class="alert alert-info" role="alert">
-											<span style="color: green; font-weight: bold;"> Latest Proposals for Hire</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>				
-					<section class="wt-haslayout wt-dbsectionspace">
-						<div class="row justify-content-md-center">
-						{% for proposal in proposals %}
-							<div class="col-12 col-sm-12 col-md-12 col-lg-3">
-								<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-									<figure class="wt-companysimg">
-									{% if proposal.thumbnail %}
-										<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
-									{% endif %}
-									</figure>
-									<div class="wt-companysinfo">
-										<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" style="height:80px;" alt="img description"></figure>
-										<div class="wt-title">
-											<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_full_name}}{% endif %}</a>
-											<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a> 
-										<hr>
-										<ul class="wt-postarticlemeta">
-											<li class="wt-following">
-												<a href="javascript:void(0);">
-													<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
-												</a>
-											</li>
-											<li class="wt-following">
-												<a href="javascript:void(0);">
-													<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
-												</a>
-											</li>
-											<li class="wt-following">
-												<a href="javascript:void(0);">
-													<span><i class="far fa-star"></i>5</span>
-												</a>
-											</li>
-										</ul>
-										</div>
-									</div>
-								</div>
-							</div>
-							{% endfor %}
-							{% if not proposals %}
-							<hr>
-							<div class="text-center">
-								<span style="color: green; font-weight: bold;"> No Proposals to show yet</span>
-							</div>
-							{% endif %}
-						</div>
-					</div>
-				</section>
-				<div class="wt-proposalholder">
-					<div class="row justify-content-md-center">
-						<div class="wt-sectionhead wt-textcenter">
-							<span>Copyright @ {{website.site_name}}</span>
-						</div>
-					</div>
-				</div>
-			</main>
+		let first_name = $('[name="first_name"]').val();
+		let last_name = $('[name="last_name"]').val();
+		let short_name = $('[name="short_name"]').val();
+		let email = $('[name="email"]').val();
+		let phone = $('[name="phone"]').val();
 
-{% endblock %}
+		let displaySuccess = document.getElementById('registerError')
+
+		$("#registerNow").attr("disabled", true);
+
+        if(first_name == ''||last_name == ''|| short_name ==''||email == ''|| phone ==''){
+            //swal("Alert!", "All fields are required", "error");
+
+			displaySuccess.textContent = '';
+			$('#registerError').removeClass('alert alert-success');
+			displaySuccess.textContent = 'All fields are required'
+			$('#registerError').addClass('alert alert-danger');
+            return false;
+
+        }
+        else{
+			$.ajax({
+				type: 'POST',
+				url: '{% url "account:register" %}',
+				data: {
+					first_name: first_name,
+					last_name: last_name,
+					short_name: short_name,
+					email: email,
+					phone: phone,
+					csrfmiddlewaretoken: "{{csrf_token}}",
+					action: 'register-now'
+				},
+				success: function (json) {
+					if (json.errors != ''){
+						displaySuccess.textContent = '';
+						$('#registerError').removeClass('alert alert-success');
+						displaySuccess.textContent = json.message;
+                		$('#registerError').addClass('alert alert-danger');
+						document.getElementById('registerError').innerHTML = json.errors
+
+					}else{
+						$('[name="first_name"]').val('');
+						$('[name="last_name"]').val('');
+						$('[name="short_name"]').val('');
+						$('[name="email"]').val('');
+						$('[name="phone"]').val('');
+
+						displaySuccess.textContent = '';
+						$('#registerError').removeClass('alert alert-danger');
+						displaySuccess.textContent = json.message;
+                		$('#registerError').addClass('alert alert-success');
+						document.getElementById('registerError').innerHTML = json.message
+					}
+					$("#registerNow").attr("disabled", false);
+				},
+				error: function (xhr, errmsg, err) {}
+			});
+		}
+		})
+	</script>
+	{% endblock scripts %}

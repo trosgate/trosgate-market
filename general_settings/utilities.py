@@ -1,9 +1,9 @@
 from . models import WebsiteSetting
-
+from django.contrib.sites.models import Site
 
 def website_name():
     try:
-        return WebsiteSetting.objects.get(pk=1).site_name
+        return Site.objects.get_current().name
     except:
         return None
 
@@ -17,8 +17,8 @@ def get_protocol_only():
 
 def get_protocol_with_domain_path():
     try:
-        website_setting = WebsiteSetting.objects.get(pk=1)
-        return f'{website_setting.protocol}{website_setting.site_domain}'
+        website_setting = Site.objects.get_current()
+        return f'{get_protocol_only()}{website_setting.domain}'
     except:
         return None
 

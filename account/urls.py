@@ -14,7 +14,6 @@ app_name = 'account'
 
 # shared accounts app urls
 urlpatterns = [
-    # path('countries/', views.countries, name='countries'),
 
     path("", views.homepage, name='homepage'),
     path('subscription/<str:type>/', views.create_merchant, name='create_merchant'),
@@ -54,6 +53,7 @@ urlpatterns = [
         name="password_reset_complete",
     ),
         
+    path("account/users/", views.merchant_user, name = "merchant_user"), 
 ]
 
 htmx_urlpatterns = [
@@ -61,8 +61,9 @@ htmx_urlpatterns = [
     path("verify_team/", verify_team, name = "verify_team"),
     path('user_types/', user_types, name='user_types'),
     path('searchtype/', user_types, name='searchtype'),
-    path('remove_message/', views.remove_message, name='remove_message'),
     path('build_subdomain/', build_subdomain, name='build_subdomain'),
+    path('remove_message/', views.remove_message, name='remove_message'),
+    path('block_or_unblock/', views.block_or_unblock, name='block_or_unblock'),
 ]
 
 urlpatterns += htmx_urlpatterns

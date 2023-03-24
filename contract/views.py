@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ContractorForm, InternalContractForm, ExternalContractForm
 from .models import Contractor, Contract, InternalContract, ContractChat
 from django.db import transaction as db_transaction
-from general_settings.models import PaymentGateway
+from payments.models import PaymentGateway
 from account.models import Customer
 from proposals.models import Proposal
 from teams.models import Team
@@ -24,7 +24,6 @@ from general_settings.gateways import PayPalClientConfig, StripeClientConfig, Fl
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.fees_and_charges import get_contract_fee_calculator,get_external_contract_gross_earning, get_external_contract_fee_calculator
-from general_settings.models import PaymentGateway
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from teams.controller import PackageController

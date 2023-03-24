@@ -1,0 +1,41 @@
+<div class="col-12">
+    <nav>
+        <div class="nav nav-pills nav-justified">
+            <button class="nav-item nav-link text-white btn btn-info btn-sm" 
+                hx-get="{% url 'proposals:modify_proposal_step_one' proposal.pk proposal.slug %}"
+                hx-target="#step-1-form"
+                style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                <span><em class="badge badge-danger" style="border-radius; 50%;"> 1 </em>&nbsp; &nbsp;Introduction</span>
+            </button>
+            <button class="nav-item nav-link text-white btn btn-info btn-sm" 
+                hx-get="{% url 'proposals:modify_proposal_step_two' proposal.pk proposal.slug %}"
+                hx-target="#step-1-form"
+                style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                <span><em class="badge badge-danger" style="border-radius; 50%;"> 2 </em>&nbsp; &nbsp;Background</span>
+            </button>
+            <button class="nav-item nav-link text-white btn btn-info btn-sm" 
+                hx-get="{% url 'proposals:modify_proposal_step_three' proposal.pk proposal.slug %}"
+                hx-target="#step-1-form"
+                style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                <span><em class="badge badge-danger" style="border-radius; 50%;"> 3 </em>&nbsp; &nbsp;Faqs</span>
+            </button>
+            <button class="nav-item nav-link text-white btn btn-info btn-sm"
+                hx-get="{% url 'proposals:modify_proposal_step_four' proposal.pk proposal.slug %}"
+                hx-target="#step-1-form"
+                style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                <span><em class="badge badge-danger" style="border-radius; 50%;"> 4 </em>&nbsp; &nbsp;Attributes</span>
+            </button>
+        </div>
+    </nav>
+</div>
+
+{% comment %} <a class="nav-item nav-link text-white btn btn-success mt-2" 
+href="{% url 'proposals:modify_proposal_step_two' proposal.id proposal.slug %}">
+<i class="fa fa-arrow-right"> &nbsp; &nbsp; Background</i>
+</a>
+<a class="nav-item nav-link text-white btn btn-primary mt-2" 
+href="{% url 'proposals:modify_proposal_step_three' proposal.id proposal.slug %}">
+<i class="fa fa-arrow-right"> &nbsp; &nbsp; Faqs</i></a>
+<a class="nav-item nav-link text-white btn btn-success mt-2" 
+href="{% url 'proposals:modify_proposal_step_four' proposal.id proposal.slug %}">
+<i class="fa fa-arrow-right"> &nbsp; &nbsp; Attributes</i></a> {% endcomment %}

@@ -85,7 +85,7 @@
 							<div class="col-12 col-sm-12 col-md-12 col-lg-6 pull-right">
 								<div class="wt-signupcontent">
 									<div class="wt-title">
-										<h2><span> {{active_team.title}}</span>Active Team</h2>
+										<h2><span> {{active_team.title}}</span></h2>
 									</div>
 									<div class="wt-description">
 										<p>Consectetur adipisicing elit amissed dotem eiusmod tempor incuntes utneai labore etdolore.</p>
@@ -389,7 +389,7 @@
 							<th>Proposal</th>
 							<th>Author</th>
 							<th>Date Created </th>
-							<th>Progress</th>
+							<th>Status</th>
 							<th>Action</th>
 							
 						</tr>
@@ -401,9 +401,9 @@
 							<td>{{forloop.counter}} </td>
 							<td class='text-left'>{{proposal.title}}</td>
 							<td>{{proposal.created_by.get_full_name}}</td>
+							<td>{{proposal.get_status_display}}</td>
 							<td>{{proposal.created_at|date:"M-d-Y"}}</td>
-							<td>{{proposal.percent_progress}} Complete</td>
-							<td><a href="{% url 'proposals:modify_proposal_step_one' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></td>
+							<td><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></td>
 						</tr>
 						{% endfor %}
 					</tbody>

@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.contrib.auth import logout
 
 
+
 class DynamicHostMiddleware:
     '''
         To update the URLs dynamically based on the requested domain, 
@@ -61,8 +62,17 @@ class DynamicHostMiddleware:
         else:
             request.parent = None
 
+        request.tenant = self.is_merchant_family(request, site)
+
         response = self.get_response(request)
         return response
+
+    def is_merchant_family(self, request, site):
+        """Check and assign object to Merchant."""
+        if not request.user.is_authenticated:
+            return Merchant.objects.filter(site=site).first()
+        elif request.user.is_authenticated and not request.user.is_admin:
+            return request.user.active_merchant_id
 
 
 class MerchantGateMiddleware:
@@ -80,9 +90,10 @@ class MerchantGateMiddleware:
 
     def __call__(self, request):
         request.merchant = None
-        if request.user.is_authenticated and request.user.user_type == 'merchant':
+        
+        if request.user.is_authenticated and request.user.is_merchant:
 
-            request.merchant = Merchant.objects.filter(merchant=request.user).first()
+            request.merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
             
             gate_url = reverse("account:dashboard") # subscriptions:complete
             if (
@@ -99,3 +110,5 @@ class MerchantGateMiddleware:
     def is_granted_passage(self, path):
         """Check if the request is allowed against the allow list."""
         return any(pattern.match(path) for pattern in self.allow_list_patterns)
+    
+

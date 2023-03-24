@@ -75,7 +75,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_assistant = models.BooleanField(_("Virtual Assistant"), default=False)
     user_type = models.CharField(_("User Type"), choices=USER_TYPE, max_length=30)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-
+    active_merchant_id = models.PositiveIntegerField(_("Active Merchant ID"), default=0)
     date_joined = models.DateTimeField(_("Date Joined"), auto_now_add=True)
     last_login = models.DateTimeField(_("Last Login"), auto_now=True)
 
@@ -171,7 +171,12 @@ class Package(models.Model):
     # Initial Plan Configuration
     type = models.CharField(_("Package Type"), choices=STATUS, default=STARTER, unique=True, max_length=50)
     verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_("Customize name for the package. If empty, the default names will be displayed"), max_length=50)
-    max_member_per_team = models.PositiveIntegerField(_("Max member Per Team"), default=1, help_text=_("You can only add up to 4 members for the biggest package"), validators=[MinValueValidator(1), MaxValueValidator(5)])
+    can_change_domain = models.BooleanField(_("Domain Change"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Merchant with this package can change domain"),)
+    ssl_activation = models.BooleanField(_("SSL Installation"), choices=((False, 'No'), (True, 'Yes')), default=True, help_text=_("Domains on site will be provided with ssl. We recommend actiovation for all domains"),)
+    max_num_of_staff = models.PositiveIntegerField(_("Number of Staff"), default=1, help_text=_("Numner of staffs that merchant can invite"), validators=[MinValueValidator(1), MaxValueValidator(5)])
+    can_upsell_teams = models.BooleanField(_("Upselling Subscription"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Merchant with this package can sell subscription to their freelancers who want to upgrade"),)
+    max_users_sitewide = models.PositiveIntegerField(_("Max number of users"), default=100, help_text=_("Total users including merchant and staffs"), validators=[MinValueValidator(100), MaxValueValidator(1000000)])
+    multiple_freelancer_teams = models.BooleanField(_("Multiple teams per Freelancer"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Each freelancer can create multiple teams"),)
     monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
     monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
@@ -227,7 +232,7 @@ class Merchant(models.Model):
         related_name="packages", 
         on_delete=models.PROTECT
     )
-
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Company Staff"), related_name="merchant_staff")    
     gender = models.CharField(
         _("Gender"), 
         max_length=10, 

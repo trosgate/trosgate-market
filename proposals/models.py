@@ -15,6 +15,8 @@ from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta
 from contract.models import InternalContract
 from django.urls import reverse
+from django.contrib.sites.models import Site
+from account.models import Merchant
 
 
 def proposal_images_path(instance, filename):
@@ -22,8 +24,20 @@ def proposal_images_path(instance, filename):
 
 
 class ActiveProposals(models.Manager):
-    def get_queryset(self):
+    def active_proposal(self):
         return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
+
+# class ActiveProposals(models.Manager):
+#     def for_merchant(self):
+#         return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
+
+  
+class MerchantManager(models.Manager):
+    def for_merchant(self, request):# get_queryset for_merchant
+        if hasattr(request, 'tenant') and request.tenant is not None:
+            return super().get_queryset(request).filter(merchant=request.tenant)
+        else:
+            return super().get_queryset(request)
 
 
 class Proposal(models.Model):
@@ -103,7 +117,9 @@ class Proposal(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="proposalauthor", on_delete=models.CASCADE)
     reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
     merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='proposalmerchant', on_delete=models.PROTECT)
+    
     objects = models.Manager()
+    # for_merchant = MerchantManager()
     active = ActiveProposals()
 
     class Meta:
@@ -132,10 +148,9 @@ class Proposal(models.Model):
                 self.reference = 'P' + str(uuid4()).split('-')[4]
             except:
                 self.reference = 'P' + str(uuid4()).split('-')[4]
+            self.slug=(slugify(self.title))
         super(Proposal, self).save(*args, **kwargs)
 
-    def percent_progress(self):
-        return f'{self.progress}%'
 
     @property
     def preview_proposal_sales_count(self):
@@ -167,13 +182,16 @@ class ProposalSupport(Proposal):
 
 
 class ProposalChat(models.Model):
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='proposalchats', on_delete=models.PROTECT)
     team = models.ForeignKey('teams.Team', verbose_name=_("Proposal Team"), related_name='proposalchats', on_delete=models.CASCADE)
     proposal = models.ForeignKey(Proposal, verbose_name=_("Proposal"), related_name='proposalschats', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='proposalsender', on_delete=models.CASCADE)
     content = models.TextField()
     sent_on = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-
+    objects = models.Manager()
+    for_merchant = MerchantManager()
+    
     class Meta:
         ordering = ['sent_on']
 

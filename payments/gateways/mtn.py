@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import uuid
 
+
 class MTNCheckout:
     def __init__(self):
         self.name = "mtn"

@@ -17,7 +17,8 @@ import json
 from general_settings.fund_control import get_min_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
 from future.utilities import get_transfer_feature
 from account.models import Country
-from general_settings.models import Category, PaymentGateway, Skill
+from general_settings.models import Category, Skill
+from payments.models import PaymentGateway
 from teams.models import Team
 from account.models import Customer
 from proposals.models import Proposal

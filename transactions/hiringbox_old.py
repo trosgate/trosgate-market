@@ -1,5 +1,5 @@
 from proposals.models import Proposal
-from general_settings.models import PaymentGateway, DiscountSystem
+from payments.models import PaymentGateway
 from django.conf import settings
 from general_settings.discount import (
     get_level_one_rate,

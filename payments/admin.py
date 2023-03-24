@@ -1,11 +1,73 @@
 from django.contrib import admin
-from .models import PaymentAccount, PaymentRequest, AdminCredit
+from .models import StripeMerchant, PayPalMerchant, FlutterwaveMerchant, RazorpayMerchant, MTNMerchant, PaymentAccount, PaymentRequest, AdminCredit
 from django.db import transaction as db_transaction
 from .forms import AdminApproveForm, PaymentChallengeForm
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
+
+
+
+@admin.register(StripeMerchant)
+class StripeMerchantAdmin(admin.ModelAdmin):
+    list_display = ['merchant',]
+    list_display_links = ['merchant']
+    # readonly_fields = ['merchant']
+    radio_fields = {'sandbox': admin.HORIZONTAL}
+    fieldsets = (
+        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
+        ('Stripe API', {'fields': ('stripe_public_key','stripe_secret_key', 'stripe_webhook_key',)}),
+        ('Stripe Package Subscription', {'fields': ('stripe_subscription_price_id',)}),
+    )
+
+
+@admin.register(PayPalMerchant)
+class PayPalMerchantAdmin(admin.ModelAdmin):
+    list_display = ['merchant',]
+    list_display_links = ['merchant']
+    # readonly_fields = ['merchant']
+    radio_fields = {'sandbox': admin.HORIZONTAL}
+    fieldsets = (
+        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
+        ('PayPal API', {'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id',)}),
+    )
+
+
+@admin.register(FlutterwaveMerchant)
+class FlutterwaveMerchantAdmin(admin.ModelAdmin):
+    list_display = ['merchant',]
+    list_display_links = ['merchant']
+    # readonly_fields = ['merchant']
+    radio_fields = {'sandbox': admin.HORIZONTAL}
+    fieldsets = (
+        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
+        ('Flutterwave API', {'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_subscription_price_id',)}),
+    )
+
+
+@admin.register(RazorpayMerchant)
+class RazorpayMerchantAdmin(admin.ModelAdmin):
+    list_display = ['merchant',]
+    list_display_links = ['merchant']
+    # readonly_fields = ['merchant']
+    radio_fields = {'sandbox': admin.HORIZONTAL}
+    fieldsets = (
+        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
+        ('Razorpay API', {'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
+    )
+
+
+@admin.register(MTNMerchant)
+class MTNMerchantAdmin(admin.ModelAdmin):
+    list_display = ['merchant',]
+    list_display_links = ['merchant']
+    # readonly_fields = ['merchant']
+    radio_fields = {'sandbox': admin.HORIZONTAL}
+    fieldsets = (
+        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
+        ('Stripe API', {'fields': ('mtn_api_user_id','mtn_api_key', 'mtn_subscription_key','mtn_callback_url',)}),       
+    )
 
 
 @admin.register(PaymentAccount)

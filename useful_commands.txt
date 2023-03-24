@@ -1,11 +1,12 @@
 //this will dumpdata
 python manage.py dumpdata teams.Team > new.json
+python manage.py dumpdata account.package > new.json
 python manage.py dumpdata proposals.Proposal > db_proposals.json
 python manage.py dumpdata > railway.json
 
 //this will indent dumpdata
 
-python manage.py dumpdata freelancer.Freelancer --indent 4 > db_freelancer_auth.json
+python manage.py dumpdata account.package --indent 4 > db_packages.json
 
 //listen to stripe webhook on a particular endpoint
 stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/   

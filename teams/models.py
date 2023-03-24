@@ -53,7 +53,7 @@ class Team(models.Model):
     notice = models.TextField(_("Notice"), max_length=500)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=INACTIVE)
+    status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=ACTIVE)
     package_status = models.CharField(_("Package Status"), max_length=20, choices=PACKAGE_STATUS, default=DEFAULT)
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     slug = models.SlugField(_("Slug"), max_length=100, editable=True)

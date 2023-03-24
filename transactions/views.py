@@ -16,7 +16,7 @@ from teams.models import Team
 from account.models import Package
 from proposals.models import Proposal
 from paypalcheckoutsdk.orders import OrdersGetRequest
-from general_settings.models import PaymentGateway
+from payments.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
 from .models import OneClickPurchase, ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
@@ -366,31 +366,21 @@ def stripe_payment_order(request):
     grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
 
-    stripe_obj = StripeClientConfig()
-    stripe_reference = stripe_obj.stripe_unique_reference()
-    stripe.api_key = stripe_obj.stripe_secret_key()
 
-    session = stripe.checkout.Session.create(
-        metadata = {'mode':'payment'},
-        payment_method_types=['card'],
-        line_items = [
-            {
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': 'Hiring of Applicants',
-                    },
-                    'unit_amount': grand_total * 100,
-                },
-                'quantity': 1
-            },
-        ],
-        mode='payment',
-        success_url=f"{get_protocol_only()}{str(get_current_site(request))}/transaction/congrats/",
-        cancel_url=f"{get_protocol_only()}{str(get_current_site(request))}/dashboard/",
+    stripe_checkout = StripeClientConfig()
+    success_url=f"{get_protocol_only()}{str(get_current_site(request))}/transaction/congrats/",
+    cancel_url=f"{get_protocol_only()}{str(get_current_site(request))}/dashboard/",
+
+    session = stripe_checkout.create_checkout(
+        amount=grand_total, 
+        currency='usd', 
+        customer_email=request.user.email, 
+        success_url=success_url,
+        cancel_url=cancel_url
     )
-    gateway_type = str(hiringbox.get_gateway())
+
     payment_intent = session.payment_intent
+    gateway_type = str(hiringbox.get_gateway())
 
     if Purchase.objects.filter(stripe_order_key=payment_intent).exists():
         pass
@@ -404,9 +394,8 @@ def stripe_payment_order(request):
                 client_fee = int(total_gateway_fee), 
                 category = Purchase.PROPOSAL,
                 payment_method=gateway_type,
-                salary_paid=grand_total,
-                unique_reference=stripe_reference,           
-            )           
+                salary_paid=grand_total           
+            )
             purchase.stripe_order_key=payment_intent
             purchase.status=Purchase.FAILED
             purchase.save()

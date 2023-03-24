@@ -1,6 +1,7 @@
 from .models import InternalContract
 from django.conf import settings
-from general_settings.models import PaymentGateway, DiscountSystem
+from payments.models import PaymentGateway
+from general_settings.models import DiscountSystem
 from general_settings.discount import (
     get_level_one_rate, get_level_two_rate, get_level_three_rate, 
     get_level_four_rate, get_level_one_start_amount, get_level_one_delta_amount, 

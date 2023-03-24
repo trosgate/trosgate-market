@@ -5,7 +5,7 @@ import stripe
 import secrets
 import requests
 from transactions.models import Purchase
-from general_settings.models import PaymentAPIs
+from payments.models import PaymentAPIs
 from django.conf import settings
 
 import razorpay
