@@ -1,81 +1,133 @@
 import stripe
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from payments.models import PaymentGateway
+from payments.models import PaymentGateway, StripeMerchant
+from account.fund_exception import GatewayModuleNotFound, GatewayNotConfigured, InvalidData
+from payments.checkout_card import CreditCard
 
 
-class StripeCheckout:
-    def __init__(self):
-        self.name = "stripe"
-        self.type_choices = (
-            ("stripe", "Stripe"),
-            ("paypal", "PayPal"),
-            ("razorpay", "Razorpay"),
-            ("flutterwave", "Flutterwave"),
-        )
+class StripeClientConfig:
+    display_name = "Stripe"
+    currency = "usd"
+
+    def __init__(self, request):
+        self.merchant = request.merchant
         # Load the Stripe keys from the database
         try:
-            payment_gateway = PaymentGateway.objects.get(status="stripe")
-            self.stripe_secret_key = payment_gateway.secret_key
-            self.stripe_public_key = payment_gateway.public_key
-            stripe.api_key = self.stripe_secret_key
+            gateway = PaymentGateway.objects.get(name=self.display_name, status='active')
         except PaymentGateway.DoesNotExist:
-            raise Exception("Stripe payment gateway not found in the database")
-        
-    def create_checkout(self, amount, currency="usd", description="", customer_email=None, success_url=None, cancel_url=None):
+            raise GatewayModuleNotFound("The '%s' gateway is not available." % self.display_name)
+
         try:
-            session = stripe.checkout.Session.create(
-                payment_method_types=["card"],
-                line_items=[{
-                    "price_data": {
-                        "currency": currency,
-                        "unit_amount": amount,
-                        "product_data": {
-                            "name": description,
-                        },
-                    },
-                    "quantity": 1,
-                }],
-                mode="payment",
-                success_url=success_url,
-                cancel_url=cancel_url,
-            )
-            return session.id
-        except stripe.error.StripeError as e:
-            # Handle any Stripe errors here
-            return None
+            active_gateway = gateway
+            payment_gateway=StripeMerchant.objects.get(merchant=self.merchant, gateway=active_gateway, status=self.name)
+            self.stripe_secret_key = payment_gateway.stripe_secret_key
+            self.stripe_public_key = payment_gateway.stripe_public_key
+            self.stripe_webhook_key = payment_gateway.stripe_webhook_key
+            self.stripe_subscription_price_id = payment_gateway.stripe_subscription_price_id
+            stripe.api_key = self.stripe_secret_key
         
-    def create_recurrent(self, amount, currency="usd", description="", customer_email=None, success_url=None, cancel_url=None, interval="month"):
+        except PaymentGateway.DoesNotExist:
+            raise GatewayNotConfigured("The '%s' gateway is not configured." % self.display_name)
+
+
+    def create_checkout(self, merchant, amount, credit_card):
+
+        if merchant is None:
+            raise InvalidData("Error occured on our side. Please try in few time")
+        
+        card = {
+            'object': 'card',
+            'number': credit_card.number,
+            'exp_month': credit_card.month,
+            'exp_year': credit_card.year,
+            'cvc': credit_card.verification_value
+        }
+        
         try:
-            customer = stripe.Customer.create(email=customer_email)
-            subscription = stripe.Subscription.create(
-                customer=customer.id,
-                items=[{
-                    "price_data": {
-                        "currency": currency,
-                        "unit_amount": amount,
-                        "product_data": {
-                            "name": description,
-                        },
-                    },
-                    "quantity": 1,
-                }],
-                payment_behavior="default_incomplete",
-                expand=["latest_invoice.payment_intent"],
-                billing_cycle_anchor="now",
-                cancel_url=cancel_url,
-                success_url=success_url,
-                metadata={"description": description},
-                trial_period_days=7,
-                default_payment_method_types=["card"],
-                proration_behavior="create_prorations",
-                interval=interval
+            response = stripe.Charge.create(
+                name=merchant.merchant.get_full_name(),
+                email=merchant.merchant.email,
+                amount=int(amount * 100),
+                currency= self.currency,
+                source=card
             )
-            return subscription.id
-        except stripe.error.StripeError as e:
-            # Handle any Stripe errors here
-            return None
+
+        except (stripe.error.StripeError, stripe.CardError, stripe.InvalidRequestError) as e:
+            raise InvalidData(f"Error! {e}")
+
+        return {'status': 'SUCCESS', 'response': response}
     
+         
+    def create_recurrent(self, merchant, amount, credit_card, interval, package):
+        # validate interval for "month" or "annual"
+
+        if merchant is None:
+            raise InvalidData("Error occured on our side. Please try in few time")
+        
+        card = {
+            'object': 'card',
+            'number': credit_card.number,
+            'exp_month': credit_card.month,
+            'exp_year': credit_card.year,
+            'cvc': credit_card.verification_value
+        }
+        
+        try:
+            # Create customer in stripe vault for future auto-charges
+            customer = stripe.Customer.create(
+                name=merchant.merchant.get_full_name(),
+                email=merchant.merchant.email,
+                amount=int(amount * 100),
+                currency= self.currency,
+                source=card
+            )
+            # Create a subscription for the customer
+            response = stripe.Subscription.create(
+                customer=customer.id,
+                items=[
+                    {
+                        'price': 'your_stripe_plan_price_id',
+                    },
+                ],
+            )
+
+        except (stripe.error.StripeError, stripe.CardError, stripe.InvalidRequestError) as e:
+            raise InvalidData(f"Error! {e}")
+
+        return {'status': 'SUCCESS', 'response': response}
+
+
+    # Store this in stripe vault for the purpose of refund
+    # def store(self, credit_card, options=None):
+    #     card = credit_card
+    #     if isinstance(credit_card, CreditCard):
+    #         if not self.validate_card(credit_card):
+    #             raise InvalidCard("Invalid Card")
+    #         card = {
+    #             'number': credit_card.number,
+    #             'exp_month': credit_card.month,
+    #             'exp_year': credit_card.year,
+    #             'cvc': credit_card.verification_value
+    #             }
+    #     try:
+
+
+    # def unstore(self, identification, options=None):
+    #     try:
+    #         customer = self.stripe.Customer.retrieve(identification)
+    #         response = customer.delete()
+    #         transaction_was_successful.send(sender=self,
+    #                                           type="unstore",
+    #                                           response=response)
+    #         return {"status": "SUCCESS", "response": response}
+    #     except self.stripe.InvalidRequestError as error:
+    #         transaction_was_unsuccessful.send(sender=self,
+    #                                           type="unstore",
+    #                                           response=error)
+    #         return {"status": "FAILURE", "response": error}
+
+
     @csrf_exempt
     def handle_webhook(self, request):
         payload = request.body
