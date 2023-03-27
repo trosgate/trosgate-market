@@ -46,8 +46,7 @@ class PaymentGateway(models.Model):
 
 class PaymentAPIs(models.Model): # This model stores apis for parent site
     preview = models.CharField(_("Preamble"), max_length=255, default="This is the API Section for the integrated payment gateways", blank=True)
-    gateway_count = models.PositiveSmallIntegerField(_("Number of Gateways"), default=4, blank=True, null=True)
-
+   
     # Stripe API Credentials
     stripe_public_key = encrypt(models.CharField(_("STRIPE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     stripe_secret_key = encrypt(models.CharField(_("STRIPE SECRET KEY"), max_length=255, blank=True, null=True))
@@ -76,102 +75,47 @@ class PaymentAPIs(models.Model): # This model stores apis for parent site
         verbose_name_plural = 'Payment API'
 
 
-class StripeMerchant(models.Model):# This model stores apis for merchant site
-    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='stripemerchant', on_delete=models.CASCADE,)
-    gateway = models.ForeignKey(PaymentGateway, verbose_name=_('Merchant'), related_name='stripemerchantgw', on_delete=models.CASCADE,)
+class MerchantAPIs(models.Model): # This model stores apis for parent site
+    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='paymentapi', on_delete=models.CASCADE)
    
     # Stripe API Credentials
     stripe_public_key = encrypt(models.CharField(_("STRIPE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     stripe_secret_key = encrypt(models.CharField(_("STRIPE SECRET KEY"), max_length=255, blank=True, null=True))
     stripe_webhook_key = encrypt(models.CharField(_("STRIPE WEEBHOOK KEY(OPTIONAL)"), max_length=255, blank=True, null=True))
     stripe_subscription_price_id = encrypt(models.CharField(_("STRIPE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
-
-    def __str__(self):
-        return self.merchant
-
-    class Meta:
-        verbose_name = 'Stripe Merchant API'
-        verbose_name_plural = 'Stripe Merchant API'
-
-
-class PayPalMerchant(models.Model):# This model stores apis for merchant site
-    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='paypalmerchant', on_delete=models.CASCADE,)
-    gateway = models.ForeignKey(PaymentGateway, verbose_name=_('Merchant'), related_name='paypalmerchantgw', on_delete=models.CASCADE,)
+    stripe_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
     
     # PayPal API Credentials
     paypal_public_key = encrypt(models.CharField(_("PAYPAL PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     paypal_secret_key = encrypt(models.CharField(_("PAYPAL SECRET KEY"), max_length=255, blank=True, null=True))
     paypal_subscription_price_id = encrypt(models.CharField(_("PAYPAL SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
-
-    def __str__(self):
-        return self.merchant
-
-    class Meta:
-        verbose_name = 'PayPal Merchant API'
-        verbose_name_plural = 'PayPal Merchant API'
-
+    paypal_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
     
-class FlutterwaveMerchant(models.Model):# This model stores apis for parent site
-    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='flutterwavemerchant', on_delete=models.CASCADE,)
-    gateway = models.ForeignKey(PaymentGateway, verbose_name=_('Merchant'), related_name='flutterwavemerchantgw', on_delete=models.CASCADE,)
-        
     # Flutterwave API Credentials
     flutterwave_public_key = encrypt(models.CharField(_("FLUTTERWAVE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     flutterwave_secret_key = encrypt(models.CharField(_("FLUTTERWAVE SECRET KEY"), max_length=255, blank=True, null=True))
+    flutterwave_secret_hash = models.UUIDField(unique=True, verbose_name="Flutterwave secret Hash", editable=True, default=uuid.uuid4,)
     flutterwave_subscription_price_id = encrypt(models.CharField(_("FLUTTERWAVE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
-
-    def __str__(self):
-        return self.merchant
-
-    class Meta:
-        verbose_name = 'Flutterwave Merchant API'
-        verbose_name_plural = 'Flutterwave Merchant API'
-
-
-class RazorpayMerchant(models.Model):# This model stores apis for parent site
-    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='razorpaymerchant', on_delete=models.CASCADE,)
-    gateway = models.ForeignKey(PaymentGateway, verbose_name=_('Merchant'), related_name='razorpaymerchantgw', on_delete=models.CASCADE,)
-        
+    flutterwave_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
     # Razorpay API Credentials
     razorpay_public_key_id = encrypt(models.CharField(_("RAZORPAY PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     razorpay_secret_key_id = encrypt(models.CharField(_("RAZORPAY SECRET KEY"), max_length=255, blank=True, null=True))
     razorpay_subscription_price_id = encrypt(models.CharField(_("RAZORPAY SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
-
-    def __str__(self):
-        return self.merchant
-
-    class Meta:
-        verbose_name = 'Razorpay Merchant API'
-        verbose_name_plural = 'Razorpay Merchant API'
-
-    # def save(self, *args, **kwargs):
-    #     super(PaymentAPIs, self).save(*args, **kwargs)
-
-
-class MTNMerchant(models.Model):# This model stores apis for parent site
-    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='mtnmerchant', on_delete=models.CASCADE,)
-    gateway = models.ForeignKey(PaymentGateway, verbose_name=_('Merchant'), related_name='mtnmerchantgw', on_delete=models.CASCADE,)
-        
-    # Razorpay API Credentials
+    razorpay_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    # MTN API Credentials
     mtn_api_user_id = encrypt(models.CharField(_("MTN API_USER ID"), max_length=255, blank=True, null=True))
     mtn_api_key = encrypt(models.CharField(_("MTN API KEY"), max_length=255, blank=True, null=True))
     mtn_subscription_key = encrypt(models.CharField(_("MTN SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     mtn_callback_url = encrypt(models.CharField(_("MTN CALLBACK URL"), max_length=255, blank=True, null=True))
-    sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
+    mtn_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
 
     def __str__(self):
-        return self.merchant
+        return str(self.merchant)
 
     class Meta:
-        verbose_name = 'MTN Merchant API'
-        verbose_name_plural = 'MTN Merchant API'
-
-    # def save(self, *args, **kwargs):
-    #     super(PaymentAPIs, self).save(*args, **kwargs)
+        verbose_name = 'Merchant API'
+        verbose_name_plural = 'Merchant API'
 
 
 class PaymentAccount(models.Model):

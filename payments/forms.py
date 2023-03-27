@@ -1,11 +1,132 @@
-from .models import PaymentAccount, PaymentRequest, AdminCredit
+from .models import PaymentGateway, PaymentAccount, PaymentRequest, AdminCredit
 from django import forms
 from account.fund_exception import FundException
 from notification.mailer import send_credit_to_team, send_withdrawal_marked_failed_email
 from django.utils.translation import gettext_lazy as _
-from .models import PaymentGateway
+from .models import PaymentGateway, MerchantAPIs
 import datetime
 from .checkout_card import CreditCard
+
+
+
+class StripeMerchantForm(forms.ModelForm):
+    class Meta:
+        model = MerchantAPIs
+        fields = [
+            # Stripe
+            'stripe_public_key', 'stripe_secret_key', 'stripe_webhook_key', 
+            'stripe_subscription_price_id', 'sandbox',  
+        ]
+        
+    def __init__(self, *args, **kwargs):
+        super(StripeMerchantForm, self).__init__(*args, **kwargs)
+   
+        # Flutterwave
+        self.fields['stripe_public_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_secret_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_webhook_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['stripe_subscription_price_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['sandbox'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class PayPalMerchantForm(forms.ModelForm):
+    class Meta:
+        model = MerchantAPIs
+        fields = [
+            # Stripe
+            'paypal_public_key', 'paypal_secret_key', 
+            'paypal_subscription_price_id', 'sandbox',  
+        ]
+        
+    def __init__(self, *args, **kwargs):
+        super(PayPalMerchantForm, self).__init__(*args, **kwargs)
+
+        # Flutterwave
+        self.fields['paypal_public_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paypal_secret_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paypal_subscription_price_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['sandbox'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class FlutterwaveMerchantForm(forms.ModelForm):
+    class Meta:
+        model = MerchantAPIs
+        fields = [
+            # Stripe
+            'flutterwave_public_key', 'flutterwave_secret_key', 
+            'flutterwave_subscription_price_id', 'sandbox',  
+        ]
+        
+    def __init__(self, *args, **kwargs):
+        super(FlutterwaveMerchantForm, self).__init__(*args, **kwargs)
+
+        # Flutterwave
+        self.fields['flutterwave_public_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_secret_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['flutterwave_subscription_price_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['sandbox'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class RazorpayMerchantForm(forms.ModelForm):
+    class Meta:
+        model = MerchantAPIs
+        fields = [
+            # Stripe
+            'razorpay_public_key_id', 'razorpay_secret_key_id', 
+            'razorpay_subscription_price_id', 'sandbox',  
+        ]
+        
+    def __init__(self, *args, **kwargs):
+        super(RazorpayMerchantForm, self).__init__(*args, **kwargs)
+
+        # Flutterwave
+        self.fields['razorpay_public_key_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['razorpay_secret_key_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['razorpay_subscription_price_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['sandbox'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
+class MTNMerchantForm(forms.ModelForm):
+    class Meta:
+        model = MerchantAPIs
+        fields = [
+            # Stripe
+            'mtn_api_user_id', 'mtn_api_key', 
+            'mtn_subscription_key', 'mtn_callback_url', 'sandbox',  
+        ]
+        
+    def __init__(self, *args, **kwargs):
+        super(MTNMerchantForm, self).__init__(*args, **kwargs)
+
+        # Flutterwave
+        self.fields['mtn_api_user_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['mtn_api_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['mtn_subscription_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['mtn_callback_url'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['sandbox'].widget.attrs.update(
+            {'class': 'form-control'})
+
 
 CARD_TYPES = [
     ('', ''),

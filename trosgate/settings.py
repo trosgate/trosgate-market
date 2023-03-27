@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'future',
     'resolution',
     'payments',
+    'merchants',
 
     # Third party apps
     'django_htmx',
@@ -292,10 +293,10 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # TO DETERMINE THE CODE LENGTH DURING EXTERNAL INVITATION
 MAXIMUM_INVITE_SIZE = 6
 
-# A domains.map FILE WILL BE STORED IN THIS PATH AND RUN WITH MGT COMMAND
+# A domains.map FILE WILL BE STORED IN THIS PATH AND RUN WITH celery cron
 NGINX_DOMAINS_MAP_FILE = '/etc/nginx/domains.map'
 
-# accounts
+# EXEMPTED PAGES IF MERCHANT IS NOT WITH ACTIVE ACCOUNT
 MERCHANT_GATE_ALLOW_LIST = [
     "/logout/",
     "/marketing/support",
@@ -309,7 +310,7 @@ MERCHANT_GATE_ALLOW_LIST = [
 CACHE_TTL = 60 * 60 # 1 HOUR CACHE TIMEHOUT
 # CACHES = {
 #     'custom_cache': {
-#         'BACKEND': 'path.to.CustomCache',
+#         'BACKEND': 'account.cache_backend.CacheBackend',
 #         'TIMEOUT': 3600,
 #         'OPTIONS': {
 #             'VERSION': 1,
@@ -317,7 +318,7 @@ CACHE_TTL = 60 * 60 # 1 HOUR CACHE TIMEHOUT
 #     },
 # }
 
-# # Use the custom cache backend as the default cache backend
+# Use the custom cache backend as the default cache backend
 # CACHE_MIDDLEWARE_ALIAS = 'custom_cache'
 # CACHE_MIDDLEWARE_SECONDS = 3600
 # CACHE_MIDDLEWARE_KEY_PREFIX = 'myapp'

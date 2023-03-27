@@ -226,11 +226,14 @@ class Merchant(models.Model):
     merchant = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant', on_delete=models.CASCADE)
     business_name = models.CharField(_("Business Name"), max_length=255)
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(_("Last Created"), auto_now=True)
     package = models.ForeignKey("account.Package", 
         verbose_name=_("Package"), 
         related_name="packages", 
         on_delete=models.PROTECT
+    )
+    gateways = models.ManyToManyField("payments.PaymentGateway", 
+        verbose_name=_("Supported Gateways"), 
+        related_name="packages"
     )
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Company Staff"), related_name="merchant_staff")    
     gender = models.CharField(
@@ -238,7 +241,6 @@ class Merchant(models.Model):
         max_length=10, 
         choices=GENDER
     )
-
     tagline = models.CharField(
         _("Tagline"), 
         max_length=100, 
@@ -250,7 +252,6 @@ class Merchant(models.Model):
         blank=True, 
         error_messages={"name": {"max_length": _("A maximum of 2000 words required")}},
     )
-
     profile_photo = models.ImageField(
         _("Profile Photo"), 
         upload_to='client/', 
@@ -265,22 +266,22 @@ class Merchant(models.Model):
         _("Banner Photo"), 
         upload_to='client/', 
         default='client/banner.png'
-    )
-   
+    )  
     address = models.CharField(
         _("Residence Address"), 
         max_length=100, 
         null=True, 
         blank=True
     )
-
     announcement = models.TextField(
         _("Announcement"), 
         max_length=1000, 
         null=True, 
         blank=True
     )
-
+    created_at = models.DateTimeField(_("Last Created"), auto_now_add=True)
+    modified = models.DateTimeField(_("Last Modified"), auto_now=True)
+    
     objects = models.Manager()
     curr_merchant = CurrentSiteManager()
 

@@ -1,0 +1,66 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %} 
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+		<main class="wt-main wt-haslayout">
+			<div class="wt-proposalholder wt-title text-center">
+
+				<h4>Activate Gateways to make them Available on your Site </h4> 
+
+				<nav>
+					<div id='selectGateway' class="nav nav-pills nav-justified">
+						{% include 'merchants/partials/add_gateway.html' %}
+					</div>
+				</nav>
+			</div>
+
+			<section class="wt-haslayout wt-dbsectionspace">
+				<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+							
+							{% comment %} {% if request.merchant %} {% endcomment %}
+							<div class="wt-freelancerholder wt-rcvproposalholder">
+																						
+								<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
+
+								<div id='stripeApi'>
+									{% include 'merchants/partials/add_stripe_api.html' %}
+								</div>
+								<div id='paypalApi'>		
+									{% include 'merchants/partials/add_paypal_api.html' %}
+								</div>
+								<div id='flutterwaveApi'>		
+									{% include 'merchants/partials/add_flutterwave_api.html' %}
+								</div>
+								<div id='razorpayApi'>		
+									{% include 'merchants/partials/add_razorpay_api.html' %}
+								</div>
+								<div id='mtnApi'>		
+									{% include 'merchants/partials/add_mtn_api.html' %}
+								</div>
+									
+							</div>
+																		                  														
+							</div>
+						</div>
+					</div>
+				</div>
+					
+				</section>
+
+				<div class="wt-proposalholder">
+					<div class="row justify-content-md-center">
+						<div class="wt-sectionhead wt-textcenter">
+							<span>Copyright @ {{request.site.name|capfirst}}</span>
+						</div>
+					</div>
+				</div>
+
+			</main>
+		<!--Main End-->	
+				
+{% endblock %}

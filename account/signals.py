@@ -1,7 +1,8 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from . models import Customer, TwoFactorAuth, Merchant
 from django.core.cache import cache
+from django.core.cache import caches
 
 
 @receiver(post_save, sender=Customer)
@@ -16,3 +17,5 @@ def clear_team_cache(sender, instance, created, **kwargs):
     print('initial cache_key', cache_key)
     cache.delete(cache_key)
     print('later cache_key', cache_key)
+
+

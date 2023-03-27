@@ -332,20 +332,37 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
 @admin.register(Merchant)
 class MerchantAdmin(admin.ModelAdmin):   
     list_display = ['business_name', 'merchant', 'type', 'package', 'created_at']
-    readonly_fields = ['business_name', 'merchant', 'package', 'members', 'created_at']
     radio_fields = {'type': admin.HORIZONTAL}    
-    # list_display_links = None
+    readonly_fields = [
+        'business_name', 'merchant', 'package', 'members', 'created_at', 'modified', 'tagline', 'description',
+        'profile_photo', 'image_tag', 'banner_photo',  'banner_tag','address','announcement', 
+        'company_logo', 'logo_tag', 'get_merchant','gender', 'get_site','gateways', 
+    ]
+    # list_display_links = None  
+    fieldsets = (
+        ('Personal Information', {'fields': (
+            'business_name', 'get_merchant', 'gender', 'address',
+        )}),
+        ('Personal & Business Media', {'fields': (
+            'profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 
+            'company_logo', 'logo_tag',
+        )}),
+        ('Website and Content', {'fields': ('get_site', 'tagline', 'description','announcement',)}),
+        ('Gateways and Staffs', {'fields': ('gateways', 'members',)}),
+        ('Activity Log', {'fields': ('created_at', 'modified',)}),
+    )
 
-    # def get_queryset(self, request):
-    #     qs = super(MerchantAdmin, self).get_queryset(request)
-    #     if request.user.is_superuser:
-    #         return qs.all().exclude(user__is_staff=True)  
-    #     else:
-    #         return qs.filter(pk=0)  
-            
     @admin.display(description='Merchant Types', ordering='merchant__user_type')
     def get_user_type(self, obj):
         return obj.merchant.user_type.capitalize()
+
+    @admin.display(description='Merchant', ordering='merchant__first_name')
+    def get_merchant(self, obj):
+        return obj.merchant.get_full_name()
+    
+    @admin.display(description='Website', ordering='site')
+    def get_site(self, obj):
+        return f"Domain: {obj.site.domain} - Name: {obj.site.name}"
 
     # def has_add_permission(self, request):
     #     return False

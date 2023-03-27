@@ -1,0 +1,78 @@
+<form method="POST", autocomplete='off'> {% csrf_token %}
+    <div class="wt-jobdescription wt-tabsinfo">
+        <div class="wt-jobdetails wt-tabsinfo">
+        <div class="wt-tabscontenttitle">
+            <h2>Stripe Account</h2>
+        </div>                                          
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="text-left">Account</th>
+                    <th>API Credential</th>
+                </tr>
+                </thead>
+                <body>
+                <tr>
+                    <td class="text-left">Publishable Key</td>
+                    <td>
+                        {{stripeform.stripe_public_key}}
+                        <span style="color:red;" role="alert">{{ stripeform.stripe_public_key.errors}}</span>
+                    </td>
+                </tr>
+                </body>												
+                <body>
+                <tr>
+                    <td class="text-left">Secret Key</td>
+                    <td>
+                        {{stripeform.stripe_secret_key}}
+                        <span style="color:red;" role="alert">{{ stripeform.stripe_secret_key.errors}}</span>
+                    </td>
+                </tr>
+                </body>													
+                <body>
+                <tr>
+                    <td class="text-left">Webhook path</td>
+                    <td>
+                        {{stripeform.stripe_webhook_key}}
+                        <span style="color:red;" role="alert">{{ stripeform.stripe_webhook_key.errors}}</span>
+                    </td>
+                </tr>
+                </body>
+                <body>
+                <tr>
+                    <td class="text-left">Subscription Key</td>
+                    <td>
+                        {{stripeform.stripe_subscription_price_id}}
+                        <span style="color:red;" role="alert">{{ stripeform.stripe_subscription_price_id.errors}}</span>
+                    </td>
+                </tr>
+                </body>
+                <body>
+                    <tr>
+                        <td class="text-left">Sandbox Environment</td>
+                        <td>
+                            {{stripeform.sandbox}}
+                            <span style="color:red;" role="alert">{{ stripeform.sandbox.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>														
+                <body>
+            </table> 
+        </div>
+        <div>
+            <div>
+                <div class="wt-updatall">
+                    <i class="far fa-money-bill-alt"></i>
+                    <span> click on "Save Changes" button</span>
+                    <button type="button" class="wt-btn"
+                        hx-post="{% url 'merchants:add_stripe_api' %}"
+                        hx-target="#stripeApi"
+                        style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                    Save Stripe API
+                </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

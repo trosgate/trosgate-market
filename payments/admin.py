@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import StripeMerchant, PayPalMerchant, FlutterwaveMerchant, RazorpayMerchant, MTNMerchant, PaymentAccount, PaymentRequest, AdminCredit
+from .models import MerchantAPIs, PaymentAccount, PaymentRequest, AdminCredit
 from django.db import transaction as db_transaction
 from .forms import AdminApproveForm, PaymentChallengeForm
 from django.urls import path, reverse
@@ -7,67 +7,43 @@ from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
 
+MAX_OBJECTS = 1
 
 
-@admin.register(StripeMerchant)
-class StripeMerchantAdmin(admin.ModelAdmin):
-    list_display = ['merchant',]
+@admin.register(MerchantAPIs)
+class MerchantAPIAdmin(admin.ModelAdmin):
+    list_display = ['merchant']
     list_display_links = ['merchant']
-    # readonly_fields = ['merchant']
+    readonly_fields = ['merchant']
     radio_fields = {'sandbox': admin.HORIZONTAL}
     fieldsets = (
-        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
-        ('Stripe API', {'fields': ('stripe_public_key','stripe_secret_key', 'stripe_webhook_key',)}),
-        ('Stripe Package Subscription', {'fields': ('stripe_subscription_price_id',)}),
+        ('API Environment', {'fields': ('sandbox',)}),
+        ('Stripe API', {'fields': ('stripe_public_key',
+         'stripe_secret_key', 'stripe_webhook_key','stripe_subscription_price_id',)}),
+        ('PayPal API', {
+         'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id',)}),
+        ('Flutterwave API', {
+         'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
+        ('Razorpay API', {
+         'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
+        ('MTN API', {
+         'fields': ('mtn_api_user_id', 'mtn_api_key', 'mtn_subscription_key','mtn_callback_url',)}),
     )
 
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= MAX_OBJECTS:
+            return False
+        return super().has_add_permission(request)
 
-@admin.register(PayPalMerchant)
-class PayPalMerchantAdmin(admin.ModelAdmin):
-    list_display = ['merchant',]
-    list_display_links = ['merchant']
-    # readonly_fields = ['merchant']
-    radio_fields = {'sandbox': admin.HORIZONTAL}
-    fieldsets = (
-        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
-        ('PayPal API', {'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id',)}),
-    )
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
 
-@admin.register(FlutterwaveMerchant)
-class FlutterwaveMerchantAdmin(admin.ModelAdmin):
-    list_display = ['merchant',]
-    list_display_links = ['merchant']
-    # readonly_fields = ['merchant']
-    radio_fields = {'sandbox': admin.HORIZONTAL}
-    fieldsets = (
-        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
-        ('Flutterwave API', {'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_subscription_price_id',)}),
-    )
-
-
-@admin.register(RazorpayMerchant)
-class RazorpayMerchantAdmin(admin.ModelAdmin):
-    list_display = ['merchant',]
-    list_display_links = ['merchant']
-    # readonly_fields = ['merchant']
-    radio_fields = {'sandbox': admin.HORIZONTAL}
-    fieldsets = (
-        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
-        ('Razorpay API', {'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
-    )
-
-
-@admin.register(MTNMerchant)
-class MTNMerchantAdmin(admin.ModelAdmin):
-    list_display = ['merchant',]
-    list_display_links = ['merchant']
-    # readonly_fields = ['merchant']
-    radio_fields = {'sandbox': admin.HORIZONTAL}
-    fieldsets = (
-        ('Merchant Environment', {'fields': ('merchant','sandbox',)}),
-        ('Stripe API', {'fields': ('mtn_api_user_id','mtn_api_key', 'mtn_subscription_key','mtn_callback_url',)}),       
-    )
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 @admin.register(PaymentAccount)

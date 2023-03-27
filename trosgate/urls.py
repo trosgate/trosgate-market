@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', include(tf_urls)),
     path('', include('account.urls', namespace='account')),
+    path('merchants/', include('merchants.urls', namespace='merchants')),
     path('client/', include('client.urls', namespace='client')),
     path('freelancer/', include('freelancer.urls', namespace='freelancer')), 
     path('project/', include('projects.urls', namespace='projects')),

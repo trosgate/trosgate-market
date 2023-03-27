@@ -15,7 +15,6 @@ from .checkout_card import CreditCard
 
 
 
-
 # def paypal(request):
 #     amount = 1
 #     response = None
@@ -55,11 +54,6 @@ from .checkout_card import CreditCard
 #                                              'amount':amount,
 #                                              'response':response,
 #                                              'title':'Stripe Payment'})
-
-
-
-
-
 
 
 

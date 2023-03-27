@@ -1,0 +1,79 @@
+
+<form method="POST", autocomplete='off'> {% csrf_token %}
+    <div class="wt-jobdescription wt-tabsinfo">
+        <div class="wt-jobdetails wt-tabsinfo">
+            <div class="wt-tabscontenttitle">
+                <h2>MTN Account</h2>
+            </div>                                          
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="text-left">Account</th>
+                        <th>API Credential</th>
+                    </tr>
+                    </thead>
+                    <body>
+                    <tr>
+                        <td class="text-left">API User ID</td>
+                        <td>
+                            {{mtnform.mtn_api_user_id}}
+                            <span style="color:red;" role="alert">{{ mtnform.mtn_api_user_id.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>												
+                    <body>
+                    <tr>
+                        <td class="text-left">API Key</td>
+                        <td>
+                            {{mtnform.mtn_api_key}}
+                            <span style="color:red;" role="alert">{{ mtnform.mtn_api_key.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>													
+                    <body>
+                    <tr>
+                        <td class="text-left">Subscription Key</td>
+                        <td>
+                            {{mtnform.mtn_subscription_key}}
+                            <span style="color:red;" role="alert">{{ mtnform.mtn_subscription_key.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>
+                    <body>
+                    <tr>
+                        <td class="text-left">Callback Url</td>
+                        <td>
+                            {{mtnform.mtn_callback_url}}
+                            <span style="color:red;" role="alert">{{ mtnform.mtn_callback_url.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td class="text-left">Sandbox Environment</td>
+                            <td>
+                                {{mtnform.sandbox}}
+                                <span style="color:red;" role="alert">{{ mtnform.sandbox.errors}}</span>
+                            </td>
+                        </tr>
+                        </body>														
+                    <body>
+                </table> 
+            </div>
+            <div>
+                <div>
+                    <div class="wt-updatall">
+                        <i class="far fa-money-bill-alt"></i>
+                        <span> click on "Save MTN API" button</span>
+                        <button type="button" class="wt-btn"
+                            hx-post="{% url 'merchants:add_mtn_api' %}"
+                            hx-target="#mtnApi"
+                            style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                            Save MTN API
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>

@@ -174,8 +174,8 @@ class PaymentGatewayAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentAPISetting)
 class PaymentAPIsAdmin(admin.ModelAdmin):
-    list_display = ['preview', 'gateway_count']
-    list_display_links = ['preview', 'gateway_count']
+    list_display = ['preview']
+    list_display_links = ['preview']
     readonly_fields = ['preview']
     radio_fields = {'sandbox': admin.HORIZONTAL}
     fieldsets = (

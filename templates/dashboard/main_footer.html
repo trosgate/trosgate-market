@@ -60,7 +60,7 @@
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 push-lg-1">
 								<div class="wt-companyinfo">
-									<span><a href="javascript:void(0);">New @ {{website.site_name}}?</a> For sure you can change that too.</span>
+									<span><a href="javascript:void(0);">New @ {{request.site.name|capfirst}}?</a> For sure you can change that too.</span>
 								</div>
 								<div class="wt-fbtnarea">
 									<a href="{% url 'account:register' %}" class="wt-btn">Join Now</a>
@@ -73,7 +73,7 @@
 					<div class="container">
 						<div class="row">
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-								<p class="wt-copyrights"><a style="text-decoration:None; color:white;" href="/">{{website.site_name}} Marketplace </a></p>
+								<p class="wt-copyrights"><a style="text-decoration:None; color:white;" href="/">{{request.site.name|capfirst}} Marketplace </a></p>
 								<nav class="wt-addnav">
 									<ul>
 										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>

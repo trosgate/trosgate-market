@@ -1,0 +1,70 @@
+
+<form method="POST", autocomplete='off'> {% csrf_token %}
+    <div class="wt-jobdescription wt-tabsinfo">
+        <div class="wt-jobdetails wt-tabsinfo">
+            <div class="wt-tabscontenttitle">
+                <h2>Razorpay Account</h2>
+            </div>                                          
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="text-left">Account</th>
+                        <th>API Credential</th>
+                    </tr>
+                    </thead>
+                    <body>
+                    <tr>
+                        <td class="text-left">Publishable Key</td>
+                        <td>
+                            {{razorpayform.razorpay_public_key_id}}
+                            <span style="color:red;" role="alert">{{ razorpayform.razorpay_public_key_id.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>												
+                    <body>
+                    <tr>
+                        <td class="text-left">Secret Key</td>
+                        <td>
+                            {{razorpayform.razorpay_secret_key_id}}
+                            <span style="color:red;" role="alert">{{ razorpayform.razorpay_secret_key_id.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>													
+                    <body>
+                    <tr>
+                        <td class="text-left">Subscription Key</td>
+                        <td>
+                            {{razorpayform.razorpay_subscription_price_id}}
+                            <span style="color:red;" role="alert">{{ razorpayform.razorpay_subscription_price_id.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td class="text-left">Sandbox Environment</td>
+                            <td>
+                                {{razorpayform.sandbox}}
+                                <span style="color:red;" role="alert">{{ razorpayform.sandbox.errors}}</span>
+                            </td>
+                        </tr>
+                        </body>														
+                    <body>
+                </table> 
+            </div>
+            <div>
+                <div> 
+                    <div class="wt-updatall">
+                        <i class="far fa-money-bill-alt"></i>
+                        <span> click on "Save Razorpay API" button</span>
+                        <button type="button" class="wt-btn"
+                            hx-post="{% url 'merchants:add_razorpay_api' %}"
+                            hx-target="#razorpayApi"
+                            style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                            Save Razorpay API
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
