@@ -6,7 +6,7 @@ from account.permission import user_is_freelancer
 from teams.forms import TeamCreationForm
 from teams.models import Team, Invitation
 from .models import PaymentAccount, PaymentRequest
-from .forms import CheckoutCardForm, PaymentAccountForm
+from .forms import StripeCardForm, PaymentAccountForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import PaymentGateway

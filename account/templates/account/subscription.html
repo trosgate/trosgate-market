@@ -1,15 +1,21 @@
-{% extends 'dashboard/main_base.html' %}
-{% load static %} 
+{% extends "dashboard/main_base1.html" %}
+{% load static %}
 {% load widget_tweaks %}
-{% block content %}
+{% block content1 %}
 
 
-    <div class="wt-haslayout wt-main-section">
-    <div class="container">
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  
+        <div class="container">
         <div class="row justify-content-md-center">
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
-                <div class="wt-dashboardbox">
-                    <div class="wt-dashboardboxtitle">
+                {% comment %} <div class="wt-dashboardbox"> {% endcomment %}
+                    <div class="textcenter">
                         <h2>Join for Free</h2>
                     </div>
                     <div class="wt-dashboardboxcontent">
@@ -20,80 +26,68 @@
                             Ooop! form error occured. Please check below and correct
                         </div>
                         {% endif %}  
-                            <div class="wt-jobdescription wt-tabsinfo">
-                                <div class="form-row">
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Background</h2>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        {{regform.first_name.label}}
-                                        {{regform.first_name}}
-                                        <span style="color:red;" role="alert">{{ regform.first_name.errors}}</span>
-                                    </div> 
-                                    <div class="form-group col-md-6">
-                                        {{regform.last_name.label}}
-                                        {{regform.last_name}}
-                                        <span style="color:red;" role="alert">{{ regform.last_name.errors}}</span>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        {{regform.email.label}}
-                                        {{regform.email}}
-                                        <span style="color:red;" role="alert">{{ regform.email.errors}}</span>
-                                    </div>	
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{regform.first_name.label}}
+                                {{regform.first_name}}
+                                <span style="color:red;" role="alert">{{ regform.first_name.errors}}</span>
+                            </div> 
+                            <div class="form-group col-md-6">
+                                {{regform.last_name.label}}
+                                {{regform.last_name}}
+                                <span style="color:red;" role="alert">{{ regform.last_name.errors}}</span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{regform.email.label}}
+                                {{regform.email}}
+                                <span style="color:red;" role="alert">{{ regform.email.errors}}</span>
+                            </div>	
 
-                                    <div class="form-group col-md-6">
-                                        {{regform.phone.label}}
-                                        {{regform.phone}}
-                                        <span style="color:red;" role="alert">{{ regform.phone.errors}}</span>
-                                    </div>
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Business</h2>
-                                    </div>	
-                                    <div class="form-group">
-                                        {{regform.business_name.label}}
-                                        {% render_field regform.business_name hx-post='/build_subdomain/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#business_name_status' %} 
-                                        <span style="color:red;" role="alert">{{ regform.business_name.errors}}</span>
-                                    </div>
-                                    <div class="text-left">
-                                        <div id="business_name_status" class="input-group col-lg-12"></div>
-                                    </div>
+                            <div class="form-group col-md-6">
+                                {{regform.phone.label}}
+                                {{regform.phone}}
+                                <span style="color:red;" role="alert">{{ regform.phone.errors}}</span>
+                            </div>
 
-                                    <div class="form-group">
-                                        {{regform.country.label}}
-                                        {{regform.country}}
-                                        <span style="color:red;" role="alert">{{ regform.country.errors}}</span>
-                                    </div>
-                                    
-                                    <input type="number" name="package" id="id_package", value="{{package.pk}}" hidden>
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Security</h2>
-                                    </div>	
-                                    <div class="form-group col-md-6">
-                                        {{regform.password1.label}}
-                                        {{regform.password1}}
-                                        <span style="color:red;" role="alert">{{ regform.password1.errors}}</span>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        {{regform.password2.label}}
-                                        {{regform.password2}}
-                                        <span style="color:red;" role="alert">{{ regform.password2.errors}}</span>
-                                    </div>
-                                </div>
+                            <div class="form-group col-md-12">
+                                {{regform.business_name.label}}
+                                {% render_field regform.business_name hx-post='/build_subdomain/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#business_name_status' %} 
+                                <span style="color:red;" role="alert">{{ regform.business_name.errors}}</span>
                             </div>
+                            <div class="text-left">
+                                <div id="business_name_status" class="input-group col-lg-12"></div>
                             </div>
-                                </div>
-                                    <div class="wt-updatall">
-                                        <span style="color:green;" role="alert">Already have account on {{website.site_name}}?<a href="{% url 'account:login' %}"> Login </span>
-                                        <button type="submit" class="wt-btn"> Join Now </button>
-                                    </div>
-                                </div>
+                            
+                            <div class="form-group col-md-12">
+                                {{regform.country.label}}
+                                {{regform.country}}
+                                <span style="color:red;" role="alert">{{ regform.country.errors}}</span>
                             </div>
-                        </div>  
-                    </form>
-                </div>
+                                                                
+                            <input type="number" name="package" id="id_package", value="{{package.pk}}" hidden>
+                            <div class="form-group col-md-6">
+                                {{regform.password1.label}}
+                                {{regform.password1}}
+                                <span style="color:red;" role="alert">{{ regform.password1.errors}}</span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{regform.password2.label}}
+                                {{regform.password2}}
+                                <span style="color:red;" role="alert">{{ regform.password2.errors}}</span>
+                            </div>
+                        </div>
+                        </div>
+                            <div class="text-center">
+                                <span style="color:green;" role="alert">Already have account on {{website.site_name}}?<a href="{% url 'account:login' %}"> Login </span><br>
+                                <button type="submit" class="appointment-btn"> Create Merchant </button>
+                            </div>
+                        </div>
+                    </div>  
+                </form>
             </div>
         </div>
-    </div>
-
-{% endblock %}
-
+    <br>
+    <br>
+    <br>
+{% include 'dashboard/main_copyright1.html' %}
+{% endblock content1 %}

@@ -134,8 +134,6 @@ CARD_TYPES = [
     ('master', 'Master'),
     ('discover', 'Discover'),
     ('american_express', 'American Express'),
-    ('diners_club', 'Diners Club'),
-    ('maestro', 'Maestro'),
     ]
 
 today = datetime.date.today()
@@ -143,7 +141,7 @@ MONTH_CHOICES = [(m, datetime.date(today.year, m, 1).strftime('%b')) for m in ra
 YEAR_CHOICES = [(y, y) for y in range(today.year, today.year + 21)]
 
 
-class CheckoutCardForm(forms.Form):
+class StripeCardForm(forms.Form):
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
     package = forms.CharField(required=False)
@@ -160,6 +158,20 @@ class CheckoutCardForm(forms.Form):
             raise forms.ValidationError('Payment card validation failed')
         return data
 
+    def clean(self):
+        cleaned_data = super().clean()
+        card_number = cleaned_data.get('card_number')
+        exp_month = cleaned_data.get('exp_month')
+        exp_year = cleaned_data.get('exp_year')
+        cvc = cleaned_data.get('cvc')
+        
+        # Create CreditCard object and validate it
+        cc = CreditCard(card_number, exp_month, exp_year, cvc)
+        if not cc.validate():
+            raise forms.ValidationError('Invalid credit card information.')
+        
+        return cleaned_data
+    
 
 class PaymentAccountForm(forms.ModelForm):
     class Meta:

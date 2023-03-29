@@ -1,0 +1,48 @@
+{% extends 'dashboard/main_base.html' %}
+{% load static %} 
+{% block content %}
+
+
+    <div class="wt-haslayout wt-main-section">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxcontent">
+                                                                                    
+                    <form method='POST'>{% csrf_token %}
+                        {% if loginform.errors %}
+                        <div class="alert alert-danger text-center" role="alert">
+                            Ooop! form error occured. Please check below and correct
+                        </div>
+                        {% endif %}  
+                        
+                        <div class="wt-jobdescription wt-tabsinfo">
+                            <div class="form-row">
+                                <div class="wt-tabscontenttitle">
+                                    <h2>Let us Log you in</h2>
+                                </div>
+                                <div class="form-group">
+                                    {{loginform.email.label}}
+                                    {{loginform.email}}
+                                    <span style="color:red;" role="alert">{{ loginform.email.errors}}</span>
+                                </div>	
+                                <div class="form-group">
+                                    {{loginform.password.label}}
+                                    {{loginform.password}}
+                                    <span style="color:red;" role="alert">{{ loginform.password.errors}}</span>
+                                </div>	
+                            </div>
+                            <span style="color:green;" role="alert">New to {{website.site_name}}?<a href="{% url 'account:register' %}"> Join free </a></span><br>
+                            <span style="color:green;" role="alert">Reset Account <a href="{% url 'account:passwordreset' %}"> password here </a></span>
+                        </div>
+                        <button type="submit" class="wt-btn"> Submit </button>
+                        </div>  
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

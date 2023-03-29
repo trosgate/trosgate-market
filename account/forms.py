@@ -160,7 +160,7 @@ class MerchantRegisterForm(forms.ModelForm):
         self.fields['phone'].widget.attrs.update(
             {'class': 'form-control',})
         self.fields['country'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
+            {'class': 'form-control',})
         self.fields['business_name'].widget.attrs.update(
             {'class': 'form-control',})
         self.fields['package'].widget.attrs.update(
@@ -248,6 +248,13 @@ class UserLoginForm(AuthenticationForm):
         }
     ))
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        cust_email = Customer.objects.filter(email=email)
+        if not cust_email:
+            raise forms.ValidationError(
+                'Ooops! the input detail(s) is not valid')
+        return email
 
 class PasswordResetForm(PasswordResetForm):
     email = forms.EmailField(max_length=100, widget=forms.TextInput(

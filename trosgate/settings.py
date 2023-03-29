@@ -28,8 +28,8 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-#DEBUG = False
+#DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['*']  
@@ -136,19 +136,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
-#SERVER SIDE
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'trosgates',
-#         'USER': 'katey',
-#         'PASSWORD': 'Prof2ike.y2ky2k',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
-
-# LOCAL SIDE
+# SERVER SIDE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -264,7 +252,7 @@ PASSWORD_RESET_TIMEOUT = 1209600 #two weeks in seconds
 USE_THOUSAND_SEPARATOR = True
 EMAIL_USE_LOCALTIME = True
 
-if DEBUG == False:
+if not DEBUG:
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
     SESSION_COOKIE_SECURE = True

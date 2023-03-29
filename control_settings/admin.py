@@ -8,7 +8,7 @@ from . models import (
 )
 
 MAX_OBJECTS = 1
-MAX_GATEWAYS = 6
+MAX_GATEWAYS = 7
 
 
 @admin.register(LayoutSetting)

@@ -19,6 +19,7 @@ class PaymentGateway(models.Model):
     PAYPAL = 'paypal' 
     FLUTTERWAVE = 'flutterwave'
     RAZORPAY = 'razorpay'
+    PAYSTACK = 'paystack'
     MTN_MOMO = 'mtn_momo'
     GATEWAY_TYPE = (
         (BALANCE, _('Balance')),
@@ -26,6 +27,7 @@ class PaymentGateway(models.Model):
         (PAYPAL, _('PayPal')),
         (FLUTTERWAVE, _('Flutterwave')),
         (RAZORPAY, _('Razorpay')),
+        (PAYSTACK, _('Paystack')),
         (MTN_MOMO, _('MTN Momo')),
     )
     name = models.CharField(_("Payment Gateway"), choices=GATEWAY_TYPE, default=BALANCE, max_length=20, unique=True)

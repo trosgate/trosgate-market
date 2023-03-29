@@ -17,6 +17,7 @@ from contract.models import InternalContract
 from django.urls import reverse
 from django.contrib.sites.models import Site
 from account.models import Merchant
+from django.utils.text import slugify
 
 
 def proposal_images_path(instance, filename):

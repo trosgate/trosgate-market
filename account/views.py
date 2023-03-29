@@ -153,7 +153,8 @@ def homepage(request):
         'home_layout': home_layout,
     }
     if request.parent:
-        return render(request, 'homepage.html', context)
+        return render(request, 'homepage1.html', context)
+        # return render(request, 'homepage.html', context)
     else:
         return render(request, 'merchant_home.html', context)
 
@@ -177,13 +178,16 @@ def loginView(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         
-        user = authenticate(request, email=email, password=password)
-        auth_backend = CustomAuthBackend()
-        return auth_backend.user_type_redirect(request, user)  
+        if not Customer.objects.filter(email=email, password=check_password(password)).exists():
+            messages.error(request, f'Invalid email or password!')  
+
+        else:
+            user = authenticate(request, email=email, password=password)
+            auth_backend = CustomAuthBackend()
+            return auth_backend.user_type_redirect(request, user)
         
     else:
         loginform = UserLoginForm()
-
 
     context = {
         'loginform': loginform

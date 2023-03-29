@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'dashboard/main_header1.html' %}
+<body hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
+    {% include 'dashboard/main_navbar1.html' %}
+    {% if request.user.freelancer %}
+	{% if active_team.status == 'inactive' %}
+    <div class="alert alert-warning alert-dismissible fade show text-center">
+        <span> You are currently logged into inactive team and most features are disabled. </span>
+    </div>
+    {% endif %} 
+    {% endif %} 
+    <!-- Alert message Start -->
+    {% if messages %}
+        {% for message in messages %}        
+        <div class="row justify-content-md-center">        
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <span class="wt-jobalerts">
+                    <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                        <span> {{ message}} </span>
+                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+                    </div>
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}  
+
+    {% block content1 %}
+
+    {% endblock content1 %}
+
+    {% include 'dashboard/main_scripts1.html' %}
+    
+    {% block scripts %}
+    {% endblock scripts %}
+
+</body>
+
+</html>
