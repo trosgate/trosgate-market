@@ -178,7 +178,7 @@ def loginView(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         
-        if not Customer.objects.filter(email=email, password=check_password(password)).exists():
+        if not Customer.objects.filter(email=email).exists():
             messages.error(request, f'Invalid email or password!')  
 
         else:

@@ -28,8 +28,8 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['*']  
@@ -89,16 +89,17 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'account.middleware_prod.DynamicHostMiddleware',
-    # 'account.middleware_test.DynamicHostMiddleware',
+    'account.middleware_host.DynamicHostMiddleware',
+    'account.middleware_gate.MerchantGateMiddleware',
+    'account.middleware_test.DynamicHostMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
-    # 'account.middleware_test.MerchantGateMiddleware',
-    'account.middleware_prod.MerchantGateMiddleware',
+    'account.middleware_test.MerchantGateMiddleware',
+    # 'account.middleware_prod.MerchantGateMiddleware',
     'analytics.middleware.Middleware',
 ]
 
@@ -211,10 +212,10 @@ LOGOUT_REDIRECT_URL = "account:homepage"
 
 
 #Custom Email Backend for Trosgate software
-EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
  
 ADMINS = (
