@@ -22,7 +22,7 @@ jobs:
       with:
         host: ${{ secrets.DIGITALOCEAN_HOST }}
         username: katey
-        password: ${{ secrets.DIGITALOCEAN_PASSWORD }}
+        key: ${{ secrets.DIGITALOCEAN_PRIVATE_KEY }}
         script: |
           cd /webapps/trosgate/trosgate_env
           source bin/activate
