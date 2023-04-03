@@ -28,13 +28,14 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
-# ALLOWED_HOSTS = []
 # ALLOWED_HOSTS = ['*']  
-ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
-# ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
+ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['gigred.website', '193.43.134.36']
+#  
 SITE_ID = 1
 SITE_ID_DOMAIN = 'trosgate.com'
 AUTH_USER_MODEL = 'account.Customer'
@@ -210,10 +211,10 @@ LOGOUT_REDIRECT_URL = "account:homepage"
 # EMAIL_HOST_PASSWORD = 'yaqtwqjpabdmxkao'
 
 #Custom Email Backend for Trosgate software
-EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
  
 ADMINS = (
