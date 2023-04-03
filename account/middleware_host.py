@@ -1,9 +1,10 @@
 # middleware.py
-import re
+
+import os
 from django.contrib.sites.models import Site
 from django.conf import settings
 from account.models import Merchant
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseForbidden
 from django.urls import reverse
 
 

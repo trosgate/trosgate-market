@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
-import dj_database_url
+
 # load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,15 +28,15 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['*']  
-# ALLOWED_HOSTS = ['68.183.137.119', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['*']  
+ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36'] 
 SITE_ID = 1
-SITE_ID_DOMAIN = 'localhost'
+SITE_ID_DOMAIN = 'trosgate.com'
 AUTH_USER_MODEL = 'account.Customer'
 
 # Application definition
@@ -91,15 +91,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'account.middleware_host.DynamicHostMiddleware',
     'account.middleware_gate.MerchantGateMiddleware',
-    'account.middleware_test.DynamicHostMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
+    # 'account.middleware_test.DynamicHostMiddleware',
+    # 'account.middleware_test.MerchantGateMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
-    'account.middleware_test.MerchantGateMiddleware',
-    # 'account.middleware_prod.MerchantGateMiddleware',
     'analytics.middleware.Middleware',
 ]
 
@@ -139,7 +138,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
-# SERVER SIDE
+# SERVER/LOCAL SIDE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -203,19 +202,18 @@ LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"
 LOGOUT_REDIRECT_URL = "account:homepage"
 
-# Twilio SendGrid
-# EMAIL_HOST = 'smtp.sendgrid.net'
+# Gmail API
+# EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'apikey'
-# EMAIL_HOST_PASSWORD = "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"
-
+# EMAIL_HOST_USER = 'myvoistudio@gmail.com'
+# EMAIL_HOST_PASSWORD = 'yaqtwqjpabdmxkao'
 
 #Custom Email Backend for Trosgate software
-# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
  
 ADMINS = (
@@ -255,16 +253,18 @@ PASSWORD_RESET_TIMEOUT = 1209600 #two weeks in seconds
 USE_THOUSAND_SEPARATOR = True
 EMAIL_USE_LOCALTIME = True
 
-if not DEBUG:
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-    SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
-    SESSION_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    CSRF_COOKIE_SECURE = True
+# if not DEBUG:
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
+SESSION_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+CSRF_COOKIE_SECURE = True
+EMAIL_SUBJECT_PREFIX = '[Trosgate]'
 
 # EMAIL PASS LATEST: yqwvhebpxtgqmjph
 

@@ -16,14 +16,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install python3 python3-pip python3-venv nginx supervisor -y
-        python3 -m venv trosgate_env
-        source trosgate_env/bin/activate
-        pip3 install -r requirements.txt
-      
-    - name: Build and test code
-      run: |
-        python manage.py test
-        python manage.py collectstatic
       
     - name: Deploy code to DigitalOcean
       uses: appleboy/ssh-action@master
@@ -32,10 +24,11 @@ jobs:
         username: katey
         password: ${{ secrets.DIGITALOCEAN_PASSWORD }}
         script: |
-          cd /home/Katey/trosgate
+          cd /webapps/trosgate/trosgate_env
+          source bin/activate
           git pull
-          source trosgate_env/bin/activate
           pip3 install -r requirements.txt
           python manage.py migrate
-          sudo supervisorctl restart gunicorn
+          python manage.py collectstatic
           sudo systemctl restart nginx
+          sudo supervisorctl restart trosgate
