@@ -28,12 +28,12 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 # ALLOWED_HOSTS = ['*']  
-# ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
-ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36']
 #  
 SITE_ID = 1
