@@ -38,6 +38,10 @@ class Command(BaseCommand):
         call_command("migrate")
         
         # INITIAL DATABASE POPULATOR STARTS
+
+        if not Package.objects.count():
+            call_command("loaddata", "fixures/db_packages.json")
+
         if not Country.objects.count():
             call_command("loaddata", "fixures/db_countries.json")
 
@@ -47,8 +51,8 @@ class Command(BaseCommand):
         if not AutoTyPist.objects.count():
             call_command("loaddata", "fixures/db_autotypist.json")
 
-        # if not Customer.objects.count():
-        #     call_command("loaddata", "fixures/db_admin_auth.json")
+        if not Customer.objects.count():
+            call_command("loaddata", "fixures/db_admin_auth.json")
 
         if not LayoutSetting.objects.count():
             call_command("loaddata", "fixures/db_layout.json")
@@ -116,12 +120,6 @@ class Command(BaseCommand):
         if not Mailer.objects.count():
             call_command("loaddata", "fixures/db_mailer.json")
 
-        if not Package.objects.count():
-            call_command("loaddata", "fixures/db_packages.json")
-
-        if not TermsAndConditions.objects.count():
-            call_command("loaddata", "db_termsandcond.json")
-
         if not Hiring.objects.count():
             call_command("loaddata", "fixures/db_howitworkhiring.json")
         
@@ -131,6 +129,10 @@ class Command(BaseCommand):
         if not AboutUsPage.objects.count():
             call_command("loaddata", "fixures/db_aboutus.json")
 
+        if not TermsAndConditions.objects.count():
+            call_command("loaddata", "fixures/db_termsandcond.json")
+        
+        
         # INITIAL DATABASE POPULATOR ENDS
 
         # FIXURE OBJECTS INSERTION STARTS FROM HERE

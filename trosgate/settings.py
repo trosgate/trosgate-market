@@ -14,6 +14,7 @@ from pathlib import Path
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
 
+
 # load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,8 +32,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
 # DEBUG = False
 
-# ALLOWED_HOSTS = ['*']  
+# ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36']
 #  
@@ -84,20 +86,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'account.middleware_host.DynamicHostMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'account.middleware_host.DynamicHostMiddleware',
     'account.middleware_gate.MerchantGateMiddleware',
+    # 'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
-    # 'account.middleware_test.DynamicHostMiddleware',
-    # 'account.middleware_test.MerchantGateMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'analytics.middleware.Middleware',

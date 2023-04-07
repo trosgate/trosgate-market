@@ -105,6 +105,10 @@ def autoLogout(request):
 
 
 def homepage(request):
+    print('User: ',request.user)
+    print('site: ',request.site)
+    print('parent_site: ',request.parent_site)
+    print('tenant: ',request.tenant)
     if request.user.is_authenticated:
         return redirect('account:dashboard')
 
@@ -152,7 +156,7 @@ def homepage(request):
         'searchform': searchform,
         'home_layout': home_layout,
     }
-    if request.parent:
+    if request.parent_site:
         return render(request, 'homepage1.html', context)
         # return render(request, 'homepage.html', context)
     else:

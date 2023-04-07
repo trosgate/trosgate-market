@@ -1,7 +1,11 @@
 #
 #Helper functions forgenerating 2FA Code
+from django.contrib.sites.models import Site
+from django.conf import settings
+from django.apps import apps
 
 import random
+
 
 def auth_code():
     number_list = [x for x in range(10)]
@@ -15,7 +19,13 @@ def auth_code():
     return passcode
 
 
-#
+def load_allowed_hosts():
+    domains = set(settings.ALLOWED_HOSTS)
+    Site = apps.get_model('sites', 'Site')
+    sites = Site.objects.all()
+    for site in sites:
+        domains.add(site.domain)
+    return list(domains)
 
 
 
