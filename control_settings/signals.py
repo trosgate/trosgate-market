@@ -12,7 +12,7 @@ def enforce_default_setting(sender, instance, created, **kwargs):
     for readability, modelname is preferred
     '''
     GatewaySetting.objects.filter(default=True).update(default=False)
-    GatewaySetting.objects.filter(name='balance').update(default=True)
+    GatewaySetting.objects.filter(name='balance').update(default=True, subscription=False)
 
 
 # #This will clean old banner imae when a new one is uploaded to replace

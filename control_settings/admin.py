@@ -4,7 +4,7 @@ from . models import (
     PaydayController, PaymentsController, DepositController, DepositSetting,
     HiringSetting, DiscountSettings,
     MailerSetting, TestMailSetting, SubscriptionSetting, ExchangeRateSetting,
-    LayoutSetting, GatewaySetting, PaymentAPISetting
+    LayoutSetting, GatewaySetting
 )
 
 MAX_OBJECTS = 1
@@ -152,9 +152,44 @@ class ExachangeRateAPIAdmin(admin.ModelAdmin):
 
 @admin.register(GatewaySetting)
 class PaymentGatewayAdmin(admin.ModelAdmin):
-    list_display = ['name', 'default', 'processing_fee', 'status', 'ordering']
-    list_editable = ['processing_fee', 'status', 'ordering']
-    list_display_links = ['name', 'default']
+    list_display = ['name', 'processing_fee', 'subscription', 'status', 'ordering']
+    list_editable = ['status', 'ordering']
+    list_display_links = ['name', 'processing_fee']
+    readonly_fields = ['default']
+    fieldsets = (
+        ('Gateway Activation Settings', {'fields': (
+            'name', 'processing_fee','default', 'ordering','status',
+        )}),
+        ('Subscription Payment APIs', {'fields': ('public_key',
+            'secret_key', 'webhook_key','subscription_price_id', 'sandbox','subscription',)}),
+    )
+    radio_fields = {
+        'subscription': admin.HORIZONTAL,
+        'status': admin.HORIZONTAL,
+        }
+
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+        disabled_fields = set() 
+
+        
+        if obj is not None and obj.name == 'balance':
+            disabled_fields |= {                
+                'public_key',
+                'secret_key',
+                'webhook_key',
+                'subscription_price_id',
+                'sandbox',
+                'subscription',
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+        
+        return form
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_GATEWAYS:
@@ -172,40 +207,40 @@ class PaymentGatewayAdmin(admin.ModelAdmin):
         return actions
 
 
-@admin.register(PaymentAPISetting)
-class PaymentAPIsAdmin(admin.ModelAdmin):
-    list_display = ['preview']
-    list_display_links = ['preview']
-    readonly_fields = ['preview']
-    radio_fields = {'sandbox': admin.HORIZONTAL}
-    fieldsets = (
-        ('API Environment', {'fields': ('sandbox',)}),
-        ('Stripe API', {'fields': ('stripe_public_key',
-         'stripe_secret_key', 'stripe_webhook_key',)}),
-        ('Stripe Package Subscription', {
-         'fields': ('stripe_subscription_price_id',)}),
-        ('PayPal API', {
-         'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id',)}),
-        ('Flutterwave API', {
-         'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
-        ('Razorpay API', {
-         'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
-    )
+# @admin.register(PaymentAPISetting)
+# class PaymentAPIsAdmin(admin.ModelAdmin):
+#     list_display = ['preview']
+#     list_display_links = ['preview']
+#     readonly_fields = ['preview']
+#     radio_fields = {'sandbox': admin.HORIZONTAL}
+#     fieldsets = (
+#         ('API Environment', {'fields': ('sandbox',)}),
+#         ('Stripe Payment API', {'fields': ('stripe_public_key',
+#          'stripe_secret_key', 'stripe_webhook_key','stripe_subscription_price_id', 'stripe_active',)}),
+#         ('PayPal Payment API', {
+#          'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id', 'paypal_active',)}),
+#         ('Flutterwave Payment API', {
+#          'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash', 'flutterwave_active',)}),
+#         ('Razorpay Payment API', {
+#          'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id','razorpay_active',)}),
+#         ('MTN Momo API', {
+#          'fields': ('mtn_api_user_id', 'mtn_api_key', 'mtn_subscription_key','mtn_callback_url','mtn_active',)}),
+#     )
 
-    def has_add_permission(self, request):
-        if self.model.objects.count() >= MAX_OBJECTS:
-            return False
-        return super().has_add_permission(request)
+#     def has_add_permission(self, request):
+#         if self.model.objects.count() >= MAX_OBJECTS:
+#             return False
+#         return super().has_add_permission(request)
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
 @admin.register(HiringSetting)

@@ -59,6 +59,7 @@ class StripeClientConfig:
             customer = stripe.Customer.create(email=customer_email)
             subscription = stripe.Subscription.create(
                 customer=customer.id,
+                plan=plan_id
                 items=[{
                     "price_data": {
                         "currency": currency,
@@ -84,6 +85,7 @@ class StripeClientConfig:
         except stripe.error.StripeError as e:
             # Handle any Stripe errors here
             return None
+
     
     @csrf_exempt
     def handle_webhook(self, request):

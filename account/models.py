@@ -13,6 +13,8 @@ from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
+from .import constant
+import datetime
 
 
 
@@ -91,7 +93,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
     # With merchant manager below, Customer.objects.all() will return all Customer objects in the database, 
     # but Customer.merchant.all() will return only the Customer objects associated with the current site, according to the SITE_ID setting.
-    merchant = CurrentSiteManager()
+    merchants = CurrentSiteManager()
 
     def save(self, *args, **kwargs):
         self.email = self.email.lower()
@@ -231,6 +233,7 @@ class Merchant(models.Model):
         related_name="packages", 
         on_delete=models.PROTECT
     )
+    package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     gateways = models.ManyToManyField("payments.PaymentGateway", 
         verbose_name=_("Supported Gateways"), 
         related_name="packages"
@@ -320,10 +323,10 @@ class Merchant(models.Model):
     logo_tag.short_description = 'company_logo'
 
 
-    # @property
-    # def trial_end(self):
-    #     """Calculate the account's trial end date."""
-    #     return self.user.date_joined + datetime.timedelta(days=constants.TRIAL_DAYS)
+    @property
+    def trial_end(self):
+        """Calculate the account's trial end date."""
+        return self.merchant.date_joined + datetime.timedelta(days=constant.TRIAL_DAYS)
     
 
 class TwoFactorAuth(models.Model):

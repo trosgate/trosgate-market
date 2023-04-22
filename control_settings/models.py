@@ -4,7 +4,7 @@ from general_settings . models import (
     TestEmail, SubscriptionGateway, HiringFee, ExachangeRateAPI,
     PaymentsControl, Mailer, DepositControl, DepositGateway
 )
-from payments.models import PaymentGateway, PaymentAPIs 
+from payments.models import PaymentGateway
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import FileExtensionValidator
 
@@ -87,13 +87,6 @@ class GatewaySetting(PaymentGateway):
         ordering = ['ordering']
         verbose_name = _("Payment Gateway")
         verbose_name_plural = _("Payment Gateway")
-
-
-class PaymentAPISetting(PaymentAPIs):
-    class Meta:
-        proxy=True
-        verbose_name = _("Payment API")
-        verbose_name_plural = _("Payment API")
 
 
 class HiringSetting(HiringFee):

@@ -14,7 +14,7 @@ class ProjectCreationForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ['title', 'category', 'preview', 'service_level', 'completion_time', 'dura_converter', 
-                'project_skill', 'description', 'rating', 'amount', 'sample_link',]
+                'skill', 'description', 'rating', 'salary', 'sample_link',]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,11 +35,11 @@ class ProjectCreationForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'YYYY-MM-DD'})            
         self.fields['sample_link'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'https: // example.com'})
-        self.fields['project_skill'].widget.attrs.update(
+        self.fields['skill'].widget.attrs.update(
             {'class': 'form-control chosen-select Skills', 'placeholder': 'Project Skills'})
         self.fields['rating'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Project Rating'})
-        self.fields['amount'].widget.attrs.update(
+        self.fields['salary'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'eg : $800 - $1200'})
 
     def clean_skill(self):

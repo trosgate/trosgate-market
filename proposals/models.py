@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.contrib.sites.models import Site
 from account.models import Merchant
 from django.utils.text import slugify
+from merchants.models import MerchantProduct
 
 
 def proposal_images_path(instance, filename):
@@ -28,10 +29,6 @@ class ActiveProposals(models.Manager):
     def active_proposal(self):
         return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
 
-# class ActiveProposals(models.Manager):
-#     def for_merchant(self):
-#         return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
-
   
 class MerchantManager(models.Manager):
     def for_merchant(self, request):# get_queryset for_merchant
@@ -41,86 +38,25 @@ class MerchantManager(models.Manager):
             return super().get_queryset(request)
 
 
-class Proposal(models.Model):
-    # STORAGE = activate_storage_type()
-    # proposal Duration converter
-    ONE_DAY = "one_day"
-    TWO_DAYS = "two_days"
-    THREE_DAYS = "three_days"
-    FOUR_DAYS = "four_days"
-    FIVE_DAYS = "five_days"
-    SIX_DAYS = "six_days"
-    ONE_WEEK = "one_week"
-    TWO_WEEK = "two_weeks"
-    THREE_WEEK = "three_weeks"
-    ONE_MONTH = "one_month"
-    DURATION_CONVERTER = (
-        (ONE_DAY, _("01 Day")),
-        (TWO_DAYS, _("02 Days")),
-        (THREE_DAYS, _("03 Days")),
-        (FOUR_DAYS, _("04 Days")),
-        (FIVE_DAYS, _("05 Days")),
-        (SIX_DAYS, _("06 Days")),
-        (ONE_WEEK, _("01 Week")),
-        (TWO_WEEK, _("02 Weeks")),
-        (THREE_WEEK, _("03 Weeks")),
-        (ONE_MONTH, _("01 Month")),
-    )
+class MerchantMaster(MerchantProduct):
+    merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
+    
+    class Meta:
+        abstract = True
 
-    # Service Level
-    BASIC = 'basic'
-    STANDARD = 'standard'
-    PREMIUM = 'premium'
-    SERVICE_LEVEL = (
-        (BASIC, _('Basic')),
-        (STANDARD, _('Standard')),
-        (PREMIUM, _('Premium')),
-    )
-    #
-    # Proposal Status
-    REVIEW = 'review'
-    ACTIVE = 'active'
-    MODIFY = 'modify'
-    ARCHIVE = 'archived'
-    STATUS = (
-        (REVIEW, _("Review")),
-        (ACTIVE, _("Active")),
-        (MODIFY, _("Modify")),
-        (ARCHIVE, _("Archived")),
-    )
-    #
-    # Proposal Overview
-    title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
-    category = models.ForeignKey('general_settings.Category', verbose_name=_("Category"), related_name="proposal", on_delete=models.RESTRICT, max_length=250)
-    slug = models.SlugField(_("Slug"), max_length=255)
-    preview = models.CharField(_("Preview"), max_length=255, error_messages={"name": {"max_length": _("Preview field is required with maximum of 250 characters")}},)
-    skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("Proposal Skills"),  error_messages={"name": {"max_length": _("Skill field is required")}},)
-    sample_link = models.URLField(_("Sample Website"), max_length=2083, help_text=_("the link must be a verified url"), null=True, blank=True)
-    status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=REVIEW)
-    # Main body content
-    description = models.TextField(verbose_name=_("Description"), max_length=3500, error_messages={"name": {"max_length": _("Description field is required")}},)
+
+class Proposal(MerchantMaster):
+    revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
+    team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
     faq_one = models.CharField(_("FAQ #1"), max_length=100)
     faq_one_description = models.TextField(_("FAQ #1 Details"), max_length=255)
     faq_two = models.CharField(_("FAQ #2"), max_length=100, null=True, blank=True)
     faq_two_description = models.TextField(_("FAQ #2 Details"), max_length=255, null=True, blank=True)
     faq_three = models.CharField(_("FAQ #3"), max_length=100, null=True, blank=True)
     faq_three_description = models.TextField(_("FAQ #3 Details"), max_length=255, null=True, blank=True)
-    # proposal summary
-    salary = models.PositiveIntegerField(_("Salary"), default=10, help_text=_("Minimum Salary is $10"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
-    service_level = models.CharField(_("Service level"), max_length=20, choices=SERVICE_LEVEL, default=BASIC, error_messages={"name": {"max_length": _("Service Level field is required")}},)
-    revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
-    dura_converter = models.CharField(_("Duration"), max_length=100, choices=DURATION_CONVERTER, default=ONE_DAY)
-    thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
-    created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    published = models.BooleanField(_("Published"), choices=((False, 'Private'), (True, 'Public')), default=False)
-    team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), related_name="proposalauthor", on_delete=models.CASCADE)
-    reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='proposalmerchant', on_delete=models.PROTECT)
-    
+ 
     objects = models.Manager()
-    # for_merchant = MerchantManager()
     active = ActiveProposals()
 
     class Meta:

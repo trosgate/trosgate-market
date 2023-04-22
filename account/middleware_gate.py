@@ -25,7 +25,7 @@ class MerchantGateMiddleware:
 
             request.merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
             
-            gate_url = reverse("account:dashboard") # subscriptions:complete
+            gate_url = reverse("merchants:subscription")
             if (
                 request.merchant.type in Merchant.ACTIVE_TYPES
                 or request.path_info == gate_url # MEANING THEY ARE WHERE THEY SHOULD BE CHECKING OUT

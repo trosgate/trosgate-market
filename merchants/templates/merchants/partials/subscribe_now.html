@@ -1,0 +1,107 @@
+<nav>
+    <div id='selectGateway' class="row justify-content-md-center">
+    {% for gateway in gateways %}
+    <form class="nav-item nav-link">{% csrf_token %}
+        <input type="text" name="package" value="{{package.name}}" id="id_{{package.name}}" hidden>
+        <input type="text" name="mygateway" value="{{gateway.name}}" id="id_{{gateway.name}}" hidden>
+        <button type="button" class="btn btn-danger btn-sm text-center" 
+            hx-post="{% url 'merchants:subscribe_pay' %}"
+            hx-target="#selectGateway"
+            {% if selectgateway.name == gateway.name %}
+            style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;"
+            {% else %}
+            style="background-color:red; font-weight: bold; margin:2px;"
+            {% endif %}
+            >
+            Pay with {{gateway.get_name_display}} 
+        </button>
+    </form>
+    {% endfor %}
+</div>
+</nav><br><br>
+<div class="container">
+    {% if selectgateway.name %}
+    <div style="font-weight:bold; font-size:28px; text-decoration:underline;">{{selectgateway.get_name_display}} Selected @ ${{amount}}</div><br>
+    {% endif %}
+    <div class="row align-items-center justify-content-center">
+    {% if selectgateway.name == 'stripe' %}
+        <form id="cardform">{% csrf_token %}
+            <input type="number" name="amount" value="{{amount}}" required hidden/>
+            <input type="text" name="package" value="{{request.merchant.package}}" required hidden/>
+            <div class="form-group col-md-6 text-left">
+                {{creditcardform.first_name.label}}
+                {{creditcardform.first_name}}
+                <span style="color:red;" role="alert">{{creditcardform.first_name.errors}}</span>
+            </div>
+            <div class="form-group col-md-6 text-left">
+                {{creditcardform.last_name.label}}
+                {{creditcardform.last_name}}
+                <span style="color:red;" role="alert">{{creditcardform.last_name.errors}}</span>
+            </div>
+            <div class="form-group col-md-6 text-left">
+                {{creditcardform.number.label}}
+                {{creditcardform.number}}
+                <span style="color:red;" role="alert">{{creditcardform.number.errors}}</span>
+            </div>
+            <div class="form-group col-md-2">
+                {{creditcardform.cvv.label}}
+                {{creditcardform.cvv}}
+                <span style="color:red;" role="alert">{{creditcardform.cvv.errors}}</span>
+            </div>
+            <div class="form-group col-md-2">
+                {{creditcardform.month.label}}
+                {{creditcardform.month}}
+                <span style="color:red;" role="alert">{{creditcardform.month.errors}}</span>
+            </div>
+            <div class="form-group col-md-2">
+                {{creditcardform.year.label}}
+                {{creditcardform.year}}
+                <span style="color:red;" role="alert">{{creditcardform.year.errors}}</span>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}        
+                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                        <span class="wt-jobalerts">
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                                <span> {{ message}} </span>
+                                <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %} 
+             
+            <div class="text-center">
+                <button type="button" class="btn btn-info btn-sm text-center" 
+                    hx-post="{% url 'merchants:stripe_subscription' %}"
+                    hx-target="#selectGateway"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                    Pay Now with Stripe
+                </button>
+            </div>
+        </form>
+            {% endif %}
+    </div>
+</div>
+<div class="container">
+    {% if selectgateway.name == 'paypal' %}
+    <span>This is the paypal</span>
+    {% endif %}
+    {% if selectgateway.name == 'flutterwave' %}
+    <span>This is the flutterwave</span>
+    {% endif %}
+    {% if selectgateway.name == 'razorpay' %}
+    <span>This is the Razorpay</span>
+    {% endif %}
+    {% if selectgateway.name == 'mtn_momo' %}
+    <span>This is the MTN Momo</span>
+    {% endif %}
+</div>
+
+
+
+
+

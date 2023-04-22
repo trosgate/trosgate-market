@@ -17,9 +17,11 @@ from account.fund_exception import FundException
 from teams.models import Team
 from client.models import ClientAccount
 from resolution.models import OneClickResolution, ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
+from merchants.models import MerchantMaster as MerchantTransaction
 
 
-class OneClickPurchase(models.Model):
+
+class OneClickPurchase(MerchantTransaction):
     SUCCESS = 'success'
     FAILED = 'failed'
     STATUS_CHOICES = (
@@ -217,13 +219,13 @@ class OneClickPurchase(models.Model):
         return oneclick_sale, client, freelancer, resolution
 
 
-class Purchase(models.Model):
+class Purchase(MerchantTransaction):
     SUCCESS = 'success'
     FAILED = 'failed'
     STATUS_CHOICES = (
         (SUCCESS, _('Success')),
         (FAILED, _('Failed'))
-    )    
+    )
 
     # ONE_CLICK = 'one_click'
     PROPOSAL = 'proposal'
@@ -425,11 +427,9 @@ class Purchase(models.Model):
         return purchase, contract_item, contract
 
 
-class ApplicationSale(models.Model):
-    #status choices to be added to track the state of order
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredapplicantteam', on_delete=models.CASCADE)
-    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="applicantionsales", on_delete=models.CASCADE)
-    project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
+class MerchantMaster(MerchantTransaction):
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), on_delete=models.CASCADE)
+    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"))
     total_sales_price = models.PositiveIntegerField(_("Applicant Budget"))
     disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
@@ -439,10 +439,18 @@ class ApplicationSale(models.Model):
     discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
     total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
     earning = models.PositiveIntegerField(_("Earning"))
-    total_earnings = models.PositiveIntegerField(_("Total Earning"))
+    total_earning = models.PositiveIntegerField(_("Total Earning"))
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
+
+    class Meta:
+        abstract = True
+
+
+class ApplicationSale(MerchantMaster):
+    #status choices to be added to track the state of order
+    project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
 
     class Meta:
         ordering = ("-created_at",)
@@ -498,23 +506,8 @@ class ApplicationSale(models.Model):
         return application, client, freelancer, resolution
 
 
-class ProposalSale(models.Model):
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredproposalteam', on_delete=models.CASCADE)
-    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="proposalsales", on_delete=models.CASCADE)
+class ProposalSale(MerchantMaster):
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal Hired"), related_name="proposalhired", on_delete=models.CASCADE)
-    sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Total Salary"))
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
-    staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
-    earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
-    discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
-    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
-    earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"))
-    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
-    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -579,23 +572,8 @@ class ProposalSale(models.Model):
         return proposal_sale, client, freelancer, resolution
 
 
-class ContractSale(models.Model):
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredcontractteam', on_delete=models.CASCADE)
-    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="contractsales", on_delete=models.CASCADE)
+class ContractSale(MerchantMaster):
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)
-    sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Contract Total"))
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
-    staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
-    earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
-    discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
-    total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
-    earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"))
-    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
-    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -660,22 +638,9 @@ class ContractSale(models.Model):
         return contract_sale, client, freelancer, resolution
 
 
-class ExtContract(models.Model):
+class ExtContract(MerchantMaster):
     # status choices to be added to track the state of order
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='hiredextcontractteam', on_delete=models.CASCADE)
-    purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), related_name="extcontractsales", on_delete=models.CASCADE)
     contract = models.ForeignKey("contract.Contract", verbose_name=_("Contract Hired"), related_name="extcontracthired", on_delete=models.CASCADE)
-    sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Contract Total"))
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
-    staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
-    earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
-    earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"))
-    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
-    is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -741,8 +706,7 @@ class ExtContract(models.Model):
         return contract_sale, client, freelancer, resolution
 
 
-class SubscriptionItem(models.Model):
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='subscriptionteam', on_delete=models.CASCADE)
+class SubscriptionMaster(MerchantMaster):
     payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
     price = models.PositiveIntegerField()
     status = models.BooleanField(_("Paid"), choices=((False, 'No'), (True, 'Yes')), default=False)
@@ -751,6 +715,23 @@ class SubscriptionItem(models.Model):
     created_at = models.DateTimeField(_("Subscription Start"), blank=True, null=True)
     activation_time = models.DateTimeField(_("Activation Time"), blank=True, null=True)
     expired_time = models.DateTimeField(_("Est. Expiration"), blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Plan(SubscriptionMaster):
+
+    class Meta:
+        ordering = ("-created_at",)
+        get_latest_by = ("-created_at",)
+        
+    def __str__(self):
+        return str(self.team.title)
+
+
+class SubscriptionItem(SubscriptionMaster):
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='subscriptionteam', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ("-created_at",)

@@ -1,0 +1,141 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main class="wt-main wt-haslayout">
+				<div class="wt-haslayout wt-innerbannerholder">
+					<div class="container">
+						<div class="row justify-content-md-center">
+							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+								<div class="wt-innerbannercontent">
+								<div class="wt-title"><h2>Invitation to Team</h2></div>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									<li class="wt-active">Invites </li>
+								</ol>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="wt-proposalholder">
+					<div class="row justify-content-md-center">
+						<div class="wt-hireduserstatus">
+							<h4>Invitation to "{{ teams.title }}"</h4>
+							<em>There are two options available to invite users. (1) Internal Users & (2) External Freelancers</em>
+						</div>											
+					</div>
+				</div>
+
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+							<div class="wt-dashboardbox">
+								<div class="wt-dashboardboxcontent wt-rcvproposala">
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+
+									<div class="wt-freelancerholder wt-rcvproposalholder">
+										<div class="wt-sectiontitle">
+											<span>Option #1: Internal Invitation(via Profile)</span>
+										</div>
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Instructions</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: Click on <em>'Invite Freelancer'</em> button below</span></li>
+											<li><span><i class="fa fa-check"></i>#2: You will be taken to the list of freelancers page</span></li>
+											<li><span><i class="fa fa-check"></i>#3: Click on <em>'user Avatar', or 'User fullname' or tagline</em> to open details</span></li>
+											<li><span><i class="fa fa-check"></i>#4: locate the button 'invite Freelancer' and Click to invite</span></li>
+										</ul>
+										{% if max_team_members %}											
+											<div class="form-group wt-btnarea">
+												<a href="{% url 'freelancer:freelancer_listing' %}"><button type="button" class="btn btn-danger"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite Freelancer</button></a>
+											</div>
+										{% else %}
+										<div class="wt-btnarea alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-6">
+											<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+												Maximum membership reached and can no longer invite. 
+											</span>
+										</div>	
+										{% endif %}											
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>	
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+									<div class="wt-freelancerholder wt-rcvproposalholder">												
+										<div class="wt-sectiontitle">
+											<span>Option #2: External Invitation</span>
+										</div>
+
+										<form autocomplete='off'> {% csrf_token %}
+											{% if max_team_members %}
+											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="invitation-message"></div>
+											<div class="form-group ">
+												<input id="id_emailer" class="form-control col-md-6" type="email" name="emailer" placeholder="enter user email" required>
+											</div> 
+											<div class="form-group wt-btnarea">
+												<button id="emailInvitation" 
+													type="submit" 
+													class="btn btn-danger"
+													hx-post= "{% url 'teams:external_invitation' %}"
+													hx-target="#invited-user">
+													<i class="fa fa-handshake-o" aria-hidden="true"></i>
+													 Invite member 
+												</button>
+											</div>											
+											{% else %}
+											<div class="wt-btnarea alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-6">
+												<span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                                    Maximum membership reached and can no longer invite. 
+                                                </span>
+											</div>	
+											{% endif %}
+										</form> 
+										<ul class="wt-projectliststyle">
+											<div class="wt-title">
+												<h5>Remember!</h5>
+											</div>	
+											<li><span><i class="fa fa-check"></i>#1: Provide a valid email that invitee can monitor</span></li>
+											<li><span><i class="fa fa-check"></i>#2: The provided email owner shouldn't be one of your existing team member</span></li>
+										</ul>											                  														
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+		</section>
+		
+    			    <div class="wt-proposalholder">
+						<div class="row justify-content-md-center">
+							<div class="wt-sectionhead wt-textcenter">
+								<span>Copyright @ {{website.site_name}}</span>
+							</div>
+						</div>
+					</div>
+
+			</main>
+			<!--Main End-->	
+
+				
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+	$(document).on("click", "#emailInvitation", function(){
+		$("#id_emailer").val('')
+	})
+</script>
+
+{% endblock scripts %}

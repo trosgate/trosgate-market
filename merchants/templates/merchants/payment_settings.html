@@ -22,45 +22,32 @@
 						<div class="wt-dashboardbox">
 							<div class="wt-dashboardboxcontent wt-rcvproposala">
 							
-							{% comment %} {% if request.merchant %} {% endcomment %}
 							<div class="wt-freelancerholder wt-rcvproposalholder">
 																						
 								<span id="paymentAccount-message" style="color:green; text-align:right;">.</span>
 
-								<div id='stripeApi'>
-									{% include 'merchants/partials/add_stripe_api.html' %}
-								</div>
-								<div id='paypalApi'>		
-									{% include 'merchants/partials/add_paypal_api.html' %}
-								</div>
-								<div id='flutterwaveApi'>		
-									{% include 'merchants/partials/add_flutterwave_api.html' %}
-								</div>
-								<div id='razorpayApi'>		
-									{% include 'merchants/partials/add_razorpay_api.html' %}
-								</div>
-								<div id='mtnApi'>		
-									{% include 'merchants/partials/add_mtn_api.html' %}
+								<div id='paymentApi'>
+									{% include 'merchants/partials/create_payment.html' %}
 								</div>
 									
 							</div>
 																		                  														
-							</div>
 						</div>
 					</div>
 				</div>
-					
-				</section>
+			</div>
+				
+			</section>
 
-				<div class="wt-proposalholder">
-					<div class="row justify-content-md-center">
-						<div class="wt-sectionhead wt-textcenter">
-							<span>Copyright @ {{request.site.name|capfirst}}</span>
-						</div>
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{request.site.name|capfirst}}</span>
 					</div>
 				</div>
+			</div>
 
-			</main>
+		</main>
 		<!--Main End-->	
 				
 {% endblock %}

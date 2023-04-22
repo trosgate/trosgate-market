@@ -13,6 +13,7 @@ from teams.models import Team, Invitation
 from contract.models import Contract
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
+from .validators import DomainValidator
 
 
 class SearchTypeForm(forms.Form):
@@ -256,6 +257,7 @@ class UserLoginForm(AuthenticationForm):
                 'Ooops! the input detail(s) is not valid')
         return email
 
+
 class PasswordResetForm(PasswordResetForm):
     email = forms.EmailField(max_length=100, widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Email', 'id': 'form-email'}))
@@ -298,3 +300,26 @@ class TwoFactorAuthForm(forms.ModelForm):
             raise forms.ValidationError(
                 _('Invalid token entered. Please check and try again'))
         return pass_code
+
+
+class DomainForm(forms.ModelForm): 
+    pass_code = forms.CharField(validators=[DomainValidator()], help_text = "Enter your domain")
+
+    class Meta:
+        model = Merchant
+        fields = ['pass_code']
+          
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+         # Personal Details   
+        self.fields['domain'].widget.attrs.update(
+            {'class': 'form-control',})
+
+    def clean_domain(self):
+        domain = self.cleaned_data['domain']
+        checker = Site.objects.filter(domain=domain)
+        if checker.count():    
+            raise forms.ValidationError(
+                _('This domain already registered'))
+        return domain

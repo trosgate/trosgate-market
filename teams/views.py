@@ -33,7 +33,6 @@ from freelancer.models import Freelancer
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from transactions.models import Purchase, SubscriptionItem
-from payments.models import PaymentAPIs
 from django.conf import settings
 from account.fund_exception import InvitationException
 from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token

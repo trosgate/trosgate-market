@@ -14,7 +14,7 @@
         "model": "payments.paymentgateway",
         "pk": 2,
         "fields": {
-            "name": "PayPal",
+            "name": "paypal",
             "status": true,
             "default": false,
             "processing_fee": 7,

@@ -1,34 +1,27 @@
 import stripe
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from payments.models import PaymentGateway, StripeMerchant
+from payments.models import PaymentGateway
 from account.fund_exception import GatewayModuleNotFound, GatewayNotConfigured, InvalidData
 from payments.checkout_card import CreditCard
 
 
 class StripeClientConfig:
-    display_name = "Stripe"
+    display_name = "stripe"
     currency = "usd"
 
     def __init__(self, request):
         self.merchant = request.merchant
         # Load the Stripe keys from the database
         try:
-            gateway = PaymentGateway.objects.get(name=self.display_name, status='active')
+            payment_gateway = PaymentGateway.objects.get(name=self.display_name, subscription=True, status=True)
+            self.stripe_secret_key = payment_gateway.secret_key
+            self.stripe_public_key = payment_gateway.public_key
+            self.stripe_webhook_key = payment_gateway.webhook_key
+            self.stripe_subscription_price_id = payment_gateway.subscription_price_id
+            stripe.api_key = self.stripe_secret_key
         except PaymentGateway.DoesNotExist:
             raise GatewayModuleNotFound("The '%s' gateway is not available." % self.display_name)
-
-        try:
-            active_gateway = gateway
-            payment_gateway=StripeMerchant.objects.get(merchant=self.merchant, gateway=active_gateway, status=self.name)
-            self.stripe_secret_key = payment_gateway.stripe_secret_key
-            self.stripe_public_key = payment_gateway.stripe_public_key
-            self.stripe_webhook_key = payment_gateway.stripe_webhook_key
-            self.stripe_subscription_price_id = payment_gateway.stripe_subscription_price_id
-            stripe.api_key = self.stripe_secret_key
-        
-        except PaymentGateway.DoesNotExist:
-            raise GatewayNotConfigured("The '%s' gateway is not configured." % self.display_name)
 
 
     def create_checkout(self, merchant, amount, credit_card):
@@ -46,7 +39,7 @@ class StripeClientConfig:
         
         try:
             response = stripe.Charge.create(
-                name=merchant.merchant.get_full_name(),
+                name=self.merchant.get_full_name(),
                 email=merchant.merchant.email,
                 amount=int(amount * 100),
                 currency= self.currency,
@@ -59,40 +52,57 @@ class StripeClientConfig:
         return {'status': 'SUCCESS', 'response': response}
     
          
-    def create_recurrent(self, merchant, amount, credit_card, interval, package):
+    def create_recurrent(self, credit_card, package, interval="month"):
         # validate interval for "month" or "annual"
 
-        if merchant is None:
-            raise InvalidData("Error occured on our side. Please try in few time")
+        if self.merchant is None:
+            raise InvalidData("Invalid request")
         
         card = {
             'object': 'card',
-            'number': credit_card.number,
-            'exp_month': credit_card.month,
-            'exp_year': credit_card.year,
-            'cvc': credit_card.verification_value
+            'number': credit_card['number'],
+            'exp_month': credit_card['month'],
+            'exp_year': credit_card['year'],
+            'cvc': credit_card['cvv']
         }
-        
         try:
             # Create customer in stripe vault for future auto-charges
             customer = stripe.Customer.create(
-                name=merchant.merchant.get_full_name(),
-                email=merchant.merchant.email,
-                amount=int(amount * 100),
+                name=self.merchant.merchant.get_full_name(),
+                email=self.merchant.merchant.email,
+                amount=int(credit_card['amount'] * 100),
                 currency= self.currency,
-                source=card
+                source=card,
+                plan=package
             )
             # Create a subscription for the customer
             response = stripe.Subscription.create(
                 customer=customer.id,
-                items=[
-                    {
-                        'price': 'your_stripe_plan_price_id',
+                items=[{
+                    "price_data": {
+                        "currency": self.currency,
+                        "unit_amount": credit_card.amount,
+                        "product_data": {
+                            'name': 'payment for subscription',
+                        },
                     },
-                ],
+                    "quantity": 1,
+                }],
+                payment_behavior="default_incomplete",
+                expand=["latest_invoice.payment_intent"],
+                billing_cycle_anchor="now",
+                metadata={"client_reference_id":self.merchant.id},
+                trial_period_days=30, # must be integer like 7 for 7 days
+                default_payment_method_types=["card"],
+                proration_behavior="create_prorations",
+                interval=interval
             )
 
-        except (stripe.error.StripeError, stripe.CardError, stripe.InvalidRequestError) as e:
+        # except (stripe.CardError) as e:
+        #     raise InvalidData(f"Error! {e}")
+        # except (stripe.InvalidRequestError) as e:
+        #     raise InvalidData(f"Error! {e}")
+        except (stripe.error.StripeError) as e:
             raise InvalidData(f"Error! {e}")
 
         return {'status': 'SUCCESS', 'response': response}

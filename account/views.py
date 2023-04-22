@@ -105,10 +105,6 @@ def autoLogout(request):
 
 
 def homepage(request):
-    print('User: ',request.user)
-    print('site: ',request.site)
-    print('parent_site: ',request.parent_site)
-    print('tenant: ',request.tenant)
     if request.user.is_authenticated:
         return redirect('account:dashboard')
 
@@ -386,9 +382,7 @@ def user_dashboard(request):
             teamform = TeamCreationForm()
 
         merchant = Proposal.objects.filter(team=user_active_team)
-        print('merchant::', merchant)
-        print('tenant::', request.tenant)
-        print('count ::', merchant.count())
+
         context = {
             'proposals': proposals,
             'open_projects': open_projects,
@@ -426,9 +420,9 @@ def user_dashboard(request):
         
         merchant_profile = get_object_or_404(Merchant, pk=request.user.active_merchant_id, members__in=[request.user])
  
-        print('yes yes yes', request.tenant)
-
-        print('no no no', request.merchant)
+        print('merchant::', request.merchant)
+        print('tenant::', request.tenant)
+        print('Site ::', request.site)
         context = {
             'merchant_profile': merchant_profile,
 
@@ -470,11 +464,6 @@ def block_or_unblock(request):
         'users': users,
     }
     return render(request, 'account/partials/merchant_users.html', context)
-
-
-
-
-
 
 
 

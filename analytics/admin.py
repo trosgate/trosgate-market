@@ -147,7 +147,7 @@ class SuccessContractAdmin(admin.ModelAdmin):
 class SuccessApplicationAdmin(admin.ModelAdmin):
     model = SuccessApplication
     list_display = [
-        'team', 'created_at','total_sales_price','total_earnings', 
+        'team', 'created_at','total_sales_price','total_earning', 
         'total_earning_fee_charged', 'total_discount_offered','get_status'
     ]    
     list_display_links = None
@@ -166,12 +166,12 @@ class SuccessApplicationAdmin(admin.ModelAdmin):
             purchase__status='success'
         ).annotate(
             ttotal_sales_price=(F("total_sales_price")),
-            ttotal_earning=(F("total_earnings")),
+            ttotal_earning=(F("total_earning")),
             ttotal_earning_fee_charged=(F("total_earning_fee_charged")),
             ttotal_discount_offered=(F("total_discount_offered"))
         ).aggregate(
             total_sales_price=(Sum("ttotal_sales_price")),
-            total_earning=(Sum("total_earnings")),
+            total_earning=(Sum("total_earning")),
             total_earning_fee_charged=(Sum("ttotal_earning_fee_charged")),
             total_discount_offered=(Sum("ttotal_discount_offered"))
         )

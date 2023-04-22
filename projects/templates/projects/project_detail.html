@@ -61,7 +61,7 @@
 										<h2>{{projectdetail.title}}</h2>
 										
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{base_currency}} {{projectdetail.amount}}</span></li>
+											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{base_currency}} {{projectdetail.salary}}</span></li>
 											<li><span>{% if not projectdetail.created_by.country.flag %}{{projectdetail.created_by.country.country_code}} - {% endif %}{% if projectdetail.created_by.country.flag %}<img src="{{projectdetail.created_by.country.flag.url}}" alt="img description">{% endif %} {{projectdetail.created_by.country.name}}</span></li>
 											{% if project.status == 'active' %}
 											<li><span><i class="far fa-star" style="color:gold;"></i> Rating: {{project.rating}}</span></li>
@@ -104,7 +104,7 @@
 												<h3>Skills Required</h3>
 											</div>
 											<div class="wt-tag wt-widgettag">
-											{% for skill in projectdetail.project_skill.all %}
+											{% for skill in projectdetail.skill.all %}
 												<a href="javascript:void(0);">{{skill}}</a>
 											{% endfor %}
 											</div>

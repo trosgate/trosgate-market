@@ -1,0 +1,211 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% comment %} {% load trackertag %} {% endcomment %}
+{% block content %}
+{% include 'dashboard/main_sidebar.html' %}
+
+
+<main id="wt-main" class="wt-main wt-haslayout">
+    <section class="wt-haslayout wt-dbsectionspace">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                <div class="wt-dashboardbox">
+                    <div class="wt-dashboardboxtitle">
+                        <h2>Packages ({{request.merchant.package.get_type_display}})
+
+                            {% if request.merchant.merchant == request.user %}
+                            <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Payment Due On: <b>{{request.merchant.trial_end|date:'M-d-Y'}}</b></span>
+                            {% endif %}
+                        </h2>
+                    </div>
+                   
+                    <div id="packaging" class="wt-dashboardboxcontent wt-packages">
+                        <div class="row g-0">
+                            {% for package in packages %}
+                            {% if package.type == 'Basic' %}
+                            <div class="col-lg-4 wow slideInUp" data-wow-delay="0.6s">
+                                <div class="bg-light rounded">
+                                    <div class="border-bottom py-4 px-5 mb-0">
+                                        <h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+                                    </div>
+                                    
+                                    <div class="p-5 pt-0">
+                                        <h1 class="display-5 mb-3"> 
+                                            <small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+                                                class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+                                        </h1>
+                                        
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Offering:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>SSL Certificate</span>{% if package.ssl_activation %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Change Domain</span>{% if package.can_change_domain %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Max Staff</span>{% if package.max_num_of_staff %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_num_of_staff}} </span>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Total Sitewide Users</span>{% if package.max_users_sitewide %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_users_sitewide}} </span>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Marketing:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Upselling Subscription</span>{% if package.can_upsell_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Multiple Teams Per Freelancer</span>{% if package.multiple_freelancer_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Ticket System</span><i class="fa fa-check text-primary pt-1"></i>
+                                        </div>
+                                        
+                                        <a href="{% url 'merchants:subscribe_now' package.type %}" class="btn btn-danger py-2 px-4 mt-4"> Subscribe Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if package.type == 'Team' %}
+                            <div class="col-lg-4 wow slideInUp" data-wow-delay="0.3s">
+                                <div class="bg-white rounded shadow position-relative" style="z-index: 1;">
+                                    <div class="border-bottom py-4 px-5 mb-0">
+                                        <h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+                                    </div>
+                                    <div class="p-5 pt-0">
+                                        <h1 class="display-5 mb-3">
+                                            <small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+                                                class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+                                        </h1>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Offering:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>SSL Certificate</span>{% if package.ssl_activation %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Change Domain</span>{% if package.can_change_domain %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Max Staff</span>{% if package.max_num_of_staff %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_num_of_staff}} </span>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Total Sitewide Users</span>{% if package.max_users_sitewide %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_users_sitewide}} </span>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Marketing:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Upselling Subscription</span>{% if package.can_upsell_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Multiple Teams Per Freelancer</span>{% if package.multiple_freelancer_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Ticket System</span><i class="fa fa-check text-primary pt-1"></i>
+                                        </div>
+                                        <a href="{% url 'merchants:subscribe_now' package.type %}" class="btn btn-danger py-2 px-4 mt-4"> Subscribe Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if package.type == 'Enterprise' %}
+                            <div class="col-lg-4 wow slideInUp" data-wow-delay="0.9s">
+                                <div class="bg-light rounded">
+                                    <div class="border-bottom py-4 px-5 mb-0">
+                                        <h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+                                    </div>
+                                    <div class="p-5 pt-0">
+                                        <h1 class="display-5 mb-3">
+                                            <small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+                                                class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+                                        </h1>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Offering:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>SSL Certificate</span>{% if package.ssl_activation %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Change Domain</span>{% if package.can_change_domain %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Max Staff </span>{% if package.max_num_of_staff %} <span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_num_of_staff}} </span>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Total Sitewide Users</span>{% if package.max_users_sitewide %} <span class="badge badge-primary pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_users_sitewide}} </span>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Marketing:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Upselling Subscription</span>{% if package.can_upsell_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Multiple Teams Per Freelancer</span>{% if package.multiple_freelancer_teams %} <i class="fa fa-check text-primary pt-1"></i>{% else %} <i class="fa fa-close text-danger pt-1"></i>{% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Ticket System</span><i class="fa fa-check text-primary pt-1"></i>
+                                        </div>
+                                        <a href="{% url 'merchants:subscribe_now' package.type %}" class="btn btn-danger py-2 px-4 mt-4"> Subscribe Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="wt-proposalholder">
+        <div class="row justify-content-md-center">
+            <div class="wt-sectionhead wt-textcenter">
+                <span>Copyright @ {{website.site_name}}</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,7 +8,7 @@ from general_settings . models import (
     Currency, Payday, StorageBuckets, TestEmail, 
     AutoLogoutSystem, ExachangeRateAPI
 )
-from payments.models import PaymentAPIs, PaymentGateway
+from payments.models import PaymentGateway
 from control_settings.models import LayoutSetting
 from teams . models import Team, Invitation
 from proposals . models import Proposal

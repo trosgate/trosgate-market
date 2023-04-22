@@ -137,13 +137,13 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
     list_filter = ['purchase__status','is_refunded']
     search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
-         'team', 'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earnings', 'total_sales_price', 'discount_offered',
+         'team', 'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earning', 'total_sales_price', 'discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value', 'is_refunded'
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','project',)}),
         ('Revenue', {'fields': ('total_sales_price', 'earning_fee_charged','discount_offered','is_refunded',)}),
-        ('Earning/Profit', {'fields': ('staff_hired','earning','total_earnings',)}),
+        ('Earning/Profit', {'fields': ('staff_hired','earning','total_earning',)}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 

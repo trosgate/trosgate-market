@@ -1,0 +1,30 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %} 
+{% include 'dashboard/main_sidebar.html' %}
+
+
+
+			<!--Main Start-->
+		<main class="wt-main wt-haslayout">
+			<div class="wt-proposalholder wt-title text-center">
+
+				<h4>Select Gateway </h4> 
+
+				<div id='selectGateway'>
+					{% include 'merchants/partials/subscribe_now.html' %}
+				</div>
+			</div>
+
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{request.site.name|capfirst}}</span>
+					</div>
+				</div>
+			</div>
+
+		</main>
+		<!--Main End-->	
+				
+{% endblock %}

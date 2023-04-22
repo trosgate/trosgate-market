@@ -10,10 +10,31 @@ from account.fund_exception import FundException
 from notification.mailer import send_credit_to_team, send_marked_paid_in_bulk_email, send_withdrawal_marked_failed_email
 from account.models import Customer
 from teams.models import Team
+from merchants.models import MerchantMaster
 
 
 
-class PaymentGateway(models.Model):
+class PaymentAPI(models.Model): # This model stores apis for parent site
+    public_key = encrypt(models.CharField(_("Puplishable Key/API Id"), max_length=255, blank=True, null=True))
+    secret_key = encrypt(models.CharField(_("Secret Key/API Key"), max_length=255, blank=True, null=True))
+    webhook_key = encrypt(models.CharField(
+        _("API Webhook"), 
+        max_length=255, 
+        blank=True, 
+        null=True,
+        help_text=_(
+        "This is mandatory for payment with Mobile money, Stripe. Optional for other gateways"),
+    ))
+    subscription_price_id = encrypt(models.CharField(_("Subscription Id"), max_length=255, blank=True, null=True))
+    sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
+
+    class Meta:
+        verbose_name = 'Payment API'
+        verbose_name_plural = 'Payment API'
+        abstract = True
+
+
+class PaymentGateway(PaymentAPI):
     BALANCE = 'balance'
     STRIPE = 'stripe'
     PAYPAL = 'paypal' 
@@ -30,14 +51,36 @@ class PaymentGateway(models.Model):
         (PAYSTACK, _('Paystack')),
         (MTN_MOMO, _('MTN Momo')),
     )
-    name = models.CharField(_("Payment Gateway"), choices=GATEWAY_TYPE, default=BALANCE, max_length=20, unique=True)
-    status = models.BooleanField(_("Status"), choices=((False, 'Inactive'), (True, 'Active')), default=False)
-    processing_fee = models.PositiveIntegerField(_("Processing Fee"), null=True, blank=True, default=0, help_text=_(
-        "discount price must be less than actual price"), validators=[MinValueValidator(0), MaxValueValidator(20000)])
-    ordering = models.PositiveIntegerField(_("Ordering"), default=1, help_text=_(
-        "This determines how each Gateway will appear to user eg, 1 means 1st position"), validators=[MinValueValidator(1), MaxValueValidator(10)])
+    name = models.CharField(
+        _("Payment Gateway"), 
+        choices=GATEWAY_TYPE, 
+        default=BALANCE, 
+        max_length=20, 
+        unique=True
+    )
+    status = models.BooleanField(
+        _("Status"), 
+        choices=((False, 'Inactive'), (True, 'Active')), 
+        default=False
+    )
+    processing_fee = models.PositiveIntegerField(
+        _("Processing Fee"),
+        default=0, 
+        help_text=_(
+        "discount price must be less than actual price"), 
+        validators=[MinValueValidator(0), MaxValueValidator(20000)]
+    )
+    ordering = models.PositiveIntegerField(
+        _("Ordering"), default=1, 
+        help_text=_(
+        "This determines how each Gateway will appear to user eg, 1 means 1st position"), 
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
+    subscription = models.BooleanField(_("Merchant Payment Support"), choices=(
+        (False, 'Disabled Subscription'), (True, 'Enabled Subscription')), default=False)
+    
     default = models.BooleanField(_("Default"), choices=(
-        (False, 'No'), (True, 'Yes')), blank=True)
+        (False, 'No'), (True, 'Yes')), default=True)
 
     def __str__(self):
         return str(self.get_name_display())
@@ -45,36 +88,29 @@ class PaymentGateway(models.Model):
     class Meta:
         ordering = ['ordering']
 
-
-class PaymentAPIs(models.Model): # This model stores apis for parent site
-    preview = models.CharField(_("Preamble"), max_length=255, default="This is the API Section for the integrated payment gateways", blank=True)
-   
-    # Stripe API Credentials
-    stripe_public_key = encrypt(models.CharField(_("STRIPE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    stripe_secret_key = encrypt(models.CharField(_("STRIPE SECRET KEY"), max_length=255, blank=True, null=True))
-    stripe_webhook_key = encrypt(models.CharField(_("STRIPE WEEBHOOK KEY(OPTIONAL)"), max_length=255, blank=True, null=True))
-    stripe_subscription_price_id = encrypt(models.CharField(_("STRIPE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    # PayPal API Credentials
-    paypal_public_key = encrypt(models.CharField(_("PAYPAL PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    paypal_secret_key = encrypt(models.CharField(_("PAYPAL SECRET KEY"), max_length=255, blank=True, null=True))
-    paypal_subscription_price_id = encrypt(models.CharField(_("PAYPAL SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
-    # Flutterwave API Credentials
-    flutterwave_public_key = encrypt(models.CharField(_("FLUTTERWAVE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    flutterwave_secret_key = encrypt(models.CharField(_("FLUTTERWAVE SECRET KEY"), max_length=255, blank=True, null=True))
-    flutterwave_secret_hash = models.UUIDField(unique=True, verbose_name="Flutterwave secret Hash", editable=True, default=uuid.uuid4,)
-    flutterwave_subscription_price_id = encrypt(models.CharField(_("FLUTTERWAVE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    # Razorpay API Credentials
-    razorpay_public_key_id = encrypt(models.CharField(_("RAZORPAY PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
-    razorpay_secret_key_id = encrypt(models.CharField(_("RAZORPAY SECRET KEY"), max_length=255, blank=True, null=True))
-    razorpay_subscription_price_id = encrypt(models.CharField(_("RAZORPAY SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-
-    def __str__(self):
-        return self.preview
-
-    class Meta:
-        verbose_name = 'Payment API'
-        verbose_name_plural = 'Payment API'
+    def clean(self):
+        # Start amount against delta validation
+        if self.subscription == True and self.public_key is None or self.subscription == True and self.public_key == '':
+            raise ValidationError(
+                {'public_key': _('Field required for subscription')})
+        
+        if self.subscription == True and self.secret_key is None or self.subscription == True and self.secret_key == '':
+            raise ValidationError(
+                {'secret_key': _('Field required for subscription')})
+        
+        if (self.name == 'stripe' and self.subscription == True) and self.webhook_key is None or self.webhook_key == '':
+            raise ValidationError(
+                {'webhook_key': _('Field required for subscription')})
+        
+        if (self.name == 'mtn_momo' and self.subscription == True) and self.webhook_key is None or self.webhook_key == '':
+            raise ValidationError(
+                {'webhook_key': _('Field required for subscription')})
+        
+        if self.subscription == True and self.subscription_price_id is None or self.subscription == True and self.subscription_price_id == '':
+            raise ValidationError(
+                {'subscription_price_id': _('Field required for subscription')})
+                 
+        return super().clean()
 
 
 class MerchantAPIs(models.Model): # This model stores apis for parent site
@@ -120,7 +156,14 @@ class MerchantAPIs(models.Model): # This model stores apis for parent site
         verbose_name_plural = 'Merchant API'
 
 
-class PaymentAccount(models.Model):
+    def masked_sensitive_field(self):
+        if len(self.sensitive_field) <= 3:
+            return '*' * len(self.sensitive_field)
+        else:
+            return self.sensitive_field[:3] + '_' + '*' * (len(self.sensitive_field) - 3)
+        
+
+class PaymentAccount(MerchantMaster):
     MOMO = 'mobilemoney'
     BANK = 'bank'
     FLUTTERWAVE_CHOICES = (
@@ -128,7 +171,6 @@ class PaymentAccount(models.Model):
         (BANK, _('Bank Account')),
     )  
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='paymentaccount', on_delete=models.PROTECT,)
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='paymentaccountmerchant', on_delete=models.PROTECT,)
     primary_account_type = models.ForeignKey(PaymentGateway, verbose_name=_('Account Type'), related_name='paymntaccountgateway', null=True, blank=True, on_delete=models.SET_NULL,)
     
     paypal_account = encrypt(models.CharField(_("Bearer Account/Email"), max_length=100, help_text=_(

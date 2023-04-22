@@ -134,44 +134,61 @@ CARD_TYPES = [
     ('master', 'Master'),
     ('discover', 'Discover'),
     ('american_express', 'American Express'),
-    ]
+]
 
 today = datetime.date.today()
 MONTH_CHOICES = [(m, datetime.date(today.year, m, 1).strftime('%b')) for m in range(1, 13)]
-YEAR_CHOICES = [(y, y) for y in range(today.year, today.year + 21)]
+current_year = datetime.datetime.now().year
+YEAR_CHOICES = [(year, str(year)) for year in range(current_year, current_year + 21)]
 
 
-class StripeCardForm(forms.Form):
-    first_name = forms.CharField(required=False)
-    last_name = forms.CharField(required=False)
-    package = forms.CharField(required=False)
-    card_type = forms.ChoiceField(choices=CARD_TYPES, required=False)
-    month = forms.ChoiceField(choices=MONTH_CHOICES)
-    year = forms.ChoiceField(choices=YEAR_CHOICES)
-    number = forms.CharField(required=False)
-    verification_value = forms.CharField(label='CVV', required=False)
+class CreditCardForm(forms.Form):
+    first_name = forms.CharField(required=True, label='First name*')
+    last_name = forms.CharField(required=True, label='First name*')
+    package = forms.CharField(required=True)
+    amount = forms.IntegerField(required=True)
+    month = forms.ChoiceField(choices=MONTH_CHOICES, required=True, label='Expiry Month*')
+    year = forms.ChoiceField(choices=YEAR_CHOICES, required=True, label='Expiry Year*')
+    number = forms.CharField(required=True, label='Card Number*')
+    cvv = forms.CharField(required=True, label='Card CVV*')
 
+    def clean_number(self):
+        number = self.cleaned_data['number']
+        if not number or number.isspace():
+            raise forms.ValidationError('Missing card number')
+        return number
+    
+    def clean_cvv(self):
+        cvv = self.cleaned_data['cvv']
+        if not cvv:
+            raise forms.ValidationError('Missing card CVV')
+        return cvv
+    
     def clean(self):
         data = self.cleaned_data
         credit_card = CreditCard(**data)
         if not credit_card.is_valid():
             raise forms.ValidationError('Payment card validation failed')
         return data
-
-    def clean(self):
-        cleaned_data = super().clean()
-        card_number = cleaned_data.get('card_number')
-        exp_month = cleaned_data.get('exp_month')
-        exp_year = cleaned_data.get('exp_year')
-        cvc = cleaned_data.get('cvc')
-        
-        # Create CreditCard object and validate it
-        cc = CreditCard(card_number, exp_month, exp_year, cvc)
-        if not cc.validate():
-            raise forms.ValidationError('Invalid credit card information.')
-        
-        return cleaned_data
     
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super(CreditCardForm, self).__init__(
+            *args, 
+            initial={
+            'first_name':request.user.first_name,
+            'last_name':request.user.last_name},
+            **kwargs
+        )
+        self.fields['first_name'].widget.attrs['class'] = 'form-control'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control'
+        self.fields['number'].widget.attrs['class'] = 'form-control'
+        self.fields['cvv'].widget.attrs['class'] = 'form-control'
+        self.fields['year'].widget.attrs['class'] = 'custom-select'
+        self.fields['year'].widget.attrs['style'] = 'height: 50px;'
+        self.fields['month'].widget.attrs['class'] = 'custom-select'
+        self.fields['month'].widget.attrs['style'] = 'height: 50px;'
+        
 
 class PaymentAccountForm(forms.ModelForm):
     class Meta:
