@@ -4,14 +4,29 @@ Auth: 4000002500003155
 
 Error: 4000000000009995
 
-public: 'pk_test_51JxEfNF4wH80TkNlzPX02TCj0H8k1L2rviwn961IIyuO9yuXIVjAr3PjrejrS5vDMe2iXLYVHLbTCVk5rDVEEkwl00dV0nWbqW'
-secret: 'sk_test_51JxEfNF4wH80TkNlVeNwGaAJYSaduuxjjeGWRzoemJj833qIn4pKnwwfP2pvemT8oiepPbAr9lBZkkkH9fIhQEtO00JkJOMAHt'
-webhook: 'whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c'
-          whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c
-          
-config id from cli: 'acct_1JxEfNF4wH80TkNl'
+public: 'pk_test_51JxEfNF4wH80TkNlgTuafnWaz7TKrQr34DUqaHwC5BaFOJ2FWsggoVBIeMHUtmRhwLIBuQe75QnZze3mpETo1q8300ZjZ423cP'
+secret: 'sk_test_51JxEfNF4wH80TkNlwb7kYyjvWkJnB3BjBantEbw5akhnOZCSnCb4nqxBW8mjpMvnjJUWvKRq745IMrb5Ri9CbLTw00f7IG6QDi'
+webhook: ''
 
-pairing code: gifted-magic-hail-won
+CREDIT CARD:  4242424242424242
+CREDIT CARD CANNOT BE USED DIRECTLY IN TEST ENVIRONMENT. SO USE TOKENS BELOW
+Visa:	tok_visa
+Visa (debit):  tok_visa_debit
+Mastercard:	 tok_mastercard
+Mastercard (debit):	 tok_mastercard_debit
+Mastercard (prepaid):  tok_mastercard_prepaid
+American Express:  tok_amex
+Discover:  tok_discover
+Diners Club:  tok_diners
+JCB:  tok_jcb
+UnionPay:  tok_unionpay
+
+
+# PACKAGE
+ENTERPRISE: price_1MxbNoF4wH80TkNlnmoi9SXR
+TEAM: price_1MxbNGF4wH80TkNlAsLCy1jQ
+BASIC: price_1MxbMPF4wH80TkNl02yvO4yX
+
 
 //listen to stripe webhook on a particular endpoint
 stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/   

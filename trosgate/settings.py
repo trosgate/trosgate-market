@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
-
+from django.db import connections
 
 # load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'django_celery_beat'
 ]
 
+
 MIDDLEWARE = [
     'account.middleware_host.DynamicHostMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -102,6 +103,7 @@ MIDDLEWARE = [
     'analytics.middleware.Middleware',
 ]
 
+
 AUTHENTICATION_BACKENDS = [
     'account.backend.CustomAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -109,6 +111,7 @@ AUTHENTICATION_BACKENDS = [
 
 
 ROOT_URLCONF = 'trosgate.urls'
+
 
 TEMPLATES = [
     {
@@ -139,7 +142,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
 # SERVER/LOCAL SIDE
-DATABASE_ROUTERS = ['account.router.MerchantRouter']
+# DATABASE_ROUTERS = ['account.router.MerchantRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

@@ -6,6 +6,7 @@ from django.db import connections
 from django.db.utils import OperationalError
 
 
+
 class DynamicHostMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -50,6 +51,7 @@ class DynamicHostMiddleware:
         connections.merchant = schema_name
 
         request.tenant = self.is_merchant_family(request, site)
+        request.schema_name = schema_name # set the schema name on the request object
 
         response = self.get_response(request)    
         return response
