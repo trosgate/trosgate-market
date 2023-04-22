@@ -20,14 +20,19 @@ from django.utils import timezone
 from general_settings.models import ProposalGuides
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
+
 @login_required
 @user_is_client
 def create_project(request):
+    print(request.merchant)
+    print(request.tenant.id)
+    print(request.site.id)
     if request.method == 'POST':
         projectform = ProjectCreationForm(request.POST)
-
+        print(request.POST)
         if projectform.is_valid():
             project = projectform.save(commit=False)
+            project.merchant_id = request.tenant.id
             project.created_by = request.user
             project.slug = slugify(project.title)
             project.status= 'active'

@@ -23,6 +23,7 @@ from proposals.utilities import (
     one_month,
 )
 from merchants.models import MerchantProduct
+from django.contrib.sites.models import Site
 
 
 class PublishedProjects(models.Manager):
@@ -87,6 +88,8 @@ class Project(MerchantProduct):
                 self.reference = 'P' + str(uuid4()).split('-')[4]
             except:
                 self.reference = 'P' + str(uuid4()).split('-')[4]
+        # if self.merchant_id is None:
+            # self.merchant_id = Site.objects.get_current().id
         super(Project, self).save(*args, **kwargs)
 
 

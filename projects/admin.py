@@ -8,13 +8,13 @@ class ProjectAdmin(admin.ModelAdmin):
     list_editable = ['published', 'status']
     search_fields = ['title']
     readonly_fields = [
-        'category', 'preview', 'salary','rating',
+        'merchant', 'category', 'preview', 'salary','rating',
         'service_level', 'skill','reference','created_by',
         'description','sample_link','dura_converter','duration','reopen_count', 'completion_time'
     ]
     actions = ['Feature_on_home', 'Unfeature_from_home']
     fieldsets = (
-        ('Introduction', {'fields': ('category', 'preview', 'salary',)}),
+        ('Introduction', {'fields': ('merchant', 'category', 'preview', 'salary',)}),
         ('Specialties', {'fields': ('service_level', 'skill','rating','reopen_count', )}),
         ('Details', {'fields': ('description','sample_link','dura_converter','duration', 'completion_time',)}),
         ('Project Creator', {'fields': ('reference','created_by',)}),   

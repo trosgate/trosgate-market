@@ -43,7 +43,7 @@ class ProjectCreationForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'eg : $800 - $1200'})
 
     def clean_skill(self):
-        skill_count = self.cleaned_data['project_skill']
+        skill_count = self.cleaned_data['skill']
         if len(skill_count) > 3:
             raise forms.ValidationError(_("Skill selected must not be more than three"))
         return skill_count

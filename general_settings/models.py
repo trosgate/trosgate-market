@@ -269,8 +269,8 @@ class Category(models.Model):
         return reverse('general_settings:category', args=[self.slug])
 
     # @property
-    def proposal_count(self):
-        return len(self.proposal.filter(status='active'))
+    # def proposal_count(self):
+    #     return len(self.proposal.filter(status='active'))
 
 
 class Department(models.Model):

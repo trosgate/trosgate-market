@@ -12,8 +12,26 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
 
 
+# managers.py
+from django.db import models
+
+
+class MerchantMasterManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        site = Site.objects.get_current()
+        return qs.filter(merchant=site.id)
+
+class UnscopedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+
 class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
+    
+    objects = MerchantMasterManager()
+    allobjects = UnscopedManager()
     
     class Meta:
         abstract = True
@@ -82,6 +100,9 @@ class MerchantProduct(models.Model):
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     salary = models.IntegerField(_("Price"), default=10, validators=[MinValueValidator(10), MaxValueValidator(50000)], error_messages={"amount": {"max_length": _("Set the budget amount between 10 and 50000 currency points")}},)       
+
+    objects = MerchantMasterManager()
+    allobjects = UnscopedManager()
     
     class Meta:
         abstract = True

@@ -1,13 +1,12 @@
-# middleware.py
-
 from django.contrib.sites.models import Site
 from django.conf import settings
 from account.models import Merchant
 from django.http import HttpResponseForbidden
+from django.db import connections
+from django.db.utils import OperationalError
 
 
 class DynamicHostMiddleware:
-
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -19,7 +18,7 @@ class DynamicHostMiddleware:
         if domain.startswith('www.'):
             domain = domain[4:]
 
-        if domain not in settings.ALLOWED_HOSTS:
+        if not domain in settings.ALLOWED_HOSTS:
             return HttpResponseForbidden()
         
         try:
@@ -29,13 +28,26 @@ class DynamicHostMiddleware:
             return HttpResponseForbidden()
 
         # Set the SITE_ID header to the ID of the Site object
-        request.site = site 
         settings.SITE_ID = site.id 
+        request.site = site 
           
         if site.id == 1:
             request.parent_site = site
+            schema_name = 'public'
         else:
             request.parent_site = None
+            schema_name = f'merchant_{site.id}'
+            connection = connections['default']
+            try:
+                # Create schema for tenant if it doesn't exist
+                
+                with connection.cursor() as cursor:
+                    cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+            except OperationalError as e:
+                print(f"Error while creating schema: {e}")
+                return HttpResponseForbidden()
+
+        connections.merchant = schema_name
 
         request.tenant = self.is_merchant_family(request, site)
 
@@ -55,5 +67,3 @@ class DynamicHostMiddleware:
             return request.user.active_merchant_id
         elif Merchant.objects.filter(site=site).exists():
             return Merchant.objects.filter(site=site).first()
-
-

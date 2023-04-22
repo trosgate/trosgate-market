@@ -139,7 +139,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 
 # SERVER/LOCAL SIDE
-# DATABASE_ROUTERS = ['account.router.MerchantRouter']
+DATABASE_ROUTERS = ['account.router.MerchantRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
