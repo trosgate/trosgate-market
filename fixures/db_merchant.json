@@ -1,0 +1,56 @@
+[
+    {
+        "model": "account.merchant",
+        "pk": 1,
+        "fields": {
+            "type": 4,
+            "merchant": 3,
+            "business_name": "gladiators",
+            "site": 2,
+            "package": 3,
+            "package_expiry": null,
+            "gender": "",
+            "tagline": "",
+            "description": "",
+            "profile_photo": "client/avatar5.png",
+            "company_logo": "client/logo.png",
+            "banner_photo": "client/banner.png",
+            "address": null,
+            "announcement": null,
+            "created_at": "2023-04-22T01:54:09.589Z",
+            "modified": "2023-04-22T01:54:09.589Z",
+            "gateways": [
+                3
+            ],
+            "members": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "account.merchant",
+        "pk": 2,
+        "fields": {
+            "type": 4,
+            "merchant": 4,
+            "business_name": "legend",
+            "site": 3,
+            "package": 2,
+            "package_expiry": null,
+            "gender": "",
+            "tagline": "",
+            "description": "",
+            "profile_photo": "client/avatar5.png",
+            "company_logo": "client/logo.png",
+            "banner_photo": "client/banner.png",
+            "address": null,
+            "announcement": null,
+            "created_at": "2023-04-22T02:05:45.327Z",
+            "modified": "2023-04-22T02:05:45.327Z",
+            "gateways": [],
+            "members": [
+                4
+            ]
+        }
+    }
+]

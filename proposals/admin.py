@@ -5,7 +5,6 @@ from django import forms
 
 @admin.register(Proposal)
 class ProposalAdmin(admin.ModelAdmin):
-    model = Proposal
     list_display = ['image_tag', 'title', 'team','category', 'salary', 'status', 'published']
     list_display_links = ['image_tag', 'title']
     list_editable = [ 'status','published']
@@ -25,25 +24,23 @@ class ProposalAdmin(admin.ModelAdmin):
         ('Attributes', {'fields': ('salary','service_level', 'revision', 'dura_converter', 'thumbnail',)}),   
     )
     
-
     def mark_bulk_to_public(self, request, queryset):
         queryset.update(published = True)
 
     def mark_bulk_to_private(self, request, queryset):
         queryset.update(published = False)
 
-
     def has_add_permission(self, request):
         return False
 
-    # def has_delete_permission(self, request, obj=None):
-    #     return False
+    def has_delete_permission(self, request, obj=None):
+        return False
 
-    # def get_actions(self, request):
-    #     actions = super().get_actions(request)
-    #     if 'delete_selected' in actions:
-    #         del actions['delete_selected']
-    #     return actions
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 class ProposalSupportInline(admin.StackedInline):

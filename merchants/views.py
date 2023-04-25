@@ -104,16 +104,15 @@ def stripe_subscription(request):
     selectgateway = get_object_or_404(PaymentGateway, name=gateway)
     creditcardform = CreditCardForm(request.POST or None, request=request)
     stripe_client = StripeClientConfig(request)
-    
+
     if request.method == "POST":
         if creditcardform.is_valid():
             credit_card = CreditCard(**creditcardform.cleaned_data)
             data = creditcardform.cleaned_data
             # print(data)
             try:
-                response = stripe_client.create_recurrent(
+                response = stripe_client.create_recurrent_test(
                     credit_card = data,
-                    package = 'Basic'
                 )
             except Exception as e:
                 print(str(e))

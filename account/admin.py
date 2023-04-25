@@ -244,8 +244,8 @@ class CountryAdmin(admin.ModelAdmin):
 class PackageAdmin(admin.ModelAdmin):  
     list_display = ['type','price', 'is_default', 'verbose_type', 'ordering']
     list_display_links = ['type','verbose_type']
-    excludes = ['daily_Handshake_mails_to_clients']
-    readonly_fields = ['ssl_activation','daily_Handshake_mails_to_clients']
+    # excludes = ['daily_Handshake_mails_to_clients']
+    readonly_fields = ['ssl_activation']
     radio_fields = {
         'is_default': admin.HORIZONTAL, 
         'can_change_domain':admin.HORIZONTAL,
@@ -253,6 +253,17 @@ class PackageAdmin(admin.ModelAdmin):
         'ssl_activation':admin.HORIZONTAL,
         'multiple_freelancer_teams':admin.HORIZONTAL,
     }    
+    fieldsets = (
+        ('Merchant Package', {'fields': (
+            'type', 'verbose_type', 'can_change_domain', 'ssl_activation','max_num_of_staff',
+            'can_upsell_teams', 'max_users_sitewide','multiple_freelancer_teams'
+        )}),
+        ('Merchant Upsell', {'fields': (
+            'max_member_per_team', 'max_proposals_allowable_per_team','upsell_price',   
+            'monthly_offer_contracts_per_team', 'monthly_projects_applicable_per_team', 
+        )}),
+
+    )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -376,6 +387,7 @@ class MerchantAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
+
 
 admin.site.unregister(Group)
 

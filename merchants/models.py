@@ -10,6 +10,7 @@ from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
+from account.models import Merchant
 
 
 # managers.py
@@ -20,7 +21,11 @@ class MerchantMasterManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset()
         site = Site.objects.get_current()
-        return qs.filter(merchant=site.id)
+        if site.pk == 1:
+            return qs
+        else:
+            return qs.filter(merchant__site=site.id)
+    
 
 class UnscopedManager(models.Manager):
     def get_queryset(self):
@@ -31,13 +36,20 @@ class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
     
     objects = MerchantMasterManager()
-    allobjects = UnscopedManager()
+    objectsall = UnscopedManager()
     
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        site = Site.objects.get_current()
+        merchant = Merchant.objects.filter(site=site).first()
+        if not self.merchant_id:
+            self.merchant_id = merchant.id
+        super().save(*args, **kwargs)
 
-class MerchantProduct(models.Model):
+
+class MerchantProduct(MerchantMaster):
     # proposal Duration converter
     ONE_DAY = "one_day"
     TWO_DAYS = "two_days"
@@ -83,7 +95,6 @@ class MerchantProduct(models.Model):
         (MODIFY, _("Modify")),
         (ARCHIVE, _("Archived")),
     )    
-    merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
     title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
     category = models.ForeignKey('general_settings.Category', verbose_name=_("Category"), on_delete=models.RESTRICT, max_length=250)
     slug = models.SlugField(_("Slug"), max_length=255)
@@ -101,8 +112,45 @@ class MerchantProduct(models.Model):
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     salary = models.IntegerField(_("Price"), default=10, validators=[MinValueValidator(10), MaxValueValidator(50000)], error_messages={"amount": {"max_length": _("Set the budget amount between 10 and 50000 currency points")}},)       
 
-    objects = MerchantMasterManager()
-    allobjects = UnscopedManager()
-    
     class Meta:
         abstract = True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from ckeditor.fields import RichTextField
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
@@ -27,8 +26,10 @@ from django.contrib.sites.models import Site
 
 
 class PublishedProjects(models.Manager):
-    def get_queryset(self):
-        return super(PublishedProjects, self).get_queryset().filter(published=True, status='active', duration__gte=timezone.now())
+    def publish_project(self):
+        site = Site.objects.get_current()
+        return super(PublishedProjects, self).get_queryset().filter(merchant__site=site.id, published=True, status='active', duration__gte=timezone.now())
+
 
 
 class Project(MerchantProduct):
@@ -69,7 +70,7 @@ class Project(MerchantProduct):
     completion_time = models.CharField(_("Completion In"), max_length=100, choices=PROJECT_COMPLETION, default = ONE_DAY)
     action = models.BooleanField(_("Action"), default = False)
     reopen_count = models.PositiveSmallIntegerField(_("Reopen Count"), default=0, validators=[MinValueValidator(0), MaxValueValidator(1)],)
-    objects = models.Manager()
+
     public = PublishedProjects()
 
     class Meta:
@@ -88,8 +89,6 @@ class Project(MerchantProduct):
                 self.reference = 'P' + str(uuid4()).split('-')[4]
             except:
                 self.reference = 'P' + str(uuid4()).split('-')[4]
-        # if self.merchant_id is None:
-            # self.merchant_id = Site.objects.get_current().id
         super(Project, self).save(*args, **kwargs)
 
 

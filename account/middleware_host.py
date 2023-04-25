@@ -37,21 +37,20 @@ class DynamicHostMiddleware:
             schema_name = 'public'
         else:
             request.parent_site = None
-            schema_name = f'merchant_{site.id}'
-            connection = connections['default']
-            try:
-                # Create schema for tenant if it doesn't exist
+            # schema_name = f'merchant_{site.id}'
+            # connection = connections['default']
+            # try:
+            #     # Create schema for tenant if it doesn't exist
                 
-                with connection.cursor() as cursor:
-                    cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
-            except OperationalError as e:
-                print(f"Error while creating schema: {e}")
-                return HttpResponseForbidden()
+            #     with connection.cursor() as cursor:
+            #         cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+            # except OperationalError as e:
+            #     print(f"Error while creating schema: {e}")
+            #     return HttpResponseForbidden()
 
-        connections.merchant = schema_name
+        # connections.merchant = schema_name
 
-        request.tenant = self.is_merchant_family(request, site)
-        request.schema_name = schema_name # set the schema name on the request object
+        request.merchant = self.is_merchant_family(request, site)
 
         response = self.get_response(request)    
         return response

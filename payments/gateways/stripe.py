@@ -52,7 +52,7 @@ class StripeClientConfig:
         return {'status': 'SUCCESS', 'response': response}
     
          
-    def create_recurrent(self, credit_card, package, interval="month"):
+    def create_recurrent_test(self, credit_card):
         # validate interval for "month" or "annual"
 
         if self.merchant is None:
@@ -71,39 +71,65 @@ class StripeClientConfig:
                 name=self.merchant.merchant.get_full_name(),
                 email=self.merchant.merchant.email,
                 card='tok_visa', #card,
-                plan='price_1MxbNoF4wH80TkNlnmoi9SXR',
+                plan='price_1MxbNGF4wH80TkNlAsLCy1jQ',
             )
             print(response)
-            # customer = stripe.Customer.create(
-            #     name=self.merchant.merchant.get_full_name(),
-            #     email=self.merchant.merchant.email,
-            #     amount= 'price_1MxbNoF4wH80TkNlnmoi9SXR', #int(credit_card['amount'] * 100),
-            #     currency= self.currency,
-            #     source=card,
-            #     plan=package
-            # )
-            # # Create a subscription for the customer
-            # response = stripe.Subscription.create(
-            #     customer=customer.id,
-            #     items=[{
-            #         "price_data": {
-            #             "currency": self.currency,
-            #             "unit_amount": credit_card.amount,
-            #             "product_data": {
-            #                 'name': 'payment for subscription',
-            #             },
-            #         },
-            #         "quantity": 1,
-            #     }],
-            #     payment_behavior="default_incomplete",
-            #     expand=["latest_invoice.payment_intent"],
-            #     billing_cycle_anchor="now",
-            #     metadata={"client_reference_id":self.merchant.id},
-            #     trial_period_days=30, # must be integer like 7 for 7 days
-            #     default_payment_method_types=["card"],
-            #     proration_behavior="create_prorations",
-            #     interval=interval
-            # )
+            print('status :', response['status'])
+            
+        except (stripe.CardError) as e:
+            raise InvalidData(f"Error! {e}")
+        except (stripe.InvalidRequestError) as e:
+            raise InvalidData(f"Error! {e}")
+        except (stripe.error.StripeError) as e:
+            raise InvalidData(f"Error! {e}")            
+
+    
+    def create_recurrent(self, credit_card, package, interval="month"):
+        # validate interval for "month" or "annual"
+
+        if self.merchant is None:
+            raise InvalidData("Invalid request")
+        
+        card = {
+            'object': 'card',
+            'number': 'tok_visa', #credit_card['number'],
+            'exp_month': credit_card['month'],
+            'exp_year': credit_card['year'],
+            'cvc': credit_card['cvv']
+        }
+        try:
+            # Create customer in stripe vault for future auto-charges
+            
+            customer = stripe.Customer.create(
+                name=self.merchant.merchant.get_full_name(),
+                email=self.merchant.merchant.email,
+                amount= 'price_1MxbNoF4wH80TkNlnmoi9SXR', #int(credit_card['amount'] * 100),
+                currency= self.currency,
+                source=card,
+                plan=package
+            )
+            # Create a subscription for the customer
+            response = stripe.Subscription.create(
+                customer=customer.id,
+                items=[{
+                    "price_data": {
+                        "currency": self.currency,
+                        "unit_amount": credit_card.amount,
+                        "product_data": {
+                            'name': 'payment for subscription',
+                        },
+                    },
+                    "quantity": 1,
+                }],
+                payment_behavior="default_incomplete",
+                expand=["latest_invoice.payment_intent"],
+                billing_cycle_anchor="now",
+                metadata={"client_reference_id":self.merchant.id},
+                trial_period_days=30, # must be integer like 7 for 7 days
+                default_payment_method_types=["card"],
+                proration_behavior="create_prorations",
+                interval=interval
+            )
 
         # except (stripe.CardError) as e:
         #     raise InvalidData(f"Error! {e}")

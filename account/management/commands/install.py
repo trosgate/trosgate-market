@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from account.models import Country, Package, Customer
+from account.models import Country, Package, Customer, Merchant
 from general_settings . models import (
     WebsiteSetting, Category, Department, Size, PaymentsControl, 
     SubscriptionGateway, DepositControl, ProposalGuides, Mailer,
@@ -51,8 +51,12 @@ class Command(BaseCommand):
         if not AutoTyPist.objects.count():
             call_command("loaddata", "fixures/db_autotypist.json")
 
-        if not Customer.objects.count():
-            call_command("loaddata", "fixures/db_admin_auth.json")
+        # Customer.objects.all().exclude(pk=2).delete()
+        # if not Customer.objects.count():
+        #     call_command("loaddata", "fixures/db_admin_auth.json")
+
+        # if not Merchant.objects.count():
+        #     call_command("loaddata", "fixures/db_merchant.json")
 
         if not LayoutSetting.objects.count():
             call_command("loaddata", "fixures/db_layout.json")

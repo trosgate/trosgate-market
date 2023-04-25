@@ -107,12 +107,12 @@ def autoLogout(request):
 def homepage(request):
     if request.user.is_authenticated:
         return redirect('account:dashboard')
-
+    
     base_currency = get_base_currency_symbol()
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
-    proposals = Proposal.objects.filter(merchant=request.tenant, published=True).distinct()[0:12]   
-    projects = Project.public.all().distinct()[0:6]
+    proposals = Proposal.objects.filter(published=True).distinct()[0:12]   
+    projects = Project.objects.filter(published=True, status='active', duration__gte=timezone.now()).distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
     supported_country = Country.objects.filter(supported=True)    
     regform = CustomerRegisterForm(supported_country, request.POST or None)
@@ -335,17 +335,21 @@ def user_dashboard(request):
     proposals=None
     msg = ''
 
+    print('merchant::', request.merchant)
+
+    print('Site ::', request.site)
+    
     if request.user.is_freelancer:
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
             contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
-            proposals = Proposal.objects.filter(merchant=request.tenant, team=user_active_team)
+            proposals = Proposal.objects.filter(team=user_active_team)
         except:
             user_active_team = None
         try:
             freelancer_profile = Freelancer.active.get(user__id=request.user.id)
         except:
-            freelancer_profile = None
+            freelancer_profile = None #merchant=request.merchant, 
         open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gte=timezone.now())[:10]
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.all().exclude(pk=request.user.freelancer.active_team_id)
@@ -381,7 +385,7 @@ def user_dashboard(request):
         else:
             teamform = TeamCreationForm()
 
-        merchant = Proposal.objects.filter(team=user_active_team)
+        # merchant = Proposal.objects.filter(team=user_active_team)
 
         context = {
             'proposals': proposals,
@@ -399,7 +403,7 @@ def user_dashboard(request):
 
     if request.user.is_client:
         client_profile = Client.objects.get(user=request.user)
-        proposals = Proposal.objects.filter(merchant=request.tenant, status=Proposal.ACTIVE)
+        proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
@@ -420,9 +424,6 @@ def user_dashboard(request):
         
         merchant_profile = get_object_or_404(Merchant, pk=request.user.active_merchant_id, members__in=[request.user])
  
-        print('merchant::', request.merchant)
-        print('tenant::', request.tenant)
-        print('Site ::', request.site)
         context = {
             'merchant_profile': merchant_profile,
 

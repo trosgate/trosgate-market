@@ -48,8 +48,8 @@ def proposal_listing(request):
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
     skills = Skill.objects.all().distinct()
-    proposals = Proposal.objects.filter(merchant=request.tenant, status='active').distinct()
-    print('request.tenant::', proposals)
+    proposals = Proposal.objects.filter(status='active').distinct()
+    
     base_currency = get_base_currency_symbol()
     all_proposals = proposals.count()
     
@@ -96,7 +96,7 @@ def proposal_filter(request):
     three_fifty_dollar_to_500_dollar = request.GET.get('three_fifty_dollar_to_500_dollar[]', '')
     above_500_dollar = request.GET.get('above_500_dollar[]', '')
 
-    proposals = Proposal.objects.filter(merchant=request.tenant)
+    proposals = Proposal.objects.all()
     all_proposals = proposals.count()
     #Country
     if len(country) > 0:
@@ -271,11 +271,9 @@ def proposal_step_four(request):
             # unpack and combine all form data from previous steps and current step
             form_data = {**step_one_data, **step_two_data, **step_three_data, **proposalformfour.cleaned_data}
             # Create Post object
-            curr_site = get_current_site(request)
-
+ 
             category = get_object_or_404(Category, pk=form_data['category'])
             team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id)
-            merchant = Merchant.objects.filter(site__domain = curr_site).first()
             proposal = Proposal.objects.create(
                 title=form_data['title'],
                 preview=form_data['preview'],
@@ -293,7 +291,6 @@ def proposal_step_four(request):
                 category=category,
                 created_by=request.user,
                 team=team,
-                merchant=merchant
             )
 
             proposal.skill.set(proposalformfour.cleaned_data['skill'])
@@ -320,7 +317,7 @@ def proposal_step_four(request):
 @user_is_freelancer
 def modify_proposals(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformone = ProposalStepOneForm(instance = proposal)           
 
@@ -336,7 +333,7 @@ def modify_proposals(request, proposal_id, proposal_slug):
 @user_is_freelancer
 def modify_proposal_step_one(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformone = ProposalStepOneForm(request.POST or None, instance=proposal)
 
@@ -360,7 +357,7 @@ def modify_proposal_step_one(request, proposal_id, proposal_slug):
 @user_is_freelancer
 def modify_proposal_step_two(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformtwo = ProposalStepTwoForm(request.POST or None, instance=proposal)
 
@@ -384,7 +381,7 @@ def modify_proposal_step_two(request, proposal_id, proposal_slug):
 @user_is_freelancer
 def modify_proposal_step_three(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformthree = ProposalStepThreeForm(request.POST or None, instance=proposal)
 
@@ -408,7 +405,7 @@ def modify_proposal_step_three(request, proposal_id, proposal_slug):
 @user_is_freelancer
 def modify_proposal_step_four(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, team=team, pk=proposal_id, slug=proposal_slug)
+    proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
     proposalformfour = ProposalStepFourForm(request.POST or None, request.FILES or None, instance=proposal)
 
@@ -433,7 +430,7 @@ def modify_proposal_step_four(request, proposal_id, proposal_slug):
 @user_is_freelancer
 def review_proposal(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposal = team.proposalteam.filter(merchant=request.tenant, status = Proposal.REVIEW)
+    proposal = team.proposalteam.filter(status = Proposal.REVIEW)
 
     context = {
         'team':team,
@@ -446,7 +443,7 @@ def review_proposal(request):
 @user_is_freelancer
 def active_proposal(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
-    proposal = team.proposalteam.filter(merchant=request.tenant, status = Proposal.ACTIVE)
+    proposal = team.proposalteam.filter(status = Proposal.ACTIVE)
 
     context = {
         'team':team,
@@ -459,7 +456,7 @@ def active_proposal(request):
 @user_is_freelancer
 def archive_proposal_page(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
-    proposal = team.proposalteam.filter(merchant=request.tenant, status = Proposal.ARCHIVE)
+    proposal = team.proposalteam.filter(status = Proposal.ARCHIVE)
 
     context = {
         'team': team,
@@ -472,7 +469,7 @@ def archive_proposal_page(request):
 @user_is_freelancer
 def archive_proposal(request, short_name, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    Proposal.objects.filter(merchant=request.tenant, team=team, created_by__short_name=short_name, slug=proposal_slug).update(status = Proposal.ARCHIVE)
+    Proposal.objects.filter(team=team, created_by__short_name=short_name, slug=proposal_slug).update(status = Proposal.ARCHIVE)
 
     messages.success(request, 'The proposal was archived successfully!')
 
@@ -483,7 +480,7 @@ def archive_proposal(request, short_name, proposal_slug):
 @user_is_freelancer
 def reactivate_archive_proposal(request, short_name, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    Proposal.objects.filter(merchant=request.tenant, team=team, created_by__short_name=short_name, slug=proposal_slug, status = Proposal.ARCHIVE).update(status = Proposal.ACTIVE)
+    Proposal.objects.filter(team=team, created_by__short_name=short_name, slug=proposal_slug, status = Proposal.ARCHIVE).update(status = Proposal.ACTIVE)
 
     messages.success(request, 'The archived proposal was re-activated successfully!')
 
@@ -494,7 +491,7 @@ def reactivate_archive_proposal(request, short_name, proposal_slug):
 @user_is_freelancer
 def proposal_preview(request, short_name, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, created_by__short_name=short_name, team=team)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, team=team)
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)
     
     team_members = proposal.team.members.all()
@@ -509,7 +506,7 @@ def proposal_preview(request, short_name, proposal_slug):
 
 
 def proposal_detail(request, short_name, proposal_slug):
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)   
     other_proposals = Proposal.active.exclude(pk=proposal.id)[:4]    
     team_members = proposal.team.members.all()
@@ -594,13 +591,13 @@ def proposal_chat_messages(request, short_name, proposal_slug):
     proposal=None
     if request.user.user_type == Customer.FREELANCER:    
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-        proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, team=team, created_by__short_name=short_name)
+        proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team, created_by__short_name=short_name)
 
     elif request.user.user_type == Customer.CLIENT:
-        proposal = get_object_or_404(Proposal, merchant=request.tenant, slug=proposal_slug, created_by__short_name=short_name)
+        proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name)
 
     proposalchatform = ProposalChatForm()
-    chats = ProposalChat.objects.filter(merchant=request.tenant, proposal=proposal, team=proposal.team)
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
     chat_count = chats.count()
 
     context = {
@@ -615,8 +612,8 @@ def proposal_chat_messages(request, short_name, proposal_slug):
 
 @login_required
 def create_message(request, proposal_id):
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, pk=proposal_id)
-    chats = ProposalChat.objects.filter(merchant=request.tenant,proposal=proposal, team=proposal.team)
+    proposal = get_object_or_404(Proposal, pk=proposal_id)
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
 
     content = request.POST.get('content', '')
     if content != '':
@@ -638,8 +635,8 @@ def create_message(request, proposal_id):
 
 @login_required
 def fetch_messages(request, proposal_id):
-    proposal = get_object_or_404(Proposal, merchant=request.tenant, pk=proposal_id)
-    chats = ProposalChat.objects.filter(merchant=request.tenant, proposal=proposal, team=proposal.team)
+    proposal = get_object_or_404(Proposal, pk=proposal_id)
+    chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
 
     context = {
         'proposal':proposal,

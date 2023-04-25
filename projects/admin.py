@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import Project #ProjectLanguageRequired, 
 
-       
+
+@admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['title', 'category', 'salary', 'dura_converter', 'published', 'status']                 
     list_filter = ['published',]
@@ -20,6 +21,11 @@ class ProjectAdmin(admin.ModelAdmin):
         ('Project Creator', {'fields': ('reference','created_by',)}),   
     )
 
+    # def get_queryset(self, request):
+    #     qs = super(ProjectAdmin, self).get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs.all()
+        
     def Feature_on_home(self, request, queryset):
         queryset.update(published = True)
 
@@ -36,5 +42,5 @@ class ProjectAdmin(admin.ModelAdmin):
         return False
 
 # admin.site.register(ProjectLanguageRequired)
-admin.site.register(Project, ProjectAdmin)
+# admin.site.register(Project, ProjectAdmin)
 

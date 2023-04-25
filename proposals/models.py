@@ -6,7 +6,6 @@ from django.db.models import Aggregate
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from ckeditor.fields import RichTextField
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -15,8 +14,6 @@ from teams.utilities import create_random_code
 from datetime import datetime, timezone, timedelta
 from contract.models import InternalContract
 from django.urls import reverse
-from django.contrib.sites.models import Site
-from account.models import Merchant
 from django.utils.text import slugify
 from merchants.models import MerchantProduct
 
@@ -29,23 +26,8 @@ class ActiveProposals(models.Manager):
     def active_proposal(self):
         return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
 
-  
-class MerchantManager(models.Manager):
-    def for_merchant(self, request):# get_queryset for_merchant
-        if hasattr(request, 'tenant') and request.tenant is not None:
-            return super().get_queryset(request).filter(merchant=request.tenant)
-        else:
-            return super().get_queryset(request)
 
-
-class MerchantMaster(MerchantProduct):
-    merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
-    
-    class Meta:
-        abstract = True
-
-
-class Proposal(MerchantMaster):
+class Proposal(MerchantProduct):
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
@@ -56,7 +38,6 @@ class Proposal(MerchantMaster):
     faq_three = models.CharField(_("FAQ #3"), max_length=100, null=True, blank=True)
     faq_three_description = models.TextField(_("FAQ #3 Details"), max_length=255, null=True, blank=True)
  
-    objects = models.Manager()
     active = ActiveProposals()
 
     class Meta:
@@ -126,9 +107,7 @@ class ProposalChat(models.Model):
     content = models.TextField()
     sent_on = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-    objects = models.Manager()
-    for_merchant = MerchantManager()
-    
+
     class Meta:
         ordering = ['sent_on']
 

@@ -1,7 +1,4 @@
 
-client_id: 'ATHsQNeeu9f7QhxJxOJhiCyg7xlXraRb6EFKSGIVaDwo52k3N6JuZZ5LWYCL8h-r61_Z2gcZ1ImoSVDn'
-secret_id: 'EPUPK1xIXpWX3SuKqlQiMrXf5VDzR2DJXPjnpUQQPXPt9Vnol-xQHc4N3keY9hmtlZfeWVoDaQcGMH55'
-
 SUBSCRIPTION
 ...............
 Product name: Team
@@ -12,9 +9,12 @@ Paypal Sub sample test ID: I-A2WCRT10SLCK,
 
 
 ------------Sandbox account----------
-sb-lndpj15241105@business.example.com
-Client ID: 'AQdiblZ6eqqbA8MKOAs447ZQRKp3VKgvitHAVeCTJlhQrtAMejRA1iJlK_GWnJfsDbhAMFh0swxFAtWy'
-secret_id: 'EA5YITILUhcN0_89GNzU07WT0_3HM5lfc7OyU_vT8kuCjc4h6TyaZDZUjxMIMrJiVPyDy8UXAuHVsafd'
+Bus Email: sb-f7gfj14264963@business.example.com
+Pers Email: sb-thqmh14264998@personal.example.com
+
+Url: https://sandbox.paypal.com
+Client ID: 'AVmyBFKdMgD7akvsZTJyN3XzaCCCubqa1eyXQGF1ixSmnfO4ahGpQRIun0jP8oM33bFUUwak_jgrvYAw'
+secret_id: 'EJH9ZZylfy5pYTX162szH-Y4uhA63dXQMloahpdWTeU-JJb3TfMAd7TqLEQgeulWpUb_6pP6G1HKglEm'
 
 
 

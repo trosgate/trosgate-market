@@ -1,4 +1,0 @@
-My current active tunnel
-
-forwarding = http://bbf7-41-222-234-22.eu.ngrok.io # without (s)
-forwarding = https://bbf7-41-222-234-22.eu.ngrok.io

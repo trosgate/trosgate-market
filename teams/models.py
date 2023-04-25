@@ -13,7 +13,7 @@ import secrets
 from account.models import Customer
 from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
 from django.utils.text import slugify
-
+from merchants.models import MerchantMaster
 # from freelancer.models import FreelancerAccount
 
 
@@ -26,8 +26,37 @@ def code_generator():
     return code
 
 
+class Package(models.Model):
+    #
+    # Team statuses
+    BASIC = 'Basic'
+    TEAM = 'Team'
+    STATUS =(
+        (BASIC, _('Basic')),
+        (TEAM, _('Subscription'))
+    )
+
+    #
+    #Initial Plan Configuration
+    type = models.CharField(_("Package Type"), choices=STATUS, default=BASIC, unique=True, max_length=10)  
+    max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    max_member_per_team = models.PositiveIntegerField(_("Max Member per Team"), default=0, help_text=_("New feature Coming Soon: Here, freelancer team can send followup/ reminder mail per external contract to client. Daily sending will have min of 1 amd max is 3 mails"), validators=[MinValueValidator(0), MaxValueValidator(3)])
+    price = models.PositiveIntegerField(_("Price"), default=0)
+    ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
+ 
+    class Meta:
+        ordering = ('ordering',)
+        verbose_name = _("Upsell Package")
+        verbose_name_plural = _("Upsell Packages")
+
+    def __str__(self):
+        return self.type 
+
+
 # team should have ability to add proposal extras
-class Team(models.Model):
+class Team(MerchantMaster):
     #
     # Team status
     ACTIVE = 'active'
@@ -45,11 +74,10 @@ class Team(models.Model):
         (ACTIVE, 'Active')
     )
 
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='teammerchant', on_delete=models.PROTECT)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
-    
     title = models.CharField(_("Title"), max_length=100, unique=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, verbose_name=_("Team Plan"), related_name="teampackage", on_delete=models.CASCADE)
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
     notice = models.TextField(_("Notice"), max_length=500)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)

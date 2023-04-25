@@ -121,7 +121,7 @@ class SuccessContractAdmin(admin.ModelAdmin):
             ttotal_discount_offered=(F("total_discount_offered"))
         ).aggregate(
             total_sales_price=(Sum("ttotal_sales_price")),
-            total_earning=(Sum("total_earning")),
+            total_earning=(Sum("ttotal_earning")),
             total_earning_fee_charged=(Sum("ttotal_earning_fee_charged")),
             total_discount_offered=(Sum("ttotal_discount_offered"))
         )
@@ -171,7 +171,7 @@ class SuccessApplicationAdmin(admin.ModelAdmin):
             ttotal_discount_offered=(F("total_discount_offered"))
         ).aggregate(
             total_sales_price=(Sum("ttotal_sales_price")),
-            total_earning=(Sum("total_earning")),
+            total_earning=(Sum("ttotal_earning")),
             total_earning_fee_charged=(Sum("ttotal_earning_fee_charged")),
             total_discount_offered=(Sum("ttotal_discount_offered"))
         )
