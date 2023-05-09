@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
-from django.db import connections
 
 # load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,9 +32,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
-ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
-# ALLOWED_HOSTS = ['gigred.website', '193.43.134.36']
+# ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['138.68.147.16', 'trosgate.com', '.trosgate.com'] 
+# ALLOWED_HOSTS = ['gigred.website', '193.43.134.36', trosgate.great-site.net]
 #  
 SITE_ID = 1
 SITE_DOMAIN = 'trosgate.com'
@@ -288,9 +287,6 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # TO DETERMINE THE CODE LENGTH DURING EXTERNAL INVITATION
 MAXIMUM_INVITE_SIZE = 6
 
-# A domains.map FILE WILL BE STORED IN THIS PATH AND RUN WITH celery cron
-NGINX_DOMAINS_MAP_FILE = '/etc/nginx/domains.map'
-
 # EXEMPTED PAGES IF MERCHANT IS NOT WITH ACTIVE ACCOUNT
 MERCHANT_GATE_ALLOW_LIST = [
     "/logout/",
@@ -302,6 +298,6 @@ MERCHANT_GATE_ALLOW_LIST = [
     "/merchants/subscription",
 ]
 
-WEBROOT_PATH = '/home/www/letsencrypt'
+# WEBROOT_PATH = '/home/www/letsencrypt'
 
 CACHE_TTL = 60 * 60 # 1 HOUR CACHE TIMEHOUT
