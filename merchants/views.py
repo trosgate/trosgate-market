@@ -1,15 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-import os
-import subprocess
-import OpenSSL.crypto
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from general_settings.currency import get_base_currency_symbol
-from account.models import Package
+from account.models import Package, Merchant
 from freelancer.models import Freelancer, FreelancerAccount, FreelancerAction
 from account.permission import user_is_merchant
 from teams.forms import TeamCreationForm
@@ -31,6 +28,9 @@ from payments.forms import (
 
 from payments.checkout_card import CreditCard
 from payments.gateways.stripe import StripeClientConfig
+from account.forms import DomainForm
+from django.contrib.sites.models import Site
+
 
 
 @login_required
@@ -95,7 +95,6 @@ def subscribe_pay(request):
     return render(request, "merchants/partials/subscribe_now.html", context)
 
 
-
 @login_required
 def stripe_subscription(request):
     amount = request.session["merchantpackage"]["package_amount"]
@@ -136,18 +135,43 @@ def stripe_subscription(request):
         'creditcardform': creditcardform,
     }
     return render(request, "merchants/partials/subscribe_now.html", context)
-    
+
 
 
 @login_required
 @user_is_merchant
-def add_domain(request):
-    # if request.method != 'POST':
-    #     return HttpResponseBadRequest("Invalid request method.")
+def domain_manager(request):
+    context = {
+        'domainform': DomainForm(),
+    }
 
-    # value = request.POST.get('domain')
-    # domain = value.strip().lower()
-    pass
+    return render(request, "merchants/domain_settings.html", context)
+
+
+@login_required
+@user_is_merchant
+def update_domain(request):
+    domainform = DomainForm(request.POST or None)
+
+    if domainform.is_valid():
+        domain = domainform.cleaned_data['domain']
+        domain_lookup = Site.objects.filter(domain=domain)
+        
+        if domain_lookup.count():
+            messages.error(request, f'Provided domain no longer available')
+        else:
+            merchant =request.user.merchant
+            merchant.site.domain = domain
+            merchant.site.save()
+    else:
+        messages.error(request, f'invalid domain input')
+
+    context = {
+        'domainform': DomainForm(),
+    }
+
+    return render(request, "merchants/partials/domain_settings.html", context)
+
 
 
 @login_required

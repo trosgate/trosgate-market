@@ -11,11 +11,13 @@ urlpatterns = [
     path('subscription/', views.subscription, name='subscription'),
     path('subscribe-now/<str:type>', views.subscribe_now, name='subscribe_now'),
     path('payment-settings/', views.payment_settings, name='payment_settings'),
+    path('domain-manager/', views.domain_manager, name='domain_manager'),
 
 ]
 
 
 htmx_urlpatterns = [
+    path('domains/', views.update_domain, name='update_domain'),
     path('subscribe_pay/', views.subscribe_pay, name='subscribe_pay'),
     path('add_or_remove_gateway/', views.add_or_remove_gateway, name='add_or_remove_gateway'),
     path('add_stripe_api/', views.add_stripe_api, name='add_stripe_api'),

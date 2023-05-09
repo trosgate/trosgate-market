@@ -77,7 +77,13 @@ class UserManager(BaseUserManager):
         
         domain = business_name.lower().replace(' ','-')
         curr_site = Site.objects.create(domain=f"{domain}.{site.domain}", name=f'{business_name}')
-        merchant = merchantapp.objects.create(merchant=customer, business_name=business_name, site=curr_site, package=package)
+        merchant = merchantapp.objects.create(
+            merchant=customer, 
+            business_name=business_name, 
+            site=curr_site, 
+            package=package,
+            default_domain=f"{domain}.{site.domain}"
+            )
         merchant.members.add(customer)
 
         customer.active_merchant_id = merchant.pk

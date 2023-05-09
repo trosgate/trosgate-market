@@ -229,10 +229,11 @@ class Merchant(models.Model):
     type = models.PositiveIntegerField(_("Account Status"), choices=MERCHANT_TYPE, default=TRIALING)
     merchant = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant', on_delete=models.CASCADE)
     business_name = models.CharField(_("Business Name"), max_length=255)
+    default_domain = models.CharField(_("Default Domain"), max_length=255)
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
     package = models.ForeignKey("account.Package", 
         verbose_name=_("Package"), 
-        related_name="packages", 
+        related_name="packages",
         on_delete=models.PROTECT
     )
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)

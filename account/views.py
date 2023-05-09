@@ -105,9 +105,7 @@ def autoLogout(request):
 
 
 def homepage(request):
-    print('parent_site ', request.parent_site)
-    print('site ', request.site.domain)
-    print('merchant ', request.merchant)
+
     if request.user.is_authenticated:
         return redirect('account:dashboard')
     

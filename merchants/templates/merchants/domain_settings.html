@@ -1,0 +1,53 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include 'dashboard/main_sidebar.html' %}
+
+			<!--Main Start-->
+			<main id="wt-main" class="wt-main wt-haslayout">
+
+				<div class="wt-proposalholder">
+					<div class="row justify-content-md-center">
+						<div class="wt-hireduserstatus">
+							<h4>Manage Domain</h4>
+						</div>											
+					</div>
+				</div>
+
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+									<div class="wt-freelancerholder wt-rcvproposalholder">												
+										<div class="wt-sectiontitle">
+											<span>Add the domain</span>
+										</div>
+
+										<div id='update-domain'>
+                                            {% include "merchants/partials/domain_settings.html" %}
+                                        </div>
+																				                  														
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!--Register Form End-->
+
+    		<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{request.site.name}}</span>
+					</div>
+				</div>
+			</div>
+
+			</main>
+			<!--Main End-->	
+
+				
+{% endblock %}

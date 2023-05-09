@@ -13,7 +13,7 @@ from teams.models import Team, Invitation
 from contract.models import Contract
 from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
-from .validators import DomainValidator
+from .validators import DomainValidator, DomainField
 
 
 class SearchTypeForm(forms.Form):
@@ -302,24 +302,18 @@ class TwoFactorAuthForm(forms.ModelForm):
         return pass_code
 
 
-class DomainForm(forms.ModelForm): 
-    domain = forms.CharField(validators=[DomainValidator()], help_text = "Enter your domain")
+class DomainForm(forms.Form): 
+    domain = DomainField(error_messages={'invalid': 'Please enter a valid domain name.'})
 
-    class Meta:
-        model = Merchant
-        fields = ['pass_code']
-          
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(DomainForm, self).__init__(*args, **kwargs)
+        self.fields['domain'].widget.attrs['class'] = 'form-control col-12 col-sm-12 col-md-12 col-lg-12'
 
-         # Personal Details   
-        self.fields['domain'].widget.attrs.update(
-            {'class': 'form-control',})
-
+    
     def clean_domain(self):
-        domain = self.cleaned_data['domain']
-        checker = Site.objects.filter(domain=domain)
-        if checker.count():    
-            raise forms.ValidationError(
-                _('This domain already registered'))
+        domain = self.cleaned_data['domain'].lower()
+        validator = DomainValidator(domain)
+        if not validator.validate():
+            raise ValidationError('connection denied for provided domain')
+
         return domain
