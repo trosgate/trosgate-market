@@ -6,7 +6,7 @@ app_name = 'proposals'
 
 
 urlpatterns = [     
-    #Urls for proposals table
+    #Urls users and teams
     path('', views.create_proposal, name='create_proposal'),
     path('list', views.proposal_listing, name='proposal_list'),
     path('proposal_filter/', views.proposal_filter, name='proposal_filter'),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('background/', views.proposal_step_two, name='proposal_step_two'),
     path('faq/', views.proposal_step_three, name='proposal_step_three'),
     path('attribute/', views.proposal_step_four, name='proposal_step_four'),
+
+    path('manage-proposal', views.merchant_proposal, name='merchant_proposal'),
 
     path('change/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposals, name='modify_proposals'),
     path('introduction/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_one, name='modify_proposal_step_one'),

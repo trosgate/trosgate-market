@@ -29,16 +29,16 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
+# DEBUG = True
 DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
 ALLOWED_HOSTS = ['159.65.54.45', 'trosgate.com', '.trosgate.com'] 
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36']
 #  
 SITE_ID = 1
-SITE_ID_DOMAIN = 'trosgate.com'
+SITE_DOMAIN = 'trosgate.com'
 AUTH_USER_MODEL = 'account.Customer'
 
 # Application definition
@@ -93,13 +93,13 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'account.middleware_gate.MerchantGateMiddleware',
-    # 'django.contrib.sites.middleware.CurrentSiteMiddleware', #You can use request.site in views with this middleware
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'account.middleware_gate.MerchantGateMiddleware',
+    'account.middleware_admin.AdminGateMiddleware',
     'analytics.middleware.Middleware',
 ]
 
@@ -217,7 +217,7 @@ LOGOUT_REDIRECT_URL = "account:homepage"
 EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
  
 ADMINS = (
@@ -302,19 +302,6 @@ MERCHANT_GATE_ALLOW_LIST = [
     "/merchants/subscription",
 ]
 
+WEBROOT_PATH = '/home/www/letsencrypt'
 
 CACHE_TTL = 60 * 60 # 1 HOUR CACHE TIMEHOUT
-# CACHES = {
-#     'custom_cache': {
-#         'BACKEND': 'account.cache_backend.CacheBackend',
-#         'TIMEOUT': 3600,
-#         'OPTIONS': {
-#             'VERSION': 1,
-#         },
-#     },
-# }
-
-# Use the custom cache backend as the default cache backend
-# CACHE_MIDDLEWARE_ALIAS = 'custom_cache'
-# CACHE_MIDDLEWARE_SECONDS = 3600
-# CACHE_MIDDLEWARE_KEY_PREFIX = 'myapp'

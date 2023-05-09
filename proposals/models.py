@@ -15,7 +15,7 @@ from datetime import datetime, timezone, timedelta
 from contract.models import InternalContract
 from django.urls import reverse
 from django.utils.text import slugify
-from merchants.models import MerchantProduct
+from merchants.models import MerchantProduct, MerchantMaster
 
 
 def proposal_images_path(instance, filename):
@@ -99,8 +99,7 @@ class ProposalSupport(Proposal):
         verbose_name_plural = _("Proposal Support")
 
 
-class ProposalChat(models.Model):
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='proposalchats', on_delete=models.PROTECT)
+class ProposalChat(MerchantMaster):
     team = models.ForeignKey('teams.Team', verbose_name=_("Proposal Team"), related_name='proposalchats', on_delete=models.CASCADE)
     proposal = models.ForeignKey(Proposal, verbose_name=_("Proposal"), related_name='proposalschats', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='proposalsender', on_delete=models.CASCADE)

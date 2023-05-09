@@ -1,0 +1,54 @@
+<h3 class="text-center">List of Proposals</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Team</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+
+            {% for proposal in proposals %}
+            <tr>
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td class="text-left">
+                        <a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}">{{proposal.title}}</a>
+                    </td>
+                    <td class="text-left">{{proposal.team.title|capfirst}}</td>
+                    <td class="text-center"> {{proposal.created_by.get_short_name|capfirst}}</td>
+                    <td class="text-center">{{proposal.created_at}}</td>
+                    <td class="text-center">
+                        {% if active_team.created_by == request.user or proposal.created_by == request.user %}
+                        <form>
+                            <input type="number" name="contact" value="{{proposal.pk}}" hidden>
+                            <button class="badge badge-danger"
+                                hx-post=
+                                hx-target="#contact-list"
+                                hx-confirm="This action will remove proposal">
+                                <i class="fa fa-trash"> Delete </i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <button class="badge badge-secondary" disabled>
+                        <i class="fa fa-trash"> Delete </i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if not proposals %}
+        <div class="text-center">
+            <span style="font-weight: bold;"> You donnot have any contact on the list</span>
+        </div>
+    {% endif %}
+</div>

@@ -15,17 +15,20 @@ from account.models import Merchant
 
 # managers.py
 from django.db import models
+from django.db.models import Q
+from django.utils.functional import cached_property
 
 
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
-        qs = super().get_queryset()
         site = Site.objects.get_current()
-        if site.pk == 1:
-            return qs
+        curr_merchant = Merchant.objects.filter(site=site).first()
+
+        if curr_merchant is None:
+            return super().get_queryset()
         else:
-            return qs.filter(merchant__site=site.id)
-    
+            return super().get_queryset().filter(merchant__site=site.id)
+
 
 class UnscopedManager(models.Manager):
     def get_queryset(self):

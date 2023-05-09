@@ -7,7 +7,7 @@ from django.db import models, transaction as db_transaction
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Team, Invitation, TeamChat, AssignMember, Tracking
-from account.models import Package
+from teams.models import Package
 from django.contrib.auth.decorators import login_required
 from .forms import TeamModifyForm, AssignForm
 from django.urls import reverse

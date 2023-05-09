@@ -5,7 +5,7 @@
     <div class="wt-contentwrapper">
       <!-- Header Start -->
       <header id="wt-header" class="wt-header wt-headervtwo wt-haslayout">
-        <div class="wt-navigationarea" style="background-color:{% firstof website.navbar_color %};">
+        <div class="wt-navigationarea">
           <div class="container-fluid">
             <div class="row">
               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -16,7 +16,7 @@
 
                 <div class="wt-rightarea">
                   <nav id="wt-nav" class="wt-nav navbar-expand-lg">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">
                       <i class="lnr lnr-menu"></i>
                     </button>
                     
@@ -24,24 +24,24 @@
                       <ul class="navbar-nav">
                         
                         <li class="nav-item">
-                          <a href="{% url 'pages:aboutus' %}" {% if website.navbar_color %} style="color:white;" {% endif %}>About Us</a>
+                          <a href="{% url 'pages:aboutus' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>About Us</a>
                         </li>
                         
                         <li class="nav-item">
-                          <a href="{% url 'freelancer:freelancer_listing' %}" {% if website.navbar_color %} style="color:white;" {% endif %}>Freelancers</a>
+                          <a href="{% url 'freelancer:freelancer_listing' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Freelancers</a>
                         </li>
 
                         <li class="nav-item">
-                          <a href="{% url 'pages:how_it_works' %}" {% if website.navbar_color %} style="color:white;" {% endif %}>WorkFlow</a>
+                          <a href="{% url 'pages:how_it_works' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>WorkFlow</a>
                         </li>
 
                         <li class="nav-item">
-                          <a href="{% url 'marketing:article_list' %}" {% if website.navbar_color %} style="color:white;" {% endif %}>Articles</a>
+                          <a href="{% url 'marketing:article_list' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Articles</a>
                         </li>
                        
                         {% if request.user.is_authenticated and request.user.clients %}
                         <li class="menu-item-has-children page_item_has_children"><span class="wt-dropdowarrow"><i class="lnr lnr-chevron-right"></i></span>
-                          <a href="javascript:void(0);" {% if website.navbar_color %} style="color:white;" {% endif %}>Bucket</a>
+                          <a href="javascript:void(0);" {% if website.navbar_color %} style="color:black;" {% endif %}>Bucket</a>
                           <ul class="sub-menu">
                             <li><a href="{% url 'transactions:hiring_box_summary' %}">Proposal Staffs &nbsp;<span id="members-qty">->({% with total_staff=hiring_box|length %}{% if total_staff > 0 %}{{total_staff}}{%else%}0{% endif %}{% endwith %})</span></a></li>
                             <li><a href="{% url 'applications:application_multiple_summary' %}">Project Applicants &nbsp;<span id="applicantApproveCount">->({% with total_applicant=application_addon|length %}{% if total_applicant > 0 %}{{total_applicant}}{% else %}0{% endif %}{% endwith %})</span></a></li>
@@ -49,24 +49,24 @@
                         </li>                        
                         <li
                           class="nav-item">
-                          <a href="{% url 'proposals:proposal_list' %}" {% if website.navbar_color %} style="color:white;" {% endif %}>Proposals</a>
+                          <a href="{% url 'proposals:proposal_list' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Proposals</a>
                         </li>
                         <li
                           class="nav-item text-center">
-                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:white;"></i> Balance: &nbsp;{{request.user.clientfunduser.available_balance}}</span></a>
+                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:black;"></i> Balance: &nbsp;{{request.user.clientfunduser.available_balance}}</span></a>
                         </li>
                         {% endif %}
                         {% if request.user.is_authenticated %}
                         {% if active_team.created_by == request.user %}
                         <li
                           class="nav-item text-center">
-                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:white;"></i> Team Bal: &nbsp;{{active_team.team_balance}}</span></a>
+                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:black;"></i> Team Bal: &nbsp;{{active_team.team_balance}}</span></a>
                         </li>
                         {% endif %}
                         {% endif %}
                         {% if not request.user.is_authenticated %}
                         <li class="nav-item text-center">
-                          <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-white" style="background-color:{% firstof website.button_color home_layout.banner_color purple %};">Login Now</span></a>
+                          <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-black" style="background-color:{% firstof website.button_color home_layout.banner_color purple %};">Login Now</span></a>
                         </li>
                         {% endif %}
                       </ul>
@@ -76,12 +76,12 @@
 									<div class="wt-userlogedin">
                     {% if not request.user.is_authenticated %}
                       {% if request.parent %}
-                      <a class="btn btn-danger btn-sm" href="#pricing" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Become a Merchant</a>
+                      <a class="btn btn-danger btn-sm" href="#pricing" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Become a Merchant</a>
                       {% else %}
                       {% if userregistrationmodal %}
-                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Join Us</a>
+                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Join Us</a>
                       {% else %}
-											  <a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:white;">Signup</a>
+											  <a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Signup</a>
                       {% endif %}
                       {% endif %}
                     
@@ -100,8 +100,8 @@
                       {% endif  %}
                     </figure>
                     <div class="wt-username">
-                      <h3><span {% if website.navbar_color %} style="color:white;" {% endif %}>{{request.user.get_short_name|capfirst}}</span></h3>
-                      <span {% if website.navbar_color %} style="color:white;" {% endif %}>
+                      <h3><span {% if website.navbar_color %} style="color:black;" {% endif %}>{{request.user.get_short_name|capfirst}}</span></h3>
+                      <span {% if website.navbar_color %} style="color:black;" {% endif %}>
                         {% if active_team %} {{active_team.title|slice:10}}
                         {% else %}
                         {{request.user.get_user_type_display}}

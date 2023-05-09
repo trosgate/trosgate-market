@@ -20,7 +20,7 @@ class MerchantGateMiddleware:
         ]
 
     def __call__(self, request):
-        request.merchant = None
+        
         if request.user.is_authenticated and request.user.is_merchant:
 
             # This attribute was set by upper lever middleware

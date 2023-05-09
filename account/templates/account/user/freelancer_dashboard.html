@@ -399,7 +399,7 @@
 						{% for proposal in proposals %}
 						<tr>
 							<td>{{forloop.counter}} </td>
-							<td class='text-left'>{{proposal.title}}</td>
+							<td class='text-left'><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}">{{proposal.title}}</a></td>
 							<td>{{proposal.created_by.get_full_name}}</td>
 							<td>{{proposal.get_status_display}}</td>
 							<td>{{proposal.created_at|date:"M-d-Y"}}</td>

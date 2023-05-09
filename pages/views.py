@@ -36,7 +36,7 @@ from general_settings.fees_and_charges import (
 )
 from payments.models import PaymentGateway
 from general_settings.models import Payday
-from account.models import Package
+from teams.models import Package
 from control_settings.utilities import homepage_layout
 from analytics.analytic import (
     total_freelancers,

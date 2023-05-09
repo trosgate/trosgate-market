@@ -255,11 +255,11 @@ class PackageAdmin(admin.ModelAdmin):
     }    
     fieldsets = (
         ('Merchant Package', {'fields': (
-            'type', 'verbose_type', 'can_change_domain', 'ssl_activation','max_num_of_staff',
+            'type', 'price', 'verbose_type', 'can_change_domain', 'ssl_activation','max_num_of_staff',
             'can_upsell_teams', 'max_users_sitewide','multiple_freelancer_teams'
         )}),
         ('Merchant Upsell', {'fields': (
-            'max_member_per_team', 'max_proposals_allowable_per_team','upsell_price',   
+            'max_member_per_team', 'upsell_price', 'max_proposals_allowable_per_team',  
             'monthly_offer_contracts_per_team', 'monthly_projects_applicable_per_team', 
         )}),
 

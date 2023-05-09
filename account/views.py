@@ -105,6 +105,9 @@ def autoLogout(request):
 
 
 def homepage(request):
+    print('parent_site ', request.parent_site)
+    print('site ', request.site.domain)
+    print('merchant ', request.merchant)
     if request.user.is_authenticated:
         return redirect('account:dashboard')
     
@@ -114,7 +117,7 @@ def homepage(request):
     proposals = Proposal.objects.filter(published=True).distinct()[0:12]   
     projects = Project.objects.filter(published=True, status='active', duration__gte=timezone.now()).distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
-    supported_country = Country.objects.filter(supported=True)    
+    supported_country = Country.objects.filter(supported=True)
     regform = CustomerRegisterForm(supported_country, request.POST or None)
     searchform = SearchTypeForm()
 
@@ -153,8 +156,8 @@ def homepage(request):
         'home_layout': home_layout,
     }
     if request.parent_site:
-        return render(request, 'homepage1.html', context)
-        # return render(request, 'homepage.html', context)
+        return render(request, 'homepage.html', context)
+        # return render(request, 'homepage-copy.html', context)
     else:
         return render(request, 'merchant_home.html', context)
 
@@ -335,10 +338,6 @@ def user_dashboard(request):
     proposals=None
     msg = ''
 
-    print('merchant::', request.merchant)
-
-    print('Site ::', request.site)
-    
     if request.user.is_freelancer:
         try:
             user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)

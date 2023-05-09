@@ -187,7 +187,7 @@ class Package(models.Model):
     monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
     monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
     max_member_per_team = models.PositiveIntegerField(_("Max Member per Team"), default=0, help_text=_("New feature Coming Soon: Here, freelancer team can send followup/ reminder mail per external contract to client. Daily sending will have min of 1 amd max is 3 mails"), validators=[MinValueValidator(0), MaxValueValidator(3)])
-    upsell_price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
+    upsell_price = models.PositiveIntegerField(_("Upsell Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
 
     def __str__(self):
         return str(self.verbose_type) if self.verbose_type else str(self.get_type_display())
@@ -237,7 +237,7 @@ class Merchant(models.Model):
     )
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     gateways = models.ManyToManyField("payments.PaymentGateway", 
-        verbose_name=_("Supported Gateways"), 
+        verbose_name=_("Supported Gateways"),
         related_name="packages"
     )
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Company Staff"), related_name="merchant_staff")    

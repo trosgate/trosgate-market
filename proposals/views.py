@@ -44,6 +44,28 @@ from .serializers import ProposalStepOneSerializer, ProposalStepTwoSerializer, P
 from django.contrib.sites.shortcuts import get_current_site
 
 
+
+def merchant_proposal(request):
+    proposals = Proposal.objects.filter(merchant__site=request.user.merchant.site.id)
+    
+    active_proposals = proposals.filter(status='active').count()
+    review_proposals = proposals.filter(status='review').count()
+    published_proposals = proposals.filter(published=True).count()
+    unpublished_proposals = proposals.filter(published=False).count()
+    
+    total_proposal = f'{proposals} found for the search'
+    
+    context = {
+        "proposals": proposals,
+        "total_proposal": total_proposal,
+        "active_proposals":active_proposals, 
+        "review_proposals":review_proposals, 
+        "published_proposals":published_proposals, 
+        "unpublished_proposals":unpublished_proposals, 
+    }
+    return render(request, 'proposals/merchant_proposal.html', context)
+
+
 def proposal_listing(request):
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()

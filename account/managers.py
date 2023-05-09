@@ -117,6 +117,7 @@ class UserManager(BaseUserManager):
         freelanceraccountapp = apps.get_model('freelancer', 'FreelancerAccount')
         paymentapp = apps.get_model('payments', 'PaymentAccount')
         teamsapp = apps.get_model('teams', 'Team') 
+        packageapp = apps.get_model('teams', 'Package') 
         invitationapp = apps.get_model('teams', 'Invitation') 
         
         clientapp = apps.get_model('client', 'Client')
@@ -144,6 +145,7 @@ class UserManager(BaseUserManager):
             user.save()
             freelanceraccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
             paymentapp.objects.get_or_create(merchant=merchant, user=user)[0]
+            package = packageapp.objects.get_or_create(type='Basic')[0]
 
             title = f'{user.short_name} Team'
             team = teamsapp.objects.get_or_create(
@@ -151,6 +153,7 @@ class UserManager(BaseUserManager):
                 notice=f"This is the team for {user.short_name}", 
                 merchant=merchant,
                 created_by = user,
+                package=package,
                 slug = slugify(user.short_name)
             )[0]
             team.save()

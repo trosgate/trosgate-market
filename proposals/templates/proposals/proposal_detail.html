@@ -54,14 +54,14 @@
 											{% endif %}
 										</ul>
 									</div>
-									{% if request.user.is_authenticated and request.user.clients %}
-									<div class="wt-btnarea"><a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="wt-btn">Hire Expert</a></div>
-									{% elif request.user.is_authenticated and request.user.freelancer %}
-									<div class="wt-btnarea"><button class="wt-btn"><strike style="color:white">... Hire Expert ...</strike></button></div>
-									{% elif not request.user.is_authenticated %}
-									<div class="wt-btnarea"><a href="{% url 'account:login' %}" class="wt-btn">Hire Expert</a></div>
-									{% endif %}
-								</div>
+										{% if request.user.is_authenticated and request.user.clients %}
+										<div class="wt-btnarea"><a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="wt-btn">Hire Expert</a></div>
+										{% elif request.user.is_authenticated and request.user.freelancer %}
+										<div class="wt-btnarea"><button class="wt-btn"><strike style="color:white">... Hire Expert ...</strike></button></div>
+										{% elif not request.user.is_authenticated %}
+										<div class="wt-btnarea"><a href="{% url 'account:login' %}" class="wt-btn">Hire Expert</a></div>
+										{% endif %}
+									</div>
 								</div>
 								<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
 									<figure class="wt-companysimg">
@@ -493,12 +493,14 @@
 											</ul>
 										</div>
 									</div>
+									{% if request.user.clients or request.user.freelancer %}
 									<div class="wt-clicksavearea">
 										<a href="{% url 'proposals:proposal_chat_messages' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Author Support</a>
 									</div>
+									{% endif %}
 								</div>
 									
-								<div class="wt-proposalsr"></div>
+								{% comment %} <div class="wt-proposalsr"></div>
 								<div class="wt-dashboardbox text-center">
 									<span>Advertisement</span>
 									<div class="wt-companyad">
@@ -506,7 +508,7 @@
 											<img src="{% if website.ad_image %}{{website.ad_image.url}}{% elif website.brand_ambassador_image %}{{website.brand_ambassador_image.url}}{% endif %}" style="height:270px; width:350px;" alt="Ad description">
 										</figure>
 									</div>
-								</div>
+								</div> {% endcomment %}
 
 								{% if request.user.is_authenticated %}
 								<div class="wt-proposalsr"></div>

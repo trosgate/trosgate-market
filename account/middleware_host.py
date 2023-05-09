@@ -32,27 +32,16 @@ class DynamicHostMiddleware:
         settings.SITE_ID = site.id 
         request.site = site 
           
-        if site.id == 1:
+        if request.site.domain == settings.SITE_DOMAIN:
             request.parent_site = site
-            schema_name = 'public'
+            request.merchant = None
         else:
             request.parent_site = None
-            # schema_name = f'merchant_{site.id}'
-            # connection = connections['default']
-            # try:
-            #     # Create schema for tenant if it doesn't exist
-                
-            #     with connection.cursor() as cursor:
-            #         cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
-            # except OperationalError as e:
-            #     print(f"Error while creating schema: {e}")
-            #     return HttpResponseForbidden()
-
-        # connections.merchant = schema_name
-
-        request.merchant = self.is_merchant_family(request, site)
-
-        response = self.get_response(request)    
+            request.merchant = request.site.merchant
+            # request.merchant = self.is_merchant_family(request)
+        
+        print('request.merchant', request.merchant)
+        response = self.get_response(request)
         return response
 
 
@@ -61,10 +50,15 @@ class DynamicHostMiddleware:
         return list(set(site_domains) | set(settings.ALLOWED_HOSTS))
 
 
-    def is_merchant_family(self, request, site=None):
+    def is_merchant_family(self, request):
         """Check and assign object to Merchant."""
 
-        if hasattr(request, 'user') and request.user.is_authenticated and not request.user.is_admin:
-            return request.user.active_merchant_id
-        elif Merchant.objects.filter(site=site).exists():
-            return Merchant.objects.filter(site=site).first()
+        return Merchant.objects.filter(site=request.site).first()
+        
+    # def is_merchant_family(self, request, site=None):
+    #     """Check and assign object to Merchant."""
+
+    #     if hasattr(request, 'user') and request.user.is_authenticated and not request.user.is_admin:
+    #         return request.user.active_merchant_id
+    #     elif Merchant.objects.filter(site=site).exists():
+    #         return Merchant.objects.filter(site=request.site).first()

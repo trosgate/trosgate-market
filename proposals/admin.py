@@ -45,8 +45,8 @@ class ProposalAdmin(admin.ModelAdmin):
 
 class ProposalSupportInline(admin.StackedInline):
     model = ProposalChat
-    list_display = ['team', 'sender', 'sent_on']
-    readonly_fields = ['team', 'sender', 'sent_on','content']
+    list_display = ['merchant', 'team', 'sender', 'sent_on']
+    readonly_fields = ['merchant','team', 'sender', 'sent_on','content']
     extra = 0
 
     fieldsets = (
@@ -68,13 +68,13 @@ class ProposalSupportInline(admin.StackedInline):
 @admin.register(ProposalSupport)
 class ProposalSupportAdmin(admin.ModelAdmin):
     model = ProposalSupport
-    list_display = ['team', 'title', 'created_at']
-    list_display_links = ['team','title',]
-    readonly_fields = ['team', 'title', 'created_at']
+    list_display = ['merchant', 'team', 'title', 'created_at']
+    list_display_links = ['merchant', 'team','title',]
+    readonly_fields = ['merchant', 'team', 'title', 'created_at']
     search_fields = ['team__title', 'title']
 
     fieldsets = (
-        ('Proposal Info', {'fields': ('team', 'title',)}),
+        ('Proposal Info', {'fields': ('merchant', 'team', 'title',)}),
     )
     inlines = [ProposalSupportInline]
 
