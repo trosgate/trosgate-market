@@ -303,7 +303,7 @@ class TwoFactorAuthForm(forms.ModelForm):
 
 
 class DomainForm(forms.ModelForm): 
-    pass_code = forms.CharField(validators=[DomainValidator()], help_text = "Enter your domain")
+    domain = forms.CharField(validators=[DomainValidator()], help_text = "Enter your domain")
 
     class Meta:
         model = Merchant
