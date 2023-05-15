@@ -40,7 +40,6 @@ class DynamicHostMiddleware:
             # request.merchant = request.site.merchant
             request.merchant = self.is_merchant_family(request)
         
-        print('request.merchant', request.merchant)
         response = self.get_response(request)
         return response
 

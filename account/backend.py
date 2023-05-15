@@ -47,7 +47,7 @@ class CustomAuthBackend(BaseBackend):
 
         # Checks for freelancer and redirect to 2FA or otherwise
         elif user is not None and user.is_freelancer and user.site == current_site and get_sms_feature():
-
+            print('to yesddddddddddddddd')
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
                 session.modified = True
@@ -57,6 +57,7 @@ class CustomAuthBackend(BaseBackend):
 
 
         elif user is not None and user.is_freelancer and user.site == current_site and not get_sms_feature():
+            print('to noddddddddddddddd')
             
             login(request, user)
 
@@ -103,14 +104,12 @@ class CustomAuthBackend(BaseBackend):
             return redirect('account:dashboard')
 
         elif user is not None and user.site != current_site:
-            messages.info(request, f'Hi {user}, you are being redirected to {user.site.name} as you have account there')
-            return redirect(f'http://{user.site.domain}:8000')
+            messages.info(request, f'Invalid email or password')
+            return redirect('account:login')
         
         else:
-            messages.error(request, f'Invalid credentials')
-            loginform = UserLoginForm()
-            return render(request, "account/login.html", {'loginform': loginform})
-
+            messages.info(request, f'Invalid email or password')
+            return redirect('account:login')
 
 
 

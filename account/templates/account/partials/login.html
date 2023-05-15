@@ -1,0 +1,40 @@
+{% comment %} <form method="POST">{% csrf_token %}
+    {% if loginform.errors %}
+    {% if messages %}
+    {% for message in messages %}        
+    <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <span class="wt-jobalerts">
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                    <span> {{ message}} </span>
+                    <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+                </div>
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %} 
+    {% endif %}  
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            {{loginform.email.label}}
+            {{loginform.email}}
+            <span style="color:red;" role="alert">{{ loginform.email.errors}}</span>
+        </div>	
+        <div class="form-group col-md-12">
+            {{loginform.password.label}}
+            {{loginform.password}}
+            <span style="color:red;" role="alert">{{ loginform.password.errors}}</span>
+        </div>	
+    </div>
+    <div class="text-center">
+        <span style="color:green;" role="alert">Don't have account on {{website.site_name}}?<a href="{% url 'account:register' %}"> Become Merchant </span><br>
+        <span style="color:green;" role="alert">Reset Account <a href="{% url 'account:passwordreset' %}"> password here </a></span><br>
+        <button type="submit" class="appointment-btn"
+            hx-post="{% url 'account:login' %}"
+            hx-target="#login-form"
+            style="background-color:rgb(29, 118, 90); font-weight: bold;">
+            Login Now 
+        </button>
+    </div>
+</form> {% endcomment %}

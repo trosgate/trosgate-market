@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django_countries.fields import CountryField
 from django.utils.translation import gettext_lazy as _
@@ -11,12 +12,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
 from account.models import Merchant
+import uuid
 
-
-# managers.py
-from django.db import models
-from django.db.models import Q
-from django.utils.functional import cached_property
 
 
 class MerchantMasterManager(models.Manager):
@@ -97,10 +94,12 @@ class MerchantProduct(MerchantMaster):
         (ACTIVE, _("Active")),
         (MODIFY, _("Modify")),
         (ARCHIVE, _("Archived")),
-    )    
+    )
+    id = models.AutoField(primary_key=True),
+    identifier = models.URLField(editable=True, default=uuid.uuid4, verbose_name='Identifier')    
     title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
     category = models.ForeignKey('general_settings.Category', verbose_name=_("Category"), on_delete=models.RESTRICT, max_length=250)
-    slug = models.SlugField(_("Slug"), max_length=255)
+    slug = models.SlugField(_("Slug"), max_length=255, unique=True)
     preview = models.CharField(_("Preview"), max_length=255, error_messages={"name": {"max_length": _("Preview field is required with maximum of 250 characters")}},)
     skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("Proposal Skills"),  error_messages={"name": {"max_length": _("Skill field is required")}},)
     sample_link = models.URLField(_("Sample Website"), max_length=2083, help_text=_("the link must be a verified url"), null=True, blank=True)

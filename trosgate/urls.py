@@ -6,6 +6,7 @@ from account.models import Customer
 
 
 urlpatterns = [
+    # DJANGO REGULAR URLS
     path('admin/', admin.site.urls),
     # path('', include(tf_urls)),
     path('', include('account.urls', namespace='account')),
@@ -25,6 +26,9 @@ urlpatterns = [
     path('team/analytics/', include('analytics.urls', namespace='analytics')),
     path('pages/', include('pages.urls', namespace='pages')),
     path('marketing/', include('marketing.urls', namespace='marketing')),
+    path('api/proposal/', include('proposals.api.urls', namespace='proposal_api')),
+
+    # DJANGO API URLS
     path('manager/', include('resolution.urls', namespace='resolution')),
 ]
 

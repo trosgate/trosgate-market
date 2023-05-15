@@ -14,7 +14,6 @@
             "monthly_offer_contracts_per_team": 5,
             "max_proposals_allowable_per_team": 5,
             "monthly_projects_applicable_per_team": 5,
-            "daily_Handshake_mails_to_clients": 0,
             "price": 5,
             "is_default": true,
             "ordering": 1
@@ -35,7 +34,6 @@
             "monthly_offer_contracts_per_team": 15,
             "max_proposals_allowable_per_team": 15,
             "monthly_projects_applicable_per_team": 15,
-            "daily_Handshake_mails_to_clients": 1,
             "price": 20,
             "is_default": false,
             "ordering": 2
@@ -56,7 +54,6 @@
             "monthly_offer_contracts_per_team": 25,
             "max_proposals_allowable_per_team": 25,
             "monthly_projects_applicable_per_team": 25,
-            "daily_Handshake_mails_to_clients": 3,
             "price": 30,
             "is_default": false,
             "ordering": 3

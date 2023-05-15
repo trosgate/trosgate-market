@@ -57,9 +57,9 @@ from contract.models import InternalContract, Contract
 from .forms import InvestorForm
 
 def aboutus(request):
-    aboutpage=None
-    if AboutUsPage.objects.filter(pk=1).exists():
-        aboutpage = AboutUsPage.objects.get(pk=1)
+    # aboutpage=None
+    # if AboutUsPage.objects.filter(pk=1).exists():
+    aboutpage = AboutUsPage.objects.all().first()
 
     investor_form = InvestorForm()
     context={

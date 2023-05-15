@@ -12,7 +12,7 @@
     {% endif %} 
     {% endif %} 
     <!-- Alert message Start -->
-    {% if messages %}
+   {% if messages %}
         {% for message in messages %}        
         <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
             <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
@@ -25,7 +25,7 @@
             </div>
         </div>
         {% endfor %}
-    {% endif %}  
+    {% endif %}   
 
     {% block content %}
 

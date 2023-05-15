@@ -1,12 +1,20 @@
 //this will dumpdata
+python manage.py dumpdata --indent 4 > db_packages.json
+
+
+//this will dumpdata
 python manage.py dumpdata teams.Team > new.json
 python manage.py dumpdata account.package > new.json
 python manage.py dumpdata proposals.Proposal > db_proposals.json
 python manage.py dumpdata > railway.json
 
-//this will indent dumpdata
 
-python manage.py dumpdata account.package --indent 4 > db_packages.json
+# MAIL SMTP SETTINGS
+Server: smtp-relay.sendinblue.com
+SMTP Value/Password: 1dWKrEc3kQfRYbSD
+Smtp email/Username: myvoistudio@gmail.com
+Port: 587
+
 
 //listen to stripe webhook on a particular endpoint
 stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/   
@@ -55,3 +63,15 @@ find . -path "*/migrations/*.pyc"  -delete
 celery -A trosgate.celery worker --pool=solo -l info ### on windows
 celery -A trosgate.celery worker -l info   ### on Other os
 celery -A trosgate beat -l info ### start celery beat
+
+
+
+
+
+
+
+
+
+
+
+
