@@ -30,15 +30,17 @@ class DynamicHostMiddleware:
 
         # Set the SITE_ID header to the ID of the Site object
         settings.SITE_ID = site.id 
-        request.site = site 
-          
+        request.site = site
+
+        request.merchant = None
+        request.parent_site = None
+
         if request.site.domain == settings.SITE_DOMAIN:
             request.parent_site = site
-            request.merchant = None
-        else:
-            request.parent_site = None
-            # request.merchant = request.site.merchant
-            request.merchant = self.is_merchant_family(request)
+                   
+        if request.site.domain != settings.SITE_DOMAIN:
+            request.merchant = site
+            # request.merchant = self.is_merchant_family(request)
         
         response = self.get_response(request)
         return response
@@ -49,15 +51,8 @@ class DynamicHostMiddleware:
         return list(set(site_domains) | set(settings.ALLOWED_HOSTS))
 
 
-    # def is_merchant_family(self, request):
-    #     """Check and assign object to Merchant."""
-
-    #     return Merchant.objects.filter(site=request.site).first()
-        
-    def is_merchant_family(self, request, site=None):
+    def is_merchant_family(self, request):
         """Check and assign object to Merchant."""
 
-        if hasattr(request, 'user') and request.user.is_authenticated and not request.user.is_admin:
-            return Merchant.objects.filter(pk=request.user.active_merchant_id).first()
-        elif Merchant.objects.filter(site=site).exists():
-            return Merchant.objects.filter(site=request.site).first()
+        return Merchant.objects.filter(site=request.site).first()
+        

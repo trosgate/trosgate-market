@@ -1,5 +1,5 @@
 //this will dumpdata
-python manage.py dumpdata --indent 4 > db_packages.json
+python manage.py dumpdata --exclude=auth --exclude=contenttypes --indent 4 > backups.json.gz
 
 
 //this will dumpdata

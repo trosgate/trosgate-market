@@ -35,9 +35,11 @@ class SearchTypeForm(forms.Form):
 
 
 class CustomerRegisterForm(forms.ModelForm):
+    SELECT_USER = 'User Type'
     FREELANCER = 'freelancer'
     CLIENT = 'client'
     USER_TYPE = (
+        (SELECT_USER, _('Select User Type')),
         (FREELANCER, _('Freelancer')),
         (CLIENT, _('Client')),
     )
@@ -59,27 +61,35 @@ class CustomerRegisterForm(forms.ModelForm):
 
     def __init__(self, supported_country, *args, **kwargs):
         super(CustomerRegisterForm, self).__init__(*args, **kwargs)
+        
         self.fields['country'].queryset = Country.objects.filter(id__in=supported_country)
+        self.fields['country'].widget.attrs['class'] = 'custom-select'
+        self.fields['country'].widget.attrs['style'] = 'height: 40px;'
 
-        self.fields['short_name'].widget.attrs.update(
-            {'class': 'input-group col-lg-12'})
-        self.fields['email'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['first_name'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['last_name'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['phone'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['user_type'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['country'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['password1'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-        self.fields['password2'].widget.attrs.update(
-            {'class': 'input-group col-lg-12',})
-
+        self.fields['user_type'].widget.attrs['class'] = 'custom-select'
+        self.fields['user_type'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['short_name'].widget.attrs['class'] = 'form-control'
+        self.fields['short_name'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['email'].widget.attrs['class'] = 'form-control'
+        self.fields['email'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['first_name'].widget.attrs['class'] = 'form-control'
+        self.fields['first_name'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['last_name'].widget.attrs['class'] = 'form-control'
+        self.fields['last_name'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['phone'].widget.attrs['class'] = 'form-control'
+        self.fields['phone'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['password1'].widget.attrs['class'] = 'form-control'
+        self.fields['password1'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['password2'].widget.attrs['class'] = 'form-control'
+        self.fields['password2'].widget.attrs['style'] = 'height: 40px;'
+        
         for field in self.Meta.required:
             self.fields[field].required = True
 
@@ -251,10 +261,10 @@ class UserLoginForm(AuthenticationForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        cust_email = Customer.objects.filter(email=email)
+        curr_site = Site.objects.get_current()
+        cust_email = Customer.objects.filter(curr_site=curr_site, email=email).exists()
         if not cust_email:
-            raise forms.ValidationError(
-                'Ooops! the input detail(s) is not valid')
+            raise ValidationError('Ooops! the input detail(s) is not valid')
         return email
 
 

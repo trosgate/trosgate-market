@@ -37,11 +37,11 @@ def send_test_mail(to_email):
 def two_factor_auth_mailer(user, pass_code):
     from_email = get_from_email()
     subject = f'User login activation on {website_name()}'
-    text_content = f"Hello {user.short_name}, You are about to log into your account. Please your code for login on {website_name()} is: { pass_code}"
+    text_content = f"Hello {user.get_short_name()}, You are about to log into your account. Please your code for login on {website_name()} is: { pass_code}"
     html_content = render_to_string('notification/two_factor_auth.html', {
         'website_email': from_email,
         'website_name': website_name(),
-        'user': user.short_name,
+        'user': user.get_short_name(),
         'subject': subject,
         'pass_code': pass_code,
        
@@ -276,6 +276,7 @@ def initiate_credit_memo_email(credit_memo):
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 
+
 def send_credit_to_team(account):
     # Blueprint for sending mail to receiver of new credit given by admin
     from_email = get_from_email()
@@ -390,12 +391,6 @@ def approve_application_cancel_email(resolution):
     msg.send()
 
 
-
-# To be continued
-# To be continued
-# To be continued
-# To be continued
-# To be continued
 def send_new_team_email(to_email, team):
     from_email = get_from_email()
     # acceptation_url = settings.WEBSITE_URL

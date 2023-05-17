@@ -352,7 +352,7 @@ class MerchantAdmin(admin.ModelAdmin):
     # list_display_links = None  
     fieldsets = (
         ('Personal Information', {'fields': (
-            'business_name', 'get_merchant', 'gender', 'address',
+            'business_name', 'get_merchant', 'type', 'gender', 'address',
         )}),
         ('Personal & Business Media', {'fields': (
             'profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 

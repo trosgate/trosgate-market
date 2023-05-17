@@ -48,7 +48,7 @@ class ClientAccountAdmin(admin.ModelAdmin):
     model = ClientAccount
     list_display = ['id', 'user', 'merchant', 'created_at', 'modified_on', 'available_balance']
     list_display_links = ['user', 'merchant',]
-    readonly_fields = ['user', 'merchant', 'created_at', 'modified_on', 'debug_balance', 'available_balance']
+    readonly_fields = ['user', 'merchant', 'created_at', 'modified_on', 'debug_balance'] #, 'available_balance'
     exclude = ('debug_balance',)
     search_fields = ['id', 'user__short_name']
 

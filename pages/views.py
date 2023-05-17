@@ -91,6 +91,7 @@ def terms_and_conditions(request):
 
 
 def how_it_works(request):
+    
     hiring = Hiring.objects.filter(is_published = True)
     freelancing = Freelancing.objects.filter(is_published = True)
     gateways = PaymentGateway.objects.filter(status=True)

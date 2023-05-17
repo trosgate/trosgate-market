@@ -26,11 +26,11 @@ class CustomAuthBackend(BaseBackend):
         return None
 
 
-    def get_user(self, user_id):
-        try:
-            return UserModel.objects.get(pk=user_id)
-        except UserModel.DoesNotExist:
-            return None
+    # def get_user(self, user_id):
+    #     try:
+    #         return UserModel.objects.get(pk=user_id)
+    #     except UserModel.DoesNotExist:
+    #         return None
 
 
     def user_type_redirect(self, request, user):
@@ -47,7 +47,7 @@ class CustomAuthBackend(BaseBackend):
 
         # Checks for freelancer and redirect to 2FA or otherwise
         elif user is not None and user.is_freelancer and user.site == current_site and get_sms_feature():
-            print('to yesddddddddddddddd')
+            
             if "twofactoruser" not in session:
                 session["twofactoruser"] = {"user_pk": user.pk}
                 session.modified = True
@@ -57,7 +57,6 @@ class CustomAuthBackend(BaseBackend):
 
 
         elif user is not None and user.is_freelancer and user.site == current_site and not get_sms_feature():
-            print('to noddddddddddddddd')
             
             login(request, user)
 

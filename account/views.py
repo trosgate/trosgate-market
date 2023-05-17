@@ -105,7 +105,9 @@ def autoLogout(request):
 
 
 def homepage(request):
-
+    # print('request.site :', request.site)
+    # print('request.parent :', request.parent_site)
+    # print('request.merchant :', request.merchant)
     if request.user.is_authenticated:
         return redirect('account:dashboard')
     
@@ -115,8 +117,6 @@ def homepage(request):
     proposals = Proposal.objects.filter(published=True).distinct()[0:12]   
     projects = Project.objects.filter(published=True, status='active', duration__gte=timezone.now()).distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
-    supported_country = Country.objects.filter(supported=True)
-    regform = CustomerRegisterForm(supported_country, request.POST or None)
     searchform = SearchTypeForm()
 
     if request.user.is_authenticated and not request.user.user_type == Customer.ADMIN:
@@ -127,19 +127,6 @@ def homepage(request):
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('/admin')
 
-    supported_country = Country.objects.filter(supported=True)
-
-    if request.method == 'POST':
-        regform = CustomerRegisterForm(supported_country, request.POST or None)
-        if regform.is_valid():
-            regform.save()
-
-            return render(request, 'account/registration/register_email_confirm.html', {'regform': regform})
-
-        else:
-            messages.error(request, f'Error occured. Please check and correct')
-    else:
-        regform = CustomerRegisterForm(supported_country)
     home_layout = homepage_layout()
     context = {
         'proposals': proposals,
@@ -147,8 +134,6 @@ def homepage(request):
         'packages': packages,
         'pypist': pypist,
         'users': users,
-        'regform': regform,
-        'userregistrationmodal': "userregistrationmodal",
         'base_currency': base_currency,
         'searchform': searchform,
         'home_layout': home_layout,
@@ -173,27 +158,112 @@ def loginView(request):
     # Otherwise if there is server error in sms sending, admin is also lock out 
     # TODO to have a token authenticator separate for admin and staffs
     #  
-
+    session = request.session
     loginform = UserLoginForm(request.POST or None)
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         
-        if not Customer.objects.filter(email=email).exists():
-            messages.error(request, f'Invalid email or password!')  
+        user = authenticate(request, email=email, password=password)
+       
+        if user is not None and user.site == request.site:
+
+            if user.is_freelancer and get_sms_feature():
+                
+                if "twofactoruser" not in session:
+                    session["twofactoruser"] = {"user_pk": user.pk}
+                    session.modified = True
+                    return redirect('account:two_factor_auth')
+
+                return redirect('account:two_factor_auth')
+
+            elif user.is_freelancer and not get_sms_feature():
+                
+                login(request, user)
+
+                messages.info(request, f'Welcome back {user.get_short_name()}')
+
+                return redirect('account:dashboard')
+
+            elif user.is_client and get_sms_feature():
+
+                if "twofactoruser" not in session:
+                    session["twofactoruser"] = {"user_pk": user.pk}
+                    session.modified = True
+                    return redirect('account:two_factor_auth')
+
+                return redirect('account:two_factor_auth')
+
+            elif user.is_client and not get_sms_feature():            
+                
+                login(request, user)
+
+                messages.info(request, f'Welcome back {user.get_short_name()}')
+
+                return redirect('account:dashboard')
+
+            elif user.is_merchant and get_sms_feature():
+                print(user.site, request.site)
+                if "twofactoruser" not in session:
+                    session["twofactoruser"] = {"user_pk": user.pk}
+                    session.modified = True
+                    return redirect('account:two_factor_auth')
+
+                return redirect('account:two_factor_auth')
+
+
+            elif user.is_merchant and not get_sms_feature():
+                
+                login(request, user)
+
+                messages.info(request, f'Welcome back {user.get_short_name()}')
+
+                return redirect('account:dashboard')  
+            else:
+                messages.error(request, f'Invalid email or Password.')
 
         else:
-            user = authenticate(request, email=email, password=password)
-            auth_backend = CustomAuthBackend()
-            return auth_backend.user_type_redirect(request, user)
-        
+            messages.error(request, f'Invalid email or Password.')
     else:
         loginform = UserLoginForm()
 
     context = {
         'loginform': loginform
     }
-    return render(request, "account/login.html", context)
+    if request.parent_site:
+        return render(request, "account/parent_login.html", context)
+    else:
+        return render(request, "account/merchant_login.html", context)
+
+
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# def loginView(request):
+
+#     # Admin is exempted from two step verification via sms
+#     # Otherwise if there is server error in sms sending, admin is also lock out 
+#     # TODO to have a token authenticator separate for admin and staffs
+#     #  
+
+#     loginform = UserLoginForm(request.POST or None)
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+        
+#         if not Customer.objects.filter(email=email).exists():
+#             messages.error(request, f'Invalid email or password!')  
+
+#         else:
+#             user = authenticate(request, email=email, password=password)
+#             auth_backend = CustomAuthBackend()
+#             return auth_backend.user_type_redirect(request, user)
+        
+#     else:
+#         loginform = UserLoginForm()
+
+#     context = {
+#         'loginform': loginform
+#     }
+#     return render(request, "account/login.html", context)
 
 
 def two_factor_auth(request):
@@ -203,6 +273,7 @@ def two_factor_auth(request):
 
     try:
         returned_user_pk = request.session["twofactoruser"]["user_pk"]
+        print('returned_user_pk', returned_user_pk)
         returned_user = TwoFactorAuth.objects.get(user__pk=returned_user_pk, user__is_active=True)
         pass_code = returned_user.pass_code
         user = Customer.objects.get(pk=returned_user_pk, is_active=True)
@@ -225,7 +296,8 @@ def two_factor_auth(request):
         if pass_code == received_code:
             returned_user.save()
 
-            login(request, user, backend='account.backend.CustomAuthBackend')
+            login(request, user)
+            # login(request, user, backend='account.backend.CustomAuthBackend')
 
             messages.info(request, f'Welcome back {request.user.get_short_name()}')
 
@@ -335,6 +407,10 @@ def user_dashboard(request):
     contracts=None
     proposals=None
     msg = ''
+
+    # print('request.site :', request.site)
+    # print('request.parent :', request.parent_site)
+    # print('request.merchant :', request.merchant)
 
     if request.user.is_freelancer:
         try:

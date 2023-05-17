@@ -103,10 +103,10 @@ MIDDLEWARE = [
 ]
 
 
-AUTHENTICATION_BACKENDS = [
-    'account.backend.CustomAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'account.backend.CustomAuthBackend',
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
 
 
 ROOT_URLCONF = 'trosgate.urls'
@@ -142,6 +142,7 @@ WSGI_APPLICATION = 'trosgate.wsgi.application'
 
 # SERVER/LOCAL SIDE
 # DATABASE_ROUTERS = ['account.router.MerchantRouter']
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -171,6 +172,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

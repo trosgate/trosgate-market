@@ -75,17 +75,13 @@
                   
 									<div class="wt-userlogedin">
                     {% if not request.user.is_authenticated %}
-                      {% if request.parent %}
+                      {% if request.parent_site %}
                       <a class="btn btn-danger btn-sm" href="#pricing" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Become a Merchant</a>
                       {% else %}
-                      {% if userregistrationmodal %}
-                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#userregistrationmodal" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Join Us</a>
-                      {% else %}
+
 											  <a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Signup</a>
                       {% endif %}
-                      {% endif %}
-                    
-                    {% endif  %}
+                    {% endif %}
 
                     {% if request.user.is_authenticated %}
                     <figure class="wt-userimg">

@@ -9,8 +9,18 @@ from rest_framework import status
 
 
 @api_view(['GET'])
+def api_proposal_list(request):
+    proposal = Proposal.objects.filter(status = Proposal.ACTIVE)
+    data = {}
+    if proposal.count() > 0:
+        serializer = ProposalSerializer(proposal, many=True)
+        return Response(serializer.data)
+    data['response'] = 'No proposal to display'
+    return Response(data=data)
+
+
+@api_view(['GET'])
 def api_proposal_detail(request, short_name, proposal_slug):
-    # proposal = get_object_or_404_response(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
     try:
         proposal = Proposal.objects.get(slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
     except Proposal.DoesNotExist:
@@ -26,15 +36,16 @@ def api_proposal_update(request, proposal_id, proposal_slug):
     except Proposal.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    serializer = ProposalSerializer(proposal, data=request.data)
-    data = {}
-    if request.method == 'POST':
-        if serializer.is_valid():
-            serializer.save()
-            data['success'] = 'Update Successful'
-            return Response(data=data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    serializer = ProposalSerializer(proposal, data=request.data, partial=True)
+    # data = {}
+    # if request.method == 'PUT':
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+        # data['success'] = 'Update Successful'
+        # return Response(data=data)
+    return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 

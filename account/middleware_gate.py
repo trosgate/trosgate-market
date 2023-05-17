@@ -24,7 +24,8 @@ class MerchantGateMiddleware:
         if request.user.is_authenticated and request.user.is_merchant:
 
             # This attribute was set by upper lever middleware
-            request.merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
+            if request.merchant is None:
+                request.merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
             
             gate_url = reverse("merchants:subscription")
             if (

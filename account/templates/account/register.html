@@ -4,13 +4,13 @@
 {% block content %}
 
 
-    <div class="wt-haslayout wt-main-section">
+    <div class="wt-haslayout" style="background:white;">
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
                 <div class="wt-dashboardbox">
-                    <div class="wt-dashboardboxtitle">
-                        <h2>Join for Free</h2>
+                    <div class="wt-dashboardboxtitle text-center">
+                        <h2 style="color:green; font-weight:bold;">JOIN US FOR FREE</h2>
                     </div>
                     <div class="wt-dashboardboxcontent">
                                                                                     
@@ -21,59 +21,53 @@
                         </div>
                         {% endif %}  
                             <div class="wt-jobdescription wt-tabsinfo">
-                                <div class="form-row">
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Background</h2>
-                                    </div>
-                                    <div class="form-group">
-                                        {{regform.email.label}}
-                                        {{regform.email}}
-                                        <span style="color:red;" role="alert">{{ regform.email.errors}}</span>
-                                    </div>	
-                                    <div class="form-group">
+                                <div class="form-row">                                    	
+                                    <div class="form-group col-md-4">
                                         {{regform.first_name.label}}
                                         {{regform.first_name}}
                                         <span style="color:red;" role="alert">{{ regform.first_name.errors}}</span>
                                     </div> 
-                                    <div class="form-group">
+                                    <div class="form-group col-md-4">
                                         {{regform.last_name.label}}
                                         {{regform.last_name}}
                                         <span style="color:red;" role="alert">{{ regform.last_name.errors}}</span>
                                     </div>
-                                    <div class="form-group">
+                                    
+                                    <div class="form-group col-md-4">
                                         {{regform.short_name.label}}
                                         {% render_field regform.short_name class+='form-control' hx-post='/verify_username/' hx-swap='outerhtml' hx-trigger='keyup' hx-target='#short_name_status' %} 
                                         <span style="color:red;" role="alert">{{ regform.short_name.errors}}</span>
                                         <div id="short_name_status" class="input-group col-lg-12"></div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group col-md-6">
+                                        {{regform.email.label}}
+                                        {{regform.email}}
+                                        <span style="color:red;" role="alert">{{ regform.email.errors}}</span>
+                                    </div>
+                                    <div class="form-group col-md-6">
                                         {{regform.phone.label}}
                                         {{regform.phone}}
                                         <span style="color:red;" role="alert">{{ regform.phone.errors}}</span>
                                     </div>
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Specialty</h2>
-                                    </div>	
-                                    <div class="form-group">
+                           
+                                    <div class="form-group col-md-6">
                                         {{regform.user_type.label}}
                                         {% render_field regform.user_type class+="form-control" placeholder="Select UserType" hx-get="/user_types/" hx-target="#user_type" %}
                                         <span style="color:red;" role="alert">{{ regform.user_type.errors}}</span> 
                                         <div id="user_type" class="input-group col-lg-12"></div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group col-md-6">
                                         {{regform.country.label}}
                                         {{regform.country}}
                                         <span style="color:red;" role="alert">{{ regform.country.errors}}</span>
                                     </div>
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>Security</h2>
-                                    </div>	
-                                    <div class="form-group">
+
+                                    <div class="form-group col-md-6">
                                         {{regform.password1.label}}
                                         {{regform.password1}}
                                         <span style="color:red;" role="alert">{{ regform.password1.errors}}</span>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group col-md-6">
                                         {{regform.password2.label}}
                                         {{regform.password2}}
                                         <span style="color:red;" role="alert">{{ regform.password2.errors}}</span>

@@ -121,7 +121,7 @@ def payment_option_with_fees(request):
         messages.error(request, "Please add atleast one proposal to proceed")
         return redirect("transactions:hiring_box_summary")
 
-    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
+    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='balance')
     base_currency = get_base_currency_symbol()    
     context ={
         'hiringbox': hiringbox,
