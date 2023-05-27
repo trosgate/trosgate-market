@@ -42,7 +42,6 @@ from transactions.hiringbox import HiringBox
 import copy
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
-from control_settings.utilities import homepage_layout
 from contract.models import Contract
 from .backend import CustomAuthBackend
 from .permission import user_is_merchant
@@ -105,9 +104,10 @@ def autoLogout(request):
 
 
 def homepage(request):
-    # print('request.site :', request.site)
-    # print('request.parent :', request.parent_site)
-    # print('request.merchant :', request.merchant)
+
+    # print('request.site :', request.site.merchant)
+    # print('request.site :', request.site.websitesetting.protocol)
+
     if request.user.is_authenticated:
         return redirect('account:dashboard')
     
@@ -127,7 +127,7 @@ def homepage(request):
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('/admin')
 
-    home_layout = homepage_layout()
+    home_layout = request.site # -----------check again for all user types..........
     context = {
         'proposals': proposals,
         'projects': projects,

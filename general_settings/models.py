@@ -7,34 +7,68 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+from django.contrib.sites.models import Site
+from django.contrib.sites.managers import CurrentSiteManager
 
 
 def site_path(instance, filename):
-    return "site/%s/%s" % (instance.site_name, filename)
+    return "site/%s/%s" % (instance.site.name, filename)
 
 
-class WebsiteSetting(models.Model):
-    USE_HTTPS = "https://"
-    USE_HTTP_WITH_WWW = "https://www."
-    USE_HTTP = "http://"
-    PROTOCOL_TYPE = (
-        (USE_HTTPS, _("Secure:> https://")),
-        (USE_HTTP_WITH_WWW, _("Secure https://www")),
-        (USE_HTTP, _("Insecure:> http://")),
+class SettingsMaster(models.Model):
+       
+    class Meta:
+        abstract = True
+    # Banner Choices
+    SLIDE = 'slide'
+    ROYAL = 'royal'
+    HERO = 'hero'
+    BANNER_TYPES = (
+        (SLIDE, _('Carousel Banner')),
+        (ROYAL, _('Royal Banner')),
+        (HERO, _('Hero Banner')),
     )
-
-    site_name = models.CharField(
-        _("Site Name"), max_length=50, default="Example", null=True, blank=True)
+    ZERO = 'zero'
+    ONE = 'one'
+    TWO = 'two'
+    PROMO_TYPES = (
+        (ZERO, _('No Marketing')),
+        (ONE, _('Call to Action')),
+        (TWO, _('How it Works')),
+    )
+    site = models.OneToOneField(Site, on_delete=models.CASCADE)
     tagline = models.CharField(
         _("Site Tagline"), max_length=150, default="The Marketplace", null=True, blank=True)
-    site_description = models.TextField(
+    description = models.TextField(
         _("Site Decription"), max_length=300, default="The Example Marketplace", null=True, blank=True)
     site_Logo = models.ImageField(
         _("Site Logo"),  upload_to=site_path, default='site/logo.png', null=True, blank=True)
-    protocol = models.CharField(
-        _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS, help_text=_("Warning! Make sure you have SSL Certificate for your site before switing to Secure options"))
-    site_domain = models.CharField(_("Website Domain"), max_length=255, default="example.com", help_text=_(
-        'E.x: example.com'), null=True, blank=True)
+    address = models.CharField(_("Business Address"), max_length=100, null=True, blank=True
+    )    
+    created_at = models.DateTimeField(_("Last Created"), auto_now_add=True)
+    modified = models.DateTimeField(_("Last Modified"), auto_now=True)
+    
+    # Theme Changing
+    category_type = models.BooleanField(_("Category Activator"), choices = ((False,'Silva Land'), (True, 'Royal Land')), default = False)
+    banner_type = models.CharField(_("Banner Activator"), max_length=20, choices = BANNER_TYPES, default = ROYAL)
+    title_block = models.CharField(_("Banner Title"), max_length=100, default="Hire Experts or Team")
+    subtitle_block = models.CharField(_("Banner Subtitle"), max_length=150, default="Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.")
+    video_title = models.CharField(_("Royal Video Title"), max_length=100, default="See For Yourself!", null=True, blank=True)
+    video_description = models.CharField(_("Royal Video Description"), max_length=100, default="Hire Experts or Team", null=True, blank=True)
+    video_url = models.URLField(_("Royal embed Video"), help_text=_("Your can Paste your Youtube or Vimeo video url here to embed. Only secured url allowed"), null=True, blank=True)
+    banner_image = models.ImageField(_("Home Banner Image"), help_text=_("image must be any of these: 'JPEG','JPG','PNG','PSD'"), null=True, blank=True, upload_to=site_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
+    banner_color = models.CharField(_("Hero Background Color"), max_length=100, default="purple", help_text=_("Put your color here to decorate Hero Banner Background and buttons like signup and login. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes"), null=True, blank=True)
+    banner_button_one_color = models.CharField(_("Hero Button1 Color"), max_length=100, default="green", help_text=_("Put your bootstrap color here to decorate Hero Button 1. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
+    banner_button_two_color = models.CharField(_("Hero Button2 Color"), max_length=100, default="light", help_text=_("Put your bootstrap color here to decorate Hero Button 2. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
+    promo_type = models.CharField(_("Marketing Section"), max_length=10, choices = PROMO_TYPES, default = TWO)
+    promo_title = models.CharField(_("Div Four Promo Title"), max_length=100, default="#1 Choice For Businesses", null=True, blank=True)
+    promo_subtitle = models.CharField(_("Div Four Promo Subitle"), max_length=100, default="Business on the Go", null=True, blank=True)
+    promo_description = models.TextField(
+        _("Div Four Promo Decription"), max_length=300, default="The Example Marketplace", null=True, blank=True)
+    promo_image = models.ImageField(_("Promo Image"), upload_to='promo/', default='freelancer/awards/banner.png', null=True, blank=True,)
+    footer_description = models.TextField(_("Footer Content"), max_length=250, default="Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce", null=True, blank=True)
+    
+    # branding
     button_color = models.CharField(
         _("Visitor Buttons"), 
         max_length=100, 
@@ -51,6 +85,7 @@ class WebsiteSetting(models.Model):
         null=True, 
         blank=True
     )
+    # Social handlers
     twitter_url = models.URLField(
         _("Twitter Page"), 
         max_length=255, 
@@ -79,14 +114,9 @@ class WebsiteSetting(models.Model):
         blank=True, 
         help_text=_("Enter the full secure url path of your Facebook page")
     )
-    ad_image = models.ImageField(
-        _("Hero Image"), 
-        help_text=_("This will appear on 'proposal ad, project ad and all other ad slots'. image must be any of these: 'JPEG','JPG','PNG','PSD'"), 
-        null=True, blank=True, 
-        upload_to=site_path, 
-        validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])]
-    )
-    
+
+    # Marketing
+
     brand_ambassador_image = models.ImageField(
         _("Brand Ambassador Image"), 
         help_text=_("This will appear to logged-in user on 'About Us Page, Freelancer page, project page'. Size should be 255px x 255px. image must be any of these: 'JPEG','JPG','PNG','PSD'"), 
@@ -95,21 +125,23 @@ class WebsiteSetting(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])]
     )
 
-    def __str__(self):
-        return self.site_name
+    announcement = models.TextField(
+        _("Announcement"), 
+        max_length=1000, 
+        null=True, 
+        blank=True
+    )
 
-    class Meta:
-        verbose_name = 'Site Settings'
-        verbose_name_plural = 'Site Settings'
-
-
+    objects = models.Manager()
+    curr_merchant = CurrentSiteManager()    
+    
     # image display in Admin
 
     def site_logo_tag(self):
         if self.site_Logo:
-            return mark_safe('<img src="/media/%s" width="150" height="50" />' % (self.site_Logo))
+            return mark_safe('<img src="/media/%s" width="185" height="50" />' % (self.site_Logo))
         else:
-            return (self.site_name)
+            return f'{self.site.name}'
 
     site_logo_tag.short_description = 'site_Logo'
 
@@ -117,7 +149,41 @@ class WebsiteSetting(models.Model):
         if self.site_Logo:
             return self.site_Logo.url
         else:
-            return self.site_name
+            return self.site.name
+
+    # banner image display in Admin
+    def banner_tag(self):
+        return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.banner_image))
+
+    banner_tag.short_description = 'banner_image'
+
+    # banner image display in Admin
+    def promo_image_tag(self):
+        return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.promo_image))
+
+    banner_tag.short_description = 'promo_image'
+
+
+class WebsiteSetting(SettingsMaster):
+    USE_HTTPS = "https://"
+    USE_HTTP_WITH_WWW = "https://www."
+    USE_HTTP = "http://"
+    PROTOCOL_TYPE = (
+        (USE_HTTPS, _("Live Site on: https://")),
+        (USE_HTTP_WITH_WWW, _("Live Site with www: https://www")),
+        (USE_HTTP, _("UAT Site:> http://")),
+    )
+
+    protocol = models.CharField(
+        _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS, help_text=_("Warning! Make sure you have SSL Certificate for your site before switing to Secure options"))
+    
+
+    def __str__(self):
+        return self.site.name
+
+    class Meta:
+        verbose_name = 'Site Settings'
+        verbose_name_plural = 'Site Settings'
 
 
 class StorageBuckets(models.Model):

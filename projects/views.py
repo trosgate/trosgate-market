@@ -21,6 +21,29 @@ from general_settings.models import ProposalGuides
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
 
+
+def merchant_project(request):
+    projects = Project.objects.filter(merchant__site=request.user.merchant.site.id)
+    
+    active_proposals = projects.filter(status='active').count()
+    review_proposals = projects.filter(status='review').count()
+    published_proposals = projects.filter(published=True).count()
+    unpublished_proposals = projects.filter(published=False).count()
+    
+    total_proposal = f'{projects} found for the search'
+    
+    context = {
+        "projects": projects,
+        # "total_proposal": total_proposal,
+        # "active_proposals":active_proposals,
+        # "review_proposals":review_proposals, 
+        # "published_proposals":published_proposals, 
+        # "unpublished_proposals":unpublished_proposals, 
+    }
+    return render(request, 'projects/merchant_project.html', context)
+
+
+
 @login_required
 @user_is_client
 def create_project(request):

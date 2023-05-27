@@ -1,4 +1,5 @@
 from .models import Category, WebsiteSetting, AutoLogoutSystem
+from django.contrib.sites.models import Site
 
 
 def categories(request):
@@ -9,23 +10,13 @@ def categories(request):
 
 
 def website(request):
-    if WebsiteSetting.objects.filter(pk=1).exists():
-        website = WebsiteSetting.objects.get(pk=1)
-        return {'website': website}
-        
-    else:
-        website = WebsiteSetting.objects.create(
-            pk=1, site_name='Trosgate',
-            tagline='Freelance marketplace saas',
-            site_description='Freelance marketplace saas',
-            protocol='https://',
-            site_domain='trosgate.com',
-            twitter_url='https://trosgate.com',
-            instagram_url='https://trosgate.com',
-            youtube_url='https://trosgate.com',
-            facebook_url='https://trosgate.com'
-        )
-        return {'website': website}
+    site = Site.objects.get_current()
+    merchant = request.merchant
+    parent = request.parent_site
+    if merchant is not None and site == merchant:
+        return {'website': request.site.merchant}
+    if parent is not None and site == parent:
+        return {'website': request.site.websitesetting}
 
 
 def autoLogoutSystem(request):

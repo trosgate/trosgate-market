@@ -12,7 +12,7 @@
         <!-- Slide 1 -->
         <div class="carousel-item active" style="background-image: url({% static 'images/slide/slide-1.jpg' %})">
           <div class="container">
-            <h2>Welcome to <span>{{request.site.name}}</span></h2>
+            <h2>Welcome to <span>{{website.site.name}}</span></h2>
             <p>This is great est quam dolor ad a aliquid qui aliquid. Sequi ea ut et est quaerat sequi nihil ut aliquam. Occaecati alias dolorem mollitia ut. Similique ea voluptatem. Esse doloremque accusamus repellendus deleniti vel.</p>
             <a href="#about" class="btn-get-started scrollto">Read More</a>
           </div>
@@ -51,7 +51,7 @@
 
   <main id="main">
     
-    {% if home_layout.show_gateways == True %}
+    {% comment %} {% if website.show_gateways == True %} {% endcomment %}
 
     <!-- ======= Featured Services Section ======= -->
     <section id="featured-services" class="featured-services">
@@ -93,7 +93,7 @@
         </div>
       </div>
     </section><!-- End Featured Services Section -->
-    {% endif %}
+    {% comment %} {% endif %} {% endcomment %}
 
     <!-- ======= Cta Section ======= -->
     <section id="cta" class="cta">
@@ -105,7 +105,8 @@
         </div>
 
       </div>
-    </section><!-- End Cta Section -->
+    </section>
+    <!-- End Cta Section -->
 
     <!-- ======= About Us Section ======= -->
     <section id="about" class="about">
@@ -489,7 +490,7 @@
     </section><!-- End Departments Section -->
 
     <!-- ======= Testimonials Section ======= -->
-    <section id="testimonials" class="testimonials">
+    <section id="testimonials" class="testimonials" style="opacity:1; background-image: url({% static 'images/slide/slide-1.jpg' %})">
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">

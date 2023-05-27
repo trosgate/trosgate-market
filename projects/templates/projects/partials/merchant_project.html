@@ -1,0 +1,54 @@
+<h3 class="text-center">List of projects</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+
+            {% for project in projects %}
+            <tr>
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td class="text-left">
+                        <a href="{{project.get_project_absolute_url}}">{{project.title}}</a>
+                    </td>
+                    <td class="text-left">{{project.created_by.country|slice:60}}</td>
+                    <td class="text-center"> {{project.created_by.get_short_name|capfirst}}</td>
+                    <td class="text-center">{{project.created_at}}</td>
+                    <td class="text-center">
+                        {% if request.merchant == request.user %}
+                        <form>
+                            <input type="number" name="contact" value="{{proposal.pk}}" hidden>
+                            <button class="badge badge-danger"
+                                hx-post=''
+                                hx-target="#contact-list"
+                                hx-confirm="This action will remove proposal">
+                                <i class="fa fa-trash"> Remove </i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <button class="badge badge-secondary" disabled>
+                        <i class="fa fa-trash"> Delete </i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if not projects %}
+        <div class="text-center">
+            <span style="font-weight: bold;"> You donnot have any contact on the list</span>
+        </div>
+    {% endif %}
+</div>

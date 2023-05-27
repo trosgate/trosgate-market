@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
-{% include 'dashboard/main_header.html' %}
-<body class="wt-login" hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
+    {% include 'dashboard/main_header.html' %}
+    <body class="wt-login" hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
+    {% comment %} {% if not 'login' in request.path %} {% endcomment %}
     {% include 'dashboard/main_navbar.html' %}
+    {% comment %} {% endif %} {% endcomment %}
     {% if request.user.freelancer %}
 	{% if active_team.status == 'inactive' %}
     <div class="alert alert-warning alert-dismissible fade show text-center">
@@ -12,25 +13,25 @@
     {% endif %} 
     {% endif %} 
     <!-- Alert message Start -->
-
-    {% if request.user.is_authenticated %}
-    {% if messages %}
-        {% for message in messages %}        
-        <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                <span class="wt-jobalerts">
-                    <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
-                        <span> {{ message}} </span>
-                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
-                    </div>
-                </span>
+    
+    
+        {% if request.user.is_authenticated %}
+        {% if messages %}
+            {% for message in messages %}        
+            <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                    <span class="wt-jobalerts">
+                        <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                            <span> {{ message}} </span>
+                            <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+                        </div>
+                    </span>
+                </div>
             </div>
-        </div>
-        {% endfor %}
-    {% endif %}   
-    {% endif %}   
-     
-
+            {% endfor %}
+        {% endif %}   
+        {% endif %}   
+         
     {% block content %}
 
     {% endblock content %}

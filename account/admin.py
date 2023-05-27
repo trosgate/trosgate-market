@@ -59,7 +59,7 @@ class CustomerAdmin(BaseUserAdmin,):
     actions = ['refresh']
 
     list_display = ['id', 'get_short_name', 'email', 'is_superuser','user_type', 'is_active', 'last_login']
-    readonly_fields = ['date_joined', 'user_type', 'last_login']
+    readonly_fields = ['site', 'active_merchant_id', 'date_joined', 'user_type', 'last_login']
     list_display_links = ['get_short_name']
     list_filter = ['user_type', 'is_superuser', 'is_assistant','site']
     fieldsets = (
@@ -342,25 +342,53 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
 
 @admin.register(Merchant)
 class MerchantAdmin(admin.ModelAdmin):   
-    list_display = ['business_name', 'merchant', 'type', 'package', 'created_at']
-    radio_fields = {'type': admin.HORIZONTAL}    
+    list_display = ['site_logo_tag', 'business_name', 'merchant', 'type', 'package', 'created_at']
+    radio_fields = {
+        'type': admin.HORIZONTAL,
+        'category_type': admin.HORIZONTAL,
+        'banner_type': admin.HORIZONTAL,
+        'promo_type': admin.HORIZONTAL,
+    }    
     readonly_fields = [
-        'business_name', 'merchant', 'package', 'members', 'created_at', 'modified', 'tagline', 'description',
-        'profile_photo', 'image_tag', 'banner_photo',  'banner_tag','address','announcement', 
-        'company_logo', 'logo_tag', 'get_merchant','gender', 'get_site','gateways', 
+        'get_merchant', 'get_site', 'site_logo_tag', 'image_tag', 'banner_tag',
+        'merchant', 'package', 'members', 'created_at', 'modified', 'promo_image_tag',
+        # 'business_name', 'gender', 'tagline', 'description', 'address', 'announcement',
+        # 'gateways','banner_image',,'profile_photo'  
     ]
     # list_display_links = None  
     fieldsets = (
         ('Personal Information', {'fields': (
-            'business_name', 'get_merchant', 'type', 'gender', 'address',
+            'get_merchant', 'gender', 'profile_photo','image_tag', 
         )}),
-        ('Personal & Business Media', {'fields': (
-            'profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 
-            'company_logo', 'logo_tag',
+        ('Business Background', {'fields': (
+            'business_name', 'type', 'address','created_at', 'modified',
+            'site_Logo','site_logo_tag', 'banner_image','banner_tag', 
         )}),
-        ('Website and Content', {'fields': ('get_site', 'tagline', 'description','announcement',)}),
+        ('Website, Banner & Color Scheme', {'fields': (
+            'category_type', 'banner_type', 'title_block','subtitle_block','button_color', 'navbar_color',
+            'get_site', 'tagline', 'description','announcement','footer_description', 
+        )}),
+        ('Additional Hero Banner Contents', {'fields': (
+            'banner_color', 'banner_button_one_color', 'banner_button_two_color',
+        )}),
+        ('Additional Royal Banner Contents', {'fields': (
+            'video_title', 'video_description', 'video_url',
+        )}),
         ('Gateways and Staffs', {'fields': ('gateways', 'members',)}),
-        ('Activity Log', {'fields': ('created_at', 'modified',)}),
+        ('Payments Content', {'fields': ('gateway_title','show_gateways',)}),
+        ('Category Content', {'fields': ('category_title','category_subtitle',)}),
+        ('Proposal Content', {'fields': ('proposal_title','proposal_subtitle',)}),
+        ('Project Content', {'fields': ('project_title','project_subtitle',)}),
+
+        ('Promotion Content', {'fields': (
+            'promo_type', 'promo_title','promo_subtitle','promo_description',
+            'promo_image','promo_image_tag', 'brand_ambassador_image',
+        )}),
+        
+        ('Social Media', {'fields': (
+            'twitter_url', 'instagram_url', 'youtube_url', 'facebook_url',
+        )}),
+               
     )
 
     @admin.display(description='Merchant Types', ordering='merchant__user_type')
@@ -375,8 +403,10 @@ class MerchantAdmin(admin.ModelAdmin):
     def get_site(self, obj):
         return f"Domain: {obj.site.domain} - Name: {obj.site.name}"
 
-    # def has_add_permission(self, request):
-    #     return False
+    def has_add_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False

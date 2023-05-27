@@ -1,0 +1,26 @@
+{% load static %}
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+            <figure class="wt-mobileimg">
+                <img src="{% if website.promo_image %}{{website.promo_image.url}}{% else %}{% static 'images/work/img-03.jpg' %}{% endif %}" alt="img description">
+            </figure>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
+            <div class="wt-experienceholder">
+                <div class="wt-sectionhead">
+                    <div class="wt-sectiontitle">
+                        <h3>{% if website.promo_title %}{{website.promo_title}}{% endif %}</h3>
+                        <span>{% if website.promo_subtitle %}{{website.promo_subtitle}}{% endif %}</span>
+                    </div>
+                    <div class="wt-description">
+                        <p>{% if website.promo_description %}{{website.promo_description|linebreaksbr}}{% endif %}</p>
+                    </div>
+                    <div class="wt-btnarea">
+                        <a href="{% url 'pages:how_it_works' %}" class="wt-btn">How it Works</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

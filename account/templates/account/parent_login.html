@@ -13,11 +13,10 @@
     <br>
         <div class="container">
             <div class="row justify-content-md-center">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                <div class="col-md-6 float-center">
                     <div class="text-center">
-                        <h2>Restricted Access. Login</h2>
+                        <a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a><br><br>
                     </div>
-                     
                 
                     <form method="POST">{% csrf_token %}
                     {% if messages %}
@@ -35,12 +34,12 @@
                         {% endfor %}
                     {% endif %} 
                         <div class="text-center">
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-12 text-left">
                                 {{loginform.email.label}}
                                 {{loginform.email}}
                                 <span style="color:red;" role="alert">{{ loginform.email.errors}}</span>
                             </div>	
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-12 text-left">
                                 {{loginform.password.label}}
                                 {{loginform.password}}
                                 <span style="color:red;" role="alert">{{ loginform.password.errors}}</span>

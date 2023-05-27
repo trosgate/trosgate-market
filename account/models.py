@@ -15,7 +15,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
 from .import constant
 import datetime
-
+from general_settings.models import SettingsMaster
 
 
 class Country(models.Model):
@@ -196,7 +196,7 @@ class Package(models.Model):
         ordering = ['ordering']
 
 
-class Merchant(models.Model):
+class Merchant(SettingsMaster):
     # Merchant Type
     EXEMPT = 1 # For special accounts that require no subscription
     BETA = 2 # For beta users
@@ -230,7 +230,6 @@ class Merchant(models.Model):
     merchant = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant', on_delete=models.CASCADE)
     business_name = models.CharField(_("Business Name"), max_length=255)
     default_domain = models.CharField(_("Default Domain"), max_length=255)
-    site = models.OneToOneField(Site, on_delete=models.CASCADE)
     package = models.ForeignKey("account.Package", 
         verbose_name=_("Package"), 
         related_name="packages",
@@ -242,54 +241,19 @@ class Merchant(models.Model):
         related_name="packages"
     )
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Company Staff"), related_name="merchant_staff")    
-    gender = models.CharField(
-        _("Gender"), 
-        max_length=10, 
-        choices=GENDER
-    )
-    tagline = models.CharField(
-        _("Tagline"), 
-        max_length=100, 
-        blank=True
-    )
-    description = models.TextField(
-        _("Description"), 
-        max_length=2000, 
-        blank=True, 
-        error_messages={"name": {"max_length": _("A maximum of 2000 words required")}},
-    )
-    profile_photo = models.ImageField(
-        _("Profile Photo"), 
-        upload_to='client/', 
-        default='client/avatar5.png'
-    )
-    company_logo = models.ImageField(
-        _("Brand Logo"), 
-        upload_to='client/', 
-        default='client/logo.png'
-    )
-    banner_photo = models.ImageField(
-        _("Banner Photo"), 
-        upload_to='client/', 
-        default='client/banner.png'
-    )  
-    address = models.CharField(
-        _("Residence Address"), 
-        max_length=100, 
-        null=True, 
-        blank=True
-    )
-    announcement = models.TextField(
-        _("Announcement"), 
-        max_length=1000, 
-        null=True, 
-        blank=True
-    )
-    created_at = models.DateTimeField(_("Last Created"), auto_now_add=True)
-    modified = models.DateTimeField(_("Last Modified"), auto_now=True)
+    gender = models.CharField(_("Gender"), max_length=10, choices=GENDER)
+    profile_photo = models.ImageField(_("Profile Photo"), upload_to='client/', default='client/avatar5.png')
     
-    objects = models.Manager()
-    curr_merchant = CurrentSiteManager()
+    # Additional Customizations
+    show_gateways = models.BooleanField(_("Display Gateway"), default=True)
+    gateway_title = models.CharField(_("Gateway Title"), max_length=100, default="Collection and Payout Methods", null=True, blank=True)
+    proposal_title = models.CharField(_("Div Three Proposal Title"), max_length=100, default="Explore Proposals", null=True, blank=True)
+    proposal_subtitle = models.CharField(_("Div Three Proposal Subitle"), max_length=100, default="Verified Proposals", null=True, blank=True)
+    project_title = models.CharField(_("Div Five Project Title"), max_length=100, default="Published Jobs", null=True, blank=True)
+    project_subtitle = models.CharField(_("Div Five Project Subitle"), max_length=100, default="Apply and get Hired", null=True, blank=True)
+    category_title = models.CharField(_("Div Two Category Title"), max_length=100, default="Explore Categories", null=True, blank=True)
+    category_subtitle = models.CharField(_("Div Two Category Subitle"), max_length=100, default="Professional by categories", null=True, blank=True)
+            
 
     def __str__(self):
         return str(self.business_name)
@@ -300,30 +264,10 @@ class Merchant(models.Model):
         verbose_name_plural = "Merchants"
 
 
-    # # a url route for the profile detail page
-    # def merchant_profile_get_absolute_url(self):
-    #     return reverse('client:client_profile', args=([(self.user.short_name)]))
-    
-    # def modify_merchant_get_absolute_url(self):
-    #     return reverse('client:update_client_profile', args=([(self.user.short_name)]))
-
-    # profile image display in Admin
     def image_tag(self):
         return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.profile_photo))
     
     image_tag.short_description = 'profile_photo'
-
-    # banner image display in Admin
-    def banner_tag(self):
-        return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.banner_photo))
-
-    banner_tag.short_description = 'banner_photo'
-
-    # logo image display in Admin
-    def logo_tag(self):
-        return mark_safe('<img src="/media/%s" width="100" height="50" />' % (self.company_logo))
-
-    logo_tag.short_description = 'company_logo'
 
 
     @property

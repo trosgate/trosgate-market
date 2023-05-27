@@ -4,10 +4,11 @@ from . models import (
     Category, Department, Skill, Size, ProposalGuides,
     WebsiteSetting, AutoLogoutSystem, Currency, StorageBuckets
 )
+from django.contrib.sites.models import Site
+
 
 MAX_OBJECTS = 1
 MAX_GATEWAYS = 4
-
 
 
 @admin.register(StorageBuckets)
@@ -46,20 +47,39 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(WebsiteSetting)
 class WebsiteSettingAdmin(admin.ModelAdmin):
-    list_display = ['site_name', 'site_domain', 'tagline', 'site_logo_tag', ]
-    list_display_links = ['site_name', 'site_domain']
-    readonly_fields = ['site_logo_tag']
+    list_display = ['get_sitename', 'get_sitedomain', 'tagline', 'site_logo_tag', ]
+    list_display_links = ['get_sitename', 'get_sitedomain']
+    readonly_fields = ['site_logo_tag','site','promo_image_tag', ]
     list_per_page = sys.maxsize
     fieldsets = (
-        ('Site Description', {'fields': ('site_name', 'tagline', 'site_Logo',
-         'protocol', 'site_domain', 'site_description',)}), 
-        ('Color Scheme', {'fields': ('button_color', 'navbar_color',)}),
-        ('Social Media', {'fields': ('twitter_url', 'instagram_url', 'youtube_url', 'facebook_url',)}),
-        ('Advertisement', {'fields': ('brand_ambassador_image', 'ad_image',)}),
-    )
+        ('Site Description', {'fields': ('site', 'tagline', 'site_Logo','site_logo_tag',
+         'protocol', 'description',)}),
 
+        ('Banner Content', {'fields': ('banner_type', 'title_block','subtitle_block',)}),
+        ('Other Hero Banner Contents', {'fields': (
+            'banner_image', 'banner_color', 
+            'banner_button_one_color', 'banner_button_two_color',
+        )}),
+        ('Other Royal Banner Contents', {'fields': ('video_title', 'video_description', 'video_url',)}),
+        ('Color Scheme', {'fields': ('button_color', 'navbar_color',)}),
+
+        ('Promotion Content', {'fields': ('promo_type', 'promo_title','promo_subtitle','promo_description','promo_image', 'promo_image_tag', 'brand_ambassador_image',)}),
+        
+        ('Footer Content', {'fields': ('footer_description',)}),
+
+        ('Social Media', {'fields': ('twitter_url', 'instagram_url', 'youtube_url', 'facebook_url',)}),
+       
+    )
     radio_fields = {'protocol': admin.HORIZONTAL}
 
+    @admin.display(description='Site Name', ordering='site__name')
+    def get_sitename(self, obj):
+        return obj.site.name
+    
+    @admin.display(description='Site Domain', ordering='site__domain')
+    def get_sitedomain(self, obj):
+        return obj.site.domain
+    
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:
             return False

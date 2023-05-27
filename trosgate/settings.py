@@ -80,7 +80,8 @@ INSTALLED_APPS = [
     # 'corsheaders',
     'rest_framework',
     'django_celery_results',
-    'django_celery_beat'
+    'django_celery_beat',
+    # 'channels',
 ]
 
 
@@ -139,6 +140,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'trosgate.wsgi.application'
+ASGI_APPLICATION = 'trosgate.asgi.application'
 
 # SERVER/LOCAL SIDE
 # DATABASE_ROUTERS = ['account.router.MerchantRouter']

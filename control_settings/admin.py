@@ -4,44 +4,44 @@ from . models import (
     PaydayController, PaymentsController, DepositController, DepositSetting,
     HiringSetting, DiscountSettings,
     MailerSetting, TestMailSetting, SubscriptionSetting, ExchangeRateSetting,
-    LayoutSetting, GatewaySetting
+    GatewaySetting
 )
 
 MAX_OBJECTS = 1
 MAX_GATEWAYS = 7
 
 
-@admin.register(LayoutSetting)
-class LayoutSettingAdmin(admin.ModelAdmin):
-    list_display = ['title_block','subtitle_block']
-    list_display_links = ['title_block','subtitle_block']
-    fieldsets = (
-        ('Banner Content', {'fields': ('banner_type', 'title_block','subtitle_block',)}),
-        ('Other Royal Banner Contents', {'fields': ('video_title', 'video_description', 'video_url',)}),
-        ('Other Hero Banner Contents', {'fields': ('banner_image', 'banner_color', 'banner_button_one_color', 'banner_button_two_color',)}),
-        ('Payments Content', {'fields': ('gateway_title','show_gateways',)}),
-        ('Category Content', {'fields': ('category_title','category_subtitle',)}),
-        ('Proposal Content', {'fields': ('proposal_title','proposal_subtitle',)}),
-        ('Promotion Content', {'fields': ('promo_title','promo_subtitle','promo_description','promo_image')}),
-        ('Project Content', {'fields': ('project_title','project_subtitle',)}),
-        ('Footer Content', {'fields': ('footer_description',)}),
-    )
-    radio_fields = {'banner_type': admin.HORIZONTAL}
+# @admin.register(LayoutSetting)
+# class LayoutSettingAdmin(admin.ModelAdmin):
+#     list_display = ['title_block','subtitle_block']
+#     list_display_links = ['title_block','subtitle_block']
+#     fieldsets = (
+#         ('Banner Content', {'fields': ('banner_type', 'title_block','subtitle_block',)}),
+#         ('Other Royal Banner Contents', {'fields': ('video_title', 'video_description', 'video_url',)}),
+#         ('Other Hero Banner Contents', {'fields': ('banner_image', 'banner_color', 'banner_button_one_color', 'banner_button_two_color',)}),
+#         ('Payments Content', {'fields': ('gateway_title','show_gateways',)}),
+#         ('Category Content', {'fields': ('category_title','category_subtitle',)}),
+#         ('Proposal Content', {'fields': ('proposal_title','proposal_subtitle',)}),
+#         ('Promotion Content', {'fields': ('promo_title','promo_subtitle','promo_description','promo_image')}),
+#         ('Project Content', {'fields': ('project_title','project_subtitle',)}),
+#         ('Footer Content', {'fields': ('footer_description',)}),
+#     )
+#     radio_fields = {'banner_type': admin.HORIZONTAL}
 
-    def has_add_permission(self, request):
-        if self.model.objects.count() >= MAX_OBJECTS:
-            return False
-        return super().has_add_permission(request)
+#     def has_add_permission(self, request):
+#         if self.model.objects.count() >= MAX_OBJECTS:
+#             return False
+#         return super().has_add_permission(request)
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
 @admin.register(PaydayController)

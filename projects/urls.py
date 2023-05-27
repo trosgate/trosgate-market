@@ -8,6 +8,7 @@ app_name = 'projects'
 urlpatterns = [
     #Urls for project table
     path('', views.project_list, name='project_list'),
+    path('manage-projects', views.merchant_project, name='merchant_project'),
     path('create-project/', views.create_project, name='create_project'),
     path('active-projects/', views.active_project, name='active_project'),
     path('review-projects/', views.review_project, name='review_project'),

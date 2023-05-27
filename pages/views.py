@@ -37,7 +37,6 @@ from general_settings.fees_and_charges import (
 from payments.models import PaymentGateway
 from general_settings.models import Payday
 from teams.models import Package
-from control_settings.utilities import homepage_layout
 from analytics.analytic import (
     total_freelancers,
     total_clients,
@@ -65,7 +64,7 @@ def aboutus(request):
     context={
         "aboutpage":aboutpage,
         "investor_form":investor_form,
-        "home_layout":homepage_layout(),
+        "home_layout":request.site,
         "freelancers":total_freelancers(),
         "clients":total_clients(),
         "teams":total_teams(),
@@ -84,7 +83,7 @@ def aboutus(request):
 def terms_and_conditions(request):
     termsandcond = TermsAndConditions.objects.filter(is_published = True)
     context={
-        "home_layout":homepage_layout(),
+        "home_layout":request.site,
         "termsandcond":termsandcond
     }
     return render(request, "pages/terms_and_conditions.html", context)
@@ -157,7 +156,7 @@ def how_it_works(request):
     l4_application_net_earning = round(l4_disc_sales_price - get_application_fee_calculator(l4_disc_sales_price))
 
     context ={
-        "home_layout":homepage_layout(), 
+        "home_layout":request.site, 
         "hiring":hiring, 
         'freelancing':freelancing, 
         'gateways':gateways, 

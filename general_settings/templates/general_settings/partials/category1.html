@@ -1,0 +1,36 @@
+{% load static %}
+<div class="wt-haslayout">
+    <div class="wt-main-section">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                    <div class="wt-sectionhead wt-textcenter">
+                        <div class="wt-sectiontitle">
+                            <h2>{% if website.category_title %}{{website.category_title}}{% endif %}</h2>
+                            <span>{% if website.category_subtitle %}{{website.category_subtitle}}{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                    <div class="wt-categoryexpl">
+                    {% for category in categories %}
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 float-left">
+                            <div class="wt-categorycontent">
+                                <figure><img src="{{category.icon.url}}" alt="image description"></figure>
+                                <div class="wt-cattitle">
+                                    <h3><a href="javascrip:void(0);">{{category.name}}</a></h3>
+                                    <span>Items: <em style="color:green;">{{category.proposal_count}}</em></span>
+                                </div>
+                                <div class="wt-categoryslidup">
+                                    <p>{{category.preview}}.</p>
+                                    <a href="{{category.category_absolute_url}}">Explore <i class="fa fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Categories End-->

@@ -1,0 +1,26 @@
+{% load static %}
+<header class="bg-red py-5" style="background-color:{% firstof website.banner_color purple %};">
+    <div class="container px-5">
+        <div class="row gx-5 align-items-center justify-content-center">
+            <div class="col-lg-8 col-xl-7 col-xxl-6">
+                <div class="my-5 text-center text-xl-start">
+                    <h1 class="display-5 fw-bolder text-white mb-2">{% if website.title_block %}{{website.title_block}} {% endif %}</h1>
+                    <p class="lead fw-normal text-white-50 mb-4" style="color:white;">{% if website.subtitle_block %}{{website.subtitle_block}} {% endif %}.</p>
+                    <h3 style="color:white">in {% if pypist %}<span class="autoTyper" style="color:yellow;"></span>{% endif %}</h3>
+                    <form class="wt-formtheme wt-formbanner">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                {{searchform.search_type}}
+                            </div>
+                        <fieldset>
+                    </form><br>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
+                        <a class="btn btn-{% firstof website.banner_button_one_color blue %} btn-lg px-4 me-sm-3 text-white" href="{% url 'account:login' %}" style="margin:5px;">Get Started</a>
+                        <a class="btn btn-outline-{% firstof website.banner_button_two_color blue %} btn-lg px-4" href="{% url 'pages:how_it_works' %}" style="margin:2px;">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center"><img class="img-fluid rounded-3 my-5" src="{% if website.banner_image %}{{website.banner_image.url}}{% endif %}" alt="Hero banner"/></div>
+        </div>
+    </div>
+</header>

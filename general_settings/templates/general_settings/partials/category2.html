@@ -1,0 +1,29 @@
+{% load static %}
+<!-- ======= Services Section ======= -->
+<div id="services" class="services services">
+    {% comment %} style="background-color:#3fbbc0;" {% endcomment %}
+    <div class="container" data-aos="fade-up">
+
+    <div class="section-title">
+        <div class="text-center">
+            <div style="margin-top:30px;">
+                <h2>{% if website.category_title %}{{website.category_title}}{% endif %}</h2>
+                <span>{% if website.category_subtitle %}{{website.category_subtitle}}{% endif %}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-lg-3 col-md-6 icon-box" data-aos="zoom-in" data-aos-delay="100">
+            <div class="icon">
+                <img src="{{category.icon.url}}" alt="image description">
+            </div>
+            <h4 class="title"><a href="{{category.category_absolute_url}}">{{category.name}}</a></h4>
+        </div>
+        {% endfor %}
+    </div>
+
+    </div>
+</div>
+<!-- End Services Section -->

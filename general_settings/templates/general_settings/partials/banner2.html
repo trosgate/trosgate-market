@@ -1,0 +1,47 @@
+{% load static %}
+<div class="wt-haslayout wt-bannerholder">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-5">
+                <div class="wt-bannerimages">
+                    <figure class="wt-bannermanimg" data-tilt>
+                        <img src="{% static 'images/bannerimg/img-01.png' %}" alt="img description">
+                        <img src="{% static 'images/bannerimg/img-02.png' %}" class="wt-bannermanimgone" alt="img description">
+                        <img src="{% static 'images/bannerimg/img-03.png' %}" class="wt-bannermanimgtwo" alt="img description"> 
+                    </figure>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-7">
+                <div class="wt-bannercontent">
+                    <div class="wt-bannerhead">
+                        <div class="wt-title">
+                            <h2 style="color:white">{% if website.title_block %}{{website.title_block}}{% endif %}</h2>
+                            <h2 style="color:white">in {% if pypist %}<span class="autoTyper" style="color: yellow;"></span>{% endif %}</h2>
+                        </div>
+                        <div class="wt-description">
+                            <p>{% if website.subtitle_block %}{{website.subtitle_block}}{% endif %}.</p>
+                        </div>
+                    </div>
+                    <form class="wt-formtheme wt-formbanner">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                {{searchform.search_type}}
+                            </div>
+                        <fieldset>
+                    </form>
+                    {% if website.video_url or website.embed_video %}
+                    <div class="wt-videoholder">
+                        <div class="wt-videoshow">
+                            <a data-rel="prettyPhoto[video]" href="{% if website.video_url %}{{website.video_url}}{% endif %}"><i class="fa fa-play"></i></a>
+                        </div>
+                        <div class="wt-videocontent">
+                            <span>{% if website.video_title %}{{website.video_title}}{% endif %}<em>How it works &amp; {% if website.video_description %}{{website.video_description}} {% endif %}.</em></span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

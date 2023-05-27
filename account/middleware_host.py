@@ -1,9 +1,8 @@
 from django.contrib.sites.models import Site
 from django.conf import settings
 from account.models import Merchant
-from django.http import HttpResponseForbidden
-from django.db import connections
-from django.db.utils import OperationalError
+from django.http import HttpResponseForbidden, HttpResponseNotFound
+
 
 
 
@@ -19,8 +18,8 @@ class DynamicHostMiddleware:
         if domain.startswith('www.'):
             domain = domain[4:]
 
-        if not domain in settings.ALLOWED_HOSTS:
-            return HttpResponseForbidden()
+        if domain not in settings.ALLOWED_HOSTS:
+            return HttpResponseNotFound()
         
         try:
             # Look up the Site object for the requested domain

@@ -3,7 +3,9 @@
 
 {% include 'dashboard/main_header1.html' %}
 <body hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
+    {% if not 'login' in request.path %}
     {% include 'dashboard/main_navbar1.html' %}
+    {% endif %}
     {% if request.user.freelancer %}
 	{% if active_team.status == 'inactive' %}
     <div class="alert alert-warning alert-dismissible fade show text-center">
@@ -13,6 +15,8 @@
     {% endif %} 
     <!-- Alert message Start -->
 
+    
+    
     {% if request.user.is_authenticated %}
     {% if messages %}
         {% for message in messages %}        
@@ -29,8 +33,6 @@
         {% endfor %}
     {% endif %}  
     {% endif %}  
-
-
     {% block content1 %}
 
     {% endblock content1 %}

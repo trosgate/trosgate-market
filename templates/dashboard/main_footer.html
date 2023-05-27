@@ -9,7 +9,7 @@
 								<div class="wt-footerlogohold">
 									<strong class="wt-logo"><a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a></strong>
 									<div class="wt-description">
-										<p>{% if home_layout.footer_description %}{{home_layout.footer_description}}{% endif %}</a></p>
+										<p>{% if website.footer_description %}{{website.footer_description}}{% endif %}</a></p>
 									</div>
 									<ul class="wt-socialiconssimple wt-socialiconfooter">
 										{% if website.facebook_url %}

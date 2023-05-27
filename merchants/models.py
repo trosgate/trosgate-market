@@ -19,12 +19,26 @@ import uuid
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
         site = Site.objects.get_current()
-        curr_merchant = Merchant.objects.filter(site=site).first()
-
-        if curr_merchant is None:
+        curr_merchant = Merchant.objects.filter(site=site).exists()
+        # print(curr_merchant
+        # print(self.merchant_id)
+        if not curr_merchant:
             return super().get_queryset()
         else:
             return super().get_queryset().filter(merchant__site=site.id)
+
+    # def get_queryset(self):
+    #     site = Site.objects.get_current()
+    #     curr_merchant = Merchant.objects.filter(site=site).first()
+    #     print('site.merchant ::', site)
+    #     print('curr_merchant ::', curr_merchant)
+
+    #     if curr_merchant:
+    #         return super().get_queryset().filter(merchant=site.id) # Merchant case
+    #     else:
+    #         return super().get_queryset().filter(merchant__site=site.id) # Merchant User case
+    
+
 
 
 class UnscopedManager(models.Manager):
@@ -47,6 +61,7 @@ class MerchantMaster(models.Model):
         if not self.merchant_id:
             self.merchant_id = merchant.id
         super().save(*args, **kwargs)
+
 
 
 class MerchantProduct(MerchantMaster):
@@ -96,7 +111,7 @@ class MerchantProduct(MerchantMaster):
         (ARCHIVE, _("Archived")),
     )
     id = models.AutoField(primary_key=True),
-    identifier = models.URLField(editable=True, default=uuid.uuid4, verbose_name='Identifier')    
+    identifier = models.URLField(editable=False, unique=True, default=uuid.uuid4, verbose_name='Identifier')    
     title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
     category = models.ForeignKey('general_settings.Category', verbose_name=_("Category"), on_delete=models.RESTRICT, max_length=250)
     slug = models.SlugField(_("Slug"), max_length=255, unique=True)
