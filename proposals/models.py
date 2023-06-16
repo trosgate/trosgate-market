@@ -53,10 +53,10 @@ class Proposal(MerchantProduct):
 
     image_tag.short_description = 'thumbnail'
 
-    # absolute url for tender detail page
+    # absolute url for proposal detail page
     def proposal_absolute_url(self):
         return reverse('proposals:proposal_preview', kwargs={'short_name': self.created_by.short_name, 'proposal_slug':self.slug})
-
+    
     def tracking_time(self):
         return sum(tracker.minutes for tracker in self.trackings.all())
 
@@ -74,10 +74,7 @@ class Proposal(MerchantProduct):
     def preview_proposal_sales_count(self):
         return self.proposalhired.filter(purchase__status='success').count()
     
-    @property
-    def preview_oneclick_sales_count(self):
-        return self.oneclickproposal.filter(status='success').count()
-    
+
     @property
     def preview_contract_sales_count(self):
         new_contract = 0
@@ -86,9 +83,10 @@ class Proposal(MerchantProduct):
             new_contract = contract.contracthired.filter(purchase__status='success').count()
         return new_contract
 
+
     @property
     def aggregated_sales_count(self):
-        return (self.preview_proposal_sales_count + self.preview_oneclick_sales_count + self.preview_contract_sales_count)
+        return (self.preview_proposal_sales_count + self.preview_contract_sales_count)
 
 
 class ProposalSupport(Proposal):

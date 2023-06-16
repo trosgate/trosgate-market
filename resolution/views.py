@@ -20,20 +20,16 @@ from . forms import (
     ApplicationCancellationForm,
     ProposalCancellationForm,
     ContractCancellationForm,
-    OneClickCancellationForm
 )
 from transactions.models import (
-    OneClickPurchase,
     Purchase, 
     ProposalSale, 
     ContractSale,
     ApplicationSale 
 )
 from . models import (
-    OneClickResolution,
     ProjectResolution,
     ProposalResolution,
-    OneClickReview, 
     ApplicationReview,
     ProposalReview,
     ContractResolution,
@@ -41,7 +37,6 @@ from . models import (
     ApplicationCancellation,
     ProposalCancellation,
     ContractCancellation,
-    OneClickCancellation,
     ContractCompletionFiles,
     ProjectCompletionFiles, 
     ProposalCompletionFiles 
@@ -61,8 +56,6 @@ def application_manager(request, application_id, project_slug):
     cancellation_form = ApplicationCancellationForm(request.POST or None)
         
     if request.user.user_type == Customer.FREELANCER:
-        if request.user != application.team.created_by:
-            return redirect('transactions:one_click_transaction')
 
         project_resolution = ProjectResolution.objects.filter(
             application=application, 
@@ -78,9 +71,7 @@ def application_manager(request, application_id, project_slug):
             completed_file.application = resolution
             completed_file.save()
 
-    elif request.user.user_type == Customer.CLIENT:
-        if request.user != application.purchase.client:
-            return redirect('transactions:one_click_transaction')        
+    elif request.user.user_type == Customer.CLIENT:       
         
         project_resolution = ProjectResolution.objects.filter(application=application, application__purchase__client = request.user)
         if project_resolution.count() > 0:
@@ -226,8 +217,6 @@ def proposal_manager(request, proposalsale_id, proposal_slug):
     completion_form = ProposalCompletionForm(request.POST, request.FILES)
     cancellation_form = ProposalCancellationForm(request.POST or None)
     if request.user.user_type == Customer.FREELANCER:
-        if request.user != proposal_sold.team.created_by:
-            return redirect('transactions:proposal_transaction') 
 
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
         proposal_resolution = ProposalResolution.objects.filter(
@@ -240,9 +229,7 @@ def proposal_manager(request, proposalsale_id, proposal_slug):
             duration_end_time = resolution.end_time
 
     elif request.user.user_type == Customer.CLIENT:
-        if request.user != proposal_sold.purchase.client:
-            return redirect('transactions:proposal_transaction')        
-        
+
         proposal_resolution = ProposalResolution.objects.filter(proposal_sale=proposal_sold, proposal_sale__purchase__client = request.user)
         if proposal_resolution.count() > 0:
             resolution = proposal_resolution.first()
@@ -379,7 +366,7 @@ def confirm_proposal_cancel(request):
 
 @login_required
 def contract_manager(request, contractsale_id, contract_slug):
-    resolution = ''
+    resolution = None
     duration_end_time = ''
     cancellation_message = None
     contract_sold = get_object_or_404(ContractSale, pk=contractsale_id, contract__slug=contract_slug)
@@ -387,13 +374,10 @@ def contract_manager(request, contractsale_id, contract_slug):
     completion_form = ContractCompletionForm(request.POST or None, request.FILES or None)
     cancellation_form = ContractCancellationForm(request.POST or None)
     if request.user.user_type == Customer.FREELANCER:
-        if request.user != contract_sold.team.created_by:
-            return redirect('transactions:contract_transaction') 
-
+        
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
         contract_resolution = ContractResolution.objects.filter(
-            contract_sale__pk=contract_sold.id, 
-            contract_sale__team = team, 
+            contract_sale__pk=contract_sold.id,
             team=team
         )
         if contract_resolution.count() > 0:
@@ -401,8 +385,6 @@ def contract_manager(request, contractsale_id, contract_slug):
             duration_end_time = resolution.end_time
 
     elif request.user.user_type == Customer.CLIENT:
-        if request.user != contract_sold.purchase.client:
-            return redirect('transactions:contract_transaction')        
         
         contract_resolution = ContractResolution.objects.filter(contract_sale=contract_sold, contract_sale__purchase__client = request.user)
         if contract_resolution.count() > 0:
@@ -534,159 +516,159 @@ def confirm_internal_contract(request):
         return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
 
 
-@login_required
-def oneclick_manager(request, purchase_pk, reference):
-    resolution = None
-    duration_end_time = ''
-    oneclick_resolution=None
-    cancellation_message = None
+# @login_required
+# def oneclick_manager(request, purchase_pk, reference):
+#     resolution = None
+#     duration_end_time = ''
+#     oneclick_resolution=None
+#     cancellation_message = None
 
-    oneclick_sold = get_object_or_404(OneClickPurchase, pk=purchase_pk, reference=reference)
+#     oneclick_sold = get_object_or_404(OneClickPurchase, pk=purchase_pk, reference=reference)
 
-    client_review = OneClickReview.objects.filter(resolution__oneclick_sale=oneclick_sold)
-    # completion_form = OneClickCompletionForm(request.POST or None, request.FILES or None)
-    cancellation_form = OneClickCancellationForm(request.POST or None)
-    if request.user.user_type == Customer.FREELANCER:
-        if request.user != oneclick_sold.team.created_by:
-            return redirect('transactions:one_click_transaction')
+#     client_review = OneClickReview.objects.filter(resolution__oneclick_sale=oneclick_sold)
+#     # completion_form = OneClickCompletionForm(request.POST or None, request.FILES or None)
+#     cancellation_form = OneClickCancellationForm(request.POST or None)
+#     if request.user.user_type == Customer.FREELANCER:
+#         if request.user != oneclick_sold.team.created_by:
+#             return redirect('transactions:one_click_transaction')
 
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
-        oneclick_resolution = OneClickResolution.objects.filter(oneclick_sale=oneclick_sold, oneclick_sale__team=team)
-        if oneclick_resolution.count() > 0:
-            resolution = oneclick_resolution.first()
-            duration_end_time = resolution.end_time
-
-
-    elif request.user.user_type == Customer.CLIENT:
-        if request.user != oneclick_sold.client:
-            return redirect('transactions:one_click_transaction')
-
-        oneclick_resolution = OneClickResolution.objects.filter(oneclick_sale=oneclick_sold, oneclick_sale__client=request.user)
-        if oneclick_resolution.count() > 0:
-            resolution = oneclick_resolution.first()
-            duration_end_time = resolution.end_time
-
-    cancel_message = OneClickCancellation.objects.filter(resolution=resolution)
-    if cancel_message.count() > 0:
-        cancellation_message = cancel_message.first()
-
-    context = {
-        "oneclick_sold": oneclick_sold,
-        "resolution": resolution,
-        # "completion_form": completion_form,
-        "cancellation_form": cancellation_form,
-        "cancellation_message": cancellation_message,        
-        "client_review": client_review,
-        "duration_end_time": duration_end_time,
-        "currency": get_base_currency_code,
-    }
-    return render(request, "resolution/oneclick_resolution.html", context)
+#         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+#         oneclick_resolution = OneClickResolution.objects.filter(oneclick_sale=oneclick_sold, oneclick_sale__team=team)
+#         if oneclick_resolution.count() > 0:
+#             resolution = oneclick_resolution.first()
+#             duration_end_time = resolution.end_time
 
 
-@login_required
-@user_is_freelancer
-def oneclick_start_work(request):
-    if request.POST.get('action') == 'start-work':
-        oneclick_id = int(request.POST.get('oneclickId'))
+#     elif request.user.user_type == Customer.CLIENT:
+#         if request.user != oneclick_sold.client:
+#             return redirect('transactions:one_click_transaction')
 
-        oneclick_sale = get_object_or_404(OneClickPurchase, pk=oneclick_id, team__created_by=request.user, status = OneClickPurchase.SUCCESS)
-        if OneClickResolution.objects.filter(oneclick_sale=oneclick_sale, team=oneclick_sale.team).exists():
-            print('%s' % (str('Oneclick task already started'))) 
-            pass
-        else:
-            try:
-                OneClickResolution.start_oneclick(oneclick_sale=oneclick_sale,team=oneclick_sale.team)
-            except Exception as e:
-                print('%s' % (str(e)))            
-        response = JsonResponse({'message': 'work started'})
-        return response
+#         oneclick_resolution = OneClickResolution.objects.filter(oneclick_sale=oneclick_sold, oneclick_sale__client=request.user)
+#         if oneclick_resolution.count() > 0:
+#             resolution = oneclick_resolution.first()
+#             duration_end_time = resolution.end_time
 
+#     cancel_message = OneClickCancellation.objects.filter(resolution=resolution)
+#     if cancel_message.count() > 0:
+#         cancellation_message = cancel_message.first()
 
-login_required
-@user_is_client
-def oneclick_review(request):
-    success_or_error_message = ''
-    error_messages = ''
-    reviews=''
-    resolution=''
-    if request.POST.get('action') == 'oneclick-review':
-        oneclick_id = int(request.POST.get('oneclickId'))
-        rating = int(request.POST.get('rating'))
-        title = str(request.POST.get('title'))
-        message = str(request.POST.get('message'))
-
-        oneclick_sale = get_object_or_404(OneClickPurchase, pk=oneclick_id, client=request.user, status = OneClickPurchase.SUCCESS)
-        resolution = get_object_or_404(OneClickResolution, oneclick_sale=oneclick_sale, team=oneclick_sale.team)
-
-        reviews = OneClickReview.objects.filter(resolution=resolution, status=True)
-        if reviews.count() > 0:
-            review = reviews.first()
-            review.resolution = resolution
-            review.title = title
-            review.message = message
-            review.rating = rating
-            review.status = True
-            review.save()
-            success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review modified Successfully</span>'
-        else:
-            try:
-                OneClickResolution.review_and_approve(
-                    resolution_pk=resolution.pk, 
-                    team=oneclick_sale.team, 
-                    title=title, 
-                    message=message, 
-                    rating=rating
-                )
-                success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review received Successfully</span>'
-            except Exception as e:
-                error_messages = str(e)
-                success_or_error_message = f'<span id="reviewerror-message" style="color:red;"> {error_messages}</span>'
-
-            response = JsonResponse({'success_or_error_message': success_or_error_message})
-            return response
+#     context = {
+#         "oneclick_sold": oneclick_sold,
+#         "resolution": resolution,
+#         # "completion_form": completion_form,
+#         "cancellation_form": cancellation_form,
+#         "cancellation_message": cancellation_message,        
+#         "client_review": client_review,
+#         "duration_end_time": duration_end_time,
+#         "currency": get_base_currency_code,
+#     }
+#     return render(request, "resolution/oneclick_resolution.html", context)
 
 
-@login_required
-@user_is_client
-def oneclick_cancelled(request):
-    resolution_id = request.POST.get('resolution')
-    cancel_type = request.POST.get('cancel_type', '')
-    message = request.POST.get('message', '')
-    cancellation_message = None
-    resolution = get_object_or_404(OneClickResolution, pk=resolution_id, status = 'ongoing', oneclick_sale__client = request.user)
+# @login_required
+# @user_is_freelancer
+# def oneclick_start_work(request):
+#     if request.POST.get('action') == 'start-work':
+#         oneclick_id = int(request.POST.get('oneclickId'))
+
+#         oneclick_sale = get_object_or_404(OneClickPurchase, pk=oneclick_id, team__created_by=request.user, status = OneClickPurchase.SUCCESS)
+#         if OneClickResolution.objects.filter(oneclick_sale=oneclick_sale, team=oneclick_sale.team).exists():
+#             print('%s' % (str('Oneclick task already started'))) 
+#             pass
+#         else:
+#             try:
+#                 OneClickResolution.start_oneclick(oneclick_sale=oneclick_sale,team=oneclick_sale.team)
+#             except Exception as e:
+#                 print('%s' % (str(e)))            
+#         response = JsonResponse({'message': 'work started'})
+#         return response
+
+
+# login_required
+# @user_is_client
+# def oneclick_review(request):
+#     success_or_error_message = ''
+#     error_messages = ''
+#     reviews=''
+#     resolution=''
+#     if request.POST.get('action') == 'oneclick-review':
+#         oneclick_id = int(request.POST.get('oneclickId'))
+#         rating = int(request.POST.get('rating'))
+#         title = str(request.POST.get('title'))
+#         message = str(request.POST.get('message'))
+
+#         oneclick_sale = get_object_or_404(OneClickPurchase, pk=oneclick_id, client=request.user, status = OneClickPurchase.SUCCESS)
+#         resolution = get_object_or_404(OneClickResolution, oneclick_sale=oneclick_sale, team=oneclick_sale.team)
+
+#         reviews = OneClickReview.objects.filter(resolution=resolution, status=True)
+#         if reviews.count() > 0:
+#             review = reviews.first()
+#             review.resolution = resolution
+#             review.title = title
+#             review.message = message
+#             review.rating = rating
+#             review.status = True
+#             review.save()
+#             success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review modified Successfully</span>'
+#         else:
+#             try:
+#                 OneClickResolution.review_and_approve(
+#                     resolution_pk=resolution.pk, 
+#                     team=oneclick_sale.team, 
+#                     title=title, 
+#                     message=message, 
+#                     rating=rating
+#                 )
+#                 success_or_error_message = f'<span id="reviewerror-message" style="color:green;"> Review received Successfully</span>'
+#             except Exception as e:
+#                 error_messages = str(e)
+#                 success_or_error_message = f'<span id="reviewerror-message" style="color:red;"> {error_messages}</span>'
+
+#             response = JsonResponse({'success_or_error_message': success_or_error_message})
+#             return response
+
+
+# @login_required
+# @user_is_client
+# def oneclick_cancelled(request):
+#     resolution_id = request.POST.get('resolution')
+#     cancel_type = request.POST.get('cancel_type', '')
+#     message = request.POST.get('message', '')
+#     cancellation_message = None
+#     resolution = get_object_or_404(OneClickResolution, pk=resolution_id, status = 'ongoing', oneclick_sale__client = request.user)
     
-    message_length = len(message) <= 500
-    if cancel_type != '' and message != '' and message_length:
-        if OneClickCancellation.objects.filter(resolution=resolution).exists():
-            pass
-        else:
-            try:
-                OneClickResolution.cancel_oneclick(
-                    resolution=resolution.id, cancel_type=cancel_type,message=message
-                )
-            except Exception as e:
-                print(str(e))
+#     message_length = len(message) <= 500
+#     if cancel_type != '' and message != '' and message_length:
+#         if OneClickCancellation.objects.filter(resolution=resolution).exists():
+#             pass
+#         else:
+#             try:
+#                 OneClickResolution.cancel_oneclick(
+#                     resolution=resolution.id, cancel_type=cancel_type,message=message
+#                 )
+#             except Exception as e:
+#                 print(str(e))
 
-    cancel_message = OneClickCancellation.objects.filter(resolution=resolution, status = 'initiated')
-    if cancel_message.count() > 0:
-        cancellation_message = cancel_message.first()    
-    context = {
-        'cancellation_message':cancellation_message
-    }       
-    return render(request, 'resolution/component/oneclick_cancelled.html', context)
+#     cancel_message = OneClickCancellation.objects.filter(resolution=resolution, status = 'initiated')
+#     if cancel_message.count() > 0:
+#         cancellation_message = cancel_message.first()    
+#     context = {
+#         'cancellation_message':cancellation_message
+#     }       
+#     return render(request, 'resolution/component/oneclick_cancelled.html', context)
 
 
-@login_required
-@user_is_freelancer
-def confirm_oneclick_contract(request):
-    resolution_id = request.POST.get('confirmcanceloneclick')
-    resolution = get_object_or_404(OneClickResolution, pk=resolution_id, oneclick_sale__team__created_by = request.user)    
-    try:
-        OneClickResolution.approve_and_cancel_oneclick(resolution=resolution.id)
-        return HttpResponse("<div style='color:green;'> Successfully approved cancellation request </div>")
-    except Exception as e:
-        errors = (str(e))
-        return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
+# @login_required
+# @user_is_freelancer
+# def confirm_oneclick_contract(request):
+#     resolution_id = request.POST.get('confirmcanceloneclick')
+#     resolution = get_object_or_404(OneClickResolution, pk=resolution_id, oneclick_sale__team__created_by = request.user)    
+#     try:
+#         OneClickResolution.approve_and_cancel_oneclick(resolution=resolution.id)
+#         return HttpResponse("<div style='color:green;'> Successfully approved cancellation request </div>")
+#     except Exception as e:
+#         errors = (str(e))
+#         return HttpResponse(f"<div style='color:red;'> {errors} </div>")    
 
 
 @login_required

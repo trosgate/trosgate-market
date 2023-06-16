@@ -1,16 +1,10 @@
-from datetime import datetime
 from django.db import models
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from ckeditor.fields import RichTextField
-from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.utils import timezone
-from uuid import uuid4
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.template.defaultfilters import slugify
-from datetime import datetime, timezone, timedelta
-from teams.utilities import create_random_code
 from django.template.defaultfilters import truncatechars
 
 
@@ -42,12 +36,12 @@ class Application(models.Model):
     # Application Status
     PENDING = 'pending'
     ACCEPTED = 'accepted'
-    REJECTED = 'rejected'
+    REJECTED = 'closed'
     APPLICATION_STATUS = (
         (PENDING, _('Pending')),
         (ACCEPTED, _('Approved')),
-        (REJECTED, _('Rejected')),
-    ) 
+        (REJECTED, _('Closed')),
+    )
     team = models.ForeignKey('teams.Team', verbose_name=_("Applicant Team"), related_name="applications", on_delete=models.CASCADE, max_length=250)
     project = models.ForeignKey('projects.Project', verbose_name=_("Project"), related_name="applications", on_delete=models.CASCADE)
     message = models.TextField(_("Message"), max_length=2000, null=True, blank=True)
@@ -56,7 +50,8 @@ class Application(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     applied_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Applicant"),  related_name="applicants", on_delete=models.CASCADE)
     status = models.CharField(_("Status"), max_length=20, choices=APPLICATION_STATUS, default=PENDING)
- 
+    accept = models.BooleanField(default=False)
+
     def __str__(self):
         return f'{self.project.title}'
 

@@ -22,11 +22,12 @@
 			<div class="container">
 				<div class="row justify-content-md-center">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
-							<div class="wt-dashboardbox">
-								<div class="wt-dashboardboxtitle">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxtitle">
 								<div class="wt-dashboardboxtitle">
 									<h2>Post a Project</h2>
 								</div>
+								<form method="POST" enctype="multipart/form-data" autocomplete="off">
 								<div class="wt-dashboardboxcontent">
 									{% if projectform.errors %}
 									
@@ -40,81 +41,78 @@
 										<div class="wt-tabscontenttitle">
 											<h2>Project Description</h2>
 										</div>
-										<form method="POST" enctype="multipart/form-data" autocomplete="off">
 											{% csrf_token %}
-												<div class="form-group">
-													{{projectform.title.label}}
-													{{projectform.title}}
-													<span style="color:red;" role="alert">{{ projectform.title.errors}}</span>
-													
-												</div>	
+											<div class="form-group">
+												{{projectform.title.label}}
+												{{projectform.title}}
+												<span style="color:red;" role="alert">{{ projectform.title.errors}}</span>
+											</div>	
 
-												<div class="form-group">																																		
-													{{projectform.category.label}}
-													{{projectform.category}}
-													<span style="color:red;" role="alert">{{ projectform.category.errors}}</span>
-												</div>	
-
-												<div class="form-group">
-													{{projectform.preview.label}}
-													{{projectform.preview}}
-													<span style="color:red;" role="alert">{{ projectform.preview.errors}}</span>
-												</div>
-												
-												<div class="form-group form-group-half">
-													{{projectform.completion_time.label}}
-													{{projectform.completion_time}}
-													<span style="color:red;" role="alert">{{ projectform.completion_time.errors}}</span>
-												</div>
-												<div class="form-group form-group-half">																																														
-													{{projectform.service_level.label}}
-													{{projectform.service_level}}
-													<span style="color:red;" role="alert">{{ projectform.service_level.errors}}</span>
-												</div>	
-												
-												<div class="form-group form-group-half">
-													{{projectform.dura_converter.label}} in
-													{{projectform.dura_converter}}
-													<span style="color:red;" role="alert">{{ projectform.dura_converter.errors}}</span>
-												</div>									
-
-												<div class="form-group form-group-half">
-													{{projectform.rating.label}}
-													{{projectform.rating}}
-													<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>			
-												</div>	
-
-												<div class="form-group">
-													{{projectform.salary.label}}
-													{{projectform.salary}}
-													<span style="color:red;" role="alert">{{ projectform.salary.errors}}</span>			
-												</div>
+											<div class="form-group">
+												{{projectform.preview.label}}
+												{{projectform.preview}}
+												<span style="color:red;" role="alert">{{ projectform.preview.errors}}</span>
 											</div>
-											<div class="wt-jobdetails wt-tabsinfo">
-												<div class="wt-tabscontenttitle">
-													<h2>Project Details</h2>
-												</div>
-												<div class="form-group">
-													{{projectform.media|safe}}
-													{{projectform.description}}
-													<span style="color:red;" role="alert">{{ projectform.description.errors}}</span>
-												</div>																	
-												<div class="form-group">
-													<italics> {{projectform.sample_link.label}}</italics>
-													{{projectform.sample_link}}	
-													<span style="color:red;" role="alert">{{ projectform.sample_link.errors}}</span>														
-												</div>																						
-
-											<div class="wt-jobskills wt-tabsinfo">
-												<div class="wt-tabscontenttitle">
-													<h2>Specialties Required</h2>
-												</div>
-												<div class="form-group">
-													{{projectform.skill.label}}
-													{{ projectform.skill}}
-													<span style="color:red;" role="alert">{{ projectform.skill.errors}}</span>
-												</div>
+											
+											<div class="form-group form-group-half">																																		
+												{{projectform.category.label}}
+												{{projectform.category}}
+												<span style="color:red;" role="alert">{{ projectform.category.errors}}</span>
 											</div>
+											<div class="form-group form-group-half">
+												{{projectform.salary.label}}
+												{{projectform.salary}}
+												<span style="color:red;" role="alert">{{ projectform.salary.errors}}</span>			
+											</div>	
+											<div class="form-group form-group-half">
+												{{projectform.completion_time.label}}
+												{{projectform.completion_time}}
+												<span style="color:red;" role="alert">{{ projectform.completion_time.errors}}</span>
+											</div>
+											<div class="form-group form-group-half">																																														
+												{{projectform.service_level.label}}
+												{{projectform.service_level}}
+												<span style="color:red;" role="alert">{{ projectform.service_level.errors}}</span>
+											</div>	
+											
+											<div class="form-group form-group-half">
+												{{projectform.dura_converter.label}} in
+												{{projectform.dura_converter}}
+												<span style="color:red;" role="alert">{{ projectform.dura_converter.errors}}</span>
+											</div>									
+
+											<div class="form-group form-group-half">
+												{{projectform.rating.label}}
+												{{projectform.rating}}
+												<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>			
+											</div>	
+
+										</div>
+										<div class="wt-jobdetails wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Project Details</h2>
+											</div>
+											<div class="form-group">
+												{{projectform.media|safe}}
+												{{projectform.description}}
+												<span style="color:red;" role="alert">{{ projectform.description.errors}}</span>
+											</div>																	
+											<div class="form-group">
+												<italics> {{projectform.sample_link.label}}</italics>
+												{{projectform.sample_link}}	
+												<span style="color:red;" role="alert">{{ projectform.sample_link.errors}}</span>														
+											</div>																						
+
+										<div class="wt-jobskills wt-tabsinfo">
+											<div class="wt-tabscontenttitle">
+												<h2>Specialties Required (Up to 5)</h2>
+											</div>
+											<div class="form-group">
+												{{projectform.skill.label}}
+												{{ projectform.skill}}
+												<span style="color:red;" role="alert">{{ projectform.skill.errors}}</span>
+											</div>
+										</div>
 										</div>
 									</div>
 									</div>
@@ -124,8 +122,12 @@
 												<span>Post job by just clicking on “Post Job Now” button.</span>
 												<button type="submit" class="wt-btn"> Post Job Now </button>
 											</div>
-											</form>
+										</div>
 									</div>
-								</div>
-								<!--Register Form End-->
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+							<!--Register Form End-->
 {% endblock %}

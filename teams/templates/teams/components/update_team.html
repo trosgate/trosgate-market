@@ -1,0 +1,17 @@
+{% if update_teamform %}
+<form> {% csrf_token %}
+	<div class="form-group">
+		{{update_teamform.title.label}}
+		{{update_teamform.title}}
+	</div>
+	<div class="form-group">
+		{{update_teamform.notice.label}}
+		{{update_teamform.notice}}
+	</div>
+	<div class="text-center">
+		<button type="submit" class="wt-btn"
+			hx-post="{% url 'teams:update_team' %}" 
+			hx-target="#modify-team"> Update Team </button>
+	</div>											
+</form>                   														
+{% endif %}

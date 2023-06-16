@@ -49,7 +49,9 @@ class SettingsMaster(models.Model):
     modified = models.DateTimeField(_("Last Modified"), auto_now=True)
     
     # Theme Changing
-    category_type = models.BooleanField(_("Category Activator"), choices = ((False,'Silva Land'), (True, 'Royal Land')), default = False)
+    proposal_detail = models.BooleanField(_("Proposal Detail Display"), choices = ((False,'Proposal with Full Image'), (True, 'Proposal with Side Image')), default = False)
+    category_type = models.BooleanField(_("Category Type"), choices = ((False,'Flat Display Category'), (True, 'Popup Display Category')), default = False)
+    project_type = models.BooleanField(_("Job Listing Type"), choices = ((False,'VerticaL display'), (True, 'Horizontal display')), default = False)
     banner_type = models.CharField(_("Banner Activator"), max_length=20, choices = BANNER_TYPES, default = ROYAL)
     title_block = models.CharField(_("Banner Title"), max_length=100, default="Hire Experts or Team")
     subtitle_block = models.CharField(_("Banner Subtitle"), max_length=150, default="Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.")
@@ -60,7 +62,7 @@ class SettingsMaster(models.Model):
     banner_color = models.CharField(_("Hero Background Color"), max_length=100, default="purple", help_text=_("Put your color here to decorate Hero Banner Background and buttons like signup and login. Example '3F0F8FF', or 'red' or 'blue' or 'purple' or any css color code. Warning!: Donnot add quotation marks around the color attributes"), null=True, blank=True)
     banner_button_one_color = models.CharField(_("Hero Button1 Color"), max_length=100, default="green", help_text=_("Put your bootstrap color here to decorate Hero Button 1. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
     banner_button_two_color = models.CharField(_("Hero Button2 Color"), max_length=100, default="light", help_text=_("Put your bootstrap color here to decorate Hero Button 2. Example 'primary' or 'secondary' or 'light' or 'success' . Warning!: Exclude quotation marks when you input color attributes"), null=True, blank=True)
-    promo_type = models.CharField(_("Marketing Section"), max_length=10, choices = PROMO_TYPES, default = TWO)
+    promo_type = models.CharField(_("Marketing Section"), max_length=30, choices = PROMO_TYPES, default = TWO)
     promo_title = models.CharField(_("Div Four Promo Title"), max_length=100, default="#1 Choice For Businesses", null=True, blank=True)
     promo_subtitle = models.CharField(_("Div Four Promo Subitle"), max_length=100, default="Business on the Go", null=True, blank=True)
     promo_description = models.TextField(

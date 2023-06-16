@@ -19,33 +19,27 @@
     <div class="wt-rightarea">
         {% if request.user == application.project.created_by %}
         <div class="wt-hireduserstatus">
-            {% if application.status == 'pending' %} 
             <form> {% csrf_token %}
                 <input type="text" name="project" value="{{application.project.pk}}" id="id_project" hidden>
                 <input type="text" name="application" value="{{application.pk}}" id="id_application" hidden>
+                {% if application.accept == False %} 
                 <button type="submit" class="btn btn-danger btn-sm"
                     hx-post="{% url "applications:add_application" %}"
-                    hx-target="#approve-applicant"
-                    hx-confirm="You are about to add applicant to bucket">
-                    Approve
+                    hx-target="#approve-applicant">
+                    Add to Box
                 </button>
-                <a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm" target="_blank">View Bucket</a> 
-            </form>
-            {% elif application.status == 'accepted' %} 
-            <form> {% csrf_token %}
-                <input type="text" name="project" value="{{application.project.pk}}" id="id_project" hidden>
-                <input type="text" name="application" value="{{application.pk}}" id="id_application" hidden>
+                <a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm" target="_blank">View Box</a> 
+                {% elif application.accept == True %} 
                 <button type="submit" class="btn btn-danger btn-sm"
                     hx-post="{% url "applications:add_application" %}"
-                    hx-target="#approve-applicant"
-                    hx-confirm="You are about to remove applicant from bucket">
-                    Unapprove
+                    hx-target="#approve-applicant">
+                    Remove
                 </button>
-                <a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm" target="_blank">View Bucket</a> 
+                <a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm" target="_blank">View Box</a> 
+                {% endif %}
             </form>
-            {% endif %}
+            
         </div>
-        
         {% endif %}
         <div class="wt-hireduserstatus">
             <h5>{{application.team.members.count}}</h5>
@@ -56,14 +50,23 @@
             <span>In {{application.get_estimated_duration_display}}</span>
         </div>
         <div class="wt-hireduserstatus">
-            <h5 id="application-status" class="application-status">{{application.get_status_display}}</h5>
+            <h5 id="application-status" class="application-status">
+                {% if application.status == 'pending' %}
+                <i class="fas fa-spinner fa-spin 1x" style="color:green;"></i>
+                {% endif %}
+                {{application.get_status_display}}
+            </h5>
             <span>Status</span>
         </div>
-        </div>
-        <div class="wt-description">
-            <h5>Message :) </h5>
+    </div>												
+    <div class="wt-projecthistory">
+        <div class="wt-description" style='padding:0'>
+            <div class="text-left">
+                <h4>Message <i class="fa fa-envelope" style="color:green;"></i></h4>
+            </div>
             {{application.message|linebreaksbr}}
-        </div>												
+        </div>
+    </div>												
     </div>
     {% endfor %}
     {% if not applications %}

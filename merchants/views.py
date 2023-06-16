@@ -25,11 +25,53 @@ from payments.forms import (
     MTNMerchantForm,
     CreditCardForm
 )
-
+from account.forms import (
+    MerchantthemeForm,
+    MerchantBrandingForm
+)
 from payments.checkout_card import CreditCard
 from payments.gateways.stripe import StripeClientConfig
 from account.forms import DomainForm
 from django.contrib.sites.models import Site
+
+
+@login_required
+@user_is_merchant
+def theme_settings(request):
+    themeform = MerchantthemeForm(request.POST or None, instance=request.merchant)
+    brandingform = MerchantBrandingForm(request.POST or None, instance=request.merchant)
+    context = {
+        'themeform':themeform,
+        'brandingform':brandingform,
+    }
+
+    return render(request, "merchants/theme.html", context)
+
+
+@login_required
+@user_is_merchant
+def theme_form(request):
+    themeform = MerchantthemeForm(request.POST, instance=request.merchant)
+    if themeform.is_valid():
+        themeform.save()
+        messages.info(request, f'Saved successfully')
+    context = {
+        'themeform': themeform,
+    }
+    return render(request, "merchants/partials/theme.html", context)
+
+
+@login_required
+@user_is_merchant
+def brand_form(request):
+    brandingform = MerchantBrandingForm(request.POST, instance=request.merchant)
+    if brandingform.is_valid():
+        brandingform.save()
+        messages.info(request, f'Saved successfully')
+    context = {
+        'brandingform': brandingform,
+    }
+    return render(request, "merchants/partials/brand.html", context)
 
 
 
@@ -135,7 +177,6 @@ def stripe_subscription(request):
         'creditcardform': creditcardform,
     }
     return render(request, "merchants/partials/subscribe_now.html", context)
-
 
 
 @login_required

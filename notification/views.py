@@ -1,25 +1,26 @@
-# from django.shortcuts import render, redirect
-# from django.contrib.auth.decorators import login_required
-# from .models import Notification
+import json
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from account.models import Customer
+from django.contrib.sessions.models import Session
+from .models import Room
+from django.views.decorators.http import require_POST
+from teams.utilities import create_random_code
 
-# @login_required
-# def notifications(request):
-#     goto = request.GET.get('goto', '')
-#     # notification_id = request.GET.get('notification', 0)
-#     notification_slug = request.GET.get('notification', '')
-#     # extra_id = request.GET.get('extra_id', 0)
 
-#     if goto != '':
-#         notification = Notification.objects.get(slug=notification_slug)
-#         notification.is_read = True
-#         notification.save()
+@require_POST
+def create_room(request, reference):
+    data = json.loads(request.body)
 
-#         # if notification.notification_type == Notification.MESSAGE:
-#         #     return redirect('application_detail', application_id=notification.extra_id)
-#         if notification.notification_type == Notification.APPLICATION:
-#             return redirect('application_detail', application_slug=notification.slug)
-#     context = {
+    page_name = data.get('url', '')
+    guest = data.get('guestname', '')
+    
+    Room.objects.create(reference=reference, guest=guest, page_name=page_name)
+    return JsonResponse({'room':'success'})
 
-#     }
-#     return render(request, 'notification/notifications.html', context)
 
+def chatroom(request, room_name):
+    # room = Room.objects.get(reference=room_name)
+    # return JsonResponse({'room':room}, safe=False)
+    return render(request, 'notification/partials/helpdesk.html', {'room':room_name})

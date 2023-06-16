@@ -1,0 +1,99 @@
+<aside id="wt-sidebar" class="wt-sidebar">
+    <div class="wt-dashboardbox">
+        <div class="wt-dashboardboxtitle text-center">
+            <h2>About Author</h2>
+        </div>
+        <div class="wt-dashboardboxcontent wt-hiredfreelance">
+            <div class="wt-companysinfo">
+                <figure class="wt-companyad">
+                    <img src="{% firstof proposal.created_by.freelancer.profile_photo.url proposal.created_by.freelancer.banner_photo.url proposal.thumbnail.url %}" style="height:100px;" alt="img description">
+                </figure>
+                <div class="wt-title"> 
+                    <a href="javascript:void(0);">
+                        <i class="fa fa-check-circle"> {% if request.user.is_authenticated %} {{proposal.created_by.get_full_name|capfirst}} {% else %} {{proposal.created_by.short_name|capfirst}} {% endif %}</i>
+                    </a>
+                </div>
+                <ul class="wt-postarticlemeta">
+                    <li>
+                        <a href="javascript:void(0);">
+                            <span>Jobs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{profile_view.freelancer_profile_absolute_url}}">
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li class="wt-following">
+                        <a href="javascript:void(0);">
+                            <span>Following</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% if request.user.clients or request.user.freelancer %}
+        <div class="wt-clicksavearea">
+            <a href="{% url 'proposals:proposal_chat_messages' proposal.slug %}" class="btn btn-danger justify-content-md-center"><i class="far fa-smile"></i> Author Support</a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <div class="wt-proposalsr"></div>
+        <div class="wt-dashboardbox">
+            <div class="wt-dashboardboxtitle">
+                <h2>{% if request.user.clients %} Recommended Proposals {% elif request.user.freelancer %} This Team's Proposals {% endif %}</h2>
+            </div>
+            <div class="wt-dashboardboxcontent wt-hiredfreelance">
+                {% for captured_proposal in all_viewed_proposals %}
+                <div class="wt-userlistinghold wt-featured">
+                    <figure class="wt-userlistingimg">
+                        <img src="{% firstof captured_proposal.thumbnail.url captured_proposal.team.created_by.freelancer.profile_photo.url captured_proposal.created_by.freelancer.profile_photo.url%}" style="height:60px; width:60px" alt="image description" class="img description">
+                    </figure>
+                <div class="wt-proposaldetails">
+                    <div class="wt-contenthead">
+                        <div class="wt-title">
+                            <a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}">{{captured_proposal.team|truncatechars:25}}<span>{{captured_proposal.title|truncatechars:25}}</span></a>
+                            <a href="{% url 'proposals:proposal_detail' captured_proposal.created_by.short_name captured_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
+                        </div>
+                    </div>													
+                </div>	
+                </div>
+                {% empty %}
+                <p>No recommendation at the moment</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+    {% if other_proposals|length > 0 %}
+    <div class="wt-proposalsr"></div>
+        <div class="wt-dashboardbox">
+            <div class="wt-dashboardboxtitle">
+                <h2>{% if request.user.clients %} Other Proposals {% elif request.user.freelancer %} This Team's Proposals {% endif %}</h2>
+            </div>
+            <div class="wt-dashboardboxcontent wt-hiredfreelance">
+                {% for oth_proposal in other_proposals %}
+                <div class="wt-userlistinghold wt-featured">
+                    <figure class="wt-userlistingimg">
+                        <img src="{% firstof oth_proposal.thumbnail.url oth_proposal.team.created_by.freelancer.profile_photo.url oth_proposal.created_by.freelancer.profile_photo.url %}" style="height:60px; width:60px" alt="image description" class="img description">
+                    </figure>
+                <div class="wt-proposaldetails">
+                    <div class="wt-contenthead">
+                        <div class="wt-title">
+                            <a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}">{{oth_proposal.team|truncatechars:25}}<span>{{oth_proposal.title|truncatechars:25}}</span></a>
+                            <a href="{% url 'proposals:proposal_detail' oth_proposal.created_by.short_name oth_proposal.slug %}" class="wt-hiredarrow"><i class="lnr lnr-chevron-right"></i></a>
+                        </div>
+                    </div>													
+                </div>	
+                </div>
+                {% empty %}
+                <p>No recommendation at the moment</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    {% endif %}
+</aside>

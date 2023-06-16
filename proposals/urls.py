@@ -33,7 +33,7 @@ urlpatterns = [
     path('attribute/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_four, name='modify_proposal_step_four'),
 
     # Proposal chats   
-    path('author/<str:short_name>/<slug:proposal_slug>', views.proposal_chat_messages, name='proposal_chat_messages'),
+    path('<slug:proposal_slug>/chat', views.proposal_chat_messages, name='proposal_chat_messages'),
     # path('messages/<str:short_name>/<slug:proposal_slug>/detail', views.proposal_chat_details, name='proposal_chat_details'),
    
 ]

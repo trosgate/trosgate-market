@@ -29,3 +29,8 @@
 {% else %}
 <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> No messages at the moment</span>
 {% endif %}
+<div hx-get="{% url 'proposals:fetch_messages' proposal.id %}"
+    hx-trigger="every 1s"
+    hx-swap="innerhtml"
+    hx-target="#proposal-messages">
+</div>

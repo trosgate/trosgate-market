@@ -38,7 +38,7 @@ from analytics.analytic import (
 
 # this will appear in search results
 def freelancer_listing(request):
-    freelancer_list = Freelancer.active.all().exclude(description = "", skill = None)
+    freelancer_list = Freelancer.objects.filter(created=True)
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
     skills = Skill.objects.all().distinct()
@@ -59,7 +59,7 @@ def freelancer_listing(request):
 
 
 def freelancer_search(request):
-    freelancer_list = Freelancer.active.all().exclude(description = "", skill = None)
+    freelancer_list = Freelancer.objects.filter(created=True)
     base_currency = get_base_currency_symbol()
     #Country
     country = request.GET.getlist('country[]')
@@ -81,49 +81,48 @@ def freelancer_search(request):
     join_four_year = request.GET.get('join_four_year[]', '')
     join_over_five_year = request.GET.get('join_over_five_year[]', '')
 
-    freelancers = Freelancer.active.all().exclude(description = "", skill = None)
-    all_freelancers = freelancers.count()
+    all_freelancers = freelancer_list.count()
 
     # Country
     if len(country) > 0:
-        freelancer_list = freelancers.filter(user__country__id__in=country).distinct()
+        freelancer_list = freelancer_list.filter(user__country__id__in=country).distinct()
     # Skills    
     if len(skill) > 0:
-        freelancer_list = freelancers.filter(skill__id__in=skill).distinct()
+        freelancer_list = freelancer_list.filter(skill__id__in=skill).distinct()
 
     # Upgraded Teams
     if upgraded_founder != '':
         teams = Team.objects.filter(status=Team.ACTIVE, package_status=Team.ACTIVE).values_list('created_by').distinct()
-        freelancer_list = freelancers.filter(user__in=list(teams))
+        freelancer_list = freelancer_list.filter(user__in=list(teams))
 
     # Basic Teams
     if basic_founder != '':
         teams = Team.objects.filter(status=Team.ACTIVE, package_status=Team.DEFAULT).values_list('created_by').distinct()
-        freelancer_list = freelancers.filter(user__in=list(teams))
+        freelancer_list = freelancer_list.filter(user__in=list(teams))
 
     # User Joined Date
     if join_one_month != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=one_month()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=one_month()).distinct()
     if join_two_month != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=two_months()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=two_months()).distinct()
     if join_three_month != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=three_months()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=three_months()).distinct()
     if join_four_month != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=four_months()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=four_months()).distinct()
     if join_five_month != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=five_months()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=five_months()).distinct()
     if join_six_month != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=six_months()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=six_months()).distinct()
     if join_one_year != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=one_year()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=one_year()).distinct()
     if join_two_year != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=two_years()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=two_years()).distinct()
     if join_three_year != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=three_years()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=three_years()).distinct()
     if join_four_year != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=four_years()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=four_years()).distinct()
     if join_over_five_year != '':
-        freelancer_list = freelancers.filter(user__date_joined__lte=five_years()).distinct()
+        freelancer_list = freelancer_list.filter(user__date_joined__lte=five_years()).distinct()
 
     search_count = len(freelancer_list)
     totalcount = f'<div id="freelancerTotal" class="alert alert-info text-center" role="alert" style="color:black;">{search_count} of {all_freelancers} search results found</div>'
@@ -140,7 +139,7 @@ def freelancer_search(request):
 def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id)
-    proposal_count = len(Proposal.objects.filter(team=team, status=Proposal.ACTIVE)) > 0
+    proposal_count = Proposal.objects.filter(team=team, status=Proposal.ACTIVE).count() > 0
     monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
     ongoing_projects = ongoing_founder_projects(team)
     completed_projects = completed_founder_projects(team)
@@ -185,6 +184,7 @@ def update_freelancer(request, short_name):
         if profileform.is_valid():
             freelancer = profileform.save(commit=False)
             freelancer.user = request.user
+            freelancer.created = True
 
             freelancer.save()
             profileform.save_m2m()  # for saving manytomany items in forms
@@ -201,7 +201,6 @@ def update_freelancer(request, short_name):
         'freelancer': freelancer,
     }
     return render(request, 'freelancer/freelancer_profile_update.html', context)
-
 
 
 @login_required

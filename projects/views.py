@@ -15,11 +15,9 @@ from applications.models import Application
 from django.http import JsonResponse
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
-from notification.utilities import create_notification
 from django.utils import timezone
 from general_settings.models import ProposalGuides
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
-
 
 
 def merchant_project(request):
@@ -43,7 +41,6 @@ def merchant_project(request):
     return render(request, 'projects/merchant_project.html', context)
 
 
-
 @login_required
 @user_is_client
 def create_project(request):
@@ -57,7 +54,7 @@ def create_project(request):
             project.save()
             projectform.save_m2m()
 
-            messages.info(request, 'Project received. Hold on as we review')
+            messages.info(request, 'Job created successfully')
 
             return redirect('account:dashboard')
     else:

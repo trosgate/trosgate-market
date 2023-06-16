@@ -40,7 +40,7 @@
 												<span>{% if good_review_rate > 0 %}{{good_review_rate}} Good Review{{good_review_rate|pluralize}} <a class="javascript:void(0);">(3 Stars & Above)</a> <br>{% endif %} Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
 												{% if active_team.created_by == request.user %}
 												{% if max_team_members %}
-												{% if team.status == 'active' %}
+												{% if team.package.type == 'Team' %}
 												<div id="invitation-message"></div>
 												<div class="form-group wt-btnarea">
 													<button id="userInvitation" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"> Invite to Team</i></button>
@@ -87,7 +87,7 @@
 												{% if request.user.clients %}
 												{% if monthly_contracts_limiter %}
 												
-												{% if team.status == 'active' %}
+												{% if team.package.type == 'Team' %}
 												{% if proposal_count %}
 												<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
 												{% endif %}
@@ -169,7 +169,7 @@
 											<div class="wt-project">
 												{% if freelancer.image_one %}
 												<figure>
-													<img src="{{freelancer.image_one.url}}" alt="img description">
+													<img src="{{freelancer.image_one.url}}" alt="img description" style="max-height:150px;">
 												</figure>
 												{% endif %}
 												<div class="wt-projectcontent">
@@ -184,7 +184,7 @@
 											<div class="wt-project">
 												{% if freelancer.image_two %}
 												<figure>
-													<img src="{{freelancer.image_two.url}}"alt="img description">
+													<img src="{{freelancer.image_two.url}}"alt="img description" style="max-height:150px;">
 												</figure>
 												{% endif %}
 												<div class="wt-projectcontent">
@@ -199,7 +199,7 @@
 											<div class="wt-project">
 												{% if freelancer.image_three %}
 												<figure>
-													<img src="{{freelancer.image_three.url}}" alt="img description">
+													<img src="{{freelancer.image_three.url}}" alt="img description" style="max-height:150px;">
 												</figure>
 												{% endif %}
 												<div class="wt-projectcontent">

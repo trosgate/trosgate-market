@@ -68,7 +68,7 @@
                                           <tr>
                                               <tr> 
                                                 <td><input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
-                                                <td>{{gateway.name}}</td>
+                                                <td>{{gateway.get_name_display}}</td>
                                                 <td> ${{gateway.processing_fee}}</td>
                                               </tr>
                                           </tr>
@@ -103,7 +103,6 @@
                 action: "post",
             },
             success: function (json) {
-              console.log(json)
                 document.getElementById("subTotal").innerHTML = json.subtotal;
                 document.getElementById("totalDiscount").innerHTML = json.discount;
                 document.getElementById("totalFees").innerHTML = json.selected_fee;               

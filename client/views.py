@@ -21,7 +21,7 @@ from general_settings.gateways import PayPalClientConfig, StripeClientConfig, Fl
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.fund_control import get_min_depositor_balance, get_max_depositor_balance, get_min_deposit, get_max_deposit
 from django.contrib.sites.shortcuts import get_current_site
-from transactions.models import Purchase, OneClickPurchase
+from transactions.models import Purchase
 from contract.models import InternalContract, Contract
 from control_settings.utilities import deposit_switch
 import stripe
@@ -110,7 +110,7 @@ def one_click_proposal_checkout(request):
      
         if request.user.clientfunduser.available_balance >= proposal.salary:
             try:
-                OneClickPurchase.one_click_proposal(user=request.user, proposal=proposal)
+                Purchase.one_click_proposal(user=request.user, proposal=proposal)
                 message = f'<span id="oneClick-message" style="color:green; text-align:right;">"Congrats! Checkout Successful"</span>'
             except Exception as e:
                 err = 'Error occured and we could not create order. Try again'
@@ -132,10 +132,10 @@ def one_click_interncontract_checkout(request):
         contract_id = int(request.POST.get('contractId'))
         
         contract = get_object_or_404(InternalContract, pk=contract_id, created_by=request.user, reaction=InternalContract.ACCEPTED)
-        print(contract)
+       
         if request.user.clientfunduser.available_balance >= contract.grand_total:
             try:
-                OneClickPurchase.one_click_intern_contract(user=request.user, contract=contract)
+                Purchase.one_click_intern_contract(user=request.user, contract=contract)
                 message = f'<span id="oneClick-message" style="color:green; text-align:right;">"Congrats! Checkout Successful"</span>'
             except FundException as e:
                 err = str(e)
@@ -156,11 +156,11 @@ def one_click_externcontract_checkout(request):
     if request.POST.get('action') == 'oneclick-extpay':
         contract_id = int(request.POST.get('contractId'))
         
-        contract = get_object_or_404(Contract, pk=contract_id, client__email=request.user.email, reaction=Contract.ACCEPTED)
-     
+        contract = get_object_or_404(Contract, pk=contract_id, client__email=request.user.email, reaction=Contract.AWAITING)
+    
         if request.user.clientfunduser.available_balance >= contract.grand_total:
             try:
-                OneClickPurchase.one_click_extern_contract(user=request.user, contract=contract)
+                Purchase.one_click_extern_contract(user=request.user, contract=contract)
                 message = f'<span id="oneClick-message" style="color:green; text-align:right;">"Congrats! Checkout Successful"</span>'
             except FundException as e:
                 err = str(e)

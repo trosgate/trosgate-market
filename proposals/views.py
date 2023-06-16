@@ -22,15 +22,11 @@ from client.models import Client
 from resolution.reviews import (
     proposal_review_average, 
     contract_review_average,
-    oneclick_proposal_review_average,
-    oneclick_contract_review_average
 )
-from resolution.models import (OneClickReview, ApplicationReview, ProposalReview, ContractReview)
+from resolution.models import (ApplicationReview, ProposalReview, ContractReview)
 from analytics.analytic import (
     proposal_sales_count_by_proposal,
-    proposal_sales_count_by_contract, 
-    proposal_oneclick_count_by_proposal, 
-    proposal_oneclick_count_by_contract,
+    proposal_sales_count_by_contract,
 )
 from django.db.models import Sum, Avg, Count
 
@@ -227,7 +223,6 @@ def proposal_step_two(request):
         proposalformtwo = ProposalStepTwoForm(request.POST)
         if proposalformtwo.is_valid():
             # Update session data with new form data
-            # skill = proposalformtwo.cleaned_data['skill']
             request.session['post_step_two'] = proposalformtwo.cleaned_data
             step_one_data.update(proposalformtwo.cleaned_data)
             return redirect("proposals:proposal_step_three")
@@ -537,29 +532,18 @@ def proposal_detail(request, short_name, proposal_slug):
         resolution__proposal_sale__proposal=proposal,
         status = True
     )[:15]
-    oneclick_review_msg = OneClickReview.objects.filter(
-        resolution__oneclick_sale__team=proposal.team, 
-        resolution__oneclick_sale__proposal=proposal,
-        status = True
-    )[:15]
 
-    review_status = ((proposal_review_msg.count() + oneclick_review_msg.count()) < 1)
+    review_status = (proposal_review_msg.count() < 1)
 
     proposal_review_avg = proposal_review_average(proposal.team, proposal)
     contract_review_avg = contract_review_average(proposal.team, proposal)
-    oneclick_proposal_review_avg = oneclick_proposal_review_average(proposal.team, proposal)
-    oneclick_contract_review_avg = oneclick_contract_review_average(proposal.team, proposal)
 
     sales_count_by_proposal = proposal_sales_count_by_proposal(proposal.team, proposal)['sales_count']
     sales_count_by_contract = proposal_sales_count_by_contract(proposal.team, proposal)['sales_count'] 
-    oneclick_count_by_proposal = proposal_oneclick_count_by_proposal(proposal.team, proposal)['sales_count'] 
-    oneclick_count_by_contract = proposal_oneclick_count_by_contract(proposal.team, proposal)['sales_count']
 
     overal_proposal_sales_count = (
         sales_count_by_proposal+ 
-        sales_count_by_contract+
-        oneclick_count_by_proposal+
-        oneclick_count_by_contract
+        sales_count_by_contract
     )
 
     all_viewed_proposals = ''
@@ -589,33 +573,31 @@ def proposal_detail(request, short_name, proposal_slug):
         "overal_proposal_sales_count": overal_proposal_sales_count,
         "sales_count_by_proposal": sales_count_by_proposal,
         "sales_count_by_contract": sales_count_by_contract,
-        "oneclick_count_by_proposal": oneclick_count_by_proposal,
-        "oneclick_count_by_contract": oneclick_count_by_contract,
         "other_proposals": other_proposals,
         "team_members": team_members,
         "profile_view": profile_view,
         "proposal_review_avg": proposal_review_avg,
         "contract_review_avg": contract_review_avg,
-        "oneclick_proposal_review_avg": oneclick_proposal_review_avg,
-        "oneclick_contract_review_avg": oneclick_contract_review_avg,
         "proposal_review_msg":proposal_review_msg,
-        "oneclick_review_msg":oneclick_review_msg,
         "review_status":review_status,
         "sesion_proposal":sesion_proposal,
         "all_viewed_proposals":all_viewed_proposals,
     }
-    return render(request, 'proposals/proposal_detail.html', context)
+    if request.merchant.merchant.proposal_detail == False:
+        return render(request, 'proposals/proposal_detail.html', context)
+    else:
+        return render(request, 'proposals/proposal_detail2.html', context)
 
 
 @login_required
-def proposal_chat_messages(request, short_name, proposal_slug):
+def proposal_chat_messages(request, proposal_slug):
     proposal=None
     if request.user.user_type == Customer.FREELANCER:    
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-        proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team, created_by__short_name=short_name)
+        proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
 
     elif request.user.user_type == Customer.CLIENT:
-        proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name)
+        proposal = get_object_or_404(Proposal, slug=proposal_slug)
 
     proposalchatform = ProposalChatForm()
     chats = ProposalChat.objects.filter(proposal=proposal, team=proposal.team)
@@ -662,9 +644,6 @@ def fetch_messages(request, proposal_id):
     context = {
         'proposal':proposal,
         'chats':chats,
-
     }
     return render(request, 'proposals/components/partial_proposal.html', context)
 
-
-    

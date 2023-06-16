@@ -107,12 +107,31 @@
 						</div>
 					</div>
 				</div>
-				
+				{% if website.project_type == False %}
+				<div class="container project-container">
+					<div class="jobs">
+					{% for project in projects %}
+					<div class="job">
+						<img src="{% firstof project.created_by.clients.company_logo.url project.created_by.clients.profile_photo.url %}" alt="client-logo"/>
+						<span class="deadline">Expiry in: {{project.duration|timeuntil}}</span>
+						<h3 class="job-title">{{project.title}}</h3>
+						<div class="details">
+							{{project.preview}}<br>
+							<span style="color:green; font-weight: bold;">Company: </span><span>{% firstof project.created_by.clients.brand_name project.created_by.get_full_name %}</span><br>
+							<span style="color:green; font-weight: bold;">Country: </span><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description" style="width:20px; height:20px; max-width:20px;"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:50}}</span><br>
+							<span style="color:green; font-weight: bold;">Category: </span><span>{{project.category.name|truncatechars:18}}</span><br>
+						</div>
+						
+						<a href="{{project.get_project_absolute_url}}" class="detail-btn">More Details | {{base_currency}} {{project.salary}}</a>
+					</div>
+					{% endfor %} 
+				</div>
+				{% else %}
 				<div class="container">
 					<div class="row justify-content-md-center">
 					{% for project in projects %}
 					<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-						<aside class="wt-sidebar wt-dashboardsave wt-dbsectionspace">
+						<aside class="wt-sidebar wt-dashboardsave">
 							<div class="wt-proposalsr wt-box-shadow">
 								<div class="wt-proposalsrcontent">
 								<a href=""> 
@@ -134,12 +153,26 @@
 						</aside>
 					</div>
 					{% endfor %} 
+				{% endif %} 
 			</section>
 
-		</main>	
-	
-		{% include 'dashboard/main_footer.html' %}
+			{% comment %} <div id="wt-chatpopup" class="wt-chatpopup">
+            
+				<div id="guest-user" hx-on="htmx:afterSettle: document.getElementById('wt-getsupport').click();">
+					{% include 'notification/partials/helpdesk.html' %}
+				</div>
+					
+				<div id="wt-getsupport" class="wt-themeimgborder">
+					<img src="{% static 'images/messages/img-12.jpg' %}" alt="image description">
+				</div>
+			</div> {% endcomment %}
 
+	</main>	
+
+	{% include 'dashboard/main_footer.html' %}
+	{% block scripts %}
+	
+	{% comment %} <script src="{% static 'js/chatroom.js' %}"></script> {% endcomment %}
 	
 	<script src="{% static 'js/typed-2.0.js' %}"></script>
 	<script>
@@ -178,4 +211,5 @@
         });
         })
     </script>
-{% endblock %}
+{% endblock scripts %}
+{% endblock content %}

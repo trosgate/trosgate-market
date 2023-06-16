@@ -19,6 +19,7 @@ from string import ascii_letters, digits
 from django.utils import timezone
 from datetime import timedelta
 
+
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -31,7 +32,6 @@ def get_client_ip(request):
 def get_host_domain(request):
     return request.get_host().split(':')[0].lower()
 
-    
 #
 # This will estimate subscription expiry by 30 days interval
 def get_expiration():

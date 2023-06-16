@@ -1,285 +1,170 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% block content%}
-{% include 'dashboard/main_sidebar.html' %}
+{% block content %}
 
+			<!--Main Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                            <div class="wt-innerbannercontent">
+                                <div class="wt-title"><h2>{{active_team.title|capfirst}}</h2></div>
+                                    <ol class="wt-breadcrumb">
+                                        <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                                        <li class="wt-active">Manager</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-				<section class="wt-haslayout wt-dbsectionspace">
+				<section class="container">
 					<div class="row justify-content-md-center">				
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
-						<div class="wt-dashboardbox">
-							<div class="wt-dashboardboxtitle">
-								<h2>Manage {{ teams.title }}</h2>
-							</div>
-							<div class="wt-dashboardboxcontent wt-rcvproposala">
-								<div class="wt-userlistinghold wt-featured wt-userlistingvtwo">
-									<div class="wt-userlistingcontent">
-										<div class="wt-contenthead">
-											<div class="wt-title">
-												<h3>{{ teams.title }}</h3>
-											</div>
-											<ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">
-												<li><span class="wt-dashboradclock"><i class="fa fa-arrow-up"></i>You Are: {% if teams.created_by == request.user %}Owner{% else %}Member{% endif %}</span></li>															
-												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Created: {{teams.created_at|timesince}} ago</span></li>															
-												<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>Status: {{teams.get_status_display}}</span></li>
-												<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i> Plan:...</span></li>
-											</ul>
-										</div>
-									<div class="wt-description">
-										<h5>About "{{ teams.title }}" </h5>
-										<span>{{teams.notice|slice:200}} ...</span>
-									</div>	
-									<div class="wt-rightarea">
-										<div class="wt-btnarea">
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+							<div class="wt-dashboardbox">
+								<div class="wt-dashboardboxcontent">
+									<div class="wt-rcvproposalholder">
+										<div class="text-center">
+											{% if active_team.package.type == 'Team' %}
 											<a href="{% url 'teams:teamchatroom' %}" class="btn btn-danger">Group Chat</a>
+											{% endif %}
 											<a href="/" class="btn btn-success">Go Back</a>
 										</div>
-										<div class="wt-hireduserstatus">
-											<h4>{{teams.members.count}}</h4><span>Team Members</span>
-											<ul class="wt-hireduserimgs">
-												{% for member in teams.members.all %}
-												<li><figure><img src="{{member.freelancer.profile_photo.url}}" alt="img description"></figure></li>
-												{% endfor %}
-											</ul>									
+										<div class="wt-sectiontitle">
+											<span>About {{ team.title }}</span>
 										</div>
-									</div>
-								</div>								
-							</div>
-							{% if teams.created_by == request.user %}
-
-							<section class="wt-haslayout wt-dbsectionspace">
-								<div class="row">
-									<div class="col-12 col-sm-12 col-md-12 col-lg-12">
-									<div class="card">
-										<div class="card-header">
-											<h5>Team Owner Actions</h5>
+										<div class="wt-description">
+											<p>{{team.notice|linebreaksbr}} ...</p>
+											<div class="row justify-content-between wt-textcenter text-white">
+												<div class="col-md-3" style="color:rgb(66, 143, 191); border-radius:5px;">
+													<br>
+													<h4>Team Status</h4>
+													<span>{{team.get_status_display}}</span>
+												</div>
+												<div class="col-md-3" style="color:rgb(111, 146, 133); border-radius:5px;">
+													<br>
+													<h4>Team Roles</h4>
+													<span>{% if team.created_by == request.user %}Owner{% else %}Member{% endif %}</span>
+												</div>
+												<div class="col-md-3" style="color:rgb(121, 21, 119); border-radius:5px;">
+													<br>
+													<h4>Existence</h4>
+													<span>{{team.created_at|timesince}} ago</span>
+												</div>
+												<div class="col-md-3" style="color:rgb(97, 46, 19); border-radius:5px;">
+													<br>
+													<h4>Total Members</h4>
+													<span>{{team.members.count}}</span>
+												</div>
+												
+											</div><br><br>
 										</div>
-				
+										{% if team.created_by == request.user %}
+                                        
+										<div class="wt-sectiontitle">
+											<span>Manage Team</span>
+										</div>
+										<div id="modify-team">
+											{% include 'teams/components/manage_team.html' %}
+										</div><br>
+										{% endif %}
+										<div class="wt-sectiontitle">
+											<span>Latest Applications (<a style="text-decoration:none; color:blue" href="{% url 'applications:freelancer_application'%}">view-all</a>)</span>
+										</div>
+										{% if applications|length > 0 %}
 										<div class="table-responsive">
-											<table class="table table-striped table-sm">
-												<thead>
+											<table class="table">
+											<thead>
+											<tr>
+												<th>#</th>
+												<th>Applicant</th>
+												<th>Jobs</th>
+												<th>Date</th>
+												<th>Status</th>
+												<th>Detail</th>
+		
+											</tr>
+											</thead>
+											<tbody>
+		
+												{% for application in applications %}
 												<tr>
-			
-													<th>Make Changes</th>
-													<th>Invitation</th>
+													<td>{{forloop.counter}}</td> 
+													<td>{{application.applied_by.short_name|capfirst}}</td>
+													<td class="text-left">{{application.project.title|slice:60}}</td>
+													<td>{{application.created_at|date:"d-m-Y"}}</td>
+													<td>{{application.get_status_display}}</td>
+													<td><a href="{% url 'applications:application_detail' application.project.slug %}" class="btn btn-success btn-sm">View Message</a></td>
+												</tr>
+												{% endfor %}
+		
+											</tbody>
+										</table>
+										{% else %}
+										<p class='text-center text-green'> No job application from this Team</p>
+										{% endif %}
+										</div>	<br>
+
+										<div class="wt-sectiontitle">
+											<span>Members Profile</span>
+										</div>
+										<div class="table-responsive">
+											<table class="table">
+											<thead>
+												<tr>
+													<th>#</th>
+													<th>Image</th>
+													<th>Country</th>
+													<th>Username</th>
+													<th>Position</th>
+													{% if active_team.created_by == request.user %}
+													<th>Email</th>
+													{% endif %}
+													<th>Profile</th>
 			
 												</tr>
 												</thead>
 												<tbody>
 			
-												<tr>
-													<td><a href="{{teams.get_team_update_absolute_url}}" class="btn btn-warning btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i> Modify</a></td>
-													<td><a href="{% url 'teams:invitation' %}" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"></i> Invite User</a></td>
-												</tr>
+													{% for member in team.members.all %}
+													<tr>
+													<td>{{forloop.counter}}</td> 
+													<td>
+														<div class="text-center">
+															<img src="{% if member.freelancer.profile_photo %}{{member.freelancer.profile_photo.url}} {% else %} No Image {% endif %}" alt="image description" width="40px">
+														</div>														
+													</td>
+													<td>{{member.country.name}}</td> 
+													<td>{{member.short_name}}</td>
+													<td>{% if active_team.created_by.short_name == member.short_name %}Founder{% else %}Member{% endif %}</td>
+													{% if active_team.created_by == request.user %}
+													<td>{{member.email}}</td>
+													{% endif %}
+													<td>
+														<a href="{{member.freelancer.freelancer_profile_absolute_url}}" class="btn btn-info btn-sm">Preview</a>
+													</td>
+													</tr>
+													{% endfor %}
 			
 												</tbody>
 											</table>
-										</div>										
-									</div>										
-								</div>										
-							</section>							
-							{% endif %} 
-
-
-							<section class="wt-haslayout wt-dbsectionspace">
-							<div class="wt-freelancerholder wt-rcvproposalholder">
-								<div class="wt-tabscontenttitle">
-									<h2>{{teams.title}} has {{applications.count}} Application{{applications.count|pluralize}}</h2>
-								</div>									 
-				
-									<div class="row">
-										<div class="col-12 col-sm-12 col-md-12 col-lg-12">
-											<div class="card">
-												<div class="card-header">
-													<h5>Top 10 Recent Applications.<a class="text-red" href="{% url 'applications:freelancer_application'%}">&nbsp; view-all</a></h5>
-												</div>
-												{% if applications|length > 0 %}
-												<div class="table-responsive">
-													<table class="table table-striped table-sm">
-													<thead>
-													<tr>
-														<th>#</th>
-														<th>Applicant</th>
-														<th>Application Projects</th>
-														<th>Date</th>
-														<th>Status</th>
-														<th>Detail</th>
-				
-													</tr>
-													</thead>
-													<tbody>
-				
-														{% for application in applications %}
-														<tr>
-															<td>{{forloop.counter}}</td> 
-															<td>{{application.applied_by.short_name|capfirst}}</td>
-															<td>{{application.project.title}}</td>
-															<td>{{application.created_at|date:"d-m-Y"}}</td>
-															<td>{{application.get_status_display}}</td>
-															<td><a href="{% url 'applications:application_detail' application.project.slug %}" class="btn btn-success btn-sm">View Message</a></td>
-														</tr>
-														{% endfor %}
-				
-													</tbody>
-												</table>
-												{% else %}
-												<p class='text-center text-green'> No Project application from this Team</p>
-												{% endif %}
-											</div>
 										</div>
-									</div>										
-								</div>
-							</section>
-
-							<section class="wt-haslayout wt-dbsectionspace">
-								<div class="wt-freelancerholder wt-rcvproposalholder">
-									<div class="wt-tabscontenttitle">
-										<h2>{{teams.title}} has {{teams.members.count}} active team Member{{teams.members.count|pluralize}}</h2>
-									</div>									 
-					
-									<div class="row">
-										<div class="col-12 col-sm-12 col-md-12 col-lg-12">
-											<div class="card">
-												<div class="card-header">
-													<h5>Members Profile</h5>
-												</div>
-					
-												<div class="table-responsive">
-													<table class="table table-striped table-sm">
-													<thead>
-														<tr>
-															<th>#</th>
-															<th>Image</th>
-															<th>Country</th>
-															<th>Username</th>
-															<th>Position</th>
-															{% if active_team.created_by == request.user %}<th>Email</th>{% endif %}
-															<th>Profile</th>
-					
-														</tr>
-														</thead>
-														<tbody>
-					
-															{% for member in teams.members.all %}
-															<tr>
-															<td>{{forloop.counter}}</td> 
-															<td>
-																<div class="wt-teamholder">
-																	<figure class="wt-speakerimg float-center">
-																		
-																		<img src="{% if member.freelancer.profile_photo %}{{member.freelancer.profile_photo.url}} {% else %} No Image {% endif %}" alt="image description">
-																		
-																	</figure>
-																</div>														
-															</td>
-															<td>{{member.country.name}}</td> 
-															<td>{{member.short_name}}</td>
-															<td>{% if active_team.created_by.short_name == member.short_name %}Founder{% else %}Member{% endif %}</td>
-															{% if active_team.created_by == request.user %}
-															<td>{{member.email}}</td>
-															{% endif %}
-															<td>
-																<a href="{{member.freelancer.freelancer_profile_absolute_url}}" class="btn btn-info btn-sm">Preview</a>
-															</td>
-															</tr>
-															{% endfor %}
-					
-														</tbody>
-													</table>
-												</div>
-											</div>
-										</div>										
-									</div>
-								</section>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-8 col-lg-5 col-xl-3">
-						<aside id="wt-sidebar" class="wt-sidebar wt-dashboardsave">
-							<div class="wt-proposalsr">
-								<div class="wt-proposalsrcontent">
-									<figure>
-										<img src="{% static 'images/thumbnail/img-17.png' %}" alt="image">
-									</figure>
-									<div class="wt-title">
-										<h3>150</h3>
-										<span>Total Ongoing Jobs</span>
-									</div>
-								</div> 
-							</div>
-							<div class="wt-proposalsr">
-								<div class="wt-proposalsrcontent wt-componyfolow">
-									<figure>
-										<img src="{% static 'images/thumbnail/img-16.png' %}" alt="image">
-									</figure>
-									<div class="wt-title">
-										<h3>1406</h3>
-										<span>Total Completed Jobs</span>
-									</div>
-								</div> 
-							</div>								
-							<div class="wt-proposalsr">
-								<div class="wt-proposalsrcontent  wt-freelancelike">
-									<figure>
-										<img src="{% static 'images/thumbnail/img-15.png' %}" alt="image">
-									</figure>
-									<div class="wt-title">
-										<h3>2075</h3>
-										<span>Total Cancelled Jobs</span>
-									</div>
-								</div> 
-							</div>								
-						</aside>
-						<div class="wt-companyad">
-							<figure class="wt-companyadimg"><img src="{% static 'images/add-img.jpg' %}" alt="img description"></figure>
-							<span>Advertisement  255px X 255px</span>
-						</div>
-					</div>
-				</div>
-			</section>
-			<!--Register Form End-->
-
-
-			<!-- Add team Popup Start-->
-			<!-- Popup Start-->
-			<div class="modal fade wt-offerpopup" tabindex="-1" role="dialog" id="assignteammodal">
-				<div class="modal-dialog" role="document">
-					<div class="wt-modalcontent modal-content">
-						<div class="wt-popuptitle">
-							<h2>About to Create Team</h2>
-							<a href="javascript%3bvoid(0)%3b.html" class="wt-closebtn close"><i class="fa fa-close" data-dismiss="modal" aria-label="Close"></i></a>
-						</div>
-						<div class="modal-body">
-							<div class="wt-projectdropdown-hold">
-								<div class="wt-projectdropdown-option">
-									<div class="wt-projectselect">
-										<figure><img src="images/thumbnail/img-07.jpg" alt="img description"></figure>
-										<div class="wt-projectselect-content">
-											<h3>Project Title Here</h3>
-											<span><i class="lnr lnr-calendar-full"></i> Project Deadline: May 27, 2019</span>
-										</div>
+                                        <div>
 									</div>
 								</div>
 							</div>
-							<form method="POST", action='.', class="wt-formtheme wt-formpopup"> {% csrf_token %}
-								<div class="form-group">
-									{{assignform.project.label}}
-									{{assignform.project}}
-								</div>
-								<div class="form-group">
-									{{assignform.assignee.label}}
-									{{assignform.assignee}}
-								</div>								
-								
-								<div class="form-group wt-btnarea">
-									<button type="submit" class="btn btn-success"> Asign Member </button>
-									<button type="submit" class="btn btn-danger"> Cancel </button>
-								</div>											
-							</form>
 						</div>
+				</section>	
+				
+			<div class="wt-proposalholder">
+				<div class="row justify-content-md-center">
+					<div class="wt-sectionhead wt-textcenter">
+						<span>Copyright @ {{website.site.name}}</span>
 					</div>
 				</div>
 			</div>
-			<!-- Popup End-->			
 
-{% endblock %}
+{% endblock content %}
+				
+

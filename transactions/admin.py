@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import OneClickPurchase, Purchase, ApplicationSale, ProposalSale, ContractSale, ExtContract, SubscriptionItem
+from . models import Purchase, ApplicationSale, ProposalSale, ContractSale, ExtContract, SubscriptionItem
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
@@ -13,94 +13,93 @@ from .forms import (
 )
 
 
-@admin.register(OneClickPurchase)
-class OneClickPurchaseAdmin(admin.ModelAdmin):
-    model = OneClickPurchase
-    list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'is_refunded', 'admin_action']
-    list_filter = ['category', 'status']
-    readonly_fields = [
-        'client', 'payment_method','salary_paid','created_at','reference',
-        'client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status',
-        'team', 'category', 'proposal','contract','extcontract'
-    ]
-    fieldsets = (
-        ('Transaction Details', {'fields': ('client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'reference', 'created_at',)}),
-        ('Product Type', {'fields': ('team', 'category', 'proposal', 'contract', 'extcontract')}),
-        
-    )
+# @admin.register(OneClickPurchase)
+# class OneClickPurchaseAdmin(admin.ModelAdmin):
+#     model = OneClickPurchase
+#     list_display = ['client', 'category', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'is_refunded', 'admin_action']
+#     list_filter = ['category', 'status']
+#     readonly_fields = [
+#         'client', 'payment_method','salary_paid','created_at','unique_reference',
+#         'client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status',
+#         'team', 'category', 'proposal','contract','extcontract'
+#     ]
+#     fieldsets = (
+#         ('Transaction Details', {'fields': ('client', 'payment_method', 'salary_paid', 'earning_fee', 'total_earning', 'status', 'unique_reference', 'created_at',)}),
+#         ('Product Type', {'fields': ('team', 'category', 'proposal', 'contract', 'extcontract')}),        
+#     )
 
 
-    def get_urls(self):
-        urls = super().get_urls()
-        pattern = [
-            path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='oneclick-refund'),
-        ]
-        return pattern + urls
+#     def get_urls(self):
+#         urls = super().get_urls()
+#         pattern = [
+#             path('<int:pk>/refund/', self.admin_site.admin_view(self.approve_refund), name='oneclick-refund'),
+#         ]
+#         return pattern + urls
 
 
-    def admin_action(self, obj):
-        return format_html(
-            '<a class="button" href="{}"> Refund</a>',
-            reverse('admin:oneclick-refund', args=[obj.pk]),
-        )
+#     def admin_action(self, obj):
+#         return format_html(
+#             '<a class="button" href="{}"> Refund</a>',
+#             reverse('admin:oneclick-refund', args=[obj.pk]),
+#         )
     
-    admin_action.allow_tags = True
-    admin_action.short_description = 'Admin Action'
+#     admin_action.allow_tags = True
+#     admin_action.short_description = 'Admin Action'
 
-    def approve_refund(self, request, pk, *args, **kwargs):
-        return self.process_action(
-            request=request,
-            pk=pk,
-            action_form=OneClickRefundForm,
-            action_title='About to issue refund. Action is irreversible so be sure',
-        )
+#     def approve_refund(self, request, pk, *args, **kwargs):
+#         return self.process_action(
+#             request=request,
+#             pk=pk,
+#             action_form=OneClickRefundForm,
+#             action_title='About to issue refund. Action is irreversible so be sure',
+#         )
 
-    def process_action(self, request, pk, action_form, action_title):
-        account = self.get_object(request, pk)
-        form = ''
-        error_message = ''
-        if request.method != 'POST':
-            form = action_form()
-        else:
-            form = action_form(request.POST)
-            if form.is_valid():
-                try:
-                    form.save(pk)
-                except Exception as e:
-                    error_message = str(e)
-                    print(error_message)
-                    pass
-                else:
-                    self.message_user(request, 'Successfully made refund')
-                    url = reverse('admin:transactions_oneclickpurchase_change', args=[pk], current_app=self.admin_site.name)
-                    return HttpResponseRedirect(url)
+#     def process_action(self, request, pk, action_form, action_title):
+#         account = self.get_object(request, pk)
+#         form = ''
+#         error_message = ''
+#         if request.method != 'POST':
+#             form = action_form()
+#         else:
+#             form = action_form(request.POST)
+#             if form.is_valid():
+#                 try:
+#                     form.save(pk)
+#                 except Exception as e:
+#                     error_message = str(e)
+#                     print(error_message)
+#                     pass
+#                 else:
+#                     self.message_user(request, 'Successfully made refund')
+#                     url = reverse('admin:transactions_oneclickpurchase_change', args=[pk], current_app=self.admin_site.name)
+#                     return HttpResponseRedirect(url)
 
-        context = self.admin_site.each_context(request)
-        context['opts'] = self.model._meta
-        context['form'] = form
-        context['account'] = account
-        context['title'] = action_title
+#         context = self.admin_site.each_context(request)
+#         context['opts'] = self.model._meta
+#         context['form'] = form
+#         context['account'] = account
+#         context['title'] = action_title
 
-        return TemplateResponse(request, 'admin/account/project_refund.html', context)
+#         return TemplateResponse(request, 'admin/account/project_refund.html', context)
 
-    def has_add_permission(self, request):        
-        return False
+#     def has_add_permission(self, request):        
+#         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
     model = Purchase
-    list_display = ['client', 'category', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
+    list_display = ['client', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
     list_filter = ['category', 'status']
     readonly_fields = [
         'client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',

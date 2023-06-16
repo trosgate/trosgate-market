@@ -13,38 +13,53 @@ class DateInput(forms.DateInput):
 class ProjectCreationForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'category', 'preview', 'service_level', 'completion_time', 'dura_converter', 
+        fields = ['title', 'preview', 'category', 'service_level', 'completion_time', 'dura_converter', 
                 'skill', 'description', 'rating', 'salary', 'sample_link',]
+        required = ['title', 'preview', 'category', 'service_level', 'completion_time', 'dura_converter', 
+                'skill', 'description', 'rating', 'salary']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['title'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Title'},) 
-        self.fields['category'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Category'})
-        self.fields['preview'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Preview'})
-        self.fields['description'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Description'})
-        self.fields['service_level'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Level'})
-        self.fields['completion_time'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Type'})
-        self.fields['dura_converter'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'YYYY-MM-DD'})            
-        self.fields['sample_link'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'https: // example.com'})
-        self.fields['skill'].widget.attrs.update(
-            {'class': 'form-control chosen-select Skills', 'placeholder': 'Project Skills'})
-        self.fields['rating'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Rating'})
-        self.fields['salary'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'eg : $800 - $1200'})
+        self.fields['title'].widget.attrs['class'] = 'form-control'
+        self.fields['title'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['preview'].widget.attrs['class'] = 'form-control'
+        self.fields['preview'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['category'].widget.attrs['class'] = 'custom-select'
+        self.fields['category'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['salary'].widget.attrs['class'] = 'form-control'
+        self.fields['salary'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['description'].widget.attrs['class'] = 'form-control'
+        self.fields['description'].widget.attrs['style'] = 'height: 150px;'
+
+        self.fields['service_level'].widget.attrs['class'] = 'custom-select'
+        self.fields['service_level'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['completion_time'].widget.attrs['class'] = 'custom-select'
+        self.fields['completion_time'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['dura_converter'].widget.attrs['class'] = 'custom-select'
+        self.fields['dura_converter'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['rating'].widget.attrs['class'] = 'custom-select'
+        self.fields['rating'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['sample_link'].widget.attrs['class'] = 'form-control'
+        self.fields['sample_link'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['skill'].widget.attrs['class'] = 'form-control chosen-select Skills'
+        self.fields['skill'].widget.attrs['style'] = 'height: 40px;'
+
+        for field in self.Meta.required:
+            self.fields[field].required = True
 
     def clean_skill(self):
         skill_count = self.cleaned_data['skill']
-        if len(skill_count) > 3:
+        if len(skill_count) > 5:
             raise forms.ValidationError(_("Skill selected must not be more than three"))
         return skill_count
 

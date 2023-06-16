@@ -180,7 +180,6 @@ class Contractor(models.Model):
             return False
 
 
-
 class Contract(models.Model):
     """
     This is the External contract Model

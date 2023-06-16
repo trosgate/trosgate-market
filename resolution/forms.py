@@ -5,7 +5,6 @@ from .models import (
     ApplicationCancellation,
     ProposalCancellation,
     ContractCancellation,
-    OneClickCancellation
 )
 
 class ProjectCompletionForm(forms.ModelForm):
@@ -92,17 +91,3 @@ class ContractCancellationForm(forms.ModelForm):
         self.fields['message'].widget.attrs.update(
             {'class': 'form-control'})
 
-
-class OneClickCancellationForm(forms.ModelForm):
-
-    class Meta:
-        model = OneClickCancellation
-        fields = ['cancel_type', 'message']
-
-    def __init__(self, *args, **kwargs):
-        super(OneClickCancellationForm, self).__init__(*args, **kwargs)
-        
-        self.fields['cancel_type'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['message'].widget.attrs.update(
-            {'class': 'form-control'})

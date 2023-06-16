@@ -14,7 +14,6 @@ from account.models import Customer
 from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
 from django.utils.text import slugify
 from merchants.models import MerchantMaster
-# from freelancer.models import FreelancerAccount
 
 
 def code_generator():
@@ -70,15 +69,15 @@ class Team(MerchantMaster):
     DEFAULT = 'default'
     ACTIVE = 'active'
     PACKAGE_STATUS = (
-        (DEFAULT, 'Default'),
-        (ACTIVE, 'Active')
+        (DEFAULT, 'Default Plan'),
+        (ACTIVE, 'Active Plan')
     )
 
     title = models.CharField(_("Title"), max_length=100, unique=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
     package = models.ForeignKey(Package, verbose_name=_("Team Plan"), related_name="teampackage", on_delete=models.CASCADE)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
-    notice = models.TextField(_("Notice"), max_length=500)
+    notice = models.TextField(_("Notice"), max_length=2000)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=ACTIVE)
@@ -94,6 +93,9 @@ class Team(MerchantMaster):
     razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=255, blank=True, null=True)
     razorpay_subscription_id = models.CharField(_("Razorpay Subscription ID"), max_length=255, blank=True, null=True)
     razorpay_payment_url = models.CharField(_("Razorpay Short_Link"), max_length=255, blank=True, null=True)
+
+    # team projects to display
+    gallery_link = models.URLField(_("Sample Website"), max_length=2083, help_text=_("A link to your gallery of greaat jobs done"), null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -134,7 +136,7 @@ class Team(MerchantMaster):
 
 
 # this is for External User Invitations
-class Invitation(models.Model):
+class Invitation(MerchantMaster):
     # Type
     FOUNDER = 'founder'
     INTERNAL = 'internal'
@@ -151,7 +153,6 @@ class Invitation(models.Model):
         (INVITED, _('Invited')),
         (ACCEPTED, _('Accepted'))
     )
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='merchantinvite', on_delete=models.PROTECT)
     team = models.ForeignKey(Team, verbose_name=_("Team"), related_name='invitations', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.PROTECT) #CASCADE
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
@@ -231,7 +232,13 @@ class Invitation(models.Model):
         if receiver in team.members.all():
             raise InvitationException(_("User already a member"))
 
-        internal_invite = cls.objects.create(team=team, sender=sender, type=type, receiver=receiver, email=email)
+        internal_invite = cls.objects.create(
+            team=team, 
+            sender=sender, 
+            type=type, 
+            receiver=receiver, 
+            email=email
+        )
         return internal_invite
 
 
@@ -278,7 +285,7 @@ class Invitation(models.Model):
         return external_invite
 
 
-class TeamChat(models.Model):
+class TeamChat(MerchantMaster):
     team = models.ForeignKey(Team, verbose_name=_("Chat Team"), related_name='teamchats', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name='teamsender', on_delete=models.CASCADE)
     content = models.TextField()
@@ -292,7 +299,7 @@ class TeamChat(models.Model):
         return self.content[:50] + '...'
 
 
-class AssignMember(models.Model):
+class AssignMember(MerchantMaster):
 
     # Status
     TODO = 'todo'
@@ -325,7 +332,7 @@ class AssignMember(models.Model):
         return sum(tracker.minutes for tracker in self.trackings.all())
 
 
-class Tracking(models.Model):
+class Tracking(MerchantMaster):
     team = models.ForeignKey(Team, verbose_name=_("Team"), related_name='trackings', on_delete=models.CASCADE)
     proposal = models.ForeignKey("proposals.Proposal",  verbose_name=_(
         "Proposal"), related_name="trackings", on_delete=models.CASCADE)

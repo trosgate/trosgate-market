@@ -1,4 +1,4 @@
-from . models import (OneClickReview, ApplicationReview, ProposalReview, ContractReview)
+from . models import (ApplicationReview, ProposalReview, ContractReview)
 from django.db.models import Avg, F, Count
 from proposals.models import Proposal
 
@@ -32,32 +32,3 @@ def contract_review_average(team, proposal):
     )
     return total_review
 
-
-def oneclick_proposal_review_average(team, proposal):
-    total_review = OneClickReview.objects.filter(
-        resolution__oneclick_sale__team=team, 
-        resolution__oneclick_sale__proposal=proposal,
-        status = True
-    ).annotate(
-        total_rating=(F("rating")),
-        rating_value=(F("rating")),
-    ).aggregate(
-        proposal_average_rating=(Avg("total_rating")),
-        proposal_rating_count=(Count(F("rating_value"))),
-    )
-    return total_review
-
-
-def oneclick_contract_review_average(team, proposal):
-    total_review = OneClickReview.objects.filter(
-        resolution__oneclick_sale__team=team, 
-        resolution__oneclick_sale__contract__proposal=proposal,
-        status = True
-    ).annotate(
-        total_rating=(F("rating")),
-        rating_value=(F("rating")),
-    ).aggregate(
-        contract_average_rating=(Avg("total_rating")),
-        contract_rating_count=(Count(F("rating_value"))),
-    )
-    return total_review

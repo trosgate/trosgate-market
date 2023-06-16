@@ -20,7 +20,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from datetime import datetime, timezone, timedelta
-from notification.utilities import create_notification
 from . application import ApplicationAddon
 from general_settings.models import Currency
 from payments.models import PaymentGateway
@@ -150,13 +149,13 @@ def add_application(request):
     project = get_object_or_404(Project, pk=project_id, created_by=request.user, status=Project.ACTIVE)
     application = get_object_or_404(Application, project=project, id=application_id)
     
-    if application.status == 'pending':
-        application.status = Application.ACCEPTED
+    if application.accept == False:
+        application.accept = True
         application.save()
         applicant_box.addon(application=application)
 
-    elif application.status == 'accepted':
-        application.status = Application.PENDING
+    elif application.accept == True:
+        application.accept = False
         application.save()
         applicant_box.remove(application=application_id) 
 
@@ -168,33 +167,6 @@ def add_application(request):
     return render(request, "applications/partials/accept_applicant.html", context)
 
 
-# @login_required
-# @user_is_client
-# def add_application(request):
-#     applicant_box = ApplicationAddon(request)
-#     applicant_count = applicant_box.__len__()
-#     if request.POST.get('action') == 'accept-applicant':
-#         project_id = int(request.POST.get('projectid'))
-#         application_id = int(request.POST.get('applicationid'))
-
-#         application = get_object_or_404(
-#             Application, 
-#             project__id=project_id, 
-#             id=application_id, 
-#             project__created_by=request.user
-#         )
-#         application.status = Application.ACCEPTED
-#         application.save()
-
-#         applicant_box.addon(application=application)
-
-#         message = 'The applicant was accepted successfully'
-#         app_status = application.get_status_display()
-#         print(app_status)
-#         response = JsonResponse({'message': message, 'app_status': app_status, 'applicant_count':applicant_count})
-#         return response
-
-
 @login_required
 @user_is_client
 def remove_application(request):
@@ -202,7 +174,7 @@ def remove_application(request):
     if request.POST.get('action') == 'post':
         application_id = int(request.POST.get('applicationid'))
         application = get_object_or_404(Application, id=application_id)
-        application.status = Application.PENDING
+        application.accept = False
         application.save()        
         applicant_box.remove(application=application_id)
 
@@ -220,7 +192,7 @@ def application_fee_structure(request):
         messages.error(request, "Please add atleast one applicant to proceed")
         return redirect("applications:application_multiple_summary")
 
-    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
+    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
     context = {
         'applicant_box': applicant_box,
         'base_currency': base_currency,

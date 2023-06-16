@@ -11,8 +11,6 @@ from .paypal_subscription import activate_paypal_subscription, deactivate_paypal
 app_name = 'teams'
 
 urlpatterns = [
-
-
     path('', views.team, name='team'),
     path('send-test-email', views.send_email_to_all_users, name='send_email_to_all_users'),
 
@@ -40,7 +38,6 @@ urlpatterns = [
     path('reassign/<int:assign_id>/<slug:proposal_slug>/', views.re_assign_proposal_to_any_member, name='re_assign_proposal_to_any_member'),
     path('myself/<int:member_id>/', views.reassign_proposals_to_myself, name='reassign_proposals_to_myself'),
     path('invitation/', views.invitation, name='invitation'),
-    path('update/<int:team_id>/', views.update_teams, name='update_team'),
     path('activate/<int:team_id>/', views.activate_team, name='activate_team'),
     path('preview/<int:team_id>/', views.preview_team, name='preview_inactive_team'),
     path('detail/', views.team_single, name='team_single'),
@@ -55,7 +52,9 @@ urlpatterns = [
 
 ]
 htmx_urlpatterns = [
+    path('update/', views.update_team, name='update_team'),
     path('remove-invitee/', views.remove_invitee, name='remove_invitee'), 
+    path('gallery/', views.team_gallery, name='team_gallery'), 
 ]
 
 urlpatterns += htmx_urlpatterns

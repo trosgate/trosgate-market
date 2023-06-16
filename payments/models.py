@@ -113,9 +113,9 @@ class PaymentGateway(PaymentAPI):
         return super().clean()
 
 
-class MerchantAPIs(models.Model): # This model stores apis for parent site
-    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='paymentapi', on_delete=models.CASCADE)
-   
+class MerchantAPIs(models.Model): 
+    # This model stores apis for parent site
+    merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='paymentapi', on_delete=models.CASCADE)  
     # Stripe API Credentials
     stripe_public_key = encrypt(models.CharField(_("STRIPE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     stripe_secret_key = encrypt(models.CharField(_("STRIPE SECRET KEY"), max_length=255, blank=True, null=True))
@@ -136,11 +136,13 @@ class MerchantAPIs(models.Model): # This model stores apis for parent site
     flutterwave_secret_hash = models.UUIDField(unique=True, verbose_name="Flutterwave secret Hash", editable=True, default=uuid.uuid4,)
     flutterwave_subscription_price_id = encrypt(models.CharField(_("FLUTTERWAVE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     flutterwave_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    
     # Razorpay API Credentials
     razorpay_public_key_id = encrypt(models.CharField(_("RAZORPAY PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     razorpay_secret_key_id = encrypt(models.CharField(_("RAZORPAY SECRET KEY"), max_length=255, blank=True, null=True))
     razorpay_subscription_price_id = encrypt(models.CharField(_("RAZORPAY SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     razorpay_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    
     # MTN API Credentials
     mtn_api_user_id = encrypt(models.CharField(_("MTN API_USER ID"), max_length=255, blank=True, null=True))
     mtn_api_key = encrypt(models.CharField(_("MTN API KEY"), max_length=255, blank=True, null=True))

@@ -142,16 +142,15 @@
                             </div>
                             </div>
                             
-                            {% if request.user.email == contract.client.email %}
-                            {% if contract.reaction == 'accepted' %}
                             {% if client %}
+                            {% if request.user.email == contract.client.email %}
                             </div>
                                 </div>
                                     </div>
                                     <div class="wt-updatall">
                                         <i class="ti-announcement"></i>
                                         <span>Redeem Contract with 1-Click Checkout (1CC)</span>
-                                        <button class="wt-btn" data-toggle="modal" data-target="#oneClickContractCheckout">1 Click Pay</button>
+                                        <button class="wt-btn" data-toggle="modal" data-target="#oneClickContractCheckout">Balance Checkout</button>
                                     </div>
                                     <div class="wt-updatall">
                                         <i class="ti-announcement"></i>
@@ -160,7 +159,6 @@
                                     </div>
                                 </div>
                             </div>
-                            {% endif %}
                             {% endif %}
                             {% endif %}
                         </div>  

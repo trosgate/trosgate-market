@@ -1,0 +1,38 @@
+{% comment %} {% if room %}
+{% if username %}
+{% for chat in room %}
+
+{% if room.guest == username %}
+<div class="wt-offerermessage">
+    <figure><img src="{% if chat.sender.freelancer.profile_photo %}{{ chat.sender.freelancer.profile_photo.url }}{% endif %}" alt="image description"></figure>
+    <div class="wt-description">
+        <div class="clearfix"></div>
+        <p>{{chat.content}} </p>
+        <div class="clearfix"></div>
+        <p>{{room.guest}}</p>
+        <time datetime="2017-08-08">{{room.created_at}}</time>
+    </div>
+</div>
+
+{% else %}
+<div class="wt-memessage wt-readmessage">
+    <figure><img src="{% if chat.sender.clients.profile_photo %}{{ chat.sender.clients.profile_photo.url }}{% endif %}" alt="image description"></figure>
+    <div class="wt-description">
+        <div class="clearfix"></div>
+        <p>{{chat.content}}</p>
+        <div class="clearfix"></div>
+        <p>{{chat.sender.short_name}}&nbsp;<span class="badge badge-info">Client</span></p>
+        <time datetime="2017-08-08">{{chat.sent_on}}</time>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if not room %}
+{% if not username %}
+<div class="text-center">
+    <span style="color: green; font-weight: bold;">No messages at the moment</span>
+</div>
+{% endif %}
+{% endif %} {% endcomment %}

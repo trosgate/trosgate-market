@@ -1,33 +1,32 @@
 from django.contrib import admin
 from . models import (
-    OneClickResolution, ProjectResolution, ProposalResolution, 
+    ProjectResolution, ProposalResolution, 
     ContractResolution, ExtContractResolution, ApplicationCancellation,
-    OneClickCancellation,  ApplicationReview,ApplicationCancellation,
-    ProjectCompletionFiles, OneClickReview, 
+    ApplicationReview,ApplicationCancellation, ProjectCompletionFiles, 
     ProposalCompletionFiles, ProposalReview, ContractCancellation, 
     ContractReview, ProposalCancellation,
 )
 
 
-@admin.register(OneClickResolution)
-class OneClickResolutionAdmin(admin.ModelAdmin):
-    model = OneClickResolution
-    list_display = ['team','start_time', 'end_time', 'status']    
-    readonly_fields = ['team','start_time', 'end_time', 'status', 'oneclick_sale']
+# @admin.register(OneClickResolution)
+# class OneClickResolutionAdmin(admin.ModelAdmin):
+#     model = OneClickResolution
+#     list_display = ['team','start_time', 'end_time', 'status']    
+#     readonly_fields = ['team','start_time', 'end_time', 'status', 'oneclick_sale']
 
 
-    def has_add_permission(self, request):        
-        return False
+#     def has_add_permission(self, request):        
+#         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
 @admin.register(ProjectResolution)
@@ -109,6 +108,7 @@ class ExtContractResolutionAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
+
 
 # @admin.register(OneClickCancellation)
 # class OneClickCancellationAdmin(admin.ModelAdmin):

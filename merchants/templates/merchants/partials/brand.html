@@ -1,0 +1,82 @@
+{% if brandingform %} 
+<form method="post", class="wt-formtheme"> {% csrf_token %}
+    <div class="table-responsive">
+        <table class="table">
+            <tr>
+                <td class="text-left">{{brandingform.title_block.label}}</td>
+                <td class="text-left">
+                    {{brandingform.title_block}}
+                    {{brandingform.title_block.help_text}}
+                    <span style="color:red;" role="alert">{{brandingform.title_block.errors}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">{{brandingform.subtitle_block.label}}</td>
+                <td class="text-left">
+                    {{brandingform.subtitle_block}}
+                    <span style="color:red;" role="alert">{{brandingform.subtitle_block.errors}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">{{brandingform.tagline.label}}</td>
+                <td class="text-left">
+                    {{brandingform.tagline}}
+                    <span style="color:red;" role="alert">{{brandingform.tagline.errors}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">{{brandingform.button_color.label}}</td>
+                <td class="text-left">
+                    {{brandingform.button_color}}
+                    <span style="color:red;" role="alert">{{brandingform.button_color.errors}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">{{brandingform.description.label}}</td>
+                <td class="text-left">
+                    {{brandingform.description}}
+                    <span style="color:red;" role="alert">{{brandingform.description.errors}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">{{brandingform.announcement.label}}</td>
+                <td class="text-left">
+                    {{brandingform.announcement}}
+                    <span style="color:red;" role="alert">{{brandingform.announcement.errors}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">{{brandingform.footer_description.label}}</td>
+                <td class="text-left">
+                    {{brandingform.footer_description}}
+                    <span style="color:red;" role="alert">{{brandingform.footer_description.errors}}</span>
+                </td>
+            </tr>
+        
+        </table>
+    </div>
+
+    {% if messages %}
+    <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:4s">        
+        {% for message in messages %}        
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <span class="wt-jobalerts">
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                    <span> {{ message}} </span>
+                </div>
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+        
+    <div class="text-center">
+        <button type="button" class="wt-btn"
+            hx-post="{% url 'merchants:brand_form' %}"
+            hx-target="#brand"
+            style="background-color:rgb(29, 118, 90); font-weight: bold;">
+            Save Branding 
+        </button>
+    </div>
+</form>
+{% endif %}

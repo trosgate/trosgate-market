@@ -62,14 +62,12 @@
                                     </p>
                                     <hr>
                                     <br>
-                                    <div id="proposal-messages" 
-                                        hx-get="{% url 'proposals:fetch_messages' proposal.id %}" 
-                                        hx-trigger="every 1s" 
-                                        hx-swap="innerhtml"> 
+                                    <div id="proposal-messages"> 
                                         {% include 'proposals/components/partial_proposal.html' %}
                                     </div>
+                                    
                                     <form>
-                                    <div>
+                                    {% comment %} <div> {% endcomment %}
                                         <div class="wt-replaybox">
                                             <div class="form-group">
                                                 <textarea id="id_content" type="text" name="content" class="form-control" placeholder="start typing..."></textarea>
@@ -80,7 +78,7 @@
                                                 <button id="newMessage" hx-post="{% url 'proposals:create_message' proposal.id %}" hx-target="#proposal-messages" type="submit" class="wt-btnsendmsg">Send</button>
                                             </div>
                                         </div>
-                                    </div>
+                                    {% comment %} </div> {% endcomment %}
                                 </form>
                             </div>
                         </div>

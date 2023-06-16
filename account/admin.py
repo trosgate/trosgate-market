@@ -365,7 +365,7 @@ class MerchantAdmin(admin.ModelAdmin):
             'site_Logo','site_logo_tag', 'banner_image','banner_tag', 
         )}),
         ('Website, Banner & Color Scheme', {'fields': (
-            'category_type', 'banner_type', 'title_block','subtitle_block','button_color', 'navbar_color',
+            'category_type', 'proposal_detail', 'project_type', 'banner_type', 'title_block','subtitle_block','button_color', 'navbar_color',
             'get_site', 'tagline', 'description','announcement','footer_description', 
         )}),
         ('Additional Hero Banner Contents', {'fields': (

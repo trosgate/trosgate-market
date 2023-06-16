@@ -1,92 +1,92 @@
 {% load static %}
 
-			<!--Footer Start-->
-			<footer id="wt-footer" class="wt-footer wt-haslayout">
-				<div class="wt-footerholder wt-haslayout">
-					<div class="container">
-						<div class="row">
-							<div class="col-12 col-sm-12 col-md-6 col-lg-6">
-								<div class="wt-footerlogohold">
-									<strong class="wt-logo"><a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a></strong>
-									<div class="wt-description">
-										<p>{% if website.footer_description %}{{website.footer_description}}{% endif %}</a></p>
-									</div>
-									<ul class="wt-socialiconssimple wt-socialiconfooter">
-										{% if website.facebook_url %}
-										<li class="wt-facebook"><a href="{{website.facebook_url}}"><i class="fa fa-facebook-f"></i></a></li>
-										{% endif %}
-										{% if website.twitter_url %}
-										<li class="wt-twitter"><a href="{{website.twitter_url}}"><i class="fab fa-twitter"></i></a></li>
-										{% endif %}
-										{% if website.youtube_url %}
-										<li class="wt-youtube"><a href="{{website.youtube_url}}"><i class="fab fa-youtube"></i></a></li>
-										{% endif %}
-										{% if website.instagram_url %}
-										<li class="wt-instagram"><a href="{{website.instagram_url}}"><i class="fab fa-instagram"></i></a></li>
-										{% endif %}
-									</ul>
-								</div>
-							</div>
-							<div class="col-12 col-sm-6 col-md-3 col-lg-3">
-								<div class="wt-footercol wt-widgetcompany">
-									<div class="wt-fwidgettitle">
-										<h3>Company</h3>
-									</div>
-									<ul class="wt-fwidgetcontent">
-										<li><a href="{% url 'pages:aboutus' %}">About Us</a></li>
-										<li><a href="{% url 'pages:how_it_works' %}">How It Works</a></li>
-										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
-										<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
-									</ul>
-								</div> 
-							</div>
-							<div class="col-12 col-sm-6 col-md-3 col-lg-3">
-								<div class="wt-footercol wt-widgetexplore">
-									<div class="wt-fwidgettitle">
-										<h3>Category</h3>
-									</div>
-									<ul class="wt-fwidgetcontent">
-										{% for category in categories %}
-										<li><a href="{{category.category_absolute_url}}">{{category.name}}</a></li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
+<!--Footer Start-->
+<footer id="wt-footer" class="wt-footer wt-haslayout">
+	<div class="wt-footerholder wt-haslayout">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-6 col-lg-6">
+					<div class="wt-footerlogohold">
+						<strong class="wt-logo"><a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a></strong>
+						<div class="wt-description">
+							<p>{% if website.footer_description %}{{website.footer_description}}{% endif %}</a></p>
 						</div>
+						<ul class="wt-socialiconssimple wt-socialiconfooter">
+							{% if website.facebook_url %}
+							<li class="wt-facebook"><a href="{{website.facebook_url}}"><i class="fa fa-facebook-f"></i></a></li>
+							{% endif %}
+							{% if website.twitter_url %}
+							<li class="wt-twitter"><a href="{{website.twitter_url}}"><i class="fab fa-twitter"></i></a></li>
+							{% endif %}
+							{% if website.youtube_url %}
+							<li class="wt-youtube"><a href="{{website.youtube_url}}"><i class="fab fa-youtube"></i></a></li>
+							{% endif %}
+							{% if website.instagram_url %}
+							<li class="wt-instagram"><a href="{{website.instagram_url}}"><i class="fab fa-instagram"></i></a></li>
+							{% endif %}
+						</ul>
 					</div>
 				</div>
-				<div class="wt-haslayout wt-joininfo">
-					<div class="container">
-						<div class="row justify-content-md-center">
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 push-lg-1">
-								<div class="wt-companyinfo">
-									<span><a href="javascript:void(0);">New @ {{request.site.name|capfirst}}?</a> For sure you can change that too.</span>
-								</div>
-								<div class="wt-fbtnarea">
-									<a href="{% url 'account:register' %}" class="wt-btn">Join Now</a>
-								</div>
-							</div>
+				<div class="col-12 col-sm-6 col-md-3 col-lg-3">
+					<div class="wt-footercol wt-widgetcompany">
+						<div class="wt-fwidgettitle">
+							<h3>Company</h3>
 						</div>
+						<ul class="wt-fwidgetcontent">
+							<li><a href="{% url 'pages:aboutus' %}">About Us</a></li>
+							<li><a href="{% url 'pages:how_it_works' %}">How It Works</a></li>
+							<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
+							<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
+						</ul>
+					</div> 
+				</div>
+				<div class="col-12 col-sm-6 col-md-3 col-lg-3">
+					<div class="wt-footercol wt-widgetexplore">
+						<div class="wt-fwidgettitle">
+							<h3>Category</h3>
+						</div>
+						<ul class="wt-fwidgetcontent">
+							{% for category in categories %}
+							<li><a href="{{category.category_absolute_url}}">{{category.name}}</a></li>
+							{% endfor %}
+						</ul>
 					</div>
 				</div>
-				<div class="wt-haslayout wt-footerbottom">
-					<div class="container">
-						<div class="row">
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-								<p class="wt-copyrights"><a style="text-decoration:None; color:white;" href="/">{{request.site.name|capfirst}} Marketplace </a></p>
-								<nav class="wt-addnav">
-									<ul>
-										<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
-										<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
-										<li><a href="{% url 'pages:terms_and_conditions' %}">Privacy Policy</a></li>
-									</ul>
-								</nav>
-							</div>
-						</div>
+			</div>
+		</div>
+	</div>
+	<div class="wt-haslayout wt-joininfo">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 push-lg-1">
+					<div class="wt-companyinfo">
+						<span><a href="javascript:void(0);">New @ {{request.site.name|capfirst}}?</a> For sure you can change that too.</span>
+					</div>
+					<div class="wt-fbtnarea">
+						<a href="{% url 'account:register' %}" class="wt-btn">Join Now</a>
 					</div>
 				</div>
-			</footer>
-			<!--Footer End--> 
+			</div>
+		</div>
+	</div>
+	<div class="wt-haslayout wt-footerbottom">
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<p class="wt-copyrights"><a style="text-decoration:None; color:white;" href="/">{{request.site.name|capfirst}} Marketplace </a></p>
+					<nav class="wt-addnav">
+						<ul>
+							<li><a href="{% url 'marketing:article_list' %}">Articles</a></li>
+							<li><a href="{% url 'pages:terms_and_conditions' %}">Terms and Conditions</a></li>
+							<li><a href="{% url 'pages:terms_and_conditions' %}">Privacy Policy</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+<!--Footer End--> 
  
 
 

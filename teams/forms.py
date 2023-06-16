@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from .models import Team, Invitation, TeamChat, AssignMember
 from django import forms
+from django.forms import Textarea
 from proposals.models import Proposal
 from account.models import Customer
 from freelancer.models import Freelancer
@@ -35,8 +36,8 @@ class TeamChatForm(forms.ModelForm):
 
     class Meta:
         model = TeamChat
-        fields = ['content'] 
-
+        fields = ['content']
+ 
 
 class AssignForm(forms.ModelForm):
     assignee = forms.ModelChoiceField(queryset=AssignMember.objects.all(), empty_label='Select Team Member')
@@ -44,7 +45,6 @@ class AssignForm(forms.ModelForm):
     class Meta:
         model = AssignMember
         fields = ['assignee', 'duty'] 
-
 
     def __init__(self, assignee, *args, **kwargs):
         super(AssignForm, self).__init__(*args, **kwargs)
@@ -56,8 +56,16 @@ class AssignForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'describe the main duty e.g marketing of this proposal'})
 
 
+class TeamGalleryForm(forms.ModelForm):
 
+    class Meta:
+        model = Team
+        fields = ['gallery_link']
 
+    def __init__(self, *args, **kwargs):
+        super(TeamGalleryForm, self).__init__(*args, **kwargs)
+
+        self.fields['gallery_link'].widget.attrs['class'] = 'form-control'
 
 
 

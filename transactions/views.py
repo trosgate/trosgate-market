@@ -19,7 +19,7 @@ from paypalcheckoutsdk.orders import OrdersGetRequest
 from payments.models import PaymentGateway
 from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.csrf import csrf_exempt
-from .models import OneClickPurchase, ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from .models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
 from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
@@ -39,8 +39,10 @@ from client.models import ClientAccount
 
 @login_required
 def proposal_direct_hire(request, short_name, proposal_slug):
-    # A page for hiring single freelancer directly
-    # In frontend, the proposal is captured into session when client proceeds 
+    '''
+    A page for hiring single freelancer directly
+    In frontend, the proposal is captured into session when client proceeds 
+    '''
     proposal = get_object_or_404(Proposal, created_by__short_name=short_name,  slug=proposal_slug)
 
     context = {
@@ -61,8 +63,10 @@ def proposal_bucket(request):
 
 @login_required
 def add_proposal_to_box(request):
-    # Callable function for adding proposal and
-    # modifying the quantity of freelancer in the box
+    '''
+    Callable function for adding proposal and
+    modifying the quantity of freelancer in the box
+    '''
     hiringbox = HiringBox(request)
 
     if request.POST.get('action') == 'post':
@@ -81,8 +85,10 @@ def add_proposal_to_box(request):
 
 @login_required
 def remove_from_hiring_box(request):
-    # Callable function for removing proposal and
-    # associated quantity of freelancer from box
+    '''
+    Callable function for removing proposal and
+    associated quantity of freelancer from box
+    '''
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
@@ -96,8 +102,10 @@ def remove_from_hiring_box(request):
 
 @login_required
 def modify_from_hiring_box(request):
-    # Callable CRUD function for modifying proposal and
-    # associated quantity of freelancer
+    '''
+    Callable CRUD function for modifying proposal and
+    associated quantity of freelancer within hiring box
+    '''
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
@@ -121,7 +129,7 @@ def payment_option_with_fees(request):
         messages.error(request, "Please add atleast one proposal to proceed")
         return redirect("transactions:hiring_box_summary")
 
-    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='balance')
+    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
     base_currency = get_base_currency_symbol()    
     context ={
         'hiringbox': hiringbox,
@@ -133,9 +141,11 @@ def payment_option_with_fees(request):
 
 @login_required
 def payment_fee_structure(request):
-    # Callable function for updating the fees
-    # Adding fee ID as an object to session
-    # Adding to session makes it easy to retrieve selected fee on checkout page
+    '''
+    Callable function for updating the fees
+    Adding fee ID as an object to session
+    Adding to session makes it easy to retrieve selected fee on checkout page
+    '''
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         gateway_type = int(request.POST.get('gatewaytype'))
@@ -162,6 +172,8 @@ def payment_fee_structure(request):
         }
         response = JsonResponse(context)
         return response
+
+
 
 
 @login_required
@@ -240,10 +252,6 @@ def flutter_payment_intent(request):
     else:       
         try:
             purchase = Purchase.objects.create(
-                client=request.user,
-                full_name=request.user.get_full_name,
-                email=request.user.email,
-                country=str(request.user.country),
                 payment_method=gateway_type,
                 client_fee = int(total_gateway_fee),
                 category = Purchase.PROPOSAL,
@@ -697,7 +705,7 @@ def payment_success(request):
 @login_required
 def proposal_transaction(request):
     base_currency = get_base_currency_code()
-    proposals = ''
+    proposals = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
         proposals = ProposalSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -716,7 +724,7 @@ def proposal_transaction(request):
 @login_required
 def application_transaction(request):
     base_currency = get_base_currency_code()
-    applications = ''
+    applications = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
         applications = ApplicationSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -734,7 +742,7 @@ def application_transaction(request):
 @login_required
 def contract_transaction(request):
     base_currency = get_base_currency_code()
-    contracts = ''
+    contracts = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
         contracts = ContractSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -749,21 +757,21 @@ def contract_transaction(request):
     return render(request, 'transactions/contract_transactions.html', context)
 
 
-@login_required
-def one_click_transaction(request):
-    base_currency = get_base_currency_code()
-    oneclicks = ''
-    if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
-        oneclicks = OneClickPurchase.objects.filter(team=team, status=OneClickPurchase.SUCCESS)
+# @login_required
+# def one_click_transaction(request):
+#     base_currency = get_base_currency_code()
+#     oneclicks = ''
+#     if request.user.user_type == Customer.FREELANCER:
+#         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
+#         oneclicks = OneClickPurchase.objects.filter(team=team, status=OneClickPurchase.SUCCESS)
 
-    elif request.user.user_type == Customer.CLIENT:
-        oneclicks = OneClickPurchase.objects.filter(client=request.user, status=OneClickPurchase.SUCCESS)
+#     elif request.user.user_type == Customer.CLIENT:
+#         oneclicks = OneClickPurchase.objects.filter(client=request.user, status=OneClickPurchase.SUCCESS)
 
-    context = {
-        'oneclicks':oneclicks,
-        'base_currency': base_currency,        
-    }
-    return render(request, 'transactions/oneclicks_transactions.html', context)
+#     context = {
+#         'oneclicks':oneclicks,
+#         'base_currency': base_currency,        
+#     }
+#     return render(request, 'transactions/oneclicks_transactions.html', context)
 
 

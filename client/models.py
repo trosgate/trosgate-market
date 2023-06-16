@@ -9,10 +9,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from account.fund_exception import FundException
 from general_settings.fund_control import get_max_deposit, get_min_deposit, get_max_depositor_balance, get_min_depositor_balance
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+from merchants.models import MerchantMaster
 
 
-
-class Client(models.Model):
+class Client(MerchantMaster):
     # STORAGE = activate_storage_type()
     MALE = 'male'
     FEMALE = 'female'
@@ -143,7 +143,7 @@ class Client(models.Model):
     logo_tag.short_description = 'company_logo'
 
 
-class ClientAccount(models.Model):
+class ClientAccount(MerchantMaster):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
         related_name='clientfunduser', 
@@ -245,7 +245,7 @@ class ClientAccount(models.Model):
         return client_account, account_action
 
 
-class ClientAction(models.Model):
+class ClientAction(MerchantMaster):
     account = models.ForeignKey(
         ClientAccount, 
         verbose_name=_("Account"), 

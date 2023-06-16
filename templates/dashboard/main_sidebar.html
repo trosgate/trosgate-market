@@ -50,7 +50,6 @@
 							</a>
 							{% if active_team.status == 'active' %}						
 							<ul class="sub-menu">
-								<li><hr><a href="{% url 'transactions:one_click_transaction' %}">One-Click</a></li>
 								<li><hr><a href="{% url 'transactions:proposal_transaction' %}">Proposal</a></li>
 								<li><hr><a href="{% url 'transactions:application_transaction' %}">Application</a></li>
 								<li><hr><a href="{% url 'transactions:contract_transaction' %}">Contract</a></li>
@@ -66,7 +65,6 @@
 								<span>Transactions</span>
 							</a>
 							<ul class="sub-menu">
-								<li><hr><a href="{% url 'transactions:one_click_transaction' %}">One-Click</a></li>
 								<li><hr><a href="{% url 'transactions:proposal_transaction' %}">Proposal</a></li>
 								<li><hr><a href="{% url 'transactions:application_transaction' %}">Application</a></li>
 								<li><hr><a href="{% url 'transactions:contract_transaction' %}">Contract</a></li>

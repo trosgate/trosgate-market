@@ -1,13 +1,16 @@
-# from django.contrib import admin
-# from .models import Notification
-# from django.urls import path, reverse
-# from django.template.response import TemplateResponse
-# from django.utils.html import format_html
+from django.contrib import admin
+from .models import Message, Room
 
 
-# class NotificationAdmin(admin.ModelAdmin):
-#     model = Notification
-#     list_display = ['sender','receiver', 'notification_type', 'preview_action']
+
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    list_display = ['merchant','guest','agent', 'reference', 'status']
+    
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['merchant','sender','created_by', 'created_at',]
     
 #     def get_urls(self):
 #         urls = super().get_urls()

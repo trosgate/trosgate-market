@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Team, Invitation, TeamChat, AssignMember, Tracking
 from teams.models import Package
 from django.contrib.auth.decorators import login_required
-from .forms import TeamModifyForm, AssignForm
+from .forms import TeamModifyForm, AssignForm, TeamGalleryForm
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -93,27 +93,30 @@ def preview_team(request, team_id):
 
 @login_required
 @user_is_freelancer
-def update_teams(request, team_id):
-    update_team = get_object_or_404(
-        Team, pk=team_id, status=Team.ACTIVE, members__in=[request.user])
+def update_team(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
 
     if request.method == 'POST':
-        update_teamform = TeamModifyForm(request.POST, instance=update_team)
+        update_teamform = TeamModifyForm(request.POST or None, instance=team)
 
         if update_teamform.is_valid():
-            update_teamform.instance.slug = slugify(update_team.title)
+            update_teamform.instance.slug = slugify(team.title)
             update_teamform.save()
 
             messages.info(request, 'The Changes were saved successfully!')
-
-            return redirect('account:dashboard')
+            context = {
+                "team":team,
+                "galleryform": TeamGalleryForm(instance=team),
+            }
+            return render(request, 'teams/components/manage_team.html', context)
 
     else:
-        update_teamform = TeamModifyForm(instance=update_team)
+        update_teamform = TeamModifyForm(instance=team)
     context = {
         "update_teamform": update_teamform,
+        "team":team
     }
-    return render(request, 'teams/update_team.html', context)
+    return render(request, 'teams/components/update_team.html', context)
 
 
 @login_required
@@ -125,17 +128,38 @@ def team_single(request):
     invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
     accepted = Invitation.objects.filter(team=team, status=Invitation.ACCEPTED)
     code = Invitation.objects.values('code')
-
+    galleryform = TeamGalleryForm(instance=team)
     # to show invite
     context = {
-        "teams": team,
+        "team": team,
         "code": code,
         'invited': invited,
         'accepted': accepted,
         "proposals": proposals,
         "applications": applications,
+        "galleryform": galleryform,
     }
     return render(request, 'teams/team_detail.html', context)
+
+
+@login_required
+@user_is_freelancer
+def team_gallery(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, created_by=request.user)
+    galleryform = TeamGalleryForm(request.POST or None, instance=team)
+    
+    if galleryform.is_valid():
+        galleryform.save()
+
+    else:
+        messages.error(request, 'Invalid url submitted')
+
+    context = {
+        "team": team,
+        "galleryform": galleryform,
+        "hiddenmessage":'hide'
+    }
+    return render(request, 'teams/components/gallery.html', context)
 
 
 @login_required

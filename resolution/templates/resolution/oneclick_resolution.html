@@ -301,7 +301,7 @@
 									<h3>cancellation Request</h3>
 									<span style="color: green; font-weight: bold;"> We hope both parties could come to terms. 
 									{% if oneclick_sold.category == 'proposal' %}
-										<a href="{% url 'proposals:proposal_chat_messages' oneclick_sold.proposal.created_by.short_name oneclick_sold.proposal.slug %}" class="btn btn-outline-danger btn-sm"><i class="fa fa-envelope"> Let us Chat</i></a>
+										<a href="{% url 'proposals:proposal_chat_messages' oneclick_sold.proposal.slug %}" class="btn btn-outline-danger btn-sm"><i class="fa fa-envelope"> Let us Chat</i></a>
 										{% elif oneclick_sold.category == 'contract' %}
 										<a href="{% url 'contract:contract_discord' oneclick_sold.contract.pk oneclick_sold.contract.slug %}" class="btn btn-outline-danger btn-sm"><i class="fa fa-envelope"> Let us Chat</i></a>
 									{% endif %}

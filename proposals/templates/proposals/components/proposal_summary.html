@@ -1,0 +1,214 @@
+<div id="tabs" class="project-tab">
+        <div class="row">
+            <div class="col-md-12">
+                <nav>
+                    <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Sales Statistics</a>
+                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">FAQs</a>
+                        <a class="nav-item nav-link" id="nav-review-tab" data-toggle="tab" href="#nav-review" role="tab" aria-controls="nav-review" aria-selected="false">Review</a>
+                    </div>
+                </nav>
+            </div>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                        <section class="wt-haslayout wt-dbsectionspace">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                                {% if not request.user.is_authenticated %}
+                                <div class="text-center">
+                                    <span style="color:green; font-weight:bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                        Please login to view the statistics for the proposal. 
+                                    </span>
+                                </div>
+                                {% endif %}
+                                {% if request.user.is_authenticated %}								 
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Profile</th>
+                                            <th>Team</th>
+                                            <th>Author</th>
+                                            <th>Members</th>
+                                            <th>Skills</th>
+                                        </tr>
+                                    </thead>
+                                    <body>
+                                        <tr>
+                                            <td>Proposal</td>
+                                            <td>{{proposal.team.title}}</td>
+                                            <td>@{{proposal.created_by.short_name}}</td>
+                                            <td>has {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</td>
+                                            <td>{% for skill in proposal.skill.all %} {{skill}}, {% endfor %}</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <th>Sales Report</th>
+                                            <th>Direct</th>
+                                            <th>Contract</th>
+                                            <th>1C-Pro</th>
+                                            <th>1C-Con</th>
+                                        </tr>
+                                    </body>
+                                    <body>
+                                        <tr>
+                                            <td>Total Sales</td>
+                                            <td>{{sales_count_by_proposal}}</td>
+                                            <td>{{sales_count_by_contract}}</td>
+                                            <td>{{oneclick_count_by_proposal}}</td>
+                                            <td>{{oneclick_count_by_contract}}</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <th>Review Report</th>
+                                            <th>Direct</th>
+                                            <th>Contract</th>
+                                            <th>1C-Pro</th>
+                                            <th>1C-Con</th>
+                                        </tr>
+                                    </body>
+                                    
+                                    <body>
+                                        <tr>
+                                            <td>Rate</td>
+                                            <td>{% if proposal_review_avg.proposal_rating_count == 0 %} 0{% else %}{{proposal_review_avg.proposal_average_rating}}{% endif %}/5</td>
+                                            <td>{% if contract_review_avg.contract_rating_count == 0 %} 0{% else %}{{contract_review_avg.contract_average_rating}}{% endif %}/5</td>
+                                            <td>{% if oneclick_proposal_review_avg.proposal_rating_count == 0 %} 0{% else %}{{oneclick_proposal_review_avg.proposal_average_rating}}{% endif %}/5</td>
+                                            <td>{% if oneclick_contract_review_avg.contract_rating_count == 0 %} 0{% else %}{{oneclick_contract_review_avg.contract_average_rating}}{% endif %}/5</td>
+                                        </tr> 
+                                        <tr>
+                                            <td>Feedback {{base_currency_symbol}}{{contract_delta_amount}}</td>
+                                            <td>{{proposal_review_avg.proposal_rating_count}}</td>
+                                            <td>{{contract_review_avg.contract_rating_count}}</td>
+                                            <td>{{oneclick_proposal_review_avg.proposal_rating_count}}</td>
+                                            <td>{{oneclick_contract_review_avg.contract_rating_count}}</td>
+                                        </tr>
+                                    </body>	
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                                <p><strong>Foot Notes</strong></p>
+                                <div class="wt-freelancerholder wt-rcvproposalholder">
+                                    <span><i class="ti-check" style='color:green'> 1CC:</i> Means One click checkout transaction(excluding 1CC payment methods)</span><br>
+                                    <span><i class="ti-check" style='color:green'> Direct:</i> Data for this proposal directly bought(excluding 1CC payment methods)</span><br>
+                                    <span><i class="ti-check" style='color:green'> Contract:</i> Data for this proposal linked to contract and bought(excluding 1CC payment methods)</span><br>
+                                    <span><i class="ti-check" style='color:green'> 1C-Pro:</i> Data representing this proposal bought via ICC</span><br>
+                                    <span><i class="ti-check" style='color:green'> 1C-Con</i> Data representing this proposal linked to contract and bought via ICC</span><br>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </section>
+                        <!-- sharethis button begins-->	
+                        <div class="sharethis-inline-share-buttons"></div>
+                        <!-- sharethis button ends-->
+                    </div>
+                    
+                    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab"><br>
+                        <div class="section-title">
+                            <p>Our frequently asked questionsOur frequently asked questions.Our frequently asked questions.Our frequently asked questions.Our frequently asked questions.Our frequently asked questions..</p>
+                          </div>
+                        <ul class="wt-accordionhold accordion">
+                            {% if proposal.faq_one %}
+                            <li>
+                                <div class="wt-accordiontitle collapsed" id="headingtwo2" data-toggle="collapse" data-target="#collapsetwo2">
+                                    <span>{{proposal.faq_one}}</span>
+                                </div>
+                                <div class="wt-accordiondetails collapse" id="collapsetwo2" aria-labelledby="headingtwo2">
+                                    <div class="wt-title">
+                                        <h3>{{proposal.faq_one}}</h3>
+                                    </div>
+                                    <div class="wt-description">
+                                        {{proposal.faq_one_description}}
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% if proposal.faq_two %}
+                            <li>
+                                <div class="wt-accordiontitle collapsed" id="headingthree2" data-toggle="collapse" data-target="#collapsethree2">
+                                    <span>{{proposal.faq_two}}</span>
+                                </div>
+                                <div class="wt-accordiondetails collapse" id="collapsethree2" aria-labelledby="headingthree2">
+                                    <div class="wt-title">
+                                        <h3>{{proposal.faq_two}}</h3>
+                                    </div>
+                                    <div class="wt-description">
+                                        {{proposal.faq_two_description}}
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab">
+                        <div class="wt-clientfeedback">
+                        {% if not request.user.is_authenticated %}
+                        <div class="text-center"><br>
+                            <span style="color:green; font-weight:bold;"><i class="fa fa-exclamation-triangle"></i> 
+                                Please login to read reviews. 
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if request.user.is_authenticated %}
+                        {% if proposal_review_msg|length > 0 %}
+                            {% for review_msg in proposal_review_msg %}	
+                            <div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+                                <figure class="wt-userlistingimg">
+                                    <img src="{% if review_msg.resolution.proposal_sale.purchase.client.clients.profile_photo %}{{review_msg.resolution.proposal_sale.purchase.client.clients.profile_photo.url}}{% endif %}" alt="image description">
+                                </figure>
+                                <div class="wt-userlistingcontent">
+                                    <div class="wt-contenthead">
+                                        <div class="wt-title">
+                                            <a href="javascript:void(0);"><i class="fa fa-check-circle"></i> {{review_msg.resolution.proposal_sale.purchase.client.get_full_name}}</a>
+                                            <p>{{review_msg.title}}</p>
+                                        </div>
+                                        <ul class="wt-userlisting-breadcrumb">
+                                            <li><span><i class="far fa-calendar"> Date: {{review_msg.created_at|date:"M-d-Y"}}</i></span></li>
+                                            <li><span><img src="{% if review_msg.resolution.proposal_sale.purchase.client.clients.profile_photo %}{{review_msg.resolution.proposal_sale.purchase.client.country.flag.url}}{% endif %}" alt="img description"> {{review_msg.resolution.proposal_sale.purchase.client.country.name|truncatechars:30}}</span></li>
+                                            <li><span>{{review_msg.rating}}/5 <i class="fa fa-star fill" style='color:orange'> Review</i></span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="wt-description">
+                            <p>“{{review_msg.message|linebreaksbr}}.”</p>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% if oneclick_review_msg|length > 0 %}
+                            {% for review_msg in oneclick_review_msg %}	
+                            <div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">	
+                                <figure class="wt-userlistingimg">
+                                    <img src="{% if review_msg.resolution.oneclick_sale.client.clients.profile_photo %}{{review_msg.resolution.oneclick_sale.client.clients.profile_photo.url}}{% endif %}" alt="image description">
+                                </figure>
+                                <div class="wt-userlistingcontent">
+                                    <div class="wt-contenthead">
+                                        <div class="wt-title">
+                                            <a href="javascript:void(0);"><i class="fa fa-check-circle"></i> {{review_msg.resolution.oneclick_sale.client.get_full_name}}</a>
+                                            <p>{{review_msg.title}}</p>
+                                        </div>
+                                        <ul class="wt-userlisting-breadcrumb">
+                                            <li><span><i class="far fa-calendar"> Date: {{review_msg.created_at|date:"M-d-Y"}}</i></span></li>
+                                            <li><span><img src="{% if review_msg.resolution.oneclick_sale.client.clients.profile_photo %}{{review_msg.resolution.oneclick_sale.client.country.flag.url}}{% endif %}" alt="img description"> {{review_msg.resolution.oneclick_sale.client.country.name|truncatechars:30}}</span></li>
+                                            <li><span>{{review_msg.rating}}/5 <i class="fa fa-star fill" style='color:orange'> Review</i></span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="wt-description">
+                                <p>“{{review_msg.message|linebreaksbr}}.”</p>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if review_status %}
+                        <p class='text-center'><strong style="color:blue;" role="alert">This proposal has no reviews at the moment</strong></p>
+                        {% endif %}	
+                        {% endif %}	
+                            
+                        </div>
+                    </div>
+                </div>
+        </div>
+</div>

@@ -119,7 +119,7 @@ def accept_or_reject_contract(request):
 @user_is_client
 def internal_contract_fee_structure(request, contract_id, contract_slug):
     base_contract = BaseContract(request)
-    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
+    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='balance')
     contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, reaction=InternalContract.ACCEPTED, created_by=request.user)
     discount = base_contract.get_discount_value(contract)
     multiplier = base_contract.get_discount_multiplier(contract)
@@ -713,6 +713,7 @@ def connect_contract(request, contractor_id):
     client = get_object_or_404(Contractor, pk=contractor_id, team=team)
     existing_user = Customer.objects.filter(email=client.email).count()
     existing_contract = Contract.objects.filter(client__email=client.email).count()
+    
     profile_path= f"{get_protocol_only()}{str(get_current_site(request))}/freelancer/profile/{request.user.short_name}/"
     base_currency = get_base_currency_symbol()
     
@@ -790,7 +791,7 @@ def external_contract_detail(request, contract_id, contract_slug):
 @login_required
 @user_is_client
 def external_contract_fee_structure(request, contract_id, contract_slug):
-    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='Balance')
+    payment_gateways = PaymentGateway.objects.filter(status=True).exclude(name='balance')
     contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, reaction=Contract.ACCEPTED, client__email=request.user.email)
     base_currency = get_base_currency_symbol
     context = {

@@ -16,7 +16,6 @@ urlpatterns = [
     path('proposals/', views.proposal_transaction, name='proposal_transaction'),
     path('applications/', views.application_transaction, name='application_transaction'),
     path('contract/', views.contract_transaction, name='contract_transaction'),
-    path('oneclick/', views.one_click_transaction, name='one_click_transaction'),
 
     path('fee-structure/', views.payment_option_with_fees, name='payment_option_selection'),
     path('payment_fee_structure/', views.payment_fee_structure,name='payment_fee_structure'),

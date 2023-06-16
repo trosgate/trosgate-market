@@ -70,31 +70,33 @@ h6 {
   }
 }
 
+
 /*--------------------------------------------------------------
-# Back to top button
+# Chat button even when scroll to top
 --------------------------------------------------------------*/
+
 .back-to-top {
   position: fixed;
-  visibility: hidden;
+  visibility: visible;
   opacity: 0;
-  right: 15px;
-  bottom: 15px;
+  right: 20px;
+  bottom: 20px;
   z-index: 996;
-  background: #3fbbc0;
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
+  background: #850a87;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   transition: all 0.4s;
 }
 
 .back-to-top i {
   font-size: 28px;
-  color: #fff;
+  color: #ffffff;
   line-height: 0;
 }
 
 .back-to-top:hover {
-  background: #5ec6ca;
+  background: #300f8c;
   color: #fff;
 }
 
@@ -1650,6 +1652,92 @@ section {
 
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/*--------------------------------------------------------------
+# Project or jobs
+--------------------------------------------------------------*/
+
+.project-container{
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.project-container .jobs{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+}
+
+.project-container .jobs img{
+  width: 60px;
+}
+
+.project-container .job{
+  box-shadow: 0 4px 24px -8px rgba(2,48,71, 0.2);
+  padding: 24px;
+  border-radius: 16px;
+  transition: all 400ms ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.project-container .deadline{
+  position: absolute;
+  top: 40px;
+  right: 24px;
+  color: #e63943;
+}
+.project-container .job:hover{
+  transform: scale(1.03);
+}
+
+.project-container .job-title{
+  font-size: 20px;
+  padding: 20px 0;
+  margin: 0;
+  color: #023047;
+}
+
+.project-container .details{
+  margin-top: 6px;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.8;
+  flex: 1;
+}
+
+.project-container .detail-btn{
+  text-decoration: none;
+  border: 1px solid #023047;
+  color: #000;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 20px;
+  
+}
+.project-container .detail-btn:hover{
+  background: #023047;
+  color: #fff;
+}
+
+@media(max-width:940px){
+  .project-container .jobs{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media(max-width:640px){
+  .project-container .jobs{
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin:0 auto
   }
 }
 

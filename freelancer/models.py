@@ -22,6 +22,8 @@ from payments.models import PaymentRequest, AdminCredit
 # from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email, lock_fund_email
 from PIL import Image
+from merchants.models import MerchantMaster
+
 
 
 class ActiveFreelancer(models.Manager):
@@ -29,7 +31,7 @@ class ActiveFreelancer(models.Manager):
         return super(ActiveFreelancer, self).get_queryset().filter(user__is_active=True, user__user_type=Customer.FREELANCER)
 
 
-class Freelancer(models.Model):
+class Freelancer(MerchantMaster):
     # STORAGE = activate_storage_type()
     MALE = 'male'
     FEMALE = 'female'
@@ -84,7 +86,7 @@ class Freelancer(models.Model):
     image_three = models.ImageField(_("Image 3"), upload_to='freelancer/awards/', null=True, blank=True,)
     slug = models.SlugField(_("Slug"), max_length=30, null=True, blank=True,)
     active_team_id = models.PositiveIntegerField(_("Active Team ID"), default=0)
-    objects = models.Manager()
+    created = models.BooleanField(_("user Created"), default=False,)
     active = ActiveFreelancer()
 
     class Meta:
@@ -156,9 +158,8 @@ class Freelancer(models.Model):
     banner_tag.short_description = 'banner_photo'
 
 
-class FreelancerAccount(models.Model):
+class FreelancerAccount(MerchantMaster):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='fundtransferuser', on_delete=models.PROTECT,)
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='freelanceaccmerchant', on_delete=models.PROTECT)    
     reference = models.UUIDField(unique=True, verbose_name="Reference Number", editable=False, default=uuid.uuid4,)
     pending_balance = models.PositiveIntegerField(_("Pending Balance"), default=0,)
     available_balance = models.PositiveIntegerField(_("Account Balance"), default=0, help_text=_("Min of $20 and Max of $500 per transaction"),)
@@ -388,7 +389,7 @@ class FreelancerAccount(models.Model):
         return account_action, payment_request
 
 
-class FreelancerAction(models.Model):
+class FreelancerAction(MerchantMaster):
     # Positions
     CEO = 'ceo'
     CO_CEO = 'co_ceo'
@@ -417,7 +418,6 @@ class FreelancerAction(models.Model):
         (TRANSFER, _("Transfer")),
         (WITHDRAWAL, _("Withdrawal")),
     )
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='actionmerchant', on_delete=models.PROTECT)        
     account = models.ForeignKey(FreelancerAccount, verbose_name=_("Account"), related_name="fundmanageraccount", on_delete=models.PROTECT)
     gateway = models.ForeignKey('payments.PaymentGateway', verbose_name=_("Payment Account"), related_name="paymentaccount", blank=True, null=True, on_delete=models.SET_NULL)
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Manager"), related_name="fundtransferor", on_delete=models.PROTECT)

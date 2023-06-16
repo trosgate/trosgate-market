@@ -1,5 +1,3 @@
-import uuid
-import secrets
 from django.db import models, transaction as db_transaction
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
@@ -16,51 +14,56 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_p
 from account.fund_exception import FundException
 from teams.models import Team
 from client.models import ClientAccount
-from resolution.models import OneClickResolution, ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
-from merchants.models import MerchantMaster as MerchantTransaction
+from resolution.models import ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
+from merchants.models import MerchantMaster
+from applications.models import Application
 
 
-
-class OneClickPurchase(MerchantTransaction):
+class PurchaseMaster(MerchantMaster):
     SUCCESS = 'success'
     FAILED = 'failed'
     STATUS_CHOICES = (
         (SUCCESS, _('Success')),
         (FAILED, _('Failed'))
-    )    
+    )
 
     PROPOSAL = 'proposal'
+    PROJECT = 'project'
     CONTRACT = 'contract'
-    EXTERNAL_CONTRACT = 'externalcontract'
+    EX_CONTRACT = 'excontract'
     PURCHASE_CATEGORY = (
         (PROPOSAL, _('Proposal')),
+        (PROJECT, _('Project')),
         (CONTRACT, _('Contract')),
-        (EXTERNAL_CONTRACT, _('External Contract'))
-    )    
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="oneclickclient")
+        (EX_CONTRACT, _('Ex-Contract'))
+    ) 
+    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     salary_paid = models.PositiveIntegerField(_("Salary Paid"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"))
-    earning_fee = models.PositiveIntegerField(_("Earning Fee"))
     payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
     category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
-    reference = models.CharField(_("Reference"), max_length=100, null=True, blank=True)
+    unique_reference = models.CharField(_("Unique Reference"), max_length=100, blank=True)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
-    
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='oneclickteam', on_delete=models.PROTECT)
-    proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal"), related_name="oneclickproposal", null=True, blank=True, on_delete=models.PROTECT)
-    contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Int Contract"), related_name="intoneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
-    extcontract = models.ForeignKey("contract.Contract", verbose_name=_("Ext Contract"), related_name="extoneclickcontract", null=True, blank=True, on_delete=models.PROTECT)
-    is_refunded = models.BooleanField(_("Refunded"), default=False)
+
+    class Meta:
+        abstract = True
+
+
+class Purchase(PurchaseMaster):
+    client_fee = models.PositiveIntegerField(_("Client Fee"), default=0)
+    paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, null=True, blank=True)
+    flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=200, null=True, blank=True)
+    stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=200, null=True, blank=True)
+    razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=200, null=True, blank=True)
+    razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=200, null=True, blank=True)
+    razorpay_signature = models.CharField(_("Razorpay Signature"), max_length=200, null=True, blank=True)
 
     class Meta:
         ordering = ("-created_at",)
-        verbose_name = ("One Click Purchase")
-        verbose_name = ("One Click Purchase")
 
     def __str__(self):
-        return f'1-Click Purchase - {self.reference}'
+        return f'{self.payment_method} purchase made by {self.client.get_full_name()}'
 
 
     @classmethod
@@ -73,64 +76,84 @@ class OneClickPurchase(MerchantTransaction):
             earning_fee = get_proposal_fee_calculator(proposal.salary)
             total_earning = int(proposal.salary) - int(earning_fee)
             
-            purchass = cls.objects.create(
+            sales = cls.objects.create(
                 client=account.user,
-                category = cls.PROPOSAL,
-                payment_method='Balance',
+                payment_method='balance',
+                client_fee = int(earning_fee),
+                category = Purchase.PROPOSAL,
                 salary_paid=proposal.salary,
-                total_earning=round(total_earning),
-                earning_fee=earning_fee,
-                team = proposal.team,
-                proposal = proposal,
                 status = cls.SUCCESS,
+            )
+            stan = f'{sales.pk}'.zfill(8)
+            sales.unique_reference = f'1click{sales.client.id}{stan}'
+            sales.status=Purchase.SUCCESS
+            sales.save()
+
+            purchass = ProposalSale.objects.create(
+                team = proposal.team,
+                purchase=sales,  
+                proposal=proposal, 
+                sales_price=int(proposal.salary),
+                earning_fee_charged=earning_fee,
+                total_earning_fee_charged=earning_fee,
+                disc_sales_price=int(proposal.salary),
+                total_sales_price=int(proposal.salary),
+                earning=total_earning,
+                total_earning=total_earning
             )           
-            stan = f'{purchass.pk}'.zfill(8)
-            purchass.reference = f'1click{purchass.client.id}{stan}'
-            purchass.save()
+            
+            ClientAccount.debit_available_balance(user=sales.client, available_balance=sales.salary_paid)
 
-            ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
-
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.salary_paid, purchase=purchass.proposal)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=sales.salary_paid, purchase=purchass)
         
-        return account, purchass
+        return account, sales, purchass
 
 
     @classmethod
     def one_click_intern_contract(cls, user, contract):
         with db_transaction.atomic():
             account = ClientAccount.objects.select_for_update().get(user=user)
+                        
             if account.available_balance < contract.grand_total:
                 raise FundException('Insufficient Balance')
 
+            if contract is None:
+                raise FundException('Contract not found')
+            
             earning_fee = get_contract_fee_calculator(contract.grand_total)
             total_earning = int(contract.grand_total) - int(earning_fee)
-            
-            if not contract:
-                raise FundException('Contract not found')
 
-            if contract is None:
-                raise FundException('Contract error')
-
-            purchass = cls.objects.create(
+            sales = cls.objects.create(
                 client=account.user,
-                category = cls.CONTRACT,
-                payment_method='Balance',
+                payment_method='balance',
+                client_fee = int(earning_fee),
+                category = Purchase.CONTRACT,
                 salary_paid=contract.grand_total,
-                total_earning=round(total_earning),
-                earning_fee=earning_fee,
+                status = cls.SUCCESS,
+            )
+            stan = f'{sales.pk}'.zfill(8)
+            sales.unique_reference = f'1click{sales.client.id}{stan}'
+            sales.status=Purchase.SUCCESS
+            sales.save()
+
+            purchass = ContractSale.objects.create(
                 team = contract.team,
                 contract = contract,
-                status = cls.SUCCESS,
-            )           
-            stan = f'{purchass.pk}'.zfill(8)
-            purchass.reference = f'1click{purchass.client.id}{stan}'
-            purchass.save()
+                purchase=sales,
+                sales_price=int(contract.grand_total),
+                earning_fee_charged=earning_fee,
+                total_earning_fee_charged=earning_fee,
+                disc_sales_price=int(contract.grand_total),
+                total_sales_price=int(contract.grand_total),
+                earning=total_earning,
+                total_earning=total_earning
+            )   
 
-            ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
+            ClientAccount.debit_available_balance(user=sales.client, available_balance=sales.salary_paid)
 
             selected_contract = InternalContract.objects.select_for_update().get(pk=purchass.contract.id)
             selected_contract.reaction = 'paid'
-            selected_contract.save(update_fields=['reaction'])
+            selected_contract.save()
             
             FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, purchase=selected_contract)
 
@@ -142,14 +165,11 @@ class OneClickPurchase(MerchantTransaction):
         with db_transaction.atomic():
             account = ClientAccount.objects.select_for_update().get(user=user)
 
-            if contract is None:    
-                raise FundException('Contract error occured. Try again')
-
             if account.available_balance < contract.grand_total:
                 raise FundException('Insufficient Balance')
-
-            earning_fee = get_external_contract_fee_calculator(contract.grand_total)
-            total_earning = int(contract.grand_total) - int(earning_fee)
+            
+            if contract is None:    
+                raise FundException('Contract error occured. Try again')
 
             if not contract:
                 raise FundException('Contract not found')
@@ -157,113 +177,38 @@ class OneClickPurchase(MerchantTransaction):
             if contract is None:
                 raise FundException('Contract error')
                             
-            purchass = cls.objects.create(
+            sales = cls.objects.create(
                 client=account.user,
-                category = cls.EXTERNAL_CONTRACT,
-                payment_method='Balance',
+                payment_method='balance',
+                category = Purchase.EX_CONTRACT,
                 salary_paid=contract.grand_total,
-                total_earning=round(total_earning),
-                earning_fee=earning_fee,
+                status = cls.SUCCESS,
+            )
+            stan = f'{sales.pk}'.zfill(8)
+            sales.unique_reference = f'1click{sales.client.id}{stan}'
+            sales.status=Purchase.SUCCESS
+            sales.save()
+
+            purchass = ExtContract.objects.create(
                 team = contract.team,
-                extcontract = contract,
-                status = cls.SUCCESS,                
-            )           
-            stan = f'{purchass.pk}'.zfill(8)
-            purchass.reference = f'1click{purchass.client.id}{stan}'
-            purchass.save()
+                contract = contract,
+                purchase=sales,
+                sales_price=int(contract.grand_total),
+                disc_sales_price=int(contract.grand_total),
+                total_sales_price=int(contract.grand_total),
+                earning=int(contract.grand_total),
+                total_earning=int(contract.grand_total)
+            )  
 
-            ClientAccount.debit_available_balance(user=purchass.client, available_balance=purchass.salary_paid)
+            ClientAccount.debit_available_balance(user=sales.client, available_balance=sales.salary_paid)
 
-            selected_contract = Contract.objects.select_for_update().get(pk=purchass.extcontract.id)
+            selected_contract = Contract.objects.select_for_update().get(pk=purchass.contract.id)
             selected_contract.reaction = 'paid'
-            selected_contract.save(update_fields=['reaction'])
+            selected_contract.save()
             
             FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, purchase=selected_contract)
 
         return account, purchass, selected_contract
-
-
-    @classmethod
-    def oneclick_refund(cls, pk:int):
-        with db_transaction.atomic():
-            oneclick_sale = cls.objects.select_for_update().get(pk=pk)
-            client = ClientAccount.objects.select_for_update().get(user=oneclick_sale.client)
-            freelancer = FreelancerAccount.objects.select_for_update().get(user=oneclick_sale.team.created_by)
-            
-            try:
-                resolution = OneClickResolution.objects.select_for_update().get(oneclick_sale=oneclick_sale)            
-            except:
-                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
-            
-            if oneclick_sale.is_refunded != False:
-                raise Exception(_("This transaction cannot be refunded twice"))
-
-            # if contract_sale.purchase.status != Purchase.SUCCESS:
-            #     raise Exception(_("You cannot issue refund for a failed transaction"))
-
-            if resolution.status == 'ongoing':
-                raise Exception(_("This transaction is ongoing and cannot be refunded"))
-
-            resolution.status = 'cancelled'
-            resolution.save()
-
-            oneclick_sale.is_refunded = True
-            oneclick_sale.save()
-            
-            freelancer.pending_balance -= int(oneclick_sale.salary_paid)
-            freelancer.save(update_fields=['pending_balance'])
-            
-            client.available_balance += int(oneclick_sale.salary_paid)
-            client.save(update_fields=['available_balance'])
-
-        return oneclick_sale, client, freelancer, resolution
-
-
-class Purchase(MerchantTransaction):
-    SUCCESS = 'success'
-    FAILED = 'failed'
-    STATUS_CHOICES = (
-        (SUCCESS, _('Success')),
-        (FAILED, _('Failed'))
-    )
-
-    # ONE_CLICK = 'one_click'
-    PROPOSAL = 'proposal'
-    PROJECT = 'project'
-    CONTRACT = 'contract'
-    EX_CONTRACT = 'excontract'
-    PURCHASE_CATEGORY = (
-        # (ONE_CLICK, _('One Click')),
-        (PROPOSAL, _('Proposal')),
-        (PROJECT, _('Project')),
-        (CONTRACT, _('Contract')),
-        (EX_CONTRACT, _('Ex-Contract'))
-    )    
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orderclient")
-    full_name = models.CharField(_("Full Name"), max_length=100)
-    email = models.EmailField(_("Email"), max_length=254, blank=True)
-    phone = models.CharField(_("Phone Number"), max_length=100, null=True, blank=True)
-    country = models.CharField(_("Country"), max_length=150, blank=True)
-    salary_paid = models.PositiveIntegerField(_("Salary Paid"))
-    client_fee = models.PositiveIntegerField(_("Client Fee"))
-    payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
-    category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
-    status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
-    unique_reference = models.CharField(_("Unique Reference"), max_length=100, blank=True)
-    paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, null=True, blank=True)
-    flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=200, null=True, blank=True)
-    stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=200, null=True, blank=True)
-    razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=200, null=True, blank=True)
-    razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=200, null=True, blank=True)
-    razorpay_signature = models.CharField(_("Razorpay Signature"), max_length=200, null=True, blank=True)
-    created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
-
-    class Meta:
-        ordering = ("-created_at",)
-
-    def __str__(self):
-        return f'{self.payment_method} purchase made by {self.client.get_full_name()}'
 
 
     @classmethod
@@ -281,11 +226,15 @@ class Purchase(MerchantTransaction):
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
-            
+                    
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
                     FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
-            
+                    project = item.project
+                    # applications = Application.objects.filter(project=project)) change the statuses
+                    print(project)
+                    # print(applications)
+
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
@@ -427,19 +376,19 @@ class Purchase(MerchantTransaction):
         return purchase, contract_item, contract
 
 
-class MerchantMaster(MerchantTransaction):
+class MerchantTransaction(MerchantMaster):
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), on_delete=models.CASCADE)
-    sales_price = models.PositiveIntegerField(_("Sales Price"))
-    total_sales_price = models.PositiveIntegerField(_("Applicant Budget"))
-    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"))
+    sales_price = models.PositiveIntegerField(_("Sales Price"), default=0)
+    total_sales_price = models.PositiveIntegerField(_("Applicant Budget"), default=0)
+    disc_sales_price = models.PositiveIntegerField(_("Discounted Salary"), default=0)
     staff_hired = models.PositiveIntegerField(_("Staff Hired"), default=1)
-    earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"))
-    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"))
+    earning_fee_charged = models.PositiveIntegerField(_("Earning Fee"), default=0)
+    total_earning_fee_charged = models.PositiveIntegerField(_("Total Earning Fee"), default=0)
     discount_offered = models.PositiveIntegerField(_("Discount Offered"), default=0)
     total_discount_offered = models.PositiveIntegerField(_("Total Discount"), default=0)
-    earning = models.PositiveIntegerField(_("Earning"))
-    total_earning = models.PositiveIntegerField(_("Total Earning"))
+    earning = models.PositiveIntegerField(_("Earning"), default=0)
+    total_earning = models.PositiveIntegerField(_("Total Earning"), default=0)
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
@@ -448,65 +397,7 @@ class MerchantMaster(MerchantTransaction):
         abstract = True
 
 
-class ApplicationSale(MerchantMaster):
-    #status choices to be added to track the state of order
-    project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
-
-    class Meta:
-        ordering = ("-created_at",)
-
-    def __str__(self):
-        return str(self.project) 
-
-    def total_earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
-
-    def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.discount_offered}'
-
-    def total_earning(self):
-        return f'{get_base_currency_symbol()} {self.earning}'
-
-    def status_value(self):
-        return self.purchase.get_status_display()
-
-    @classmethod
-    def application_refund(cls, pk:int):
-        with db_transaction.atomic():
-            application = cls.objects.select_for_update().get(pk=pk)
-            client = ClientAccount.objects.select_for_update().get(user=application.purchase.client)
-            freelancer = FreelancerAccount.objects.select_for_update().get(user=application.team.created_by)
-            
-            try:
-                resolution = ProjectResolution.objects.select_for_update().get(application=application)            
-            except:
-                raise Exception(_("Sorry! could not raise refund. It could be that Team is yet to start work"))
-            
-            if application.is_refunded != False:
-                raise Exception(_("This transaction cannot be refunded twice"))
-
-            # if application.purchase.status != Purchase.SUCCESS:
-            #     raise Exception(_("You cannot issue refund for a failed transaction"))
-
-            if resolution.status == ProjectResolution.COMPLETED:
-                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
-
-            resolution.status = ProjectResolution.CANCELLED
-            resolution.save()
-
-            application.is_refunded = True
-            application.save()
-            
-            freelancer.pending_balance -= int(application.total_sales_price)
-            freelancer.save(update_fields=['pending_balance'])
-            
-            client.available_balance += int(application.total_sales_price)
-            client.save(update_fields=['available_balance'])
-
-        return application, client, freelancer, resolution
-
-
-class ProposalSale(MerchantMaster):
+class ProposalSale(MerchantTransaction):
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal Hired"), related_name="proposalhired", on_delete=models.CASCADE)
 
     class Meta:
@@ -572,7 +463,7 @@ class ProposalSale(MerchantMaster):
         return proposal_sale, client, freelancer, resolution
 
 
-class ContractSale(MerchantMaster):
+class ContractSale(MerchantTransaction):
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)
 
     class Meta:
@@ -638,7 +529,7 @@ class ContractSale(MerchantMaster):
         return contract_sale, client, freelancer, resolution
 
 
-class ExtContract(MerchantMaster):
+class ExtContract(MerchantTransaction):
     # status choices to be added to track the state of order
     contract = models.ForeignKey("contract.Contract", verbose_name=_("Contract Hired"), related_name="extcontracthired", on_delete=models.CASCADE)
 
@@ -704,6 +595,63 @@ class ExtContract(MerchantMaster):
             client.save(update_fields=['available_balance'])
 
         return contract_sale, client, freelancer, resolution
+
+
+class ApplicationSale(MerchantTransaction):
+    project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return str(self.project) 
+
+    def total_earning_fee(self):
+        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
+
+    def total_discount(self):
+        return f'{get_base_currency_symbol()} {self.discount_offered}'
+
+    def total_earning(self):
+        return f'{get_base_currency_symbol()} {self.earning}'
+
+    def status_value(self):
+        return self.purchase.get_status_display()
+
+    @classmethod
+    def application_refund(cls, pk:int):
+        with db_transaction.atomic():
+            application = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=application.purchase.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=application.team.created_by)
+            
+            try:
+                resolution = ProjectResolution.objects.select_for_update().get(application=application)            
+            except:
+                raise Exception(_("Sorry! could not raise refund. It could be that Team is yet to start work"))
+            
+            if application.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            # if application.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == ProjectResolution.COMPLETED:
+                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
+
+            resolution.status = ProjectResolution.CANCELLED
+            resolution.save()
+
+            application.is_refunded = True
+            application.save()
+            
+            freelancer.pending_balance -= int(application.total_sales_price)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(application.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+        return application, client, freelancer, resolution
 
 
 class SubscriptionMaster(MerchantMaster):

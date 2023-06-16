@@ -5,7 +5,7 @@ from .models import (Application)
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = ['team', 'budget', 'created_at', 'message_slice', 'status']
     list_filter = ['status']
-    readonly_fields = ('team', 'budget', 'created_at', 'project', 'status', 'message', 'estimated_duration', 'applied_by')
+    readonly_fields = ('team', 'budget', 'created_at', 'project', 'accept', 'status', 'message', 'estimated_duration', 'applied_by')
     search_fields = ['message']
     radio_fields = {'status': admin.HORIZONTAL}       
 

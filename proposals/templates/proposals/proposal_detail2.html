@@ -1,0 +1,234 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+	<!--Inner Home Banner Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+					<div class="wt-title"><h2>Proposal Detail</h2></div>
+						{% if request.user.is_authenticated %}
+						<ol class="wt-breadcrumb">
+							<li><a href="{% url 'account:dashboard' %}" class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o"></i> Dashboard</a></li>
+							{% if active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'active' %}
+							<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
+							<li><a href="{% url 'proposals:archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Archive</a></li>
+							{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'review' %}
+							<li><a href="javascript:void(0);" class="btn btn-success btn-sm"><i class="fas fa-spinner fa-spin"></i> Reviewing</a></li>
+							{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'archived' %}
+							<li><a href="{% url 'proposals:reactivate_archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm"><i class="fa fa-window-restore"></i> Restore</a></li>
+							{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'modify' %}
+							<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
+							{% endif %}
+						</ol>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--Inner Home End-->
+	<!--Main Start-->
+	{% comment %} <main class="wt-haslayout wt-innerbgcolor"> {% endcomment %}
+		<div class="wt-haslayout wt-main-section" style='background:white;'>
+			<!-- User Listing Start-->
+			<div class="container">
+				<div class="wt-m">
+					<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">			
+						<h2 class="d-flex justify-content-between">{{proposal.title}}</h2>
+					</div>
+						
+					<div class="row">
+						<div class="col-md-8">
+							<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="width:1920px; max-height:560px;" alt="img description">
+						</div>
+						<div class="col-md-4">
+							<div class="bg-light rounded">
+								<div class="p-5 pt-0">
+									
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Offering:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Price</span><i class="text-primary pt-1"> {{base_currency}} {{proposal.salary}}</i>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_dura_converter_display }}</i>
+									</div>
+									
+									<div class="d-flex justify-content-between mb-3">
+										<span style="font-weight:bold;">Background:</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Total Sales</span><i class="text-primary pt-1"> {{overal_proposal_sales_count}}</i>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Country</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:20%; font-size:13px;">{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name|truncatechars:25}}</span>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Date Created</span><i class="text-primary pt-1"> {{proposal.created_at|date:'D-m-Y' }}</i>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+										<span>Available Staffs</span><i class="text-primary pt-1"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</i>
+									</div>
+									<div class="d-flex justify-content-between mb-3">
+									{% if request.user.clients %}
+										<button class="appointment-btn mt-4"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:red;'>Checkout <i class="fa fa-info badge badge-success" style="border-radius:50%;"  hx-on="click: window.confirm('this is the total messages')"></i></button>
+				
+									{% endif %}
+									{% if request.user.is_authenticated and request.user.clients %}
+										<a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="appointment-btn py-2 px-4 mt-4">Hire Expert</a>
+									{% elif request.user.is_authenticated and request.user.freelancer %}
+										<button class="appointment-btn mt-4"><strike style="color:white">... Hire Expert ...</strike></button>
+									{% elif not request.user.is_authenticated %}
+										<a href="{% url 'account:login' %}" class="appointment-btn mt-4">Hire Expert</a>
+									{% endif %} 
+									</div>
+								</div>
+							</div>
+						</div>
+					
+						<div class="col-md-12"><br><br>
+							<div class="wt-tabscontenttitle">
+								<h3>Proposal Detail</h3>
+							</div>
+							
+						<div class="wt-description">
+							<div class="row">
+								<div class="col-md-8">
+									{{proposal.description|linebreaksbr}}
+									{% include 'proposals/components/proposal_addons.html' %}
+								</div>
+								<div class="col-md-4">
+									<div class="wt-dashboardbox" style="background-color: rgb(81, 72, 212); border-radius:20%;">
+										<div class="wt-dashboardboxcontent wt-hiredfreelance">
+											<div class="wt-companysinfo">
+												<figure class="wt-companyad">
+													<img src="{% firstof proposal.created_by.freelancer.profile_photo.url proposal.created_by.freelancer.banner_photo.url proposal.thumbnail.url %}" style="height:100px;" alt="img description">
+												</figure>
+												<div class="wt-title"> 
+													<a href="javascript:void(0);">
+														<i class="fa fa-check-circle"> {% if request.user.is_authenticated %} {{proposal.created_by.get_full_name|capfirst}} {% else %} {{proposal.created_by.short_name|capfirst}} {% endif %}</i>
+													</a>
+												</div>
+												<ul class="wt-postarticlemeta">
+													<li>
+														<a href="javascript:void(0);">
+															<span style="color: white;">Jobs</span>
+														</a>
+													</li>
+													<li>
+														<a href="{{profile_view.freelancer_profile_absolute_url}}">
+															<span style="color: white;">Profile</span>
+														</a>
+													</li>
+													<li class="wt-following">
+														<a href="javascript:void(0);">
+															<span style="color: white;">Following</span>
+														</a>
+													</li>
+												</ul>
+											</div>
+											<div class="wt-description"style="color: white;"><br>
+												{{proposal.created_by.freelancer.description|linebreaksbr|truncatechars:150}}
+											</div>
+										</div>
+										{% if request.user.clients or request.user.freelancer %}
+										<div class="wt-clicksavearea" style="border-radius:20%;">
+											<a href="{% url 'proposals:proposal_chat_messages' proposal.slug %}" 
+												class="btn btn-danger justify-content-md-center" 
+												style="background-color:red;">
+												<i class="far fa-smile"></i> 
+												Author Support
+											</a>
+										</div>
+										{% endif %}
+									</div>
+								</div>
+							</div><br><br>
+						</div>
+						{% include 'proposals/components/proposal_summary.html' %}
+					</div>		
+				</div>
+				<!--Content Wrapper End-->
+			</div>
+
+			{% include 'client/partials/one_click_proposal_modal.html' %}
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+	$(document).on('click', '#add-box', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#add-box').val(),
+			memberqty: $('#select option:selected').text(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			document.getElementById("members-qty").innerHTML = json.member_qty
+			count = $('#select option:selected').text()
+			document.getElementById("addon-message").innerHTML = "Addon bucket modified with" + count + "staff"
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+  </script>
+
+  <script>
+	$(document).on('click', '#oneClickCheckout', function (e) {
+	  e.preventDefault();
+
+	  let displayMessage = document.getElementById('oneClick-message');
+	  let displayError = document.getElementById("oneClick-error")
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "client:one_click_proposal_checkout" %}',
+		data: {
+			proposalId:'{{proposal.id}}',
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'oneclick-pay'
+		},
+		beforeSend:function(){
+			$("#oneClickCheckout").attr("disabled", true);
+		},
+		success: function (json) {
+			if(json.errors != ''){
+				displayError.innerHTML = json.errors;
+				$("#oneClickCheckout").attr("disabled", false);
+				return false
+			}
+			else{
+				displayMessage.innerHTML = '';
+				displayMessage.innerHTML = json.message;
+				window.location.href = "{% url 'transactions:proposal_transaction' %}"
+				$("#oneClickCheckout").attr("disabled", false);
+			}
+		},
+		error: function (xhr, errmsg, err) {
+			$("#oneClickCheckout").attr("disabled", false);
+		}
+	  });
+	})
+  </script>
+	<!-- sharethis script begins-->	
+	<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
+	<!-- sharethis script ends-->
+{% endblock scripts %}
+
+
+
+

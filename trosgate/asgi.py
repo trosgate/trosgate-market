@@ -1,11 +1,3 @@
-"""
-ASGI config for trosgate project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/3.2/howto/deployment/asgi/
-"""
 import os
 import django
 from channels.auth import AuthMiddlewareStack
@@ -20,10 +12,18 @@ import notification.routing
 
 application = ProtocolTypeRouter({
   "http": get_asgi_application(),
-  "websocket": AllowedHostsOriginValidator[
-      AuthMiddlewareStack(URLRouter(notification.routing.websocket_urlpatterns)),
-  ]
+  "websocket": AuthMiddlewareStack(
+      URLRouter(notification.routing.websocket_urlpatterns)
+    ),
 })
+
+# application = ProtocolTypeRouter({
+#   "http": get_asgi_application(),
+#   "websocket": AllowedHostsOriginValidator(
+#     AuthMiddlewareStack(URLRouter(notification.routing.websocket_urlpatterns)
+#     ),
+#   ),
+# })
 
 
 

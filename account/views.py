@@ -118,6 +118,7 @@ def homepage(request):
     projects = Project.objects.filter(published=True, status='active', duration__gte=timezone.now()).distinct()[0:6]
     users = Freelancer.active.all().distinct()[0:12]
     searchform = SearchTypeForm()
+    form_submitted = False
 
     if request.user.is_authenticated and not request.user.user_type == Customer.ADMIN:
         messages.info(request, f'Welcome back {request.user.short_name}')
@@ -137,6 +138,7 @@ def homepage(request):
         'base_currency': base_currency,
         'searchform': searchform,
         'home_layout': home_layout,
+        'form_submitted': form_submitted,
     }
     if request.parent_site:
         return render(request, 'homepage.html', context)

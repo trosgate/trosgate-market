@@ -63,12 +63,12 @@ class PackageAdmin(admin.ModelAdmin):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['title', 'merchant', 'created_at', 'team_balance', 'status',]
+    list_display = ['title', 'merchant', 'package', 'team_balance', 'status',]
     list_display_links = ['title', 'merchant']
     search_fields = ['title']
     list_filter =  ['merchant']
     readonly_fields = [
-        'title', 'merchant', 'slug', 'team_balance','notice','created_by','members', 'package_expiry',
+        'title', 'merchant', 'slug', 'team_balance','created_by','members', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',
         'paypal_customer_id', 'paypal_subscription_id',
         'razorpay_payment_id','razorpay_payment_url','razorpay_subscription_id',  
@@ -76,13 +76,17 @@ class TeamAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Introduction', {'fields': ('title', 'merchant', 'slug',  'status', 'team_balance',)}),
-        ('Package and Background', {'fields': ('package_status', 'created_by','members','notice',)}),
+        ('Package and Background', {'fields': ('package', 'package_status', 'created_by','members','notice',)}),
         ('Subscription Type - Stripe', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
         ('Subscription Type - Razorpay', {'fields': ('razorpay_payment_id','razorpay_subscription_id','razorpay_payment_url',)}),
         ('Subscription Type - PayPal', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),
     )  
 
-    radio_fields = {'status': admin.HORIZONTAL}
+    radio_fields = {
+        'status': admin.HORIZONTAL,
+        'package_status': admin.HORIZONTAL,
+        'package': admin.HORIZONTAL,
+    }
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)

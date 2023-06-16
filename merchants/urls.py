@@ -8,7 +8,8 @@ app_name = 'merchants'
 urlpatterns = [
 
     # Urls for team table
-    path('subscription/', views.subscription, name='subscription'),
+    path('theme', views.theme_settings, name='theme_settings'),
+    path('subscription', views.subscription, name='subscription'),
     path('subscribe-now/<str:type>', views.subscribe_now, name='subscribe_now'),
     path('payment-settings/', views.payment_settings, name='payment_settings'),
     path('domain-manager/', views.domain_manager, name='domain_manager'),
@@ -26,6 +27,9 @@ htmx_urlpatterns = [
     path('add_razorpay_api/', views.add_razorpay_api, name='add_razorpay_api'),
     path('add_mtn_api/', views.add_mtn_api, name='add_mtn_api'),
     path('stripe_subscription/', views.stripe_subscription, name='stripe_subscription'),
+
+    path('theme_form/', views.theme_form, name='theme_form'),
+    path('brand_form/', views.brand_form, name='brand_form'),
 ]
 
 urlpatterns += htmx_urlpatterns

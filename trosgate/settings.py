@@ -43,6 +43,7 @@ AUTH_USER_MODEL = 'account.Customer'
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -81,7 +82,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_celery_results',
     'django_celery_beat',
-    # 'channels',
+    'channels',
 ]
 
 
@@ -132,7 +133,7 @@ TEMPLATES = [
                 'general_settings.context_processors.autoLogoutSystem',
                 'transactions.context_processors.hiring_box',
                 'applications.context_processors.application_addon',
-                'contract.context_processors.chosen_contract', 
+                'contract.context_processors.chosen_contract',
                 'future.context_processors.future_release', 
             ],
         },
@@ -142,8 +143,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'trosgate.wsgi.application'
 ASGI_APPLICATION = 'trosgate.asgi.application'
 
-# SERVER/LOCAL SIDE
-# DATABASE_ROUTERS = ['account.router.MerchantRouter']
+# CHANNEL_LAYERS CONFIG
+# CHANNEL_LAYERS ={
+#     'default':{
+#         'BACKEND':'channels_redis.core.RedisChannelLayer',
+#         'CONFIG':{
+#             'hosts': [('127.0.0.1', 6379)],
+#         }
+#     }
+# }
+CHANNEL_LAYERS ={
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer',
+    }
+}
 
 DATABASES = {
     'default': {

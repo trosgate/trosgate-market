@@ -1,0 +1,55 @@
+{% load static %}
+
+<div id="showOpenChat" class="hidden">
+    <div class="wt-chatbox">
+        <div class="text-center">
+            <h3 style="background-color:rgb(41, 145, 109); color:white; border-radius: 5%;">{{website}} Support</h3>
+        </div>
+        <form method='POST'>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="guest">Your Username</label>
+                <input class="form-control" type="text" name="guest" id="guest" required/>
+                <span style="color:green;">Introduce yourself with your username</span>
+            </div>
+            <div class="text-center">
+                <button id="open_button" type="button" class="btn btn-success"
+                    style="background-color:rgb(41, 145, 109); color:white; border-radius: 5%;">
+                    Join Chatroom
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% comment %} <div id="room_name">{{room.reference}}</div>
+<div id="guest">{{room.guest}}</div> {% endcomment %}
+{% comment %} {{room.reference|json_script:"room_name"}}
+{{room.guest|json_script:"guest"}} {% endcomment %}
+
+<div id="hideOpenChat" class="hidden">
+    <div class="wt-chatbox">
+        <div class="text-center">
+            <div id="welcomeGuest" style="background-color:rgb(41, 145, 109); color:white; border-radius: 5%;">Welcome, {{guest}}</div>
+        </div>
+        <div class="wt-messages wt-verticalscrollbar wt-dashboardscrollbar" style="height:300px; overflow-y:auto; border-color: rgb(112, 112, 201);">
+            <div id="chat_log">
+
+            </div>
+        </div>
+        <div class="wt-replaybox">
+            <div class="form-group">
+                <textarea id="message_input" class="form-control" name="content" placeholder="Type message here"></textarea>
+            </div>
+            <div class="wt-iconbox">
+                <i class="lnr lnr-thumbs-up"></i>
+                <i class="lnr lnr-thumbs-down"></i>
+                <i class="lnr lnr-smile"></i>
+                <button id="sendmessagebutton" type="button" class="wt-btnsendmsg">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

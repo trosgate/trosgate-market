@@ -34,6 +34,72 @@ class SearchTypeForm(forms.Form):
             {'class': 'form-control'})
 
 
+class MerchantthemeForm(forms.ModelForm):
+
+    class Meta:
+        model = Merchant
+        fields = [
+            'category_type', 'project_type', 'proposal_detail', 'banner_type', 'promo_type', 
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(MerchantthemeForm, self).__init__(*args, **kwargs)
+
+        self.fields['category_type'].widget.attrs['class'] = 'custom-select'
+        self.fields['category_type'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['proposal_detail'].widget.attrs['class'] = 'custom-select'
+        self.fields['proposal_detail'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['banner_type'].widget.attrs['class'] = 'custom-select'
+        self.fields['banner_type'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['project_type'].widget.attrs['class'] = 'custom-select'
+        self.fields['project_type'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['promo_type'].widget.attrs['class'] = 'custom-select'
+        self.fields['promo_type'].widget.attrs['style'] = 'height: 40px;'
+
+
+class MerchantBrandingForm(forms.ModelForm):
+
+    class Meta:
+        model = Merchant
+        fields = [
+            'title_block','subtitle_block','button_color', 'navbar_color',
+            'tagline', 'description','announcement','footer_description',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(MerchantBrandingForm, self).__init__(*args, **kwargs)
+        self.fields['title_block'].widget.attrs['class'] = 'custom-select'
+        self.fields['title_block'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['tagline'].widget.attrs['class'] = 'custom-select'
+        self.fields['tagline'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['description'].widget.attrs['class'] = 'form-control'
+        self.fields['description'].widget.attrs['style'] = 'height: 150px;'
+
+        self.fields['announcement'].widget.attrs['class'] = 'form-control'
+        self.fields['announcement'].widget.attrs['style'] = 'height: 150px;'
+
+        self.fields['button_color'].widget.attrs['class'] = 'custom-select'
+        self.fields['button_color'].widget.attrs['style'] = 'height: 40px;'
+
+        self.fields['navbar_color'].widget.attrs['class'] = 'custom-select'
+        self.fields['navbar_color'].widget.attrs['style'] = 'height: 40px;'
+        
+        self.fields['subtitle_block'].widget.attrs.update(
+            {'class': 'form-control',})
+
+        self.fields['subtitle_block'].widget.attrs.update(
+            {'class': 'form-control',})
+
+        self.fields['footer_description'].widget.attrs['class'] = 'form-control'
+        self.fields['footer_description'].widget.attrs['style'] = 'height: 150px;'
+
+
 class CustomerRegisterForm(forms.ModelForm):
     SELECT_USER = 'User Type'
     FREELANCER = 'freelancer'
@@ -298,7 +364,7 @@ class TwoFactorAuthForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-         # Personal Details   
+         # Personal Details
         self.fields['pass_code'].widget.attrs.update(
             {'class': 'form-control',})
 
@@ -327,3 +393,7 @@ class DomainForm(forms.Form):
             raise ValidationError('connection denied for provided domain')
 
         return domain
+    
+
+
+
