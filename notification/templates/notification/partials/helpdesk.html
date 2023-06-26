@@ -1,5 +1,8 @@
 {% load static %}
 
+
+{{website.id|json_script:"site"}}
+
 <div id="showOpenChat" class="hidden">
     <div class="wt-chatbox">
         <div class="text-center">
@@ -22,19 +25,13 @@
     </div>
 </div>
 
-
-{% comment %} <div id="room_name">{{room.reference}}</div>
-<div id="guest">{{room.guest}}</div> {% endcomment %}
-{% comment %} {{room.reference|json_script:"room_name"}}
-{{room.guest|json_script:"guest"}} {% endcomment %}
-
 <div id="hideOpenChat" class="hidden">
     <div class="wt-chatbox">
         <div class="text-center">
             <div id="welcomeGuest" style="background-color:rgb(41, 145, 109); color:white; border-radius: 5%;">Welcome, {{guest}}</div>
         </div>
         <div class="wt-messages wt-verticalscrollbar wt-dashboardscrollbar" style="height:300px; overflow-y:auto; border-color: rgb(112, 112, 201);">
-            <div id="chat_log">
+            <div id="chat_log" style="height:300px; overflow-y:auto;">
 
             </div>
         </div>

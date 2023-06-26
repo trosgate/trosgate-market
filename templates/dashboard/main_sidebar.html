@@ -255,8 +255,15 @@
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
 								<i class="ti-pencil-alt"></i>
-								<span>Help and Support</span>
+								<span>{% if request.user.merchant %} Realtime Support {% else %} Help and Support {% endif %}</span>
 							</a>
+							{% if request.user.merchant %}
+							<ul class="sub-menu">
+								<li><hr><a href="{% url 'notification:chatroom' %}">Chat Rooms</a></li>
+								<li><hr><a href="">-----------</a></li>
+							</ul>
+							{% endif %}
+
 							{% if request.user.freelancer %}
 							<ul class="sub-menu">
 								<li><hr><a href="{% url 'marketing:support' %}">Help Desk</a></li>

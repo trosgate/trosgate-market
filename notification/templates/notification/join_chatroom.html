@@ -1,0 +1,127 @@
+{% extends "dashboard/main_base.html" %}
+
+{% load static %}
+
+{% block content %}
+            <!--Inner Home Banner Start-->
+            <div class="wt-haslayout wt-innerbannerholder">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                            <div class="wt-innerbannercontent">
+                            <div class="wt-title"><h2>Customer Support</h2></div>
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+									<li class="wt-active">Customer Support</li>
+								</ol>
+							</div>					
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Categories Start-->
+            <div class="wt-haslayout" style="background-color:white;">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <div class="wt-author">
+                                <div class="wt-authordetails">
+                                    <figure>
+                                        <a href="javascript:void(0);"><img src="{{request.user.merchant.profile_photo.url}}" style="height:60px; max-height:60px;" alt="image description"></a>
+                                    </figure>
+                                    <div class="wt-authorcontent">
+                                        <div class="wt-authorhead">
+                                            <div class="wt-boxleft">
+                                                <h3><a href="javascript:void(0);">{{request.user.get_full_name}}</a></h3>
+                                            </div>
+                                            <div class="wt-boxright">
+                                                <ul class="wt-socialiconssimple">
+                                                    <li class="wt-facebook"><a href="javascript:void(0);"><i class="fa fa-facebook-f"></i></a></li>
+                                                    <li class="wt-twitter"><a href="javascript:void(0);"><i class="fab fa-twitter"></i></a></li>
+                                                    <li class="wt-linkedin"><a href="javascript:void(0);"><i class="fab fa-linkedin-in"></i></a></li>
+                                                    <li class="wt-googleplus"><a href="javascript:void(0);"><i class="fab fa-google"></i></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-left">
+                                            <div class="col-md-3">
+                                                <span style="font-weight: bold; margin:2px;">Guest: <span style="color: blue;" >{{room.guest}}</span></span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <span style="font-weight: bold; margin:2px;">Reference:<span style="color: blue;" > {{room.reference}}</span></span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <span style="font-weight: bold; margin:2px;">Status:<span style="color: blue;" ><span style="color: blue;" > {{room.get_status_display}}</span></span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <span style="font-weight: bold; margin:2px;">Agent:<span style="color: blue;" ><span style="color: blue;" > {{room.agent}}</span></span>
+                                            </div>
+                                        </div>
+                                        <div clas="col-md-12">
+                                            <p>Website Page: {{room.page_name}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row justify-content-md-center">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">    
+                            <div class="wt-description">
+                                <div id="chat_log" style="height:400px; overflow-y:auto;">
+                                {% include 'notification/partials/join_chatroom.html' %}
+                                <div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wt-replaybox" style="margin-top:50px;margin-bottom:50px;">
+                        {% if room.status == 'active' %}
+                        <div class="form-group">
+                            <textarea id="message_input" class="form-control" name="content" placeholder="Type message here"></textarea>
+                        </div>
+                        <div class="wt-iconbox">
+                            <i class="lnr lnr-thumbs-up"></i>
+                            <i class="lnr lnr-thumbs-down"></i>
+                            <i class="lnr lnr-smile"></i>
+                            <button id="sendmessagebutton" type="button" class="wt-btnsendmsg">Send</button>
+                        </div>
+                        {% endif %}
+                        
+                    </div>
+                    
+                    {% if room.status == 'closed' %}
+                        <div class="row justify-content-center text-center">
+                            <span style="font-size:22px; color:blue;"> Guest no longer available</span>
+                        </div>
+                    {% endif %}
+                    <br><br>
+                    <br><br>
+                    <br><br>
+                    <br><br>
+                    <br><br>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+        <br>
+                    
+ 
+{% endblock content %}
+
+{% block scripts %}
+{% if request.user.is_authenticated %}
+{% if room.status == 'active' %}
+
+    {{room.reference|json_script:"room_name"}}
+    {{room.guest|json_script:"guest"}}
+    {{request.user.get_short_name|json_script:"agent_name"}}
+    {{request.user.id|json_script:"agent_id"}}
+    {{request.user.active_merchant_id|json_script:"site"}}
+
+    <script src="{% static 'js/agent_chatroom.js' %}"></script>
+{% endif %}
+{% endif %}
+{% endblock scripts %}

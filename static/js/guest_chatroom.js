@@ -7,7 +7,7 @@ let chatSocket = null
 let chatWindowUrl = window.location.href
 let chatReference = Math.random().toString(36).slice(2,12)
 
-
+const CurrentSite = document.querySelector('#site').textContent.replaceAll('"', '')
 const chatOpenElement = document.querySelector('#wt-getsupport')
 const chatOpenDivElement = document.querySelector('#showOpenChat')
 const chatOpenButtonElement = document.querySelector('#open_button')
@@ -38,11 +38,16 @@ function getCookie(name) {
 // let csrftoken = getCookie('csrftoken');
 
 
+function scrollToBottom(){
+  chatLogElement.scrollTop = chatLogElement.scrollHeight
+}
+
 function sendMessage(){
   chatSocket.send(JSON.stringify({
     'type':'message',
     'message': messageElement.value,
     'guest': chatGuest,
+    'site': CurrentSite,
   }))
   messageElement.value = ''
 }
@@ -61,7 +66,8 @@ function OnChatMessage(data){
             <div class="clearfix"></div>
             <p>${data.message} </p>
             <div class="clearfix"></div>
-            <time>by: ${data.guest}</time>
+            <p style="padding:2px; margin:0; font-size:10px;">Sent by: ${data.agent}</p>
+            <time>${data.created_at}</time>
           </div>
         </div>`
     }else{
@@ -75,13 +81,13 @@ function OnChatMessage(data){
             <div class="clearfix"></div>
             <p>${data.message} </p>
             <div class="clearfix"></div>
-            <time>by: ${data.guest}</time>
+            <p style="padding:2px; margin:0; font-size:10px;">Sent by: ${data.guest}</p>
+            <time>${data.created_at}</time>
             </div>
-            </div>`
-            // <p>${data.guest}</p>
-            // <time datetime="2017-08-08">Time: ${data.created_at}</time>
+          </div>`
     }
   }
+  scrollToBottom()
 }
 
 // Function for joining chatroom
@@ -95,7 +101,7 @@ async function joinChatroom(){
     'url': chatWindowUrl,
   }
 
-  await fetch(`/ws/create-room/${chatReference}/`,{
+  await fetch(`/create-room/${chatReference}/`,{
     method :'POST',
     headers:{
       'Content-Type': 'application/json',
@@ -114,17 +120,18 @@ async function joinChatroom(){
     console.log(error)
   })
 
-  chatSocket = new WebSocket(`${wsStart}${window.location.host}/${chatReference}/`)
+  chatSocket = new WebSocket(`${wsStart}${window.location.host}/ws/${chatReference}/?site=${CurrentSite}`)
   chatSocket.onmessage = function(e){
 
     console.log('on message stage')
+    
     OnChatMessage(JSON.parse(e.data))
-
+    scrollToBottom()
     return false
   }
   chatSocket.onopen = function(e){
     console.log('on open stage')
-    // sendMessage()
+    scrollToBottom()
   }
   chatSocket.onclose = function(e){
     console.log('on close stage')
@@ -155,4 +162,11 @@ chatSubmitElement.onclick = function(e){
   sendMessage()
 
   return false
+}
+
+messageElement.onkeyup = function(e){
+  if(e.keyCode == 13){
+
+    sendMessage()
+  }
 }

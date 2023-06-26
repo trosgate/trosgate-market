@@ -1,0 +1,48 @@
+
+<div class="wt-jobdescription wt-tabsinfo"><br>
+    <div class="wt-tabscontenttitle">
+        <h2>List of Chatrooms</h2>
+    </div>	
+    <section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+        <div class="row">
+            {% for room in rooms %}
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 mb-3">
+                {% if room.status == 'closed' %}
+                <div class="wt-insightsitem" style="background-color:rgb(239, 185, 185);">
+                {% else %}
+                <div class="wt-insightsitem" style="background-color:rgb(229, 246, 240);">
+                {% endif %}
+                    <i class="fa fa-user fa-4x"></i><br>
+                    <span class="text-left" style="font-weight:bold; color:rgb(3, 52, 7);">Guest: {{room.guest|truncatechars:30}}</span><br>
+                    <span style="color:blue;">Room: {{room.reference|truncatechars:30}}</span><br>
+                    <span style="color:blue;">Status: {{room.get_status_display}}</span><br>
+                    
+                    <div class="row justify-content-center text-center">
+                        <a   style="margin:3px;" href="{% url 'notification:support_chatroom' room.reference %}" class="btn btn-info btn-sm"
+                            style="background-color:blue; font-weight: bold;">
+                            <i class="fa fa-plus"  style="margin:3px;"> Join Room</i>
+                        </a>
+                        {% if room.status == 'closed' %}
+                        <form  style="margin:3px;"> {% csrf_token %}
+                            <input type="number" name="room_id" value="{{room.pk}}" hidden>
+                            <button class="btn btn-danger btn-sm" type="button"
+                                hx-post="{% url 'notification:remove_chatroom' %}"
+                                hx-target="#room-list"
+                                style="background-color:red; font-weight: bold;">
+                                <i class="fa fa-trash"> Remove</i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>													
+                </div>
+            </div>
+            					 
+            {% endfor %}
+        </div>						 
+    </section>
+</div>
+{% if not rooms %}
+    <div class="row justify-content-center text-center">
+        <span style="font-size:22px; color:blue;"> No active room yet</span>
+    </div>
+{% endif %}					 

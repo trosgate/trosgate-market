@@ -8,7 +8,6 @@ from .models import Customer, Country, Package, Merchant, TwoFactorAuth
 from django.utils.translation import gettext_lazy as _
 import sys
 from django.contrib.admin.models import LogEntry
-import warnings
 from account.management.commands import refresh
 from django.core.management import call_command
 

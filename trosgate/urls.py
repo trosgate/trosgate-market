@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', include(tf_urls)),
     path('', include('account.urls', namespace='account')),
-    path('ws/', include('notification.urls', namespace='notification')),
+    path('', include('notification.urls', namespace='notification')),
     path('merchant/', include('merchants.urls', namespace='merchants')),
     path('client/', include('client.urls', namespace='client')),
     path('freelancer/', include('freelancer.urls', namespace='freelancer')), 

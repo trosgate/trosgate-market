@@ -91,8 +91,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = UserManager()
-    # With merchant manager below, Customer.objects.all() will return all Customer objects in the database, 
-    # but Customer.merchant.all() will return only the Customer objects associated with the current site, according to the SITE_ID setting.
     merchants = CurrentSiteManager()
 
     def save(self, *args, **kwargs):

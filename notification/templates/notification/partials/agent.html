@@ -1,0 +1,34 @@
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
+            <tr>
+                <th>#</th>
+                <th>Agent</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>
+                    <a href="" class="btn btn-danger btn-sm">
+                        <i class="fa fa-group"> Hire Our Support </i>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        
+        <tbody>
+
+            {% for agent in agents %}
+            <tr>
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td class="text-left"> {{agent.get_full_name|capfirst}}</td>
+                    <td class="text-center"><img src="{{agent.country.flag.url}}">&nbsp; {{agent.country|slice:60}}</td>
+                    <td class="text-center">{{agent.date_joined}}</td>
+                    <td class="text-center">
+                        {% if agent.is_authenticated %}Online{% else %}Offline{% endif %}
+                    </td>
+                </tr>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

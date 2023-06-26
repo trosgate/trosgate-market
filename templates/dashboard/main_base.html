@@ -26,10 +26,11 @@
 
     {% endblock content %}
 
+    {% if not request.user.is_authenticated %}
     <!-- ChatBox Start -->
     <div id="wt-chatpopup" class="wt-chatpopup">
             
-        <div id="guest-user" hx-on="htmx:afterSettle: document.getElementById('wt-getsupport').click();">
+        <div id="guest-user">
             {% include 'notification/partials/helpdesk.html' %}
         </div>
             
@@ -38,6 +39,7 @@
         </div>
     </div>
     <!-- ChatBox End -->
+    {% endif %}
 
     {% include 'dashboard/main_scripts.html' %}
     {% include "account/modals/generic_logout_popup.html" %}

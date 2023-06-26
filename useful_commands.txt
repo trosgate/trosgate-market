@@ -1,3 +1,6 @@
+//Neon.tech system
+psql 'postgresql://isaacagbedam:NmDRfgF9AZ7e@ep-twilight-recipe-039780.eu-central-1.aws.neon.tech/neondb'
+
 //this will dumpdata
 python manage.py dumpdata --exclude=auth --exclude=contenttypes --indent 4 > backups.json.gz
 

@@ -1,0 +1,27 @@
+{% load static %}
+{% for chat in rooms %}
+
+{% if not chat.created_by %}
+<div class="wt-offerermessage">
+    <figure><img src="/static/images/user-login.jpg/" alt="image description"></figure>
+    <div class="wt-description">
+        <div class="clearfix"></div>
+        <p>{{chat.content}} </p>
+        <div class="clearfix"></div>
+        <p style="padding:2px; margin:0; font-size:10px;">Sent by: {{chat.sender}}</p>
+        <time datetime="2017-08-08">{{chat.created_at|timesince}} ago</time>
+    </div>
+</div>
+{% else %}
+<div class="wt-memessage wt-readmessage">
+    <figure><img src="/static/images/user-login.jpg/" alt="image description"></figure>
+    <div class="wt-description">
+        <div class="clearfix"></div>
+        <p>{{chat.content}}</p>
+        <div class="clearfix"></div>
+        <p style="padding:2px; margin:0; font-size:10px;">Sent by: {{chat.sender}}</p>
+        <time datetime="2017-08-08">{{chat.created_at|timesince}} ago</time>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
