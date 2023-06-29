@@ -1,18 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import QuizForm, QuestionForm, AnswerForm, QuizChangeForm
-from teams.models import Team
-from projects.models import Project
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from account.permission import user_is_freelancer, user_is_client
-from teams.models import Team
-from django.utils.text import slugify
-from django.contrib import auth, messages
+from django.contrib import messages
 from .models import Answer, Question, Quizes, Participant, Attempt
 from account.models import Customer
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.encoding import force_bytes, force_text
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .controller import QuizMaster

@@ -169,6 +169,25 @@ DATABASES = {
     }
 }
 
+# To use Neon serverles(https//:www.neon.tech) with Django, you have to create a Project on Neon and 
+# specify the project connection settings in your settings.py in 
+# the same way as for standalone Postgres.
+
+# Option 1:
+# psql 'postgresql://isaacagbedam:NmDRfgF9AZ7e@ep-twilight-recipe-039780.eu-central-1.aws.neon.tech/neondb'
+
+# Option 2:
+
+# DATABASES = {
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'NAME': 'neondb',
+#     'USER': 'isaacagbedam',
+#     'PASSWORD': 'NmDRfgF9AZ7e',
+#     'HOST': 'ep-twilight-recipe-039780.eu-central-1.aws.neon.tech',
+#     'PORT': '5432',
+#   }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

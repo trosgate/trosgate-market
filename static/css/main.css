@@ -5070,3 +5070,34 @@ body.wt-login .wt-userlogedin{display: block;}
 .hidden{
 	display: none;
 }
+
+/*Proposal Pricing Tier Style*/
+.nav.nav-tabs {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .nav.nav-tabs .nav-item {
+	flex-grow: 1;
+  }
+  
+  .nav.nav-tabs .nav-link {
+	width: 100%;
+	text-align: center;
+	font-weight:bold;
+  }
+
+  .nav.nav-tabs .nav-link.active {
+	color: #09b83e; /* Replace with your desired text color */
+  }
+
+  .proposal-action{
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .proposal-action .proposal-btn-state {
+	width: 100%;
+	text-align: center;
+	margin:5px;
+  }

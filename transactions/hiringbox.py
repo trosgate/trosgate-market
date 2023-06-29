@@ -20,16 +20,33 @@ class HiringBox():
     """
     This is the base class for proposal hiring sessions
     """
-    def __init__(self, request):
+    def __init__(self, request, data=None):
         self.session = request.session
-        # hiring_box = self.session.get('proposal_box')
         hiring_box = self.session.get(settings.HIRINGBOX_SESSION_ID)
         if settings.HIRINGBOX_SESSION_ID not in request.session:
             hiring_box = self.session[settings.HIRINGBOX_SESSION_ID] = {}
         self.hiring_box = hiring_box
+        self.data = data if data is not None else {}
 
+    def salary_tier1(self):
+        return self.data.get('salary_tier1')
 
-    def addon(self, proposal, member_qty):
+    def salary_tier1_price(self):
+        return self.data.get('salary_tier1_price')
+
+    def salary_tier2(self):
+        return self.data.get('salary_tier2')
+
+    def salary_tier2_price(self):
+        return self.data.get('salary_tier2_price')
+
+    def salary_tier3(self):
+        return self.data.get('salary_tier3')
+
+    def salary_tier3_price(self):
+        return self.data.get('salary_tier3_price')
+    
+    def addon(self, proposal, member_qty, salary):
         """
         This function will add proposal to session at its original price
         This function will modify proposal by updating member quantity that client wishes to hire
@@ -37,12 +54,13 @@ class HiringBox():
         proposal_id = str(proposal.id)
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
+            self.hiring_box[proposal_id]["salary"] = salary
         else:
-            self.hiring_box[proposal_id] = {'salary': int(proposal.salary), 'member_qty': int(member_qty)}
+            self.hiring_box[proposal_id] = {'salary': int(salary), 'member_qty': int(member_qty)}
         self.commit()
 
 
-    def modify(self, proposal, member_qty):
+    def modify(self, proposal, member_qty, salary):
         """
         We grab the proposal as a string, 
         then On condition that we have proposal in session at its original price,
@@ -52,8 +70,9 @@ class HiringBox():
 
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
+            self.hiring_box[proposal_id]["salary"] = salary
         else:
-            self.hiring_box[proposal_id] = {"salary": int(proposal.salary), "member_qty": int(member_qty)}
+            self.hiring_box[proposal_id] = {"salary": int(salary), "member_qty": int(member_qty)}
         self.commit()
 
 

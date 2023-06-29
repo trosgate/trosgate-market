@@ -18,10 +18,11 @@ class ProposalAdmin(admin.ModelAdmin):
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
         ('Basic Info', {'fields': ('created_by','merchant','team', 'identifier',)}),
+        ('Product pricing', {'fields': ('digital', 'tier_pricing','salary', 'salary_tier1','salary_tier2', 'salary_tier3',)}),
         ('Classification', {'fields': ('category','reference', 'published',)}),
         ('Description', {'fields': ('description', 'sample_link', 'skill',)}),
         ('FAQs', {'fields': ('faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'faq_three', 'faq_three_description',)}),
-        ('Attributes', {'fields': ('salary','service_level', 'revision', 'dura_converter', 'thumbnail',)}),   
+        ('Attributes', {'fields': ('service_level', 'revision', 'dura_converter', 'thumbnail',)}),   
     )
     
     def mark_bulk_to_public(self, request, queryset):

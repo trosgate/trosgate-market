@@ -61,26 +61,96 @@ def proposal_bucket(request):
     return render(request, "transactions/proposal_bucket.html", context)
 
 
+# @login_required
+# def add_proposal_to_box(request):
+#     '''
+#     Callable function for adding proposal and
+#     modifying the quantity of freelancer in the box
+#     '''
+#     proposal_id = int(request.POST.get('proposalid'))
+#     member_qty = int(request.POST.get('memberqty'))
+ 
+#     hiringbox = HiringBox(request)
+
+#     proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
+
+#     hiringbox.addon(proposal=proposal, member_qty=member_qty)
+#     memberqty = hiringbox.__len__()
+#     totals = hiringbox.get_total_price_before_fee_and_discount()
+
+#     context={
+#         'proposal': proposal,
+#         'hiringbox': hiringbox,
+#         'salary': proposal.salary, 
+#         'member_qty': memberqty, 
+#         'get_totals': totals
+#     }
+#     return render(request, 'transactions/partials/proposal_tier.html', context)
+
+
 @login_required
 def add_proposal_to_box(request):
     '''
     Callable function for adding proposal and
     modifying the quantity of freelancer in the box
     '''
-    hiringbox = HiringBox(request)
+    sal = int(request.POST.get('salary'))
+    proposal_id = int(request.POST.get('proposalid'))
+    member_qty = int(request.POST.get('memberqty'))
+    types = str(request.POST.get('types'))
+    salary = sal * member_qty
 
-    if request.POST.get('action') == 'post':
-        proposal_id = int(request.POST.get('proposalid'))
-        member_qty = int(request.POST.get('memberqty'))
-        proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
+    proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
 
-        hiringbox.addon(proposal=proposal, member_qty=member_qty)
-        memberqty = hiringbox.__len__()
-        totals = hiringbox.get_total_price_before_fee_and_discount()
+    data = {}
 
-        response = JsonResponse(
-            {'salary': proposal.salary, 'member_qty': memberqty, 'get_totals': totals})
-        return response
+    if types == 'salary_tier1':
+        data['salary_tier1'] = 'salary_tier1'
+        data['salary_tier1_price'] = salary
+        data['salary_tier2'] = None
+        data['salary_tier2_price'] = proposal.salary_tier2
+        data['salary_tier3'] = None
+        data['salary_tier3_price'] = proposal.salary_tier3
+
+    elif types == 'salary_tier2':
+        data['salary_tier1'] = None
+        data['salary_tier1_price'] = proposal.salary_tier1
+        data['salary_tier2'] = 'salary_tier2'
+        data['salary_tier2_price'] = salary
+        data['salary_tier3'] = None
+        data['salary_tier3_price'] = proposal.salary_tier3
+
+    else:
+        data['salary_tier1'] = None
+        data['salary_tier1_price'] = proposal.salary_tier1
+        data['salary_tier2'] = None
+        data['salary_tier2_price'] = proposal.salary_tier2
+        data['salary_tier3'] = 'salary_tier3'
+        data['salary_tier3_price'] = salary
+
+    hiringbox = HiringBox(request, data=data)
+
+    hiringbox.addon(proposal=proposal, member_qty=member_qty, salary=salary)
+    memberqty = hiringbox.__len__()
+
+    salary_tier1_price = hiringbox.salary_tier1_price()
+    salary_tier2_price = hiringbox.salary_tier2_price()
+    salary_tier3_price = hiringbox.salary_tier3_price()
+    # print('types=', types)
+    # print('salary_tier1_price=', salary_tier1_price)
+    # print('salary_tier2_price=', salary_tier2_price)
+    # print('salary_tier3_price=', salary_tier3_price)
+    context={
+        'proposal': proposal,
+        'hiringbox': hiringbox,
+        'salary': proposal.salary, 
+        'member_qty': memberqty, 
+        'salary_tier1_price': salary_tier1_price,
+        'salary_tier2_price': salary_tier2_price,
+        'salary_tier3_price': salary_tier3_price,
+        'base_currency':get_base_currency_symbol(),
+    }
+    return render(request, 'transactions/partials/proposal_tier.html', context)
 
 
 @login_required
@@ -172,8 +242,6 @@ def payment_fee_structure(request):
         }
         response = JsonResponse(context)
         return response
-
-
 
 
 @login_required

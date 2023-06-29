@@ -3,10 +3,9 @@ from general_settings.models import Skill, Category
 from .models import Proposal, ProposalChat
 from django.utils.translation import gettext_lazy as _
 from django import forms
-from image_cropping import ImageCropWidget, ImageRatioField
 from django.core.exceptions import ValidationError
 from datetime import datetime, timezone, timedelta
-from django.contrib.admin.widgets import FilteredSelectMultiple
+
 
 # a class to output datepicker on template
 class DateInput(forms.DateInput):

@@ -633,7 +633,7 @@ def create_message(request, proposal_id):
         'chats':chats,
         'chat_count':chat_count
     }       
-    return render(request, 'proposals/components/partial_proposal.html', context)
+    return render(request, 'proposals/components/chat_messages.html', context)
 
 
 @login_required
@@ -645,5 +645,5 @@ def fetch_messages(request, proposal_id):
         'proposal':proposal,
         'chats':chats,
     }
-    return render(request, 'proposals/components/partial_proposal.html', context)
+    return render(request, 'proposals/components/chat_messages.html', context)
 

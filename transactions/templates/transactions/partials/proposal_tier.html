@@ -1,0 +1,178 @@
+
+    <div class="tab-pane fade show active p-3 pt-0" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+    
+        <p>liqua aut enim ad minim veniamac quis nostrud exercitation.</p>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Price</span><i class="text-primary pt-1">{{base_currency}} {% if salary_tier1_price %}{{salary_tier1_price}}{% else %}{{proposal.salary_tier1}}{% endif %}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_dura_converter_display }}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span style="font-weight:bold;">Add-Ons:</span>
+        </div>
+        
+        <div class="row">
+            <div class="d-flex justify-content-between" style="margin: auto;">
+                <span style="font-weight:bold;">{{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} available: </span><br>
+            </div>
+            <div class="d-flex justify-content-between" style="margin: auto;">
+                <span style="font-weight:bold; color:blue;"> @ {{base_currency}} {{proposal.salary_tier1}}</span><br>
+            </div>
+            <div class="col-md-12">
+                <form>
+                <div class="form-group" style="margin: auto; width: 100%;">
+                    <select id="select" name="memberqty" class="custom-select" style="width: 100%;">
+                        {% if proposal.team.members.count >= 1 %}<option value="1" {% if hiring_box.member_qty %}selected{% endif %}> 1 </option>{% endif %}
+                        {% if proposal.team.members.count >= 2 %}<option value="2" {% if hiring_box.member_qty %}selected{% endif %}> 2 </option>{% endif %}
+                        {% if proposal.team.members.count >= 3 %}<option value="3" {% if hiring_box.member_qty %}selected{% endif %}> 3 </option>{% endif %}
+                        {% if proposal.team.members.count >= 4 %}<option value="4" {% if hiring_box.member_qty %}selected{% endif %}> 4 </option>{% endif %}
+                        {% if proposal.team.members.count >= 5 %}<option value="5" {% if hiring_box.member_qty %}selected{% endif %}> 5 </option>{% endif %}
+                    </select><br>
+                    <input type="number" name="salary" value="{{proposal.salary_tier1}}" hidden/>
+                    <input type="number" name="proposalid" value="{{proposal.id}}" hidden/>
+                    <input type="text" name="types" value="{{proposal.SALARY_TIER1}}" hidden/>
+                    <br>
+                    
+                </div>
+                <button type="button" class="btn btn-info btn-sm btn-block proposal-btn-state" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true"
+                    hx-post="{% url 'transactions:add_to_hiring_box' %}"
+                    hx-target="#myTabContent">
+                    +/- B-Addon
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="proposal-action">
+        {% if request.user.is_authenticated and request.user.clients %}
+            <button type="button" class="btn btn-info btn-sm proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:red;'>Instant Hire <i class="fa fa-info badge badge-success" style="border-radius:50%;"  hx-on="click: window.confirm('this is the total messages')"></i></button>
+            <a href="{% url 'transactions:hiring_box_summary' %}" class="btn btn-primary btn-sm  proposal-btn-state" target="_blank"> Review Box</a>
+            <a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm proposal-btn-state">Hire Expert</a>
+        {% elif request.user.is_authenticated and request.user.freelancer %}
+            <button type="button" class="btn btn-info btn-sm proposal-btn-state"><strike style="color:white">... Hire Expert ...</strike></button>
+        {% elif not request.user.is_authenticated %}
+            <a href="{% url 'account:login' %}" class="btn btn-info btn-sm proposal-btn-state">Hire Expert</a>
+        {% endif %} 
+    </div>
+    </div>
+    <div class="tab-pane fade p-3 pt-0" id="standard" role="tabpanel" aria-labelledby="standard-tab">
+        <p>liqua aut enim ad minim veniamac quis nostrud exercitation.</p>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Price</span><i class="text-primary pt-1"> {{base_currency}} {% if salary_tier2_price %}{{salary_tier2_price}}{% else %}{{proposal.salary_tier2}}{% endif %}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_dura_converter_display }}</i>
+        </div>
+        
+        <div class="d-flex justify-content-between mb-3">
+            <span style="font-weight:bold;">Add-Ons:</span>
+        </div>
+        <div class="row">
+            <div class="d-flex justify-content-between" style="margin: auto;">
+                <span style="font-weight:bold;">{{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} available: </span><br>
+            </div>
+            <div class="d-flex justify-content-between" style="margin: auto;">
+                <span style="font-weight:bold; color:blue;"> @ {{base_currency}} {{proposal.salary_tier2}}</span><br>
+            </div>
+            <div class="col-md-12">
+            <form>
+                <div class="form-group" style="margin: auto; width: 100%;">
+                    <select id="select" name="memberqty" class="custom-select" style="width: 100%;">
+                        {% if proposal.team.members.count >= 1 %}<option value="1" {% if hiring_box.member_qty %}selected{% endif %}> 1 </option>{% endif %}
+                        {% if proposal.team.members.count >= 2 %}<option value="2" {% if hiring_box.member_qty %}selected{% endif %}> 2 </option>{% endif %}
+                        {% if proposal.team.members.count >= 3 %}<option value="3" {% if hiring_box.member_qty %}selected{% endif %}> 3 </option>{% endif %}
+                        {% if proposal.team.members.count >= 4 %}<option value="4" {% if hiring_box.member_qty %}selected{% endif %}> 4 </option>{% endif %}
+                        {% if proposal.team.members.count >= 5 %}<option value="5" {% if hiring_box.member_qty %}selected{% endif %}> 5 </option>{% endif %}
+                    </select><br>
+                    <input type="number" name="salary" value="{{proposal.salary_tier2}}" hidden/>
+                    <input type="number" name="proposalid" value="{{proposal.id}}" hidden/>
+                    <input type="text" name="types" value="{{proposal.SALARY_TIER2}}" hidden/>
+                    <br>
+                    
+                </div>
+                <button type="button" class="btn btn-info btn-sm btn-block proposal-btn-state" id="standard-tab" data-bs-toggle="tab" data-bs-target="#standard" type="button" role="tab" aria-controls="standard" aria-selected="true"
+                    hx-post="{% url 'transactions:add_to_hiring_box' %}"
+                    hx-target="#myTabContent">
+                    +/- S-Addon
+                </button>
+            </form>
+        </div>
+    </div>
+        <div class="proposal-action">
+            {% if request.user.is_authenticated and request.user.clients %}
+                <button class="btn btn-info btn-sm proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:red;'>Instant Hire <i class="fa fa-info badge badge-success" style="border-radius:50%;"  hx-on="click: window.confirm('this is the total messages')"></i></button>
+                <a href="{% url 'transactions:hiring_box_summary' %}" class="btn btn-primary btn-sm  proposal-btn-state" target="_blank"> Review Box</a>
+                <a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm proposal-btn-state">Hire Expert</a>
+            {% elif request.user.is_authenticated and request.user.freelancer %}
+                <button class="btn btn-info btn-sm proposal-btn-state"><strike style="color:white">... Hire Expert ...</strike></button>
+            {% elif not request.user.is_authenticated %}
+                <a href="{% url 'account:login' %}" class="btn btn-info btn-sm proposal-btn-state">Hire Expert</a>
+            {% endif %} 
+        </div>
+    </div>
+    <div class="tab-pane fade p-3 pt-0" id="premium" role="tabpanel" aria-labelledby="premium-tab">
+        <p>liqua aut enim ad minim veniamac quis nostrud exercitation.</p>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Price</span><i class="text-primary pt-1"> {{base_currency}} {% if salary_tier3_price %}{{salary_tier3_price}}{% else %}{{proposal.salary_tier3}}{% endif %}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_dura_converter_display }}</i>
+        </div>
+        
+        <div class="d-flex justify-content-between mb-3">
+            <span style="font-weight:bold;">Add-Ons:</span>
+        </div>
+        <div class="row">
+            <div class="d-flex justify-content-between" style="margin: auto;">
+                <span style="font-weight:bold;">{{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}} available: </span><br>
+            </div>
+            <div class="d-flex justify-content-between" style="margin: auto;">
+                <span style="font-weight:bold; color:blue;"> @ {{base_currency}} {{proposal.salary_tier3}}</span><br>
+            </div>
+            <div class="col-md-12">
+            <form>
+                <div class="form-group" style="margin: auto; width: 100%;">
+                    <select id="select" name="memberqty" class="custom-select" style="width: 100%;">
+                        {% if proposal.team.members.count >= 1 %}<option value="1" {% if hiring_box.member_qty %}selected{% endif %}> 1 </option>{% endif %}
+                        {% if proposal.team.members.count >= 2 %}<option value="2" {% if hiring_box.member_qty %}selected{% endif %}> 2 </option>{% endif %}
+                        {% if proposal.team.members.count >= 3 %}<option value="3" {% if hiring_box.member_qty %}selected{% endif %}> 3 </option>{% endif %}
+                        {% if proposal.team.members.count >= 4 %}<option value="4" {% if hiring_box.member_qty %}selected{% endif %}> 4 </option>{% endif %}
+                        {% if proposal.team.members.count >= 5 %}<option value="5" {% if hiring_box.member_qty %}selected{% endif %}> 5 </option>{% endif %}
+                    </select><br>
+                    <input type="number" name="salary" value="{{proposal.salary_tier3}}" hidden/>
+                    <input type="number" name="proposalid" value="{{proposal.id}}" hidden/>
+                    <input type="text" name="types" value="{{proposal.SALARY_TIER3}}" hidden/>
+                    <br>
+                    
+                </div>
+                <button type="button" class="btn btn-info btn-sm btn-block proposal-btn-state" id="premium-tab" data-bs-toggle="tab" data-bs-target="#premium" type="button" role="tab" aria-controls="premium" aria-selected="true"
+                    hx-post="{% url 'transactions:add_to_hiring_box' %}"
+                    hx-target="#myTabContent">
+                    +/- P-Addon
+                </button>
+            </form>
+        </div>
+   
+        <div class="proposal-action">
+            {% if request.user.is_authenticated and request.user.clients %}
+                <button class="btn btn-info btn-sm proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:red;'>Instant Hire <i class="fa fa-info badge badge-success" style="border-radius:50%;"  hx-on="click: window.confirm('this is the total messages')"></i></button>
+                <a href="{% url 'transactions:hiring_box_summary' %}" class="btn btn-primary btn-sm  proposal-btn-state" target="_blank"> Review Box</a>
+                <a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm proposal-btn-state">Hire Expert</a>
+            {% elif request.user.is_authenticated and request.user.freelancer %}
+                <button class="btn btn-info btn-sm proposal-btn-state"><strike style="color:white">... Hire Expert ...</strike></button>
+            {% elif not request.user.is_authenticated %}
+                <a href="{% url 'account:login' %}" class="btn btn-info btn-sm proposal-btn-state">Hire Expert</a>
+            {% endif %} 
+        </div>
+    </div>
+</div>
+	

@@ -1,5 +1,5 @@
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from account.tokens import account_activation_token
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
