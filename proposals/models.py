@@ -28,6 +28,18 @@ class ActiveProposals(models.Manager):
 
 
 class Proposal(MerchantProduct):
+    BASIC = 'Basic'
+    STANDARD = 'Standard'
+    PREMIUM = 'Premium'
+
+    SALARY_TIER1 = 'salary_tier1'
+    SALARY_TIER2 = 'salary_tier2'
+    SALARY_TIER3 = 'salary_tier3'
+    PRICING_TIERS = (
+        (SALARY_TIER1, _("Basic")),
+        (SALARY_TIER2, _("Standard")),
+        (SALARY_TIER3, _("Premium")),
+    )
     revision = models.BooleanField(_("Revision"), choices=((False, 'No'), (True, 'Yes')), default=False)
     thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
@@ -37,6 +49,12 @@ class Proposal(MerchantProduct):
     faq_two_description = models.TextField(_("FAQ #2 Details"), max_length=255, null=True, blank=True)
     faq_three = models.CharField(_("FAQ #3"), max_length=100, null=True, blank=True)
     faq_three_description = models.TextField(_("FAQ #3 Details"), max_length=255, null=True, blank=True)
+    digital = models.BooleanField(_("Digital Product"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    tier_pricing = models.BooleanField(_("Tier Pricing"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    salary_tier1 = models.PositiveIntegerField(_("Price Tier1"), default=0)       
+    salary_tier2 = models.PositiveIntegerField(_("Price Tier2"), default=0)
+    salary_tier3 = models.PositiveIntegerField(_("Price Tier3"), default=0)       
+    pricing_tier = models.CharField(_("Pricing Tier"), max_length=30, choices=PRICING_TIERS, default=SALARY_TIER1)
  
     active = ActiveProposals()
 
@@ -70,6 +88,8 @@ class Proposal(MerchantProduct):
         super(Proposal, self).save(*args, **kwargs)
 
 
+    # @property
+    # @property
     @property
     def preview_proposal_sales_count(self):
         return self.proposalhired.filter(purchase__status='success').count()

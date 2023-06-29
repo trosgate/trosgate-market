@@ -44,12 +44,13 @@
 					</div>
 						
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-8 mb-4">
 							<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="width:1920px; max-height:560px;" alt="img description">
 						</div>
 						<div class="col-md-4">
 							<div class="bg-light rounded">
-								<div class="p-5 pt-0">
+								{% if proposal.tier_pricing == False %}
+								<div class="p-3 pt-0">
 									
 									<div class="d-flex justify-content-between mb-3">
 										<span style="font-weight:bold;">Offering:</span>
@@ -93,6 +94,22 @@
 									{% endif %} 
 									</div>
 								</div>
+								{% else %}
+								<ul class="nav nav-tabs" id="myTab" role="tablist">
+									<li class="nav-item" role="presentation" style="list-style-type: none;">
+									  <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">{{proposal.BASIC}}</button>
+									</li>
+									<li class="nav-item" role="presentation" style="list-style-type: none;">
+									  <button class="nav-link" id="standard-tab" data-bs-toggle="tab" data-bs-target="#standard" type="button" role="tab" aria-controls="standard" aria-selected="false">{{proposal.STANDARD}}</button>
+									</li>
+									<li class="nav-item" role="presentation" style="list-style-type: none;">
+									  <button class="nav-link" id="premium-tab" data-bs-toggle="tab" data-bs-target="#premium" type="button" role="tab" aria-controls="premium" aria-selected="false">{{proposal.PREMIUM}}</button>
+									</li>
+								</ul>
+								<div class="tab-content" id="myTabContent">
+								{% include 'transactions/partials/proposal_tier.html' %}
+								</div>
+								{% endif %}
 							</div>
 						</div>
 					
@@ -166,8 +183,8 @@
 {% endblock content %}
 
 {% block scripts %}
-<script>
-	$(document).on('click', '#add-box', function (e) {
+{% comment %} <script> {% endcomment %}
+	{% comment %} $(document).on('click', '#add-box', function (e) {
 	  e.preventDefault();
 	  $.ajax({
 		type: 'POST',
@@ -186,9 +203,9 @@
 		error: function (xhr, errmsg, err) {}
 	  });
 	})
-  </script>
+  </script> {% endcomment %}
 
-  <script>
+  {% comment %} <script>
 	$(document).on('click', '#oneClickCheckout', function (e) {
 	  e.preventDefault();
 
@@ -223,7 +240,7 @@
 		}
 	  });
 	})
-  </script>
+  </script> {% endcomment %}
 	<!-- sharethis script begins-->	
 	<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
 	<!-- sharethis script ends-->
