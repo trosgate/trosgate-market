@@ -1,7 +1,7 @@
 import stripe
 import json
 import requests
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from projects.models import Project
 from applications.models import Application
@@ -35,7 +35,7 @@ from django.db import transaction as db_transaction
 from freelancer.models import FreelancerAccount
 from general_settings.utilities import get_protocol_only
 from client.models import ClientAccount
-
+from django_htmx.http import HttpResponseClientRedirect
 
 @login_required
 def proposal_direct_hire(request, short_name, proposal_slug):
@@ -61,96 +61,48 @@ def proposal_bucket(request):
     return render(request, "transactions/proposal_bucket.html", context)
 
 
-# @login_required
-# def add_proposal_to_box(request):
-#     '''
-#     Callable function for adding proposal and
-#     modifying the quantity of freelancer in the box
-#     '''
-#     proposal_id = int(request.POST.get('proposalid'))
-#     member_qty = int(request.POST.get('memberqty'))
- 
-#     hiringbox = HiringBox(request)
-
-#     proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
-
-#     hiringbox.addon(proposal=proposal, member_qty=member_qty)
-#     memberqty = hiringbox.__len__()
-#     totals = hiringbox.get_total_price_before_fee_and_discount()
-
-#     context={
-#         'proposal': proposal,
-#         'hiringbox': hiringbox,
-#         'salary': proposal.salary, 
-#         'member_qty': memberqty, 
-#         'get_totals': totals
-#     }
-#     return render(request, 'transactions/partials/proposal_tier.html', context)
-
-
 @login_required
 def add_proposal_to_box(request):
-    '''
-    Callable function for adding proposal and
-    modifying the quantity of freelancer in the box
-    '''
-    sal = int(request.POST.get('salary'))
+    # Callable function for adding proposal and
+    # modifying the quantity of freelancer in the box
+    hiringbox = HiringBox(request)
+
+    if request.POST.get('action') == 'post':
+        proposal_id = int(request.POST.get('proposalid'))
+        member_qty = int(request.POST.get('memberqty'))
+        package_price = int(request.POST.get('salary'))
+        package = str(request.POST.get('package'))
+
+        proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
+
+        if proposal.pricing == True:
+            hiringbox.set_pricing(proposal=proposal.id, package_name=package, package_price=package_price)
+            hiringbox.addon(proposal=proposal, member_qty=member_qty, price=package_price)
+        else:
+            hiringbox.addon(proposal=proposal, member_qty=member_qty, price=proposal.salary)
+        
+        memberqty = hiringbox.__len__()
+        total = package_price * member_qty
+        base_currency = get_base_currency_symbol()
+        readable_amount = f'{base_currency} {total}'
+        
+        response = JsonResponse(
+            {'salary': readable_amount, 'member_qty': memberqty})
+        return response
+    
+
+@login_required
+def add_pricing_to_box(request):
+    package_price = int(request.POST.get('salary'))
     proposal_id = int(request.POST.get('proposalid'))
-    member_qty = int(request.POST.get('memberqty'))
-    types = str(request.POST.get('types'))
-    salary = sal * member_qty
+    package = str(request.POST.get('types'))
 
     proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
 
-    data = {}
+    hiringbox = HiringBox(request)
+    hiringbox.set_pricing(proposal=proposal.id,  package_name=package, package_price=package_price)
 
-    if types == 'salary_tier1':
-        data['salary_tier1'] = 'salary_tier1'
-        data['salary_tier1_price'] = salary
-        data['salary_tier2'] = None
-        data['salary_tier2_price'] = proposal.salary_tier2
-        data['salary_tier3'] = None
-        data['salary_tier3_price'] = proposal.salary_tier3
-
-    elif types == 'salary_tier2':
-        data['salary_tier1'] = None
-        data['salary_tier1_price'] = proposal.salary_tier1
-        data['salary_tier2'] = 'salary_tier2'
-        data['salary_tier2_price'] = salary
-        data['salary_tier3'] = None
-        data['salary_tier3_price'] = proposal.salary_tier3
-
-    else:
-        data['salary_tier1'] = None
-        data['salary_tier1_price'] = proposal.salary_tier1
-        data['salary_tier2'] = None
-        data['salary_tier2_price'] = proposal.salary_tier2
-        data['salary_tier3'] = 'salary_tier3'
-        data['salary_tier3_price'] = salary
-
-    hiringbox = HiringBox(request, data=data)
-
-    hiringbox.addon(proposal=proposal, member_qty=member_qty, salary=salary)
-    memberqty = hiringbox.__len__()
-
-    salary_tier1_price = hiringbox.salary_tier1_price()
-    salary_tier2_price = hiringbox.salary_tier2_price()
-    salary_tier3_price = hiringbox.salary_tier3_price()
-    # print('types=', types)
-    # print('salary_tier1_price=', salary_tier1_price)
-    # print('salary_tier2_price=', salary_tier2_price)
-    # print('salary_tier3_price=', salary_tier3_price)
-    context={
-        'proposal': proposal,
-        'hiringbox': hiringbox,
-        'salary': proposal.salary, 
-        'member_qty': memberqty, 
-        'salary_tier1_price': salary_tier1_price,
-        'salary_tier2_price': salary_tier2_price,
-        'salary_tier3_price': salary_tier3_price,
-        'base_currency':get_base_currency_symbol(),
-    }
-    return render(request, 'transactions/partials/proposal_tier.html', context)
+    return redirect("transactions:pricing_option_with_fees")
 
 
 @login_required
@@ -179,13 +131,15 @@ def modify_from_hiring_box(request):
     hiringbox = HiringBox(request)
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
-        member_qty = int(request.POST.get('memberqty'))
-        hiringbox.modify(proposal=proposal_id, member_qty=member_qty)
         proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
+        
+        member_qty = int(request.POST.get('memberqty'))
+        hiringbox.modify(proposal=proposal.id, member_qty=member_qty, price=proposal.salary)
 
         line_total_price = member_qty * proposal.salary
         memberqty = hiringbox.__len__()
         grand_total = hiringbox.get_total_price_before_fee_and_discount()
+
         response = JsonResponse({'member_qty': memberqty, 'grandtotal': grand_total, 'total_price': line_total_price})
         return response
 
@@ -204,9 +158,36 @@ def payment_option_with_fees(request):
     context ={
         'hiringbox': hiringbox,
         'payment_gateways': payment_gateways,
-        'base_currency': base_currency
+        'base_currency': base_currency,
+        'payment_method': 'Payment Method'
     }
     return render(request, "transactions/payment_option_with_fees.html", context)
+
+
+@login_required
+def pricing_option_with_fees(request):
+    # function for selecting checkout option
+    hiringbox = HiringBox(request)
+    proposal_package = hiringbox.get_pricing()
+
+    if not proposal_package:
+        return HttpResponseBadRequest()
+    
+    proposal_id = int(proposal_package['id'])
+    proposal = Proposal.objects.filter(pk=proposal_id, status = Proposal.ACTIVE).first()
+
+    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
+    base_currency = get_base_currency_symbol()
+    context ={
+        'proposal': proposal,
+        'hiringbox': hiringbox,
+        'payment_gateways': payment_gateways,
+        'base_currency': base_currency,
+        'payment_method': 'Payment Method',
+    }
+    if request.htmx:
+        return render(request, "transactions/partials/pricing_option_with_fees.html", context)
+    return render(request, "transactions/pricing_option_with_fees.html", context)
 
 
 @login_required
@@ -224,6 +205,8 @@ def payment_fee_structure(request):
         applicants = hiringbox.__len__()
         discount = hiringbox.get_discount_value()
         subtotal = hiringbox.get_total_price_before_fee_and_discount()
+        package_amount = hiringbox.get_pricing()['package_price']
+        package_name = hiringbox.get_pricing()['package_name']
 
         session = request.session
 
@@ -237,6 +220,8 @@ def payment_fee_structure(request):
         context = { 
             'selected_fee': selected_fee,
             'subtotal': subtotal,
+            'package_name': package_name,
+            'package_amount': package_amount,
             'discount': discount,
             'applicants': applicants,
         }

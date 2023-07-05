@@ -9,6 +9,7 @@ urlpatterns = [
     # Urls for hiring app
     path('box-summary/', views.proposal_bucket,name='hiring_box_summary'),
     path('add/', views.add_proposal_to_box, name='add_to_hiring_box'),
+    path('pricing/', views.add_pricing_to_box, name='add_pricing_to_box'),
     path('remove/', views.remove_from_hiring_box, name='remove_from_hiring_box'),
     path('modify/', views.modify_from_hiring_box, name='modify_from_hiring_box'),
 
@@ -18,7 +19,8 @@ urlpatterns = [
     path('contract/', views.contract_transaction, name='contract_transaction'),
 
     path('fee-structure/', views.payment_option_with_fees, name='payment_option_selection'),
-    path('payment_fee_structure/', views.payment_fee_structure,name='payment_fee_structure'),
+    path('payment-type/', views.pricing_option_with_fees, name='pricing_option_with_fees'),
+    path('payment-fee-structure/', views.payment_fee_structure,name='payment_fee_structure'),
     path('api/checkout/', views.final_checkout, name='payment_checkout'),
     path('flutter/checkout/api/', views.flutter_payment_intent, name='flutter_payment_intent'),
     # path('flutterwave_webhook/', views.flutterwave_webhook, name='flutterwave_webhook'),

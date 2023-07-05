@@ -5088,7 +5088,7 @@ body.wt-login .wt-userlogedin{display: block;}
   }
 
   .nav.nav-tabs .nav-link.active {
-	color: #09b83e; /* Replace with your desired text color */
+	color: #09b83e;
   }
 
   .proposal-action{
@@ -5099,5 +5099,23 @@ body.wt-login .wt-userlogedin{display: block;}
   .proposal-action .proposal-btn-state {
 	width: 100%;
 	text-align: center;
-	margin:5px;
+	background:green;
+	box-shadow: none;
+	margin:10px 0px;
+	border-radius:20px;
+  }
+  .proposal-action .addon-btn {
+	width: 50%;
+	text-align: center;
+	margin:0px 0px 2px 2px;
+  }
+
+  .addon-header{
+	color:black;
+	font-weight: bold;
+  }
+  
+  ul li .packager{
+	outline: none;
+	border-color: #fff;
   }

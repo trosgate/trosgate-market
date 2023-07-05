@@ -20,47 +20,40 @@ class HiringBox():
     """
     This is the base class for proposal hiring sessions
     """
-    def __init__(self, request, data=None):
+    def __init__(self, request):
         self.session = request.session
         hiring_box = self.session.get(settings.HIRINGBOX_SESSION_ID)
         if settings.HIRINGBOX_SESSION_ID not in request.session:
             hiring_box = self.session[settings.HIRINGBOX_SESSION_ID] = {}
         self.hiring_box = hiring_box
-        self.data = data if data is not None else {}
 
-    def salary_tier1(self):
-        return self.data.get('salary_tier1')
-
-    def salary_tier1_price(self):
-        return self.data.get('salary_tier1_price')
-
-    def salary_tier2(self):
-        return self.data.get('salary_tier2')
-
-    def salary_tier2_price(self):
-        return self.data.get('salary_tier2_price')
-
-    def salary_tier3(self):
-        return self.data.get('salary_tier3')
-
-    def salary_tier3_price(self):
-        return self.data.get('salary_tier3_price')
+    def set_pricing(self, proposal, package_name, package_price):
+        self.session['selected_package'] = {
+            'id': proposal,
+            'package_name': package_name,
+            'package_price': package_price
+        }
     
-    def addon(self, proposal, member_qty, salary):
+    def get_pricing(self):
+        return self.session.get('selected_package')
+
+
+    def addon(self, proposal, member_qty, price):
         """
+        Apply to proposals excluding digital product
         This function will add proposal to session at its original price
         This function will modify proposal by updating member quantity that client wishes to hire
         """
         proposal_id = str(proposal.id)
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
-            self.hiring_box[proposal_id]["salary"] = salary
+            self.hiring_box[proposal_id]["salary"] = price
         else:
-            self.hiring_box[proposal_id] = {'salary': int(salary), 'member_qty': int(member_qty)}
+            self.hiring_box[proposal_id] = {'salary': int(price), 'member_qty': int(member_qty)}
         self.commit()
 
 
-    def modify(self, proposal, member_qty, salary):
+    def modify(self, proposal, member_qty, price):
         """
         We grab the proposal as a string, 
         then On condition that we have proposal in session at its original price,
@@ -70,9 +63,9 @@ class HiringBox():
 
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
-            self.hiring_box[proposal_id]["salary"] = salary
+            self.hiring_box[proposal_id]["salary"] = price
         else:
-            self.hiring_box[proposal_id] = {"salary": int(salary), "member_qty": int(member_qty)}
+            self.hiring_box[proposal_id] = {"salary": int(price), "member_qty": int(member_qty)}
         self.commit()
 
 
@@ -99,18 +92,18 @@ class HiringBox():
         """
         return sum(member["member_qty"] for member in self.hiring_box.values())
 
-
     def get_total_freelancer(self):
         return sum(member["member_qty"] for member in self.hiring_box.values())
 
     def get_total_price_before_fee_and_discount(self):
-        return sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        self.subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        return self.subtotal
+        # return sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
 
     def get_gateway(self):
         if settings.PROPOSALGATEWAY_SESSION_ID in self.session:
             return PaymentGateway.objects.get(id=self.session[settings.PROPOSALGATEWAY_SESSION_ID]["gateway_id"])
         return None
-
 
     def get_fee_payable(self):
         newprocessing_fee = 0
@@ -118,9 +111,10 @@ class HiringBox():
             newprocessing_fee = self.get_gateway().processing_fee
         return newprocessing_fee
 
-
     def get_discount_multiplier(self):
-        subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        # subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        # subtotal = self.get_total_price_before_fee_and_discount()
+        subtotal = self.subtotal
         rate = 0
         if (get_level_one_start_amount() <= subtotal <= get_level_one_delta_amount()):
             rate = get_level_one_rate()
@@ -135,11 +129,10 @@ class HiringBox():
             rate = get_level_four_rate()
         return rate
         
-
-
     def get_discount_value(self):
         discount = 0
-        subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        # subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        subtotal = self.get_total_price_before_fee_and_discount()
 
         if (get_level_one_start_amount() <= subtotal <= get_level_one_delta_amount()):
             discount = 0
@@ -172,6 +165,7 @@ class HiringBox():
 
     def get_total_price_after_discount_only(self):
         subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        subtotal = self.get_total_price_before_fee_and_discount()
         total_after_discount = (subtotal - self.get_discount_value())
         return total_after_discount
 

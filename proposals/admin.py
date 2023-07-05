@@ -17,8 +17,13 @@ class ProposalAdmin(admin.ModelAdmin):
     ]
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
-        ('Basic Info', {'fields': ('created_by','merchant','team', 'identifier',)}),
-        ('Product pricing', {'fields': ('digital', 'tier_pricing','salary', 'salary_tier1','salary_tier2', 'salary_tier3',)}),
+        ('Basic Info', {'fields': ('created_by','merchant','team', 'identifier','salary',)}),
+        ('Service Product pricing', {'fields': (
+            'pricing', 'pricing1_duration','pricing2_duration', 'pricing3_duration',
+            'salary_tier1', 'salary_tier2', 'salary_tier3',
+            'revision_tier1', 'revision_tier2', 'revision_tier3',
+        )}),
+        ('Digital Product pricing', {'fields': ('digital',)}),
         ('Classification', {'fields': ('category','reference', 'published',)}),
         ('Description', {'fields': ('description', 'sample_link', 'skill',)}),
         ('FAQs', {'fields': ('faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'faq_three', 'faq_three_description',)}),

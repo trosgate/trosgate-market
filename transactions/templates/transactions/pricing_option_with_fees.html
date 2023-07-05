@@ -1,0 +1,145 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content%}
+{% include "account/partials/feebanner.html" %}
+        
+        <div class="wt-proposalholder mt-6">
+            <div class="container">
+                {% comment %} <div class="row g-3">
+
+                    <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
+                        <div class="d-flex bd-highlight ms-0">
+                        <div class="p-2 flex-grow-1 bd-highlight">Total Amount:</div>
+                        <div class="p-2 bd-highlight"><span class="fw-bold h5">{{base_currency}}</span><span id="subTotal"
+                            class="fw-bold h5">{{hiring_box.get_total_price_before_fee_and_discount}}</span></div>
+                        </div>
+                        <div class="d-flex bd-highlight">
+                        <div class="p-2 flex-grow-1 bd-highlight">Freelancer{{hiring_box.get_total_freelancer|pluralize}}:</div>
+                        <div class="p-2 bd-highlight"><span class="fw-bold h5"></span><span 
+                            class="fw-bold h5">{{hiring_box.get_total_freelancer}}</span></div>
+                        </div>
+                        <div class="d-flex bd-highlight">
+                        <div class="p-2 flex-grow-1 bd-highlight">Processing Fees (F):</div>
+                        <div class="p-2 bd-highlight"><span class="fw-bold h5"> + {{base_currency}}</span><span id="totalFees"
+                            class="fw-bold h5">{{hiring_box.get_fee_payable}}</span></div>
+                        </div>
+                        <div class="d-flex bd-highlight">
+                        <div class="p-2 flex-grow-1 bd-highlight">Discount (D) - ({{hiring_box.get_discount_multiplier}}%):</div>
+                        <div class="p-2 bd-highlight"><span class="fw-bold h5">- {{base_currency}}</span><span id="totalDiscount"
+                            class="fw-bold h5">{{hiring_box.get_discount_value}}</span></div>
+                        </div>
+                        <div class="d-flex bd-highlight">
+                        <div class="p-2 flex-grow-1 bd-highlight">Total Payable:</div>
+                        <div class="p-2 bd-highlight"><span class="fw-bold h5"> {{base_currency}}</span><span 
+                            class="fw-bold h5">({{hiring_box.get_total_price_before_fee_and_discount}} - D) + {{base_currency}}F </span></div>
+                        </div>
+                        <a role="button" href="{% url 'transactions:payment_checkout' %}" class="btn btn-primary fw-bold w-100"
+                        type="button"><i class="fa fa-lock" aria-hidden="true"></i> Pay Securely</a>
+                    </div> 
+
+                    <div class="col-md-7 col-lg-8">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                    <th>Action</th>
+                                        <th>Name</th>
+                                        <th>Fee</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody data-index="{{gateway.id}}">
+                                    {% for gateway in payment_gateways %}
+                                    <tr>
+                                        <tr> 
+                                        <td><input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
+                                        <td>{{gateway.get_name_display}}</td>
+                                        <td> ${{gateway.processing_fee}}</td>
+                                        </tr>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div> {% endcomment %}
+
+                <div class="row">
+                <div class="col-md-8">
+                    <div class="table-responsive">
+                        <table class="table" style="border:none;">
+                            <thead>
+                                <tr>
+                                <th>Action</th>
+                                    <th>Name</th>
+                                    <th>Fee</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody data-index="{{gateway.id}}">
+                                {% for gateway in payment_gateways %}
+                                <tr>
+                                    <td><input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"></input></td>
+                                    <td class="text-left">{{gateway.get_name_display}}</td>
+                                    <td> {{base_currency}} {{gateway.processing_fee}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Package</span><i class="text-primary pt-1">{% if hiring_box.get_pricing %}{{hiring_box.get_pricing.package_name|capfirst}}{% else %}{{proposal.BASIC|capfirst}}{% endif %}</i>
+                    </div>
+                   
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Price</span><i class="text-primary pt-1">{{base_currency}}{% if hiring_box.get_pricing %}{{hiring_box.get_pricing.package_price}}{% else %}{{proposal.salary_tier1}}{% endif %}</i>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Payment Method</span><span id="package_name">{% if hiring_box.get_pricing %}{{hiring_box.get_pricing.package_name}}{% else %}Not Selected {% endif %}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Processing Fee</span><span id="totalFees" class="text-primary pt-1">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Total Amount (in {{base_currency}})</span><span id="subTotal" class="text-primary pt-1">{% if hiring_box.get_pricing %}{{hiring_box.get_pricing.package_price}} + {{hiring_box.get_fee_payable}}{% else %}{{proposal.salary_tier1}} + 0{% endif %}</span>
+                    </div>
+                   
+                    <div class="d-flex justify-content-between mb-3">
+                        <a href="{% url 'transactions:payment_checkout' %}" class="btn btn-primary fw-bold w-100"
+                        type="button"><i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="wt-sectionhead wt-textcenter">
+                    <a href="{% url 'transactions:hiring_box_summary' %}" class="text-info" target="_blank">Let me review this amount ${{hiring_box.get_total_price_before_fee_and_discount}}</a><br><br>
+                    <span>Copyright @ {{website.site_name}}</span>
+                </div>
+            </div>
+        </div> 
+    <script>
+        $('input[type=radio][name=paymentGateway]').on('change', function(e) {
+            e.preventDefault();
+            $.ajax({
+            type: "POST",
+            url: '{% url "transactions:payment_fee_structure" %}',
+            data: {
+                gatewaytype: $(this).val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: "post",
+            },
+            success: function (json) {
+                document.getElementById("subTotal").innerHTML =  `${json.package_amount} + ${json.selected_fee}`;
+                document.getElementById("package_name").innerHTML = json.package_name;               
+                document.getElementById("totalFees").innerHTML = json.selected_fee;               
+            },
+            error: function (xhr, errmsg, err) {},
+            });
+            
+        });
+        </script>
+
+{% endblock %}
