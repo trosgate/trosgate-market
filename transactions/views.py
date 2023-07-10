@@ -52,16 +52,6 @@ def proposal_direct_hire(request, short_name, proposal_slug):
 
 
 @login_required
-def proposal_bucket(request):
-    # This function provides a collection of all proposals in bucket
-    hiringbox = HiringBox(request)
-    context={
-        'hiringbox': hiringbox
-    }
-    return render(request, "transactions/proposal_bucket.html", context)
-
-
-@login_required
 def add_proposal_to_box(request):
     # Callable function for adding proposal and
     # modifying the quantity of freelancer in the box
@@ -92,20 +82,6 @@ def add_proposal_to_box(request):
     
 
 @login_required
-def add_pricing_to_box(request):
-    package_price = int(request.POST.get('salary'))
-    proposal_id = int(request.POST.get('proposalid'))
-    package = str(request.POST.get('types'))
-
-    proposal = get_object_or_404(Proposal, id=proposal_id, status=Proposal.ACTIVE)
-
-    hiringbox = HiringBox(request)
-    hiringbox.set_pricing(proposal=proposal.id,  package_name=package, package_price=package_price)
-
-    return redirect("transactions:pricing_option_with_fees")
-
-
-@login_required
 def remove_from_hiring_box(request):
     '''
     Callable function for removing proposal and
@@ -115,10 +91,16 @@ def remove_from_hiring_box(request):
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
         hiringbox.remove(proposal=proposal_id)
-        memberqty = hiringbox.__len__()
+        freelancers = hiringbox.__len__()
         grand_total = hiringbox.get_total_price_before_fee_and_discount()
-        response = JsonResponse(
-            {'member_qty': memberqty, 'grandtotal': grand_total})
+        base_currency = get_base_currency_symbol()
+        discount = hiringbox.get_discount_value()
+        response = JsonResponse({
+            'freelancers': freelancers, 
+            'grandtotal': grand_total,
+            'base_currency':base_currency,
+            'discount':discount
+        })
         return response
 
 
@@ -137,10 +119,17 @@ def modify_from_hiring_box(request):
         hiringbox.modify(proposal=proposal.id, member_qty=member_qty, price=proposal.salary)
 
         line_total_price = member_qty * proposal.salary
-        memberqty = hiringbox.__len__()
+        freelancers = hiringbox.__len__()
         grand_total = hiringbox.get_total_price_before_fee_and_discount()
-
-        response = JsonResponse({'member_qty': memberqty, 'grandtotal': grand_total, 'total_price': line_total_price})
+        base_currency = get_base_currency_symbol()
+        discount = hiringbox.get_discount_value()
+        response = JsonResponse({
+            'freelancers': freelancers, 
+            'grandtotal': grand_total, 
+            'total_price': line_total_price,
+            'base_currency':base_currency,
+            'discount':discount
+        })
         return response
 
 
@@ -166,48 +155,35 @@ def payment_option_with_fees(request):
 
 @login_required
 def pricing_option_with_fees(request):
-    # function for selecting checkout option
-    hiringbox = HiringBox(request)
-    proposal_package = hiringbox.get_pricing()
-
-    if not proposal_package:
-        return HttpResponseBadRequest()
-    
-    proposal_id = int(proposal_package['id'])
-    proposal = Proposal.objects.filter(pk=proposal_id, status = Proposal.ACTIVE).first()
-
+    # function for selecting checkout payment option
     payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
-    base_currency = get_base_currency_symbol()
-    context ={
-        'proposal': proposal,
-        'hiringbox': hiringbox,
-        'payment_gateways': payment_gateways,
-        'base_currency': base_currency,
-        'payment_method': 'Payment Method',
-    }
-    if request.htmx:
-        return render(request, "transactions/partials/pricing_option_with_fees.html", context)
-    return render(request, "transactions/pricing_option_with_fees.html", context)
 
-
-@login_required
-def payment_fee_structure(request):
-    '''
-    Callable function for updating the fees
-    Adding fee ID as an object to session
-    Adding to session makes it easy to retrieve selected fee on checkout page
-    '''
     hiringbox = HiringBox(request)
-    if request.POST.get('action') == 'post':
-        gateway_type = int(request.POST.get('gatewaytype'))
-        gateway = PaymentGateway.objects.get(id=gateway_type)
-        selected_fee = gateway.processing_fee
-        applicants = hiringbox.__len__()
-        discount = hiringbox.get_discount_value()
-        subtotal = hiringbox.get_total_price_before_fee_and_discount()
-        package_amount = hiringbox.get_pricing()['package_price']
-        package_name = hiringbox.get_pricing()['package_name']
+    base_currency = get_base_currency_symbol()
+    base_currency_code = get_base_currency_code()
+    gateway_type = hiringbox.get_gateway()
+    selected_fee = hiringbox.get_fee_payable()
+    discount = hiringbox.get_discount_value()
+    subtotal = hiringbox.get_total_price_before_fee_and_discount()
+    grand_total = hiringbox.get_total_price_after_discount_and_fee()
+    # Paypal payment api
+    paypal_public_key = PayPalClientConfig().paypal_public_key() 
+    # Stripe payment api
+    stripeClient = StripeClientConfig()
+    stripe_public_key = stripeClient.stripe_public_key()
+    stripe.api_key = stripeClient.stripe_secret_key()
+    # Futterwave payment api
+    flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key()  
+    # Razorpay payment api
+    razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
 
+    subtotal = hiringbox.get_total_price_before_fee_and_discount()
+
+    if request.method == 'POST':
+        gateways = int(request.POST.get('paymentGateway'))
+        gateway = PaymentGateway.objects.get(id=gateways)
+        selected_fee = gateway.processing_fee
+        gateway_type = gateway.name
         session = request.session
 
         if "proposalgateway" not in request.session:
@@ -216,17 +192,98 @@ def payment_fee_structure(request):
         else:
             session["proposalgateway"]["gateway_id"] = gateway.id
             session.modified = True
+
+    context ={
+        'selected': 'selected',
+        'hiringbox': hiringbox,
+        'payment_gateways': payment_gateways,
+        'base_currency': base_currency,
+        'base_currency_code': base_currency_code,
+        'payment_method': 'Payment Summary',
+        'subtotal': subtotal,
+        'grand_total': grand_total,
+        'selected_fee': selected_fee,
+        "gateway_type": gateway_type,
+        "paypal_public_key": paypal_public_key,
+        "stripe_public_key": stripe_public_key,
+        "flutterwave_public_key": flutterwave_public_key,
+        "razorpay_public_key": razorpay_public_key,
+        "base_currency": base_currency,        
+        "discount": discount,        
+    }
+    if request.htmx:
+        return render(request, "transactions/partials/pricing_option_with_fees.html", context)
+
+    return render(request, "transactions/pricing_option_with_fees.html", context)
+
+
+# @login_required
+# def payment_fee_structure(request):
+#     '''
+#     Callable function for updating the fees
+#     Adding fee ID as an object to session
+#     Adding to session makes it easy to retrieve selected fee on checkout page
+#     '''
+#     hiringbox = HiringBox(request)
+#     if request.POST.get('action') == 'post':
+#         gateway_type = int(request.POST.get('gatewaytype'))
+#         gateway = PaymentGateway.objects.get(id=gateway_type)
+#         selected_fee = gateway.processing_fee
+#         discount = hiringbox.get_discount_value()
+#         subtotal = hiringbox.get_total_price_before_fee_and_discount()
         
-        context = { 
-            'selected_fee': selected_fee,
-            'subtotal': subtotal,
-            'package_name': package_name,
-            'package_amount': package_amount,
-            'discount': discount,
-            'applicants': applicants,
-        }
-        response = JsonResponse(context)
-        return response
+#         session = request.session
+
+#         if "proposalgateway" not in request.session:
+#             session["proposalgateway"] = {"gateway_id": gateway.id}
+#             session.modified = True
+#         else:
+#             session["proposalgateway"]["gateway_id"] = gateway.id
+#             session.modified = True
+        
+#         context = { 
+#             'selected_fee': selected_fee,
+#             'subtotal': subtotal,
+#             'discount': discount,
+#         }
+#         response = JsonResponse(context)
+#         return response
+
+@login_required
+def payment_fee_structure(request):
+    hiringbox = HiringBox(request)
+    gateway_type = int(request.POST.get('paymentGateway'))
+    gateway = PaymentGateway.objects.get(id=gateway_type)
+    selected_fee = gateway.processing_fee
+    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
+    base_currency = get_base_currency_symbol()
+    discount = hiringbox.get_discount_value()
+    subtotal = hiringbox.get_total_price_before_fee_and_discount()
+    
+    session = request.session
+
+    if "proposalgateway" not in request.session:
+        session["proposalgateway"] = {"gateway_id": gateway.id}
+        session.modified = True
+    else:
+        session["proposalgateway"]["gateway_id"] = gateway.id
+        session.modified = True
+    
+    context = { 
+        'selected_fee': selected_fee,
+        'subtotal': subtotal,
+        'discount': discount,
+        'hiringbox': hiringbox,
+        'payment_gateways': payment_gateways,
+        'base_currency': base_currency,
+        'payment_method': 'Payment Summary',
+        'subtotal': subtotal,
+        'selected_fee': selected_fee,
+        "gateway_type": gateway_type,        
+    }
+
+
+    return render(request, "transactions/partials/pricing_option_with_fees.html", context)
 
 
 @login_required
@@ -240,11 +297,11 @@ def final_checkout(request):
 
     if num_of_freelancers < 1:
         messages.error(request, "Please add atleast one proposal to proceed")
-        return redirect("transactions:hiring_box_summary")
+        return redirect("transactions:pricing_option_with_fees")
 
     if  "proposalgateway" not in request.session:
         messages.error(request, "Please select payment option")
-        return redirect("transactions:payment_option_selection")
+        return redirect("transactions:pricing_option_with_fees")
 
     gateway_type = hiringbox.get_gateway()
     selected_fee = hiringbox.get_fee_payable()
@@ -596,15 +653,11 @@ def paypal_payment_order(request):
         try:
             purchase = Purchase.objects.create(
                 client=request.user,
-                full_name=response.result.purchase_units[0].shipping.name.full_name,
-                email=response.result.payer.email_address,
-                country = request.user.country,
                 payment_method=str(gateway_type),
                 client_fee = int(total_gateway_fee),
                 category = Purchase.PROPOSAL,
                 salary_paid=round(float(response.result.purchase_units[0].amount.value)),
                 paypal_order_key=response.result.id,
-                unique_reference=PayPalClient.paypal_unique_reference(),
                 status = Purchase.FAILED
             )
         except Exception as e:

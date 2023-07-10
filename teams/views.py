@@ -527,7 +527,7 @@ def delete_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
 
 @login_required
 def purchase_package(request, type):
-    payPalClient = PayPalClientConfig()
+    payPalClient = PayPalClientConfig(merchant=request.merchant)
     paypal_public_key = payPalClient.paypal_public_key()
     paypal_subscription_price_id = payPalClient.paypal_subscription_price_id()
     stripe_public_key = StripeClientConfig().stripe_public_key()
@@ -572,7 +572,7 @@ def packages(request):
     error = ''
     subscription = ''
     stripeClient = StripeClientConfig()
-    paypalClient = PayPalClientConfig()
+    paypalClient = PayPalClientConfig(merchant=request.merchant)
     razorpay_client = RazorpayClientConfig()
     access_token = ''
     headers = ''

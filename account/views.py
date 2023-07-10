@@ -27,7 +27,6 @@ from django.contrib.auth import views as auth_views
 from django.views.decorators.cache import cache_control
 from marketing.models import AutoTyPist
 from django.conf import settings
-from general_settings.gateways import PayPalClientConfig, get_gateway_environment
 from django.contrib.auth.hashers import check_password
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_application_fee_calculator, get_proposal_fee_calculator
 from general_settings.models import Mailer

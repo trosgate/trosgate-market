@@ -8,11 +8,24 @@ from django_cryptography.fields import encrypt
 from django.core.exceptions import ValidationError
 from account.fund_exception import FundException
 from notification.mailer import send_credit_to_team, send_marked_paid_in_bulk_email, send_withdrawal_marked_failed_email
-from account.models import Customer
+from account.models import Customer,Merchant
 from teams.models import Team
 from merchants.models import MerchantMaster
+from django.contrib.sites.models import Site
 
 
+
+class MerchantAPIsManager(models.Manager):
+    def get_queryset(self, merchant=None):
+        site = Site.objects.get_current()
+        curr_merchant = Merchant.objects.filter(site=site).exists()
+        # print(curr_merchant)
+        # print(self.merchant_id)
+        if not curr_merchant:
+            return super().get_queryset().filter(merchant=merchant)
+        else:
+            return super().get_queryset().filter(merchant__site=site.id)
+ 
 
 class PaymentAPI(models.Model): # This model stores apis for parent site
     public_key = encrypt(models.CharField(_("Puplishable Key/API Id"), max_length=255, blank=True, null=True))
@@ -113,7 +126,7 @@ class PaymentGateway(PaymentAPI):
         return super().clean()
 
 
-class MerchantAPIs(models.Model): 
+class MerchantAPIs(models.Model):
     # This model stores apis for parent site
     merchant = models.OneToOneField('account.Merchant', verbose_name=_('Merchant'), related_name='paymentapi', on_delete=models.CASCADE)  
     # Stripe API Credentials
@@ -150,6 +163,8 @@ class MerchantAPIs(models.Model):
     mtn_callback_url = encrypt(models.CharField(_("MTN CALLBACK URL"), max_length=255, blank=True, null=True))
     mtn_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
 
+    # objects = MerchantAPIsManager()
+
     def __str__(self):
         return str(self.merchant)
 
@@ -158,12 +173,31 @@ class MerchantAPIs(models.Model):
         verbose_name_plural = 'Merchant API'
 
 
-    def masked_sensitive_field(self):
-        if len(self.sensitive_field) <= 3:
-            return '*' * len(self.sensitive_field)
-        else:
-            return self.sensitive_field[:3] + '_' + '*' * (len(self.sensitive_field) - 3)
-        
+    # def masked_stripe_public_key(self):
+    #     if self.stripe_public_key:
+    #         return self.stripe_public_key[:4] + '*' * (len(self.stripe_public_key)-5) + self.stripe_public_key[-1]
+    #     return None
+
+    def mask_key(self, key):
+        '''
+        Masks first 4 characters and last 1 character
+        '''
+        if key:
+            return key[:4] + '*' * (len(key)-5) + key[-1]
+        return None
+
+    def masked_stripe_public_key(self):
+        return self.mask_key(self.stripe_public_key)
+
+    def masked_stripe_secret_key(self):
+        return self.mask_key(self.stripe_secret_key)
+
+    def masked_paypal_public_key(self):
+        return self.mask_key(self.paypal_public_key)
+
+    def masked_paypal_secret_key(self):
+        return self.mask_key(self.paypal_secret_key)
+
 
 class PaymentAccount(MerchantMaster):
     MOMO = 'mobilemoney'

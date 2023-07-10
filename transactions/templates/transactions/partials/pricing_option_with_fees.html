@@ -1,0 +1,58 @@
+<div class="col-md-8">
+    <div class="table-responsive">
+        <table class="table" style="border:none;">
+            <thead class="addon-header">
+                <tr>
+                <th>Action</th>
+                    <th>Name</th>
+                    <th>Fee</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for gateway in payment_gateways %}
+                <tr>
+                    <td>
+                        <form>
+                        <input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"
+                            hx-post="{% url 'transactions:pricing_option_with_fees' %}"
+                            hx-target="#payment-method">
+                        </input>
+                        </form>
+                    </td>
+                    <td class="text-left">{{gateway.get_name_display}}
+                        {% if gateway_type|lower == gateway.name %} 
+                        <i class="fa fa-check" style="color:green;"></i>
+                        {% else %}
+                        <i class="fa fa-close" style="color:red;"></i>
+                        {% endif %}
+                    </td>
+                    <td> {{base_currency}} {{gateway.processing_fee}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="d-flex justify-content-between mb-3">
+        <span>Price</span><span id="grandTotal2" class="text-primary pt-1">{{base_currency}} {% if hiring_box.get_total_price_before_fee_and_discount %}{{hiring_box.get_total_price_before_fee_and_discount}}{% else %} 0 {% endif %}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Freelancer </span><span id="totalFreelancer" class="text-primary pt-1"> {{hiring_box.get_total_freelancer}}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Discount </span><span id="totalDiscount" class="text-primary pt-1"> Up to {% if hiring_box.get_discount_value %}{{hiring_box.get_discount_value}}% {% else %} {{discount}}% {% endif %}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3"> 
+        <span>Processing Fee (in {{base_currency}})</span><span id="totalFees" class="text-primary pt-1">{% if hiring_box.get_fee_payable %}{{hiring_box.get_fee_payable}} {% else %} {{selected_fee}} {% endif %}</span>
+    </div>
+
+    <div class="proposal-total-btn">
+        <a href="{% url 'transactions:payment_checkout' %}" class="btn btn-primary fw-bold w-100"
+        type="button"><i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
+    </div>
+</div>
+<div class="col-md-12">
+    <div id="paypal-button-container" style="margin:5px 0px;"></div>
+</div>
