@@ -29,7 +29,6 @@ from analytics.analytic import (
     proposal_sales_count_by_contract,
 )
 from django.db.models import Sum, Avg, Count
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -37,7 +36,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib.sites.shortcuts import get_current_site
-
 
 
 def merchant_proposal(request):
@@ -195,6 +193,7 @@ def proposal_step_one(request):
             # Store form data in session
             step_one_data = {}
             step_one_data['title'] = proposalformone.cleaned_data['title']
+            step_one_data['title'] = proposalformone.cleaned_data['title']
             step_one_data['preview'] = proposalformone.cleaned_data['preview']
             step_one_data['category'] = proposalformone.cleaned_data['category'].pk
             request.session['post_step_one'] = step_one_data
@@ -206,7 +205,6 @@ def proposal_step_one(request):
     else:
         # Get initial form data from session if available
         initial_data = request.session.get('post_step_one', {})
-        print('initial_data :', initial_data)
         proposalformone = ProposalStepOneForm(initial=initial_data)
     return render(request, 'proposals/partials/create_steps.html', {'proposalformone': proposalformone, 'variable': 'stepOne'})
 
@@ -216,6 +214,11 @@ def proposal_step_one(request):
 def proposal_step_two(request):
     # Get form data from previous step
     step_one_data = request.session.get('post_step_one')
+    pricing_type_data = request.session.get('pricing_data_type')
+    if pricing_type_data is None:
+        pricing_type_data = True
+        request.session['pricing_data_type'] = pricing_type_data
+
     if not step_one_data:
         return redirect("proposals:proposal_step_one")
    
@@ -223,6 +226,9 @@ def proposal_step_two(request):
         proposalformtwo = ProposalStepTwoForm(request.POST)
         if proposalformtwo.is_valid():
             # Update session data with new form data
+            price = proposalformtwo.cleaned_data['pricing']
+            print('price :', price)
+
             request.session['post_step_two'] = proposalformtwo.cleaned_data
             step_one_data.update(proposalformtwo.cleaned_data)
             return redirect("proposals:proposal_step_three")
@@ -232,7 +238,34 @@ def proposal_step_two(request):
         # Get initial form data from session if available
         initial_data = request.session.get('post_step_two', {})
         proposalformtwo = ProposalStepTwoForm(initial=initial_data)
-    return render(request, 'proposals/partials/create_steps.html', {'proposalformtwo': proposalformtwo, 'variable': 'stepTwo'})
+        
+    context = {
+        'variable': 'stepTwo',
+        'proposalformtwo': proposalformtwo, 
+        'pricing_type_data': pricing_type_data
+    }
+    return render(request, 'proposals/partials/create_steps.html', context)
+
+
+def pricing_type(request):
+    pricing_type_data = request.session.get('pricing_data_type')
+
+    if  pricing_type_data == True:
+        pricing_type_data = False
+    elif  pricing_type_data == False:
+        pricing_type_data = True
+    else:
+        pricing_type_data = True
+   
+    request.session['pricing_data_type'] = pricing_type_data
+    initial_data = request.session.get('post_step_two', {})
+    proposalformtwo = ProposalStepTwoForm(initial=initial_data)
+    context = {
+        'variable': 'stepTwo',
+        'proposalformtwo': proposalformtwo, 
+        'pricing_type_data': pricing_type_data
+    }
+    return render(request, 'proposals/partials/pricing_type.html', context)
 
 
 @login_required
@@ -286,8 +319,8 @@ def proposal_step_four(request):
         if proposalformfour.is_valid():
             # unpack and combine all form data from previous steps and current step
             form_data = {**step_one_data, **step_two_data, **step_three_data, **proposalformfour.cleaned_data}
+            
             # Create Post object
- 
             category = get_object_or_404(Category, pk=form_data['category'])
             team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id)
             proposal = Proposal.objects.create(
@@ -518,7 +551,10 @@ def proposal_preview(request, short_name, proposal_slug):
         "profile_view": profile_view,
 
     }
-    return render(request, 'proposals/proposal_preview.html', context)
+    if request.merchant.merchant.proposal_detail == False:
+        return render(request, 'proposals/proposal_detail.html', context)
+    else:
+        return render(request, 'proposals/proposal_detail2.html', context)
 
 
 def proposal_detail(request, short_name, proposal_slug):

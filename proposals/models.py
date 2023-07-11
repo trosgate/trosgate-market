@@ -83,10 +83,16 @@ class Proposal(MerchantProduct):
     faq_three_description = models.TextField(_("FAQ #3 Details"), max_length=255, null=True, blank=True)
     digital = models.BooleanField(_("Digital Product"), choices=((False, 'No'), (True, 'Yes')), default=False)
     pricing = models.BooleanField(_("Tier Pricing"), choices=((False, 'No'), (True, 'Yes')), default=True)
+    
     pricing_tier = models.CharField(_("Pricing Tier"), max_length=30, choices=PRICING_TIERS, default=BASIC)
     salary_tier1 = models.PositiveIntegerField(_("Price Tier1"), default=0)
     salary_tier2 = models.PositiveIntegerField(_("Price Tier2"), default=0)
     salary_tier3 = models.PositiveIntegerField(_("Price Tier3"), default=0)
+
+    description_tier1 = models.CharField(_("Package 1 preview"), max_length=80)
+    description_tier2 = models.CharField(_("Package 2 preview"), max_length=80)
+    description_tier3 = models.CharField(_("Package 3 preview"), max_length=80)
+
     revision_tier1 = models.PositiveIntegerField(_("Revision Tier1"), choices=PACKAGE_REVISION, default=ONE_TIME)
     revision_tier2 = models.PositiveIntegerField(_("Revision Tier2"), choices=PACKAGE_REVISION, default=THREE_TIMES)
     revision_tier3 = models.PositiveIntegerField(_("Revision Tier3"), choices=PACKAGE_REVISION, default=SEVEN_TIMES)

@@ -1,4 +1,3 @@
-{% comment %} <form method="post" hx-post="/my-form/" hx-include="#step-1-form, #step-2-form, #step-3-form"> {% endcomment %}
 
 <div id="step-1-form">
     {% if variable == 'stepOne' %}
@@ -55,63 +54,14 @@
     {% endif %}
 </div>
 
-
 <div id="step-2-form">
 {% if variable == 'stepTwo' %}
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="wt-jobdescription wt-tabsinfo">
-            <div class="wt-jobdetails wt-tabsinfo">
-                <div class="wt-tabscontenttitle">
-                    <h2>Description</h2>
-                </div>      
-                <div class="form-row">
-
-                    <div class="form-group">
-                        {{proposalformtwo.description.label}}
-                        {{proposalformtwo.description}}
-                        <span style="color:red;" role="alert">{{ proposalformtwo.description.errors}}</span>
-                    </div>
-                    <div class="form-group">
-                        {{proposalformtwo.sample_link.label}}
-                        {{proposalformtwo.sample_link}}
-                        <span style="color:red;" role="alert">{{ proposalformtwo.sample_link.errors}}</span>
-                    </div>
-                </div> 
-            </div>  
-            {% if messages %}
-                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
-                    {% for message in messages %}        
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                        <span class="wt-jobalerts">
-                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
-                                <span> {{ message}} </span>
-                            </div>
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            <div class="text-center">
-                <button type="submit" class="wt-btn"
-                    hx-get="{% url 'proposals:proposal_step_one' %}"
-                    hx-target="#step-1-form"
-                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
-                    Prev Step
-                </button>
-                <button id="describeBtn" type="submit" class="wt-btn"
-                    hx-post="{% url 'proposals:proposal_step_two' %}"
-                    hx-target="#step-1-form"
-                    htmx:serialize='all'
-                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
-                    Next Step
-                </button>
-            </div>
-        </form>
+    <div id="pricingPlanBtn">
+    {% include 'proposals/partials/pricing_type.html' %}
+    {% endif %}
     </div>
+</div>
 
-{% endif %}
 
 
 <div id="step-3-form">
@@ -192,31 +142,6 @@
                     <h2>Attributes</h2>
                 </div>      
                 <div class="form-row">
-                    <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Features</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tr>
-                            <th>Salary</th>
-                            <th>{{proposalformfour.salary}}</th>
-                        </tr>
-                        <tr>
-                            <th>Level</th>
-                            <th>{{proposalformfour.service_level}}</th>
-                        </tr>												
-                        <tr>
-                            <th>Duration</th>
-                            <th>{{proposalformfour.dura_converter}}</th>
-                        </tr>
-                        <tr>
-                            <th>Revision</th>
-                            <th>{{proposalformfour.revision}}</th>
-                        </tr>
-                    </table> 
                     <div class="form-group">
                         {{proposalformfour.skill.label}}
                         {{proposalformfour.skill}}

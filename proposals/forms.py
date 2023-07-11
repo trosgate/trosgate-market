@@ -34,19 +34,61 @@ class ProposalStepOneForm(forms.ModelForm):
 
 
 class ProposalStepTwoForm(forms.ModelForm):
+    tier1_preview = forms.CharField(min_length=4, max_length=30, widget=forms.Textarea(attrs={'class':'form-control', 'rows':20, 'cols':100}), required=False)
+    tier2_preview = forms.CharField(min_length=4, max_length=30, widget=forms.Textarea(attrs={'class':'form-control', 'rows':50, 'cols':100}), required=False)
+    tier3_preview = forms.CharField(min_length=4, max_length=30, widget=forms.Textarea(attrs={'class':'form-control', 'rows':50, 'cols':100}), required=False)
+    
     class Meta:
         model = Proposal
-        fields = ['description', 'sample_link']
+        fields = [
+            'description', 'sample_link','pricing',
+            'salary', 'service_level', 'revision', 'dura_converter',
+            'salary_tier1', 'salary_tier2', 'salary_tier3',
+            'revision_tier1','revision_tier2', 'revision_tier3',
+            'pricing1_duration', 'pricing2_duration', 'pricing3_duration',
+            'tier1_preview', 'tier2_preview', 'tier3_preview',
+            ]
         required = ['description']
-        # widgets = {
-        #     'description': forms.Textarea(attrs={'rows':50, 'cols':150})
-        # }
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        # self.fields['pricing'].widget.attrs['class'] = 'hidden'
         self.fields['description'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Proposal description'})
+        self.fields['salary'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ''})            
+        self.fields['service_level'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ''})
+        self.fields['revision'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ''})
+        self.fields['dura_converter'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ''})
+                        
+        self.fields['revision_tier1'].widget.attrs.update(
+            {'class': 'form-control custom-select', 'placeholder': ' '})
+        self.fields['revision_tier2'].widget.attrs.update(
+            {'class': 'form-control custom-select', 'placeholder': ' '})
+        self.fields['revision_tier3'].widget.attrs.update(
+            {'class': 'form-control custom-select', 'placeholder': ' '})
+        
+        self.fields['pricing1_duration'].widget.attrs.update(
+            {'class': 'form-control custom-select', 'placeholder': ' '})
+        self.fields['pricing2_duration'].widget.attrs.update(
+            {'class': 'form-control custom-select', 'placeholder': ' '})
+        self.fields['pricing3_duration'].widget.attrs.update(
+            {'class': 'form-control custom-select', 'placeholder': ' '})
+        
+        self.fields['salary_tier1'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ' '})
+        self.fields['salary_tier2'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ' '})
+        self.fields['salary_tier3'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ' '})
+        
         self.fields['sample_link'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': ' '})
 
@@ -80,22 +122,14 @@ class ProposalStepFourForm(forms.ModelForm):
     thumbnail = forms.ImageField(widget=forms.FileInput,)
     class Meta:
         model = Proposal
-        fields = ['salary', 'service_level', 'revision', 'dura_converter', 'skill', 'thumbnail']
-        required = ['salary', 'service_level', 'revision', 'dura_converter', 'skill', 'thumbnail']
+        fields = ['skill', 'thumbnail']
+        required = ['skill', 'thumbnail']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['salary'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})            
-        self.fields['service_level'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['revision'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['dura_converter'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''})
-        self.fields['skill'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': ''}) # chosen-select Skills
+        self.fields['skill'].widget.attrs['class'] = 'form-control chosen-select Skills'
+        # self.fields['skill'].widget.attrs['style'] = 'height: 50px;'
         self.fields['thumbnail'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': ''})
 

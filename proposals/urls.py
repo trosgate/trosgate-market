@@ -41,6 +41,7 @@ urlpatterns = [
 htmx_urlpatterns = [
     path('message/<int:proposal_id>', views.create_message, name='create_message'),
     path('fetch_messages/<int:proposal_id>', views.fetch_messages, name='fetch_messages'),
+    path('pricing', views.pricing_type, name='pricing_type'),
 ]
 
 urlpatterns += htmx_urlpatterns
