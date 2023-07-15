@@ -1,0 +1,22 @@
+
+<tr>
+    <tr>
+        <td class="text-left">
+            {% if product.product_type == False %} 
+            00000000-0000-0000-0000-000000000000 
+            {% else %}
+            {{product.license}} 
+            {% endif %}
+        </td>
+        <td class="text-left">{{product.get_product_type_display}}</td>
+        <td class="text-left">{{product.get_status_display}}</td>
+        <td class="text-center">{{product.created_at}}</td>
+        <td class="text-center">{% if product.product_type == False %} 0 {% else %}{{proposal.salary}} {% endif %}</td>
+        <td>
+            <a href="{% url 'proposals:product_download' product.proposal.slug product.pk %}" 
+                class="btn btn-outline-info btn-sm"> 
+                Sample Download
+            </a>
+        </td>
+    </tr>
+</tr>

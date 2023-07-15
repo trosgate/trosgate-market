@@ -38,7 +38,7 @@ class HiringBox():
         return self.session.get('selected_package')
 
 
-    def addon(self, proposal, member_qty, price):
+    def addon(self, proposal, member_qty, price, package_name):
         """
         Apply to proposals excluding digital product
         This function will add proposal to session at its original price
@@ -48,8 +48,9 @@ class HiringBox():
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
             self.hiring_box[proposal_id]["salary"] = price
+            self.hiring_box[proposal_id]["package_name"] = package_name
         else:
-            self.hiring_box[proposal_id] = {'salary': int(price), 'member_qty': int(member_qty)}
+            self.hiring_box[proposal_id] = {'salary': int(price), 'package_name': package_name, 'member_qty': int(member_qty)}
         self.commit()
 
 

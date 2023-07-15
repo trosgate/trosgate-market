@@ -34,7 +34,9 @@ urlpatterns = [
 
     # Proposal chats   
     path('<slug:proposal_slug>/chat', views.proposal_chat_messages, name='proposal_chat_messages'),
-    # path('messages/<str:short_name>/<slug:proposal_slug>/detail', views.proposal_chat_details, name='proposal_chat_details'),
+    path('template-and-themes/<slug:proposal_slug>/', views.create_product_view, name='create_product_view'),
+    path('attachment/<int:proposal_id>/', views.add_product_attachment, name='add_product_attachment'),
+    path('download/<slug:proposal_slug>/<int:product_id>/', views.product_download, name='product_download'),
    
 ]
 

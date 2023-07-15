@@ -58,15 +58,16 @@
 									<span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
 								</div>
 								<div class="d-flex justify-content-between mb-3">
-									<span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_dura_converter_display }}</i>
+									<span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_duration_display }}</i>
 								</div>
+								{% include 'proposals/partials/product_advert.html' %}
+								{% if request.user.clients %}
 								<div class="d-flex justify-content-center">
 									<span class="addon-header">Add-On</span>
 								</div>
 								<div class="d-flex justify-content-between mb-3">
 									<span>Available Staffs</span><i class="text-primary pt-1"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</i>
 								</div>
-								{% if request.user.clients %}
 								<form method="POST">{% csrf_token %}
 									<div class="proposal-action">
 										<input id="salary" type="number" name="salary" value="{{proposal.salary}}" hidden/>
@@ -109,6 +110,7 @@
 							<div class="tab-content" id="myTabContent">
 							{% include 'transactions/partials/proposal_tier.html' %}
 							</div>
+							
 							{% endif %}
 						</div>
 				</div>

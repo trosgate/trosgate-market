@@ -235,7 +235,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 # MEDIA PATH FOR TROSGATE SOFTWARE
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-
+PROTECTED_MEDIA_ROOT = os.path.join(BASE_DIR, 'attachments/')
+# PROTECTED_MEDIA_ROOT = BASE_DIR.parent / 'attachments'
 # LOGIN AND AUTHENTICATION FOR TROSGATE SOFTWARE
 LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "account:dashboard"

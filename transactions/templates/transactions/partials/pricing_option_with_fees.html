@@ -56,3 +56,13 @@
 <div class="col-md-12">
     <div id="paypal-button-container" style="margin:5px 0px;"></div>
 </div>
+<div class="col-md-12">
+    {% comment %} {% if gateway_type.name == "stripe" %} {% endcomment %}
+    <button 
+        style="margin:5px 0px;"
+        onclick='stripePay(event)' 
+        id="stripesubmit" class="btn btn-primary w-100 fw-bold" >
+        Pay with Stripe
+    </button>
+    {% comment %} {% endif %} {% endcomment %}
+</div>

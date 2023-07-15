@@ -23,8 +23,7 @@
             <div class="wt-tabscontenttitle">
                 <h2>Package Preview </h2>
             </div>
-            {% comment %} <input type="radio" id="id_pricing" name="pricing"  value="{{ pricing_type_data }}" {% if pricing_type_data %}checked{% endif %} hidden> {% endcomment %}
-            {{proposalformtwo.pricing}}
+            
             <div class="form-row">
                 {% if pricing_type_data %}
                 <div class="form-group col-md-4">
@@ -135,9 +134,9 @@
                 </div>
                 {% else %}
                 <div class="form-group col-md-12">
-                    {{proposalformtwo.dura_converter.label}}
-                    {{proposalformtwo.dura_converter}}
-                    <span style="color:red;" role="alert">{{ proposalformtwo.dura_converter.errors}}</span>
+                    {{proposalformtwo.duration.label}}
+                    {{proposalformtwo.duration}}
+                    <span style="color:red;" role="alert">{{ proposalformtwo.duration.errors}}</span>
                 </div>
                 {% endif %}
             </div>

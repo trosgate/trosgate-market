@@ -1,10 +1,20 @@
 import random
+import mimetypes
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Proposal, ProposalChat
+from .models import Proposal, ProposalProduct, ProposalChat
 from teams.models import Team
 from django.contrib.auth.decorators import login_required
-from .forms import ProposalStepOneForm, ProposalStepTwoForm, ProposalStepThreeForm, ProposalStepFourForm, ProposalChatForm
+from .forms import (
+    ProposalStepOneForm, 
+    ProposalStepTwoSingleForm, 
+    ProposalStepTwoTierForm,
+    ProposalStepThreeForm, 
+    ProposalStepFourForm, 
+    ProposalChatForm,
+    ProposalStepFourForm
+)
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -32,7 +42,7 @@ from django.db.models import Sum, Avg, Count
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib.sites.shortcuts import get_current_site
@@ -193,7 +203,6 @@ def proposal_step_one(request):
             # Store form data in session
             step_one_data = {}
             step_one_data['title'] = proposalformone.cleaned_data['title']
-            step_one_data['title'] = proposalformone.cleaned_data['title']
             step_one_data['preview'] = proposalformone.cleaned_data['preview']
             step_one_data['category'] = proposalformone.cleaned_data['category'].pk
             request.session['post_step_one'] = step_one_data
@@ -215,20 +224,22 @@ def proposal_step_two(request):
     # Get form data from previous step
     step_one_data = request.session.get('post_step_one')
     pricing_type_data = request.session.get('pricing_data_type')
+    
     if pricing_type_data is None:
-        pricing_type_data = True
+        pricing_type_data = True   
         request.session['pricing_data_type'] = pricing_type_data
 
     if not step_one_data:
         return redirect("proposals:proposal_step_one")
-   
+ 
+    proposalform = ProposalStepTwoTierForm(request.POST or None)
+    if pricing_type_data == False:
+        proposalform = ProposalStepTwoSingleForm(request.POST or None)
+
     if request.method == 'POST':
-        proposalformtwo = ProposalStepTwoForm(request.POST)
+        proposalformtwo = proposalform
         if proposalformtwo.is_valid():
             # Update session data with new form data
-            price = proposalformtwo.cleaned_data['pricing']
-            print('price :', price)
-
             request.session['post_step_two'] = proposalformtwo.cleaned_data
             step_one_data.update(proposalformtwo.cleaned_data)
             return redirect("proposals:proposal_step_three")
@@ -237,8 +248,11 @@ def proposal_step_two(request):
     else:
         # Get initial form data from session if available
         initial_data = request.session.get('post_step_two', {})
-        proposalformtwo = ProposalStepTwoForm(initial=initial_data)
         
+        proposalformtwo = ProposalStepTwoTierForm(initial=initial_data)
+        if pricing_type_data == False:
+            proposalformtwo = ProposalStepTwoSingleForm(initial=initial_data)
+            
     context = {
         'variable': 'stepTwo',
         'proposalformtwo': proposalformtwo, 
@@ -247,6 +261,8 @@ def proposal_step_two(request):
     return render(request, 'proposals/partials/create_steps.html', context)
 
 
+@login_required
+@user_is_freelancer
 def pricing_type(request):
     pricing_type_data = request.session.get('pricing_data_type')
 
@@ -256,10 +272,14 @@ def pricing_type(request):
         pricing_type_data = True
     else:
         pricing_type_data = True
-   
+    
     request.session['pricing_data_type'] = pricing_type_data
     initial_data = request.session.get('post_step_two', {})
-    proposalformtwo = ProposalStepTwoForm(initial=initial_data)
+
+    proposalformtwo = ProposalStepTwoTierForm(initial=initial_data)
+    if pricing_type_data == False:
+        proposalformtwo = ProposalStepTwoSingleForm(initial=initial_data)
+           
     context = {
         'variable': 'stepTwo',
         'proposalformtwo': proposalformtwo, 
@@ -274,11 +294,15 @@ def proposal_step_three(request):
     # Get form data from previous steps
     step_one_data = request.session.get('post_step_one')
     step_two_data = request.session.get('post_step_two')
+    pricing_type_data = request.session.get('pricing_data_type')
     
     if not step_one_data:
         return redirect("proposals:proposal_step_one")
-
+    
     if not step_two_data:
+        return redirect("proposals:proposal_step_two")
+    
+    if pricing_type_data is None:
         return redirect("proposals:proposal_step_two")
     
     if request.method == 'POST':
@@ -301,10 +325,12 @@ def proposal_step_three(request):
 @user_is_freelancer
 def proposal_step_four(request):
     # Get form data from previous steps
+    proposal = None
     step_one_data = request.session.get('post_step_one')
     step_two_data = request.session.get('post_step_two')
     step_three_data = request.session.get('post_step_three')
-    
+    pricing_type_data = request.session.get('pricing_data_type')
+
     if not step_one_data:
         return redirect("proposals:proposal_step_one")
 
@@ -313,44 +339,85 @@ def proposal_step_four(request):
     
     if not step_three_data:
         return redirect("proposals:proposal_step_three")
-     
+    
+    if pricing_type_data is None:
+        return redirect("proposals:proposal_step_two")
+         
     if request.method == 'POST':
         proposalformfour = ProposalStepFourForm(request.POST, request.FILES)
         if proposalformfour.is_valid():
             # unpack and combine all form data from previous steps and current step
             form_data = {**step_one_data, **step_two_data, **step_three_data, **proposalformfour.cleaned_data}
-            
             # Create Post object
             category = get_object_or_404(Category, pk=form_data['category'])
             team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id)
-            proposal = Proposal.objects.create(
-                title=form_data['title'],
-                preview=form_data['preview'],
-                description=form_data['description'],
-                sample_link=form_data['sample_link'],
-                salary=form_data['salary'],
-                service_level=form_data['service_level'],
-                revision=form_data['revision'],
-                dura_converter=form_data['dura_converter'],
-                faq_one=form_data['faq_one'],
-                faq_one_description=form_data['faq_one_description'],
-                faq_two=form_data['faq_two'],
-                faq_two_description=form_data['faq_two_description'],
-                thumbnail=form_data['thumbnail'],
-                category=category,
-                created_by=request.user,
-                team=team,
-            )
+            
+            if pricing_type_data:
+
+                proposal = Proposal.objects.create(
+                    pricing = True,
+                    title=form_data['title'],
+                    preview=form_data['preview'],
+                    description=form_data['description'],
+                    sample_link=form_data['sample_link'],
+
+                    tier1_preview=form_data['tier1_preview'],
+                    tier2_preview=form_data['tier2_preview'],
+                    tier3_preview=form_data['tier3_preview'],
+
+                    salary=form_data['salary_tier1'],
+                    salary_tier1=form_data['salary_tier1'],
+                    salary_tier2=form_data['salary_tier2'],
+                    salary_tier3=form_data['salary_tier3'],
+
+                    revision_tier1=form_data['revision_tier1'],
+                    revision_tier2=form_data['revision_tier2'],
+                    revision_tier3=form_data['revision_tier3'],
+
+                    pricing1_duration=form_data['pricing1_duration'],
+                    pricing2_duration=form_data['pricing2_duration'],
+                    pricing3_duration=form_data['pricing3_duration'],
+
+                    faq_one=form_data['faq_one'],
+                    faq_one_description=form_data['faq_one_description'],
+                    faq_two=form_data['faq_two'],
+                    faq_two_description=form_data['faq_two_description'],
+                    thumbnail=form_data['thumbnail'],
+                    category=category,
+                    created_by=request.user,
+                    team=team,
+                )
+            else:
+                proposal = Proposal.objects.create(
+                    title=form_data['title'],
+                    preview=form_data['preview'],
+                    description=form_data['description'],
+                    sample_link=form_data['sample_link'],
+                    salary=form_data['salary'],
+                    service_level=form_data['service_level'],
+                    revision=form_data['revision'],
+                    dura_converter=form_data['dura_converter'],
+                    faq_one=form_data['faq_one'],
+                    faq_one_description=form_data['faq_one_description'],
+                    faq_two=form_data['faq_two'],
+                    faq_two_description=form_data['faq_two_description'],
+                    thumbnail=form_data['thumbnail'],
+                    category=category,
+                    created_by=request.user,
+                    team=team,
+                    pricing = False
+                )
 
             proposal.skill.set(proposalformfour.cleaned_data['skill'])
             proposal.slug = slugify(proposal.title)
             proposal.save()
             
-            if proposal.pk:
+            if proposal.pk:# Implying that proposal was created
                 # Clear session data
                 del request.session['post_step_one']
                 del request.session['post_step_two']
                 del request.session['post_step_three']
+                del request.session['pricing_data_type']
 
             return render(request, 'proposals/partials/create_steps.html', {'variable': 'stepFive', 'proposal':proposal})
         else:
@@ -408,15 +475,15 @@ def modify_proposal_step_two(request, proposal_id, proposal_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)  
     proposal = get_object_or_404(Proposal, team=team, pk=proposal_id, slug=proposal_slug)
 
-    proposalformtwo = ProposalStepTwoForm(request.POST or None, instance=proposal)
-
+    proposalformtwo = ProposalStepTwoTierForm(request.POST or None, instance=proposal)
+    if proposal.pricing == False:
+        proposalformtwo = ProposalStepTwoSingleForm(request.POST or None, instance=proposal)
+    
     if proposalformtwo.is_valid():
+        proposalformtwo.pricing = proposal.pricing
         proposalformtwo.save()
 
         messages.info(request, 'Changed successfully.')
-
-    else:
-        proposalformtwo = ProposalStepTwoForm(instance = proposal)           
 
     context = {
         'proposalformtwo': proposalformtwo,
@@ -556,6 +623,71 @@ def proposal_preview(request, short_name, proposal_slug):
     else:
         return render(request, 'proposals/proposal_detail2.html', context)
 
+
+@login_required
+@user_is_freelancer
+def create_product_view(request, proposal_slug):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
+    products = ProposalProduct.objects.filter(proposal=proposal, team=team)
+    productform = ProposalStepFourForm()
+    base_currency = get_base_currency_symbol()
+    context = {
+        "proposal": proposal,
+        "productform": productform,
+        "products": products,
+        'base_currency':base_currency,
+    }
+    
+    return render(request, 'proposals/create_product.html', context)
+
+
+@login_required
+@user_is_freelancer
+def add_product_attachment(request, proposal_id):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+    proposal = get_object_or_404(Proposal, pk=proposal_id, team=team)
+    
+    if request.method == 'POST':
+        productform = ProposalStepFourForm(request.POST or None, request.FILES or None)
+        if productform.is_valid():
+            product = productform.save(commit=False)
+            product.proposal = proposal
+            product.team=team
+            product.created_by=request.user
+            product.merchant=request.merchant.merchant
+            product.save()
+
+            proposal.digital = True
+            proposal.save()
+            context = {
+                "proposal": proposal,
+                "productform": productform,
+                'product':product,
+            }
+            return render(request, 'proposals/partials/list_product.html', context)
+
+    productform = ProposalStepFourForm()
+    context = {
+        "proposal": proposal,
+        "productform": productform
+    }
+    
+    return render(request, 'proposals/partials/create_product.html', context)
+
+
+@login_required
+def product_download(request, proposal_slug, product_id):
+    proposal = get_object_or_404(Proposal, slug=proposal_slug)
+    product = get_object_or_404(ProposalProduct, proposal=proposal, pk=product_id)
+    file = product.attachment.open(mode='rb')
+    filename = product.attachment.name
+    response = FileResponse(file)
+    content_type, _ = mimetypes.guess_type(filename)
+    response['Content-Type']  = content_type or 'application/octet-stream'
+    response['Content-Disposition'] = f'attachment; filename={product.attachment}'
+    return response
+    
 
 def proposal_detail(request, short_name, proposal_slug):
     proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)

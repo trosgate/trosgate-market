@@ -76,7 +76,10 @@
 										<div class="wt-sectiontitle">
 											<span>Option #2: External Invitation</span>
 										</div>
-
+										<ul class="wt-projectliststyle">
+											<li><span><i class="fa fa-check"></i>#1: Provide a valid email that invitee can monitor</span></li>
+											<li><span><i class="fa fa-check"></i>#2: The provided email owner shouldn't be one of your existing team member</span></li>
+										</ul>
 										<form autocomplete='off'> {% csrf_token %}
 											{% if max_team_members %}
 											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center" id="invitation-message"></div>
@@ -101,13 +104,13 @@
 											</div>	
 											{% endif %}
 										</form> 
-										<ul class="wt-projectliststyle">
-											<div class="wt-title">
-												<h5>Remember!</h5>
-											</div>	
-											<li><span><i class="fa fa-check"></i>#1: Provide a valid email that invitee can monitor</span></li>
-											<li><span><i class="fa fa-check"></i>#2: The provided email owner shouldn't be one of your existing team member</span></li>
-										</ul>											                  														
+										
+										<div class="wt-tabscontenttitle">
+											<h2>Invited Members</h2>
+										</div>									 
+										<div id="invited-user" class="table-responsive">
+											{% include 'teams/components/team_invitees.html'%}			
+										</div> 
 									</div>
 								</div>
 							</div>
@@ -125,29 +128,21 @@
 								<div class="wt-sectiontitle">
 									<span>Team Members</span>
 								</div>
-								<div class="wt-tabscontenttitle">
-									<h2>Invited Members</h2>
+								
+								<div class="wt-freelancerholder wt-rcvproposalholder">
+									<div class="wt-tabscontenttitle">
+										<h2>Accepted Members</h2>
 									</div>									 
-										<div id="invited-user" class="table-responsive">
-										
-												{% include 'teams/components/team_invitees.html'%}			
-																					
-										</div> 
-									</div>
-										<div class="wt-freelancerholder wt-rcvproposalholder">
-										<div class="wt-tabscontenttitle">
-											<h2>Accepted Members</h2>
-										</div>									 
-										<div class="table-responsive">
-										<table class="table">
+									<div class="table-responsive">
+									<table class="table">
 										<thead>
-										<tr>
-											<th>#</th>
-											<th>Email</th>
-											<th>Sent on </th>
-											<th>Code Sent</th>
-											<th>Status</th>
-										</tr>
+											<tr>
+												<th>#</th>
+												<th>Email</th>
+												<th>Sent on </th>
+												<th>Code Sent</th>
+												<th>Status</th>
+											</tr>
 										</thead>
 										<tbody>
 										{% for accept in accepted %}

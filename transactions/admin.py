@@ -233,6 +233,7 @@ class ProposalSaleAdmin(admin.ModelAdmin):
             'discount_offered','is_refunded',
         )}),
         ('Earning/Profit', {'fields': ('staff_hired','earning','total_earning',)}),
+        ('Product Attributes', {'fields': ('package_name','revision','duration',)}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 

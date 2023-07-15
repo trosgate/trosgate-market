@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Proposal, ProposalSupport, ProposalChat
+from .models import Proposal, ProposalProduct, ProposalSupport, ProposalChat
 from django import forms
+
 
 
 @admin.register(Proposal)
@@ -13,12 +14,13 @@ class ProposalAdmin(admin.ModelAdmin):
         'created_by','image_tag', 'sample_link', 'skill','description',
         'team', 'category','reference', 'published', 'faq_three', 'faq_three_description',
         'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'identifier', 
-        'salary','service_level', 'revision', 'dura_converter', 'thumbnail','merchant'
+        'service_level', 'revision', 'dura_converter', 'thumbnail','merchant'
     ]
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
         ('Basic Info', {'fields': ('created_by','merchant','team', 'identifier','salary',)}),
         ('Service Product pricing', {'fields': (
+            'tier1_preview', 'tier2_preview', 'tier3_preview',
             'pricing', 'pricing1_duration','pricing2_duration', 'pricing3_duration',
             'salary_tier1', 'salary_tier2', 'salary_tier3',
             'revision_tier1', 'revision_tier2', 'revision_tier3',
@@ -47,6 +49,12 @@ class ProposalAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
+
+
+@admin.register(ProposalProduct)
+class ProposalAdmin(admin.ModelAdmin):
+    list_display = ['product_type', 'status', 'created_at']
+    readonly_fields = ['created_at']
 
 
 class ProposalSupportInline(admin.StackedInline):

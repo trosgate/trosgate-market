@@ -81,6 +81,54 @@
         
     </div> 
     </div>
+
+    {% comment %} {% if gateway_type.name == "Stripe" %}  {% endcomment %}
+    <script>
+        var CSRF_TOKEN = '{{ csrf_token }}';
+    </script>    
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script>
+    function stripePay(event) {
+        event.preventDefault();
+        
+        $("#stripesubmit").attr("disabled", true);
+        $("#convert-currency").attr("disabled", true);
+             
+        let data = {
+            'stripepCustomer': '{{request.user.get_full_name}}', 
+            'stripepEmail': '{{request.user.email}}',
+            'stripepCountry': '{{request.user.country.name}}',
+        }
+    
+        let stripe = Stripe('{{stripe_public_key}}');
+    
+        fetch('/transaction/stripe/checkout/api/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (session) {
+                return stripe.redirectToCheckout({ sessionId: session.session.id })
+            })
+            .then(function (result) {
+                $("#stripesubmit").attr("disabled", false);
+                $("#convert-currency").attr("disabled", false);
+                return console.log(result.error.message)
+            })
+            .catch(function (error) {
+                return console.log(error)
+            })
+        }
+    </script>
+
     {% endblock content %}
     {% block scripts %}
     {% comment %} <script>
@@ -254,53 +302,6 @@
         hiringPayPalButton();
     </script>
     {% comment %} {% endif %}
-
-    {% if gateway_type.name == "Stripe" %} {% endcomment %}
-    <script>
-        var CSRF_TOKEN = '{{ csrf_token }}';
-    </script>    
-    <script src="https://js.stripe.com/v3/"></script>
-
-    <script>
-    function stripePay(event) {
-        event.preventDefault();
-        
-        $("#stripesubmit").attr("disabled", true);
-        $("#convert-currency").attr("disabled", true);
-             
-        let data = {
-            'stripepCustomer': '{{request.user.get_full_name}}', 
-            'stripepEmail': '{{request.user.email}}',
-            'stripepCountry': '{{request.user.country.name}}',
-        }
-    
-        let stripe = Stripe('{{stripe_public_key}}');
-    
-        fetch('/transaction/stripe/checkout/api/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{csrf_token}}'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (session) {
-                return stripe.redirectToCheckout({ sessionId: session.session.id })
-            })
-            .then(function (result) {
-                $("#stripesubmit").attr("disabled", false);
-                $("#convert-currency").attr("disabled", false);
-                return console.log(result.error.message)
-            })
-            .catch(function (error) {
-                return console.log(error)
-            })
-        }
-    </script>
 
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <script>

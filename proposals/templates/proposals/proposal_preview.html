@@ -47,7 +47,7 @@
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
 											<li><span><i class="fa fa-dollar-sign"></i> {{proposal.get_service_level_display}}</span></li>
 											<li><span>From {% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
-											<li><span><i class="far fa-clock"></i> Duration: {{proposal.get_dura_converter_display }}</span></li>
+											<li><span><i class="far fa-clock"></i> Duration: {{proposal.get_duration_display }}</span></li>
 											{% comment %} |timeuntil {% endcomment %}
 											<li><span><i class="far fa-folder"></i> Revision: {{proposal.get_revision_display}}</span></li>
 											<li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> Min Salary: ${{proposal.salary}}</span></li>

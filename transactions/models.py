@@ -398,10 +398,43 @@ class MerchantTransaction(MerchantMaster):
 
 
 class ProposalSale(MerchantTransaction):
+    BASIC = 'basic'
+    STANDARD = 'standard'
+    PREMIUM = 'premium'
+    PRICING_TIERS = (
+        (BASIC, _("Basic")),
+        (STANDARD, _("Standard")),
+        (PREMIUM, _("Premium")),
+    )    
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal Hired"), related_name="proposalhired", on_delete=models.CASCADE)
+    revision = models.PositiveIntegerField(_("Revision"))
+    duration = models.PositiveIntegerField(_("Duration"))
+    package_name = models.CharField(_("Selected Package"), max_length=20)
 
     class Meta:
         ordering = ("-created_at",)
+
+    def save(self, *args, **kwargs):
+
+        if self.proposal.pricing:
+            pricing_tier_revisions = {
+                Proposal.BASIC: self.proposal.revision_tier1,
+                Proposal.STANDARD: self.proposal.revision_tier2,
+                Proposal.PREMIUM: self.proposal.revision_tier3,
+            }
+            pricing_tier_durations = {
+                Proposal.BASIC: self.proposal.pricing1_duration,
+                Proposal.STANDARD: self.proposal.pricing2_duration,
+                Proposal.PREMIUM: self.proposal.pricing3_duration,
+            }
+
+            self.revision = pricing_tier_revisions.get(self.package_name)
+            self.duration = pricing_tier_durations.get(self.package_name)
+        else:
+            self.revision = self.proposal.revision
+            self.duration = self.proposal.duration
+        super(ProposalSale, self).save(*args, **kwargs)
+
 
     def __str__(self):
         return str(self.proposal)

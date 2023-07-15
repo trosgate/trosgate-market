@@ -37,6 +37,8 @@ from general_settings.utilities import get_protocol_only
 from client.models import ClientAccount
 from django_htmx.http import HttpResponseClientRedirect
 
+
+
 @login_required
 def proposal_direct_hire(request, short_name, proposal_slug):
     '''
@@ -67,9 +69,9 @@ def add_proposal_to_box(request):
 
         if proposal.pricing == True:
             hiringbox.set_pricing(proposal=proposal.id, package_name=package, package_price=package_price)
-            hiringbox.addon(proposal=proposal, member_qty=member_qty, price=package_price)
+            hiringbox.addon(proposal=proposal, member_qty=member_qty, price=package_price, package_name=package)
         else:
-            hiringbox.addon(proposal=proposal, member_qty=member_qty, price=proposal.salary)
+            hiringbox.addon(proposal=proposal, member_qty=member_qty, price=proposal.salary, package_name='single')
         
         memberqty = hiringbox.__len__()
         total = package_price * member_qty
@@ -172,6 +174,8 @@ def pricing_option_with_fees(request):
     stripeClient = StripeClientConfig()
     stripe_public_key = stripeClient.stripe_public_key()
     stripe.api_key = stripeClient.stripe_secret_key()
+
+    # print(request.build_absolute_uri(reverse('transactions:proposal_transaction')))
     # Futterwave payment api
     flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key()  
     # Razorpay payment api
@@ -248,6 +252,7 @@ def pricing_option_with_fees(request):
 #         }
 #         response = JsonResponse(context)
 #         return response
+
 
 @login_required
 def payment_fee_structure(request):
@@ -430,28 +435,6 @@ def flutter_payment_intent(request):
         return JsonResponse({'redirectToCheckout': redirectToCheckout})
 
 
-# @require_http_methods(['POST'])
-# @csrf_exempt
-# def flutterwave_webhook(request):
-#     flutterwaveClient = FlutterwaveClientConfig()
-#     secret_hash = flutterwaveClient.flutterwave_secret_hash()
-#     signature = request.headers.get("verifi-hash")
-#     print('signature:', signature)
-
-#     payload = request.body
-#     print('payload:',payload)
-
-#     if signature == None or (signature != secret_hash):
-#         # This request isn't from Flutterwave; discard
-#         return HttpResponse(status=401)
-
-#     payload = request.body
-#     print(payload)
-#     # status = payload['success']
-#     # Do something (that doesn't take too long) with the payload
-#     return HttpResponse(status=200)
-
-    
 @login_required
 @user_is_client
 @require_http_methods(['GET', 'POST'])
@@ -485,18 +468,28 @@ def stripe_payment_order(request):
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
 
 
-    stripe_checkout = StripeClientConfig()
-    success_url=f"{get_protocol_only()}{str(get_current_site(request))}/transaction/congrats/",
-    cancel_url=f"{get_protocol_only()}{str(get_current_site(request))}/dashboard/",
+    stripe_obj = StripeClientConfig()
+    stripe.api_key = stripe_obj.stripe_secret_key()
+    session = stripe.checkout.Session.create(
+        metadata = {'mode':'payment'},
+        payment_method_types=['card'],
+        line_items = [
+            {
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': 'Hiring freelancer and team',
+                    },
+                    'unit_amount': grand_total * 100,
+                },
+                'quantity': 1
+            },
+        ],
+        mode='payment',
+        success_url=request.build_absolute_uri(reverse('transactions:proposal_transaction')),
+        cancel_url=request.build_absolute_uri(reverse('transactions:pricing_option_with_fees')),
 
-    session = stripe_checkout.create_checkout(
-        amount=grand_total, 
-        currency='usd', 
-        customer_email=request.user.email, 
-        success_url=success_url,
-        cancel_url=cancel_url
     )
-
     payment_intent = session.payment_intent
     gateway_type = str(hiringbox.get_gateway())
 
@@ -506,25 +499,23 @@ def stripe_payment_order(request):
         try:
             purchase = Purchase.objects.create(
                 client=request.user,
-                full_name=request.user.get_full_name,
-                email=request.user.email,
-                country=str(request.user.country),
-                client_fee = int(total_gateway_fee), 
+                payment_method=str(gateway_type),
+                client_fee = int(total_gateway_fee),
                 category = Purchase.PROPOSAL,
-                payment_method=gateway_type,
-                salary_paid=grand_total           
+                salary_paid=grand_total,
+                stripe_order_key=payment_intent,
+                status = Purchase.FAILED
             )
-            purchase.stripe_order_key=payment_intent
-            purchase.status=Purchase.FAILED
-            purchase.save()
+
         except Exception as e:
             print('%s' % (str(e)))
 
         try:
             for proposal in hiringbox:
                 ProposalSale.objects.create(
+                    package_name = proposal['package_name'],
                     team=proposal["proposal"].team, 
-                    purchase=purchase,  
+                    purchase=purchase,
                     proposal=proposal["proposal"], 
                     sales_price=int(proposal["salary"]), 
                     staff_hired=proposal["member_qty"],
@@ -544,7 +535,7 @@ def stripe_payment_order(request):
         except Exception as e:
             print('%s' % (str(e)))
 
-        hiringbox.clean_box()
+        # hiringbox.clean_box()
         return JsonResponse({'session': session,})
             
     return JsonResponse({'failed':'Bad Signature',})
@@ -553,8 +544,10 @@ def stripe_payment_order(request):
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
-    stripe.api_key = StripeClientConfig().stripe_secret_key()
-    webhook_key = StripeClientConfig().stripe_webhook_key()    
+
+    stripe_obj = StripeClientConfig()
+    stripe.api_key = stripe_obj.stripe_secret_key()
+    webhook_key = stripe_obj.stripe_webhook_key()    
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
     event = None
     team = ''
@@ -570,7 +563,7 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         if session.payment_status == 'paid':
-
+            print('WEBHOOK', session.payment_intent)
             if session.mode == 'payment' and session['metadata']['mode'] == 'payment':
                 try:
                     Purchase.stripe_order_confirmation(session.payment_intent)                    
@@ -630,7 +623,7 @@ def stripe_webhook(request):
             print('Payment unsuccessful')  
 
     return HttpResponse(status=200)
-  
+
 
 @login_required
 def paypal_payment_order(request):

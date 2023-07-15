@@ -264,7 +264,7 @@
 													<li><span><i class="far fa-folder"></i>{{proposal.get_service_level_display}}</span></li>
 													<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}} - {% endif %} &nbsp;&nbsp; {{proposal.created_by.country.name}}</span></li>
 													<li><span><i class="far fa-folder wt-viewjobfolder"></i>Revision: {{proposal.get_revision_display}}</span></li>
-													<li><span><i class="far fa-clock wt-viewjobclock"></i>Duration: {{proposal.get_dura_converter_display }}</span></li>
+													<li><span><i class="far fa-clock wt-viewjobclock"></i>Duration: {{proposal.get_duration_display }}</span></li>
 													<li><span><i class="fa fa-tag wt-viewjobtag"></i>Ref: {{proposal.reference}}</span></li>
 													<li><span><i class="fa fa-group" style='color:blue'></i>Member{{proposal.team.members.count|pluralize}}: {{proposal.team.members.count}}</span></li>
 													<li class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}" class="wt-btn">View Detail</a></li>

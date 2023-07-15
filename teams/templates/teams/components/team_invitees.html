@@ -1,6 +1,6 @@
 
 {% if messages %}
-<div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:4s">        
+<div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
     {% for message in messages %}        
     <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
         <span class="wt-jobalerts">

@@ -117,7 +117,7 @@ class MerchantProduct(MerchantMaster):
     published = models.BooleanField(_("Featured"), choices = ((False,'Unfeature'), (True, 'Feature')), default = False)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
-    salary = models.IntegerField(_("Price"), default=10, validators=[MinValueValidator(10), MaxValueValidator(50000)], error_messages={"amount": {"max_length": _("Set the budget amount between 10 and 50000 currency points")}},)       
+    salary = models.IntegerField(_("Price"), error_messages={"amount": {"max_length": _("Set the salary for this proposal")}},)       
 
     class Meta:
         abstract = True

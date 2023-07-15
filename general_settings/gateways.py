@@ -11,6 +11,7 @@ from django.contrib.sites.models import Site
 import razorpay
 
 
+
 def ref_generator():
     new_unique_reference = ''
     generated_reference = secrets.token_urlsafe(30)[:30]
@@ -34,7 +35,7 @@ class PayPalClientConfig:
         self.site = self.mysite.merchant
 
     def get_payment_gateway(self):
-        merchant = MerchantAPIs.objects.filter(merchant=self.site).first()
+        merchant = MerchantAPIs.objects.filter(merchant=self.site, paypal_active=True).first()
         return merchant
 
     def paypal_public_key(self):
@@ -74,33 +75,85 @@ class PayPalClientConfig:
 # ------------------> PAYPAL PAYMENT GATEWAY ENDS< ------------------#
 
 # ------------------> STRIPE PAYMENT GATEWAY START< ------------------#
+
+
 class StripeClientConfig:
     def __init__(self):
-        print('Stripe')
+        self.name = 'stripe'
+        self.mysite = Site.objects.get_current()
+        self.site = self.mysite.merchant
+
+    def get_payment_gateway(self):
+        merchant = MerchantAPIs.objects.filter(merchant=self.site, stripe_active=True).first()
+        return merchant
 
     def stripe_public_key(self):
-        try:
-            return PaymentGateway.objects.get(name='stripe').public_key 
-        except:
-            return None
+        gateway = self.get_payment_gateway()
+        if gateway:
+            return gateway.stripe_public_key
+        return None
 
     def stripe_secret_key(self):
-        try:
-            return PaymentGateway.objects.get(name='stripe').secret_key 
-        except:
+        gateway = self.get_payment_gateway()
+        if gateway:
+            return gateway.stripe_secret_key
+        return None
+    
+    def stripe_webhook_key(self):
+        gateway = self.get_payment_gateway()
+        if gateway:
+            return gateway.stripe_webhook_key
+        return None
+
+    def get_gateway_environment(self):
+        gateway = self.get_payment_gateway()
+        if gateway:
+            return gateway.stripe_sandbox
+        return False
+
+
+    def stripe_httpclient(self):
+        environment = self.stripe_environment()
+        if environment:
+            return environment
+        return None
+
+    def is_sandbox_environment(api_secret_key, api_public_key):
+        if api_secret_key.startswith("sk_test_") or api_public_key.startswith("pk_test_"):
+            return True # Test Environment
+        elif api_secret_key.startswith("sk_live_") or api_public_key.startswith("pk_live_"):
+            return False # Live Environment
+        else:
             return None
 
-    def stripe_webhook_key(self):
-        try:
-            return PaymentGateway.objects.get(name='stripe').webhook_key 
-        except:
-            return None    
 
-    def stripe_subscription_price_id(self):
-        try:
-            return PaymentGateway.objects.get(name='stripe').subscription_price_id 
-        except:
-            return None 
+# class StripeClientConfig:
+#     def __init__(self):
+#         print('Stripe')
+
+#     def stripe_public_key(self):
+#         try:
+#             return PaymentGateway.objects.get(name='stripe').public_key 
+#         except:
+#             return None
+
+#     def stripe_secret_key(self):
+#         try:
+#             return PaymentGateway.objects.get(name='stripe').secret_key 
+#         except:
+#             return None
+
+#     def stripe_webhook_key(self):
+#         try:
+#             return PaymentGateway.objects.get(name='stripe').webhook_key 
+#         except:
+#             return None    
+
+#     def stripe_subscription_price_id(self):
+#         try:
+#             return PaymentGateway.objects.get(name='stripe').subscription_price_id 
+#         except:
+#             return None 
 
 
 # ------------------> STRIPE PAYMENT GATEWAY ENDS< ------------------#

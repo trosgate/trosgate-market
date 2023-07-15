@@ -61,69 +61,11 @@
     {% endif %}
 </div>
 
-
 <div id="step-2-form">
-{% if variable == 'stepTwo' %}
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="wt-jobdescription wt-tabsinfo">
-            <div class="wt-jobdetails wt-tabsinfo">
-                <div class="wt-tabscontenttitle">
-                    <h2>Description</h2>
-                </div>      
-                <div class="form-row">
-
-                    <div class="form-group">
-                        {{proposalformtwo.description.label}}
-                        {{proposalformtwo.description}}
-                        <span style="color:red;" role="alert">{{ proposalformtwo.description.errors}}</span>
-                    </div>
-                    <div class="form-group">
-                        {{proposalformtwo.sample_link.label}}
-                        {{proposalformtwo.sample_link}}
-                        <span style="color:red;" role="alert">{{ proposalformtwo.sample_link.errors}}</span>
-                    </div>
-                </div> 
-            </div>  
-            {% if messages %}
-                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
-                    {% for message in messages %}        
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                        <span class="wt-jobalerts">
-                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
-                                <span> {{ message}} </span>
-                            </div>
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            <div class="text-center">
-                <button type="submit" class="btn btn-success btn-sm"
-                    hx-get="{% url 'proposals:modify_proposal_step_one' proposal.pk proposal.slug %}"
-                    hx-target="#step-1-form"
-                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
-                    Prev Step
-                </button>
-                <button id="describeBtn" type="submit" class="btn btn-danger btn-sm"
-                    hx-post="{% url 'proposals:modify_proposal_step_two' proposal.pk proposal.slug %}"
-                    hx-target="#step-1-form"
-                    htmx:serialize='all'
-                    style="background-color:red; font-weight: bold;">
-                    Save Changes
-                </button>
-                <button type="submit" class="btn btn-success btn-sm"
-                    hx-get="{% url 'proposals:modify_proposal_step_three' proposal.pk proposal.slug %}"
-                    hx-target="#step-1-form"
-                    style="background-color:rgb(29, 118, 90); font-weight: bold;">
-                    Next Step
-                </button>
-            </div>
-        </form>
-    </div>
-
-{% endif %}
+    {% if variable == 'stepTwo' %}
+        {% include 'proposals/partials/modify_pricing_type.html' %}
+    {% endif %}
+</div>
 
 
 <div id="step-3-form">
@@ -208,46 +150,20 @@
         <div class="wt-jobdescription wt-tabsinfo">
             <div class="wt-jobdetails wt-tabsinfo">
                 <div class="wt-tabscontenttitle">
-                    <h2>Attributes</h2>
+                    <h2>Media and Skills</h2>
                 </div>      
-                <div class="form-row">
-                    <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Features</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tr>
-                            <th>Salary</th>
-                            <th>{{proposalformfour.salary}}</th>
-                        </tr>
-                        <tr>
-                            <th>Level</th>
-                            <th>{{proposalformfour.service_level}}</th>
-                        </tr>												
-                        <tr>
-                            <th>Duration</th>
-                            <th>{{proposalformfour.dura_converter}}</th>
-                        </tr>
-                        <tr>
-                            <th>Revision</th>
-                            <th>{{proposalformfour.revision}}</th>
-                        </tr>
-                    </table> 
-                    <div class="form-group">
-                        {{proposalformfour.skill.label}}
-                        {{proposalformfour.skill}}
-                        <span style="color:red;" role="alert">{{ proposalformfour.skill.errors}}</span>	
-                    </div>
+                <div class="form-group">
+                    {{proposalformfour.skill.label}}
+                    {{proposalformfour.skill}}
+                    <span style="color:red;" role="alert">{{ proposalformfour.skill.errors}}</span>	
+                </div>
 
-                    <div class="form-group">
-                        {{proposalformfour.thumbnail.label}}
-                        {{proposalformfour.thumbnail}}
-                        <span style="color:red;" role="alert">{{ proposalformfour.thumbnail.errors}}</span>	
-                    </div>
-                </div> 
+                <div class="form-group">
+                    {{proposalformfour.thumbnail.label}}
+                    {{proposalformfour.thumbnail}}
+                    <span style="color:red;" role="alert">{{ proposalformfour.thumbnail.errors}}</span>	
+                </div>
+                {% comment %} </div>  {% endcomment %}
             </div>  
             {% if messages %}
                 <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        

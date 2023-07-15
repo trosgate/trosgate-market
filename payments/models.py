@@ -135,6 +135,7 @@ class MerchantAPIs(models.Model):
     stripe_webhook_key = encrypt(models.CharField(_("STRIPE WEEBHOOK KEY(OPTIONAL)"), max_length=255, blank=True, null=True))
     stripe_subscription_price_id = encrypt(models.CharField(_("STRIPE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     stripe_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    stripe_sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
     
     # PayPal API Credentials
     paypal_public_key = encrypt(models.CharField(_("PAYPAL PUBLISHABLE KEY"), max_length=255, blank=True, null=True))

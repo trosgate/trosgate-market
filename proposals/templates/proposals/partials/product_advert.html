@@ -1,0 +1,34 @@
+{% if request.user in active_team.members.all %}
+<div style="background-color: rgb(173, 235, 235); border-radius: 20%; margin:10px;">
+    <div class="d-flex justify-content-center mb-3">
+        <span style="font-weight:bold; text-decoration: underline;">Have Digital Product?</span>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+        <div class="text-center">
+            <span>Some buyers want it instant. if this service can have already-made product, then why not give them opportunity to make instant purchase.</span>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+        <div class="text-center">
+            <a href="{% url 'proposals:create_product_view' proposal.slug %}" class="btn btn-primary btn-sm" target="_blank"> + Digital product</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if request.user.clients %}
+<div style="background-color: rgb(173, 235, 235); border-radius: 20%; margin:10px;">
+    <div class="d-flex justify-content-center mb-3">
+        <span style="font-weight:bold; text-decoration: underline;">Need Instant Product?</span>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+        <div class="text-center">
+            <span>Don't worry if it's urgent. Get end-product of this service for instant purchase.</span>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+        <div class="text-center">
+            <a href="{% url 'proposals:create_product_view' proposal.slug %}" class="btn btn-primary btn-sm" target="_blank">View & Download</a>
+        </div>
+    </div>
+</div>
+{% endif %}

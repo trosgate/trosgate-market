@@ -4,8 +4,8 @@ Auth: 4000002500003155
 
 Error: 4000000000009995
 
-public: 'pk_test_51JxEfNF4wH80TkNlgTuafnWaz7TKrQr34DUqaHwC5BaFOJ2FWsggoVBIeMHUtmRhwLIBuQe75QnZze3mpETo1q8300ZjZ423cP'
-secret: 'sk_test_51JxEfNF4wH80TkNlwb7kYyjvWkJnB3BjBantEbw5akhnOZCSnCb4nqxBW8mjpMvnjJUWvKRq745IMrb5Ri9CbLTw00f7IG6QDi'
+public: 'pk_test_51JxEfNF4wH80TkNlATFfBxzCUc3qSRaxqa4FsqgGoWSHsa28ryhmyMGSFCra5SUBM6apgSyAEoU9V46H4GD9Cn5T00sgjgBqF0'
+secret: 'sk_test_51JxEfNF4wH80TkNlnyypq0PIFMPbvIjOMANrXv6qnN6RsCjHRGefSAuLNFjrhn9XvNmrr7NZCTMXni6LQEXbpSsm00VwoR0Rg2'
 webhook: ''
 
 CREDIT CARD:  4242424242424242
@@ -37,5 +37,5 @@ or
 
 or 
 
-stripe listen --api-key sk_test_51JxEfNF4wH80TkNlwb7kYyjvWkJnB3BjBantEbw5akhnOZCSnCb4nqxBW8mjpMvnjJUWvKRq745IMrb5Ri9CbLTw00f7IG6QDi
+stripe listen --api-key sk_test_51JxEfNF4wH80TkNlnyypq0PIFMPbvIjOMANrXv6qnN6RsCjHRGefSAuLNFjrhn9XvNmrr7NZCTMXni6LQEXbpSsm00VwoR0Rg2
 
