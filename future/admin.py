@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import FutureRelease
+from .models import FutureRelease, PluginFeature, Plugin
 
 MAX_OBJECTS = 1
 
+@admin.register(FutureRelease)
 class FutureReleaseAdmin(admin.ModelAdmin):
-    model = FutureRelease
     list_display = ['preview', 'alert']
     list_display_links = ['preview', 'alert']
     readonly_fields = ['deposit','ext_contract','preview', 'alert']
@@ -41,4 +41,19 @@ class FutureReleaseAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-admin.site.register(FutureRelease, FutureReleaseAdmin)
+
+@admin.register(PluginFeature)
+class PluginFeatureAdmin(admin.ModelAdmin):
+    list_display = ['title', 'preview', 'ordering']
+    list_editable = ['ordering']
+
+
+@admin.register(Plugin)
+class PluginAdmin(admin.ModelAdmin):
+    list_display = ['name', 'status', 'mode', 'price', 'ordering']
+    list_editable = ['status', 'mode', 'ordering']
+    prepopulated_fields ={'slug': ('name',)}
+    # radio_fields = {
+    #     'status': admin.HORIZONTAL,
+    #     'mode': admin.HORIZONTAL,
+    # }

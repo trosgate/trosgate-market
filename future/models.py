@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
+from django.urls import reverse
 
 
 class FutureRelease(models.Model):
@@ -40,8 +42,60 @@ class FutureRelease(models.Model):
     )
 
 	class Meta:
-		verbose_name = _("Plugin")
-		verbose_name_plural = _("Plugins")
+		verbose_name = _("Plugin -Site")
+		verbose_name_plural = _("Plugins -Site")
 
 	def __str__(self):
 		return self.preview
+	
+
+class PluginFeature(models.Model):
+    title = models.CharField(max_length=100, unique=True)
+    preview = models.TextField(_("Preview"), max_length=1000, blank=True, null=True)
+    promo_image = models.ImageField(_("Promo Image"), upload_to='promo/', default='home_promo.jpg')
+    feature1 = models.CharField(_("Feature1"), max_length=255, blank=True, null=True)
+    feature2 = models.CharField(_("Feature2"), max_length=255, blank=True, null=True)
+    feature3 = models.CharField(_("Feature3"), max_length=255, blank=True, null=True)
+    feature4 = models.CharField(_("Feature4"), max_length=255, blank=True, null=True)
+    feature5 = models.CharField(_("Feature5"), max_length=255, blank=True, null=True)
+    feature6 = models.CharField(_("Feature6"), max_length=255, blank=True, null=True)
+    ordering = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ('ordering',)
+        verbose_name = _("Plugin Feature")
+        verbose_name_plural = _("Plugins Features")
+        
+    def __str__(self):
+        return str(self.title)   
+
+
+class Plugin(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+    price = models.PositiveIntegerField(_("Price"),)
+    preview = models.TextField(_("Preview"), max_length=750)
+    description = models.TextField(_("Description"), max_length=3500)
+    mode = models.BooleanField(_("Payment Mode"), choices=((False, 'One Time'), (True, 'Monthly')), default=False)
+    status = models.BooleanField(default=True)
+    feature = models.ManyToManyField(PluginFeature, verbose_name=_("Plugin feature"), related_name="features")
+    created_at = models.DateTimeField(auto_now_add=True)
+    ordering = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ('ordering',)
+        verbose_name = _("Plugin - Merchant")
+        verbose_name_plural = _("Plugins - Merchant")
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Plugin, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name	
+
+    # absolute url for proposal detail page
+    def plugin_absolute_url(self):
+        return reverse('plugins:plugin_detail', kwargs={'plugin_slug':self.slug})
+    
+

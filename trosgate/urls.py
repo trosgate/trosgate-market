@@ -17,6 +17,7 @@ urlpatterns = [
     path('project/', include('projects.urls', namespace='projects')),
     path('proposal/', include('proposals.urls', namespace='proposals')),
     path('team/', include('teams.urls', namespace='teams')),   
+    path('plugin/', include('future.urls', namespace='plugins')),   
     path('category/', include('general_settings.urls', namespace='generalsettings')),
     path('application/', include('applications.urls', namespace='applications')),
     path('transaction/', include('transactions.urls', namespace='transactions')),

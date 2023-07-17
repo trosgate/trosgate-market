@@ -1,0 +1,127 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="wt-haslayout wt-innerbannerholder">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>Plugin Detail</h2></div>
+                        <ol class="wt-breadcrumb">
+                            <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                            <li class="wt-active">plugin</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="plugin-view" class="wt-haslayout wt-main-section">
+        <div class="container">
+            <div class="wt-title">
+                {% if request.htmx %}
+                <button hx-get="{% url 'plugins:plugin_list' %}" 
+                    hx-target="#plugin-main"
+                    hx-select="#plugin-target" 
+                    class="btn btn-success btn-block text-white">
+                    Take me back
+                </button>
+                {% else %}
+                <a href="{% url 'plugins:plugin_list' %}"class="btn btn-success btn-block text-white">
+                    Take me back
+                </a>
+                {% endif %}
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                    <div class="wt-articlesingle-holder wt-bgwhite">
+                        <div class="wt-articlesingle-content">
+                            
+                            <div class="wt-title">
+                                <h2>{{plugin.name}} - <span class="badge badge-success" style="border-radius:20%; font-size:16px; color:#fff;"> {{plugin.get_mode_display}}</span></h2>
+                            </div>
+                            
+                            <div class="wt-description">
+                                <p>{{plugin.preview}}</p>
+                                <blockquote class="wt-blockquotevone">
+                                    <span><i class="fa fa-info"></i></span>
+                                    <q>Why should I have this plugin?</q>
+                                </blockquote>
+                                
+                                <p>{{plugin.description|linebreaksbr}}</p>
+                                <div class="alert alert-warning text-center" role="alert">
+                                    <span style="color: black; font-weight: bold;"><i class="fa fa-info"></i> 
+                                        Top features of {{plugin.name}}
+                                    </span>
+                                </div>
+                                {% for feature in plugin.feature.all %}
+                                {% if forloop.counter == 1 or forloop.counter == 3 or forloop.counter == 5 or forloop.counter == 7 or forloop.counter == 9 %}
+                                <h4>#{{forloop.counter}} - {{feature.title}}.</h4>
+                                <figure class="wt-blogdetailimgvtwo wt-alignleft">
+                                    <img src="{% if feature.promo_image %}{{feature.promo_image.url}}{% endif %}" alt="image description">
+                                </figure>
+                                
+                                <p>{{feature.preview|linebreaksbr}}</p>
+                                <ul class="wt-blogliststyle">
+                                    {% if feature.feature1 %}
+                                    <li><span>{{feature.feature1}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature2 %}
+                                    <li><span>{{feature.feature2}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature3 %}
+                                    <li><span>{{feature.feature3}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature4 %}
+                                    <li><span>{{feature.feature4}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature5 %}
+                                    <li><span>{{feature.feature5}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature6 %}
+                                    <li><span>{{feature.feature6}}</span></li>
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                                
+                                <p class="wt-clear"></p>
+                                {% if not forloop.counter == 1 and not forloop.counter == 3 and not forloop.counter == 5 and not forloop.counter == 7 and not forloop.counter == 9 %}
+                                <h4 class="text-right">#{{forloop.counter}} - {{feature.title}}.</h4>
+                                <figure class="wt-blogdetailimgvtwo wt-alignright">
+                                    <img src="{% if feature.promo_image %}{{feature.promo_image.url}}{% endif %}" alt="image description">
+                                </figure>
+                                <p>{{feature.preview|linebreaksbr}}</p>
+                                <ul class="wt-blogliststyle">
+                                    {% if feature.feature1 %}
+                                    <li><span>{{feature.feature1}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature2 %}
+                                    <li><span>{{feature.feature2}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature3 %}
+                                    <li><span>{{feature.feature3}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature4 %}
+                                    <li><span>{{feature.feature4}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature5 %}
+                                    <li><span>{{feature.feature5}}</span></li>
+                                    {% endif %}
+                                    {% if feature.feature6 %}
+                                    <li><span>{{feature.feature6}}</span></li>
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                                <p class="wt-clear"></p>
+                                {% endfor %}
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    {% endblock content %}
