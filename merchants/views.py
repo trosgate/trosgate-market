@@ -305,13 +305,11 @@ def add_stripe_api(request):
     if stripeform.is_valid():
         
         data = stripeform.cleaned_data
-
         merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
         merchant_api.stripe_public_key = data['stripe_public_key']
         merchant_api.stripe_secret_key = data['stripe_secret_key']
         merchant_api.stripe_webhook_key = data['stripe_webhook_key']
         merchant_api.stripe_subscription_price_id = data['stripe_subscription_price_id']
-        merchant_api.sandbox = data['sandbox']
         merchant_api.stripe_active = True
         merchant_api.save()
 

@@ -6,7 +6,7 @@ Error: 4000000000009995
 
 public: 'pk_test_51JxEfNF4wH80TkNlATFfBxzCUc3qSRaxqa4FsqgGoWSHsa28ryhmyMGSFCra5SUBM6apgSyAEoU9V46H4GD9Cn5T00sgjgBqF0'
 secret: 'sk_test_51JxEfNF4wH80TkNlnyypq0PIFMPbvIjOMANrXv6qnN6RsCjHRGefSAuLNFjrhn9XvNmrr7NZCTMXni6LQEXbpSsm00VwoR0Rg2'
-webhook: ''
+webhook: 'whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c'
 
 CREDIT CARD:  4242424242424242
 CREDIT CARD CANNOT BE USED DIRECTLY IN TEST ENVIRONMENT. SO USE TOKENS BELOW
@@ -33,6 +33,7 @@ stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/
 
 or 
 
+.\stripe listen --forward-to http://gladiators.127.0.0.1:8000/transaction/stripe-webhook/ 
 .\stripe listen --forward-to http://127.0.0.1:8000/transaction/stripe-webhook/ 
 
 or 

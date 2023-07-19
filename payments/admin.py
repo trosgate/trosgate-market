@@ -19,9 +19,9 @@ class MerchantAPIAdmin(admin.ModelAdmin):
     fieldsets = (
         ('API Environment', {'fields': ('sandbox',)}),
         ('Stripe API', {'fields': ('stripe_public_key',
-         'stripe_secret_key', 'stripe_webhook_key','stripe_subscription_price_id',)}),
+         'stripe_secret_key', 'stripe_webhook_key','stripe_subscription_price_id','stripe_active')}),
         ('PayPal API', {
-         'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id',)}),
+         'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id', 'paypal_active')}),
         ('Flutterwave API', {
          'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
         ('Razorpay API', {

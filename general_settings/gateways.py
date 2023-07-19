@@ -9,6 +9,8 @@ from payments.models import MerchantAPIs
 from django.conf import settings
 from django.contrib.sites.models import Site
 import razorpay
+from account.fund_exception import GatewayModuleNotFound, GatewayNotConfigured, InvalidData
+
 
 
 
@@ -76,10 +78,10 @@ class PayPalClientConfig:
 
 # ------------------> STRIPE PAYMENT GATEWAY START< ------------------#
 
-
 class StripeClientConfig:
     def __init__(self):
         self.name = 'stripe'
+        self.currency = 'usd'
         self.mysite = Site.objects.get_current()
         self.site = self.mysite.merchant
 
@@ -105,28 +107,52 @@ class StripeClientConfig:
             return gateway.stripe_webhook_key
         return None
 
-    def get_gateway_environment(self):
+    def get_gateway_status(self):
+        gateway = self.get_payment_gateway()
+        if gateway:
+            return gateway.stripe_sandbox
+        return False
+    
+    def get_gateway_status(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_sandbox
         return False
 
 
-    def stripe_httpclient(self):
-        environment = self.stripe_environment()
-        if environment:
-            return environment
-        return None
+    def tokenize(self, card_number, exp_month, exp_year, cvc):
+        try:
+            token = stripe.Token.create(
+                card={
+                    'object': 'card',
+                    'number': card_number,
+                    'exp_month': exp_month,
+                    'exp_year': exp_year,
+                    'cvc': cvc
+                },
+            )
+            # print('Tokenize :', token)
+            return token
+        except stripe.error.StripeError as error:
+            print(str(error))
+            raise InvalidData(f"Error! {error}")
 
-    def is_sandbox_environment(api_secret_key, api_public_key):
-        if api_secret_key.startswith("sk_test_") or api_public_key.startswith("pk_test_"):
-            return True # Test Environment
-        elif api_secret_key.startswith("sk_live_") or api_public_key.startswith("pk_live_"):
-            return False # Live Environment
-        else:
-            return None
 
+    def checkout(self, amount, card_token):
 
+        try:
+            response = stripe.Charge.create(
+                amount=int(amount * 100),
+                currency= self.currency,
+                source=card_token
+            )
+
+        except (stripe.error.StripeError, stripe.CardError, stripe.InvalidRequestError) as e:
+            raise InvalidData(f"Error! {e}")
+
+        return response
+    
+         
 # class StripeClientConfig:
 #     def __init__(self):
 #         print('Stripe')

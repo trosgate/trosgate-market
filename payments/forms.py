@@ -15,7 +15,7 @@ class StripeMerchantForm(forms.ModelForm):
         fields = [
             # Stripe
             'stripe_public_key', 'stripe_secret_key', 'stripe_webhook_key', 
-            'stripe_subscription_price_id', 'sandbox',  
+            'stripe_subscription_price_id',  
         ]
         
     def __init__(self, *args, **kwargs):
@@ -29,8 +29,6 @@ class StripeMerchantForm(forms.ModelForm):
         self.fields['stripe_webhook_key'].widget.attrs.update(
             {'class': 'form-control'})
         self.fields['stripe_subscription_price_id'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['sandbox'].widget.attrs.update(
             {'class': 'form-control'})
 
 
@@ -142,27 +140,65 @@ current_year = datetime.datetime.now().year
 YEAR_CHOICES = [(year, str(year)) for year in range(current_year, current_year + 21)]
 
 
+class StripeCardCardForm(forms.Form):
+    month = forms.ChoiceField(choices=MONTH_CHOICES, required=True, label='Expiry Month*')
+    year = forms.ChoiceField(choices=YEAR_CHOICES, required=True, label='Expiry Year*')
+    number = forms.CharField(required=True, label='Card Number*')
+    cvc = forms.CharField(required=True, label='Card cvc*')
+    # amount = forms.IntegerField(required=True)
+
+    def clean_number(self):
+        number = self.cleaned_data['number'].strip()
+        if not number: # or number.isspace():
+            raise forms.ValidationError('Missing card number')
+        return number
+    
+    def clean_cvc(self):
+        cvc = self.cleaned_data['cvc'].strip()
+        if not cvc:
+            raise forms.ValidationError('Missing card cvc')
+        return cvc
+    
+    def clean(self):
+        data = self.cleaned_data
+        credit_card = CreditCard(**data)
+        if not credit_card.is_valid():
+            raise forms.ValidationError('Payment card validation failed')
+        return data
+    
+    def __init__(self, *args, **kwargs):
+        super(StripeCardCardForm, self).__init__(*args, **kwargs)
+
+        # self.fields['amount'].widget.attrs['class'] = 'form-control'
+        self.fields['number'].widget.attrs['class'] = 'form-control'
+        self.fields['cvc'].widget.attrs['class'] = 'form-control'
+        self.fields['year'].widget.attrs['class'] = 'custom-select'
+        self.fields['year'].widget.attrs['style'] = 'height: 50px;'
+        self.fields['month'].widget.attrs['class'] = 'custom-select'
+        self.fields['month'].widget.attrs['style'] = 'height: 50px;'
+        
+
 class CreditCardForm(forms.Form):
     first_name = forms.CharField(required=True, label='First name*')
     last_name = forms.CharField(required=True, label='First name*')
     package = forms.CharField(required=True)
-    amount = forms.IntegerField(required=True)
+    # amount = forms.IntegerField(required=True)
     month = forms.ChoiceField(choices=MONTH_CHOICES, required=True, label='Expiry Month*')
     year = forms.ChoiceField(choices=YEAR_CHOICES, required=True, label='Expiry Year*')
     number = forms.CharField(required=True, label='Card Number*')
-    cvv = forms.CharField(required=True, label='Card CVV*')
+    cvc = forms.CharField(required=True, label='Card cvc*')
 
     def clean_number(self):
-        number = self.cleaned_data['number']
+        number = self.cleaned_data['number'].strip()
         if not number or number.isspace():
             raise forms.ValidationError('Missing card number')
         return number
     
-    def clean_cvv(self):
-        cvv = self.cleaned_data['cvv']
-        if not cvv:
-            raise forms.ValidationError('Missing card CVV')
-        return cvv
+    def clean_cvc(self):
+        cvc = self.cleaned_data['cvc'].strip()
+        if not cvc:
+            raise forms.ValidationError('Missing card cvc')
+        return cvc
     
     def clean(self):
         data = self.cleaned_data
@@ -183,7 +219,7 @@ class CreditCardForm(forms.Form):
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['number'].widget.attrs['class'] = 'form-control'
-        self.fields['cvv'].widget.attrs['class'] = 'form-control'
+        self.fields['cvc'].widget.attrs['class'] = 'form-control'
         self.fields['year'].widget.attrs['class'] = 'custom-select'
         self.fields['year'].widget.attrs['style'] = 'height: 50px;'
         self.fields['month'].widget.attrs['class'] = 'custom-select'

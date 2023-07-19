@@ -2,7 +2,58 @@
 {% load static %}
 {% block content%}
 
+<style>
+    .custom-checkout-left{
+        background-color:rgb(7, 5, 49); 
+        color:#fff; 
+        height:100vh; 
+        text-align: center;
+        position: relative;
+        padding:10%;
+    }
 
+    .custom-checkout-right{
+        background-color:#fff; 
+        color:#000; 
+        height:100vh; 
+        text-align: center;
+        position: relative;
+        padding:10% 5% 5% 5%;
+
+    } 
+    @media (max-width: 767.98px) {
+      .checkout-to-show {
+        display: block !important;
+      }        
+      .flex-checkout-page {
+         height: 100vh; /* Set the row height to 100% of the viewport height */
+       }
+
+      .custom-checkout-right{
+        background-color: #fff !important; /* Set the background color to white */
+        color: #000; /* Set the text color to black */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: absolute;
+        width: 100%;
+        padding:5%;
+
+      }
+      .custom-checkout-left{
+        display:none;
+      }
+      .custom-checkout-right .reposition-top{
+        width: 100%;
+        padding:5%;
+        transform: translateY(-100%) !important;
+      }
+    }
+</style>
+
+ 
+{% comment %} 
 <div class="wt-haslayout wt-innerbannerholder">
     <div class="container">
         <div class="row justify-content-md-center">
@@ -10,13 +61,13 @@
                 <div class="wt-innerbannercontent">
                 <div class="wt-title">
                     <h2>
-                        {% if gateway_type.name == "paypal" %}
+                        {% if gateway_type == "paypal" %}
                         PayPal
-                        {% elif gateway_type.name == "flutterwave" %} 
+                        {% elif gateway_type == "flutterwave" %} 
                         Flutterwave
-                        {% elif gateway_type.name == "stripe" %}
+                        {% elif gateway_type == "stripe" %}
                         Stripe
-                        {% elif gateway_type.name == "razorpay" %}
+                        {% elif gateway_type == "razorpay" %}
                         Razorpay
                         {%endif%} 
                         Checkout
@@ -26,9 +77,31 @@
             </div>
         </div>
     </div>
+</div> {% endcomment %}
+<!-- <div class="container"> -->
+<div class="row flex-checkout-page">
+    <div class="col-md-6 col-sm-12 custom-checkout-left">
+    <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{hiring_box.get_total_price_before_fee_and_discount}}</span><br><br>
+    <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
+    <span style="font-size: 18px; font-weight:bold;">The original price + any fee deductible</span>
+    </div>
+    <div class="col-md-6 col-sm-12 custom-checkout-right">
+        <div class="reposition-top checkout-to-show" style="display:none;">
+            <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{hiring_box.get_total_price_before_fee_and_discount}}</span><br><br>
+            <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
+            <span style="font-size: 18px; font-weight:bold;">The original price + any fee deductible</span><br><br>
+        </div>
+        <div class="reposition-top">
+            {% if gateway_type == "paypal" %}
+            <div id="paypal-button-container"></div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
-<div class="wt-dashboardbox">
+
+
+{% comment %} <div class="wt-dashboardbox">
     <div class="wt-proposalsr">
         
         <br>
@@ -120,7 +193,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --> {% endcomment %}
 
 <div class="wt-proposalholder mt-6">
     <div class="row justify-content-md-center">
@@ -134,7 +207,7 @@
 
     {% block scripts %}
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
+{% comment %} 
     <script>
         //Script to add proposal quantity in session             
         $(document).on('click', '#convert-currency', function (e) {
@@ -154,11 +227,11 @@
             error: function (xhr, errmsg, err) {}
         });
         })
-    </script>
+    </script> {% endcomment %}
 
-    {% if gateway_type.name == "PayPal" %}
+    {% if gateway_type == "paypal" %}
     <script 
-        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency_code}}"data-sdk-integration-source="button-factory">
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}">
     </script>
     <script>
         function getCookie(name) {
@@ -176,8 +249,8 @@
             return cookieValue;
         }
         let csrftoken = getCookie('csrftoken');
-        
-        function hiringPayPalButton() {
+        {% comment %} <script src="{% static 'js/paypal_checkout.js' %}"></script> {% endcomment %}
+        {% comment %} function hiringPayPalButton() {
             paypal.Buttons({
                 style: {
                     layout: 'vertical', //or horizontal
@@ -185,6 +258,26 @@
                     shape: 'rect', //or pill
                     label: 'paypal',
                 },
+                createOrder() {
+                    return fetch("/my-server/create-paypal-order", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      // use the "body" param to optionally pass additional order information
+                      // like product skus and quantities
+                      body: JSON.stringify({
+                        cart: [
+                          {
+                            sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
+                            quantity: "YOUR_PRODUCT_QUANTITY",
+                          },
+                        ],
+                      }),
+                    })
+                    .then((response) => response.json())
+                    .then((order) => order.id);
+                  },
                 createOrder: function (data, actions) {
                     return actions.order.create({
                         purchase_units: [{
@@ -217,7 +310,53 @@
                 },
             }).render('#paypal-button-container');
         }
-        hiringPayPalButton();
+        hiringPayPalButton(); {% endcomment %}
+
+
+        const paypalButton = document.getElementById('paypal-button-container');
+
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                // This function will be called when the button is clicked
+                // Call your Django view to create a new PayPal order
+                return fetch("{% url 'transactions:paypal_payment_order' %}", {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({
+                        amount: '10.00', // Replace this with the actual amount you want to charge
+                        currency: 'USD', // Replace this with the currency code you want to use
+                        description: 'Test Payment', // Replace this with your order description
+                    }),
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(orderData) {
+                    return orderData.paypal_order_key;
+                });
+            },
+            onApprove: function(data, actions) {
+                // This function will be called when the payment is approved
+                // Call your Django view to capture the payment
+                return fetch("{% url 'transactions:paypal_callback' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paypal_order_key: data.orderID,
+                    }),
+                }).then(function(response) {
+                    return response.json();
+                }).then(function() {
+                    // Handle the captured payment data here (e.g., show a success message)
+                    swal("Perfect!", 'All looked good', "success").then((value) =>{
+                        window.location.href = "{% url 'transactions:proposal_transaction' %}"
+                    });              
+                });
+            }
+        }).render('#paypal-button-container');
     </script>
     {% endif %}
 

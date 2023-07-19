@@ -27,6 +27,7 @@ urlpatterns = [
     
     path('stripe/checkout/api/', views.stripe_payment_order, name='stripe_payment_order'),
     path('paypal/checkout/api/', views.paypal_payment_order, name='paypal_payment_order'),
+    path('paypal/callback/', views.paypal_callback, name='paypal_callback'),
     path('success/true/', views.payment_success, name='hiring_payment_success'),
     path('<str:short_name>/<slug:proposal_slug>', views.proposal_direct_hire, name='hiring_summary'),
     path('stripe-webhook/', views.stripe_webhook, name='stripe_webhook'),

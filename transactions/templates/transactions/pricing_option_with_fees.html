@@ -61,14 +61,14 @@
             <div class="wt-tabscontenttitle">
                 <h5>Product pricing</h5>
             </div>
-            <div id="payment-method" class="row" hx-on="htmx:afterSettle: initializePaypal()">
+            <div id="payment-method" class="row">
                 {% include 'transactions/partials/pricing_option_with_fees.html' %}
             </div>
+            {% comment %} <br>
             <br>
             <br>
             <br>
-            <br>
-            <br>
+            <br> {% endcomment %}
             <div class="row justify-content-md-center">
                 <div class="wt-sectionhead wt-textcenter">
                     <span>Copyright @ {{website.site.name|capfirst}}</span>
@@ -82,55 +82,9 @@
     </div> 
     </div>
 
-    {% comment %} {% if gateway_type.name == "Stripe" %}  {% endcomment %}
-    <script>
-        var CSRF_TOKEN = '{{ csrf_token }}';
-    </script>    
-    <script src="https://js.stripe.com/v3/"></script>
-
-    <script>
-    function stripePay(event) {
-        event.preventDefault();
-        
-        $("#stripesubmit").attr("disabled", true);
-        $("#convert-currency").attr("disabled", true);
-             
-        let data = {
-            'stripepCustomer': '{{request.user.get_full_name}}', 
-            'stripepEmail': '{{request.user.email}}',
-            'stripepCountry': '{{request.user.country.name}}',
-        }
-    
-        let stripe = Stripe('{{stripe_public_key}}');
-    
-        fetch('/transaction/stripe/checkout/api/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (session) {
-                return stripe.redirectToCheckout({ sessionId: session.session.id })
-            })
-            .then(function (result) {
-                $("#stripesubmit").attr("disabled", false);
-                $("#convert-currency").attr("disabled", false);
-                return console.log(result.error.message)
-            })
-            .catch(function (error) {
-                return console.log(error)
-            })
-        }
-    </script>
-
     {% endblock content %}
     {% block scripts %}
+    
     {% comment %} <script>
         $('input[type=radio][name=paymentGateway]').on('change', function(e) {
             e.preventDefault();
@@ -220,190 +174,6 @@
         })
     </script>
 
-    {% comment %} {% if gateway_type.name == "PayPal" %} {% endcomment %}
-     
-    <script>
-        function initializePaypal() {
-            // Initialize PayPal button after swapping DOM object
-            var paypalButtonContainer = document.getElementById('paypal-button-container');
-            var paypalButtonScript = document.createElement('script');
-            paypalButtonScript.src = "https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency_code}}";
-            console.log('things just happen')
-            paypalButtonScript.onload = function() {
-                paypal.Buttons().render(paypalButtonContainer);
-            };
-            document.body.appendChild(paypalButtonScript);
-        }
-    </script>
-      
-
-    <script
-        {% comment %} <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&components=YOUR_COMPONENTS"></script> {% endcomment %}
-        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency_code}}">
-    </script>
-    <script>
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        let csrftoken = getCookie('csrftoken');
-        
-        function hiringPayPalButton() {
-            paypal.Buttons({
-                style: {
-                    layout: 'vertical', //or horizontal
-                    color: 'gold',
-                    shape: 'rect', //or pill
-                    label: 'paypal',
-                },
-                
-                createOrder: function (data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: '{{hiring_box.get_total_price_after_discount_and_fee}}'
-                            }
-                        }]
-                    });
-                },
-                onApprove: function (data, actions) {
-                    return actions.order.capture().then(function(){
-                        let url = "{% url 'transactions:paypal_payment_order' %}"
-                        return fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'content-type': 'application/json',
-                                'X-CSRFToken': csrftoken,
-                            },
-                            body: JSON.stringify({
-                                orderID: data.orderID
-                            })
-                        }).then(function () {
-                            swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                window.location.href = "{% url 'transactions:hiring_payment_success' %}"
-                            });              
-                            
-                        })
-                    })                    
-                    
-                },
-            }).render('#paypal-button-container');
-        }
-        hiringPayPalButton();
-    </script>
-    {% comment %} {% endif %}
-
-    <script src="https://checkout.flutterwave.com/v3.js"></script>
-    <script>
-        function flutterwavePay(event) {
-        event.preventDefault();
-
-          $("#flutterwaveprojsubmit").attr("disabled", true);
-          $("#convert-currency").attr("disabled", true);
-            
-          let data = {
-            'amount': "{{hiring_box.get_total_price_after_discount_and_fee}}",
-            'name': "{{request.user.get_full_name}}",
-            'email': "{{request.user.email}}",
-            'consumerid': "{{request.user.id}}",
-      
-          }
-      
-          fetch('{% url "transaction:flutter_payment_intent" %}', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{csrf_token}}'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-          })
-            .then(function (response) {
-              return response.json()
-            })
-            .then(function (session) {
-                window.location.href = session.redirectToCheckout
-            })
-            .then(function (result) {
-                $("#flutterwaveprojsubmit").attr("disabled", false);
-                $("#convert-currency").attr("disabled", false);
-                return console.log(result)
-            })
-            .catch(function (error) {
-              return console.log(error)
-            })
-        }
-    </script> 
-
-    {% comment %}  Razorpay {% endcomment %}
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        //Script to add proposal quantity in session             
-        $(document).on('click', '#rzp-button1', function (e) {
-        e.preventDefault();
-        $.ajax({
-            method: 'GET',
-            url: '{% url "transactions:razorpay_application_intent" %}',
-            success: function (response) {
-                console.log(response)
-                var options = {
-                    "key": "{{razorpay_public_key}}", // Enter the Key ID generated from the Dashboard
-                    "amount": response.amount,//"{{hiring_box.get_total_price_after_discount_and_fee}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                    "currency": response.currency,
-                    "name": "{{website.site_name}}",
-                    "description": "Hiring of Applicants",
-                    "image": "{{website.site_Logo.url}}",
-                    "order_id": response.razorpay_order_key, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                    "handler": function (responseOne) {
-                        $.ajax({
-                            type: "POST",
-                            url: "/transaction/razorpay_webhook/",
-                            data: {
-                                orderid: responseOne.razorpay_order_id,
-                                paymentid: responseOne.razorpay_payment_id,
-                                signature: responseOne.razorpay_signature,
-                                csrfmiddlewaretoken: "{{csrf_token}}",
-                                action: "razorpay-proposal",
-                            },
-                            success: function (responseTwo) {
-                                console.log(responseTwo)
-                                swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                    window.location.href = "{% url 'transactions:application_transaction' %}"
-                                });                        
-                            }
-                        });
-                    },
-
-                    "prefill": {
-                        "name": "{{request.user.get_full_name}}",
-                        "email": "{{request.user.email}}",
-                        "contact": "{{request.user.phone}}"
-                    },
-                    "notes": {
-                        "address": "{{request.user.country}}"
-                    },
-                    "theme": {
-                        "color": "#3399cc"
-                    }
-                };
-                var rzp1 = new Razorpay(options);
-                rzp1.open();                
-            },
-            error: function (xhr, errmsg, err) {}
-        });
-        })
-    </script>
-        
 
 {% endblock scripts %}
 

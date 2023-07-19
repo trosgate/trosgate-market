@@ -255,9 +255,9 @@ class Purchase(PurchaseMaster):
 
 
     @classmethod
-    def paypal_order_confirmation(cls, pk):
+    def paypal_order_confirmation(cls, paypal_order_key):
         with db_transaction.atomic():
-            purchase = cls.objects.select_for_update().get(pk=pk)
+            purchase = cls.objects.select_for_update().get(paypal_order_key=paypal_order_key)
             if purchase.status != Purchase.FAILED:
                 raise Exception(_("This purchase already succeeded"))
             purchase.status = Purchase.SUCCESS

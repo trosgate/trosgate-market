@@ -53,16 +53,60 @@
         type="button"><i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
     </div>
 </div>
-<div class="col-md-12">
+{% comment %} <div class="col-md-12">
     <div id="paypal-button-container" style="margin:5px 0px;"></div>
 </div>
-<div class="col-md-12">
-    {% comment %} {% if gateway_type.name == "stripe" %} {% endcomment %}
-    <button 
-        style="margin:5px 0px;"
-        onclick='stripePay(event)' 
-        id="stripesubmit" class="btn btn-primary w-100 fw-bold" >
-        Pay with Stripe
-    </button>
-    {% comment %} {% endif %} {% endcomment %}
-</div>
+   
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6 align-items-center justify-content-center">
+        <form id="cardform">{% csrf_token %}
+            
+            <div class="form-group col-md-12 text-left">
+                {{creditcardform.number.label}}
+                {{creditcardform.number}}
+                <span style="color:red;" role="alert">{{creditcardform.number.errors}}</span>
+            </div>
+            <div class="form-group col-md-4">
+                {{creditcardform.cvc.label}}
+                {{creditcardform.cvc}}
+                <span style="color:red;" role="alert">{{creditcardform.cvc.errors}}</span>
+            </div>
+            <div class="form-group col-md-4">
+                {{creditcardform.month.label}}
+                {{creditcardform.month}}
+                <span style="color:red;" role="alert">{{creditcardform.month.errors}}</span>
+            </div>
+            <div class="form-group col-md-4">
+                {{creditcardform.year.label}}
+                {{creditcardform.year}}
+                <span style="color:red;" role="alert">{{creditcardform.year.errors}}</span>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}        
+                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                        <span class="wt-jobalerts">
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                                <span> {{ message}} </span>
+                                <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %} 
+                
+            <div class="text-center">
+                <button type="button" class="btn btn-info btn-sm text-center" 
+                    hx-post="{% url 'transactions:stripe_payment_order' %}"
+                    hx-target="#payment-method"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                    Pay Now with Stripe
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3"></div>
+</div> {% endcomment %}

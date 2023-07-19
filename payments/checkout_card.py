@@ -11,15 +11,11 @@ class CreditCard:
         'amex': '^3[47][0-9]{13}$',
     }
 
-    def __init__(self, first_name, last_name, number, month, year, cvv, package, amount): 
-        self.first_name = first_name
-        self.last_name = last_name
+    def __init__(self, number, month, year, cvc): 
         self.number = number.replace(' ', '')
         self.month = int(month)
         self.year = int(year)
-        self.cvv = cvv.replace(' ', '')
-        self.package = package
-        self.amount = int(amount)
+        self.cvc = cvc.replace(' ', '')
 
 
     def is_valid(self):
@@ -32,7 +28,7 @@ class CreditCard:
             return False
 
         # Validate CVC
-        if not self._validate_cvv():
+        if not self._validate_cvc():
             return False
         
         # Validate all input fields
@@ -55,7 +51,6 @@ class CreditCard:
 
         return False
 
-
     def _validate_expiration(self):
         """Check whether the credit card is expired or not"""
         # Check if expiration date is in the future
@@ -67,34 +62,27 @@ class CreditCard:
             return False
         return True
     
-
     @property
     def expire_date(self):
         """Returns the expiry date of the card in MM-YYYY format"""
         return '%02d-%04d' % (self.month, self.year)
 
-
     def _validate_fields(self):
         """Validate that all the required attributes of card are given"""
-        return (self.first_name 
-                and self.last_name
-                and self.month
+        return (self.month
                 and self.year
                 and self.number
-                and self.cvv
-                and self.package
-                and self.amount)
+                and self.cvc)
         
-
-    def _validate_cvv(self):
+    def _validate_cvc(self):
         # Check if the CVC is valid
-        if not re.match(r'^\d{3,4}$', self.cvv):
+        if not re.match(r'^\d{3,4}$', self.cvc):
             return False
 
         # Check the CVC length based on card type
-        if self.card_type == 'amex' and len(self.cvv) != 4:
+        if self.card_type == 'amex' and len(self.cvc) != 4:
             return False
-        elif len(self.cvv) != 3:
+        elif len(self.cvc) != 3:
             return False
 
         return True
