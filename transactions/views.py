@@ -766,7 +766,6 @@ def paypal_payment_order(request):
         return JsonResponse({'error': 'Invalid request method'})
 
 
-
 @login_required
 @csrf_exempt
 @require_http_methods(['POST'])
@@ -775,14 +774,12 @@ def paypal_callback(request):
 
     body = json.loads(request.body)
     paypal_order_key = body["paypal_order_key"]
-    print('paypal_order_key new:', paypal_order_key)
 
     paypal_client = PayPalClientConfig()
-    capture_data = paypal_client.capture_order(paypal_order_key)
-
-    print(capture_data['status'] )
+    capture_data = paypal_client.capture_order(paypal_order_key,)
+    capture_data_id = capture_data['purchase_units'][0]['payments']['captures'][0]['id']
     if capture_data['status'] == 'COMPLETED':
-        Purchase.paypal_order_confirmation(paypal_order_key)
+        Purchase.paypal_order_confirmation(paypal_order_key, capture_data_id)
         hiringbox.clean_box()
         return JsonResponse(capture_data)
     else:

@@ -15,17 +15,20 @@ class PayPalClientConfig:
         merchant = MerchantAPIs.objects.filter(merchant=self.site, paypal_active=True).first()
         return merchant
 
+
     def paypal_public_key(self):
-        gateway = self.get_payment_gateway()
+        gateway = self.get_payment_gateway()      
         if gateway:
             return gateway.paypal_public_key
         return None
+
 
     def paypal_secret_key(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.paypal_secret_key
         return None
+
 
     def get_base_url(self):
         sandbox_url = 'https://api.sandbox.paypal.com' 
@@ -37,6 +40,8 @@ class PayPalClientConfig:
   
 
     def get_access_token(self):
+        # print('paypal_secret_key :', self.paypal_secret_key())
+        # print('paypal_public_key :', self.paypal_public_key())
         url = f'{self.get_base_url()}/v1/oauth2/token'
         headers = {
             'Accept': 'application/json',
@@ -46,10 +51,12 @@ class PayPalClientConfig:
             'grant_type': 'client_credentials'
         }
         response = requests.post(url, auth=(self.paypal_public_key(), self.paypal_secret_key()), data=data, headers=headers)
+        
         if response.status_code == 200:
             return response.json()['access_token']
         else:
             raise Exception(f'Error: {response.text}')
+
 
     def create_order(self, amount, currency='USD', description='purchase of service'):
         url = f'{self.get_base_url()}/v2/checkout/orders'
@@ -70,12 +77,15 @@ class PayPalClientConfig:
             ]
         }
         response = requests.post(url, json=data, headers=headers)
+        
         if response.status_code == 201:
             return response.json()['id']
         else:
             raise Exception(f'Failed to create order with PayPal: {response.text}')
 
+
     def capture_order(self, order_id):
+        
         url = f'{self.get_base_url()}/v2/checkout/orders/{order_id}/capture'
         headers = {
             'Content-Type': 'application/json',
@@ -83,9 +93,11 @@ class PayPalClientConfig:
         }
         response = requests.post(url, headers=headers)
         if response.status_code == 201:
+            
             return response.json()
         else:
             raise Exception(f'Failed to capture payment with PayPal: {response.text}')
+
 
     def create_subscription(self, plan_id, quantity=1):
         url = f'{self.get_base_url()}/v1/billing/subscriptions'
@@ -102,6 +114,7 @@ class PayPalClientConfig:
             return response.json()['id']
         else:
             raise Exception(f'Failed to create subscription with PayPal: {response.text}')
+
 
     def cancel_subscription(self, subscription_id):
         url = f'{self.get_base_url()}/v1/billing/subscriptions/{subscription_id}/cancel'

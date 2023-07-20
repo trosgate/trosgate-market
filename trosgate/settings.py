@@ -243,17 +243,17 @@ LOGIN_REDIRECT_URL = "account:dashboard"
 LOGOUT_REDIRECT_URL = "account:homepage"
 
 # Gmail API
-# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST = 'smtp-relay.brevo.com'  #'smtp-relay.sendinblue.com'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = 'myvoistudio@gmail.com'
-# EMAIL_HOST_PASSWORD = 'yaqtwqjpabdmxkao'
+# EMAIL_HOST_PASSWORD = '1dWKrEc3kQfRYbSD'
 
 #Custom Email Backend for Trosgate software
-# EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
+EMAIL_BACKEND = 'general_settings.backends.MailerBackend'
 
 ####option one for email setup in development mode###
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
  
 ADMINS = (

@@ -53,6 +53,7 @@ class PurchaseMaster(MerchantMaster):
 class Purchase(PurchaseMaster):
     client_fee = models.PositiveIntegerField(_("Client Fee"), default=0)
     paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, null=True, blank=True)
+    paypal_transaction_id = models.CharField(_("PayPal Transaction ID"), max_length=200, null=True, blank=True)
     flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=200, null=True, blank=True)
     stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=200, null=True, blank=True)
     razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=200, null=True, blank=True)
@@ -255,12 +256,13 @@ class Purchase(PurchaseMaster):
 
 
     @classmethod
-    def paypal_order_confirmation(cls, paypal_order_key):
+    def paypal_order_confirmation(cls, paypal_order_key, paypal_transaction_id):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(paypal_order_key=paypal_order_key)
             if purchase.status != Purchase.FAILED:
                 raise Exception(_("This purchase already succeeded"))
             purchase.status = Purchase.SUCCESS
+            purchase.paypal_transaction_id = paypal_transaction_id
             purchase.save()
 
             contract = None

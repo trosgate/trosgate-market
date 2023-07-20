@@ -9,94 +9,10 @@ Paypal Sub sample test ID: I-A2WCRT10SLCK,
 
 
 ------------Sandbox account----------
-Bus Email: sb-f7gfj14264963@business.example.com
-Pers Email: sb-thqmh14264998@personal.example.com
+Bus Email: sb-qk1kf18073840@business.example.com     psw: @=+zI@_1
+Pers Email: sb-teapn26843346@personal.example.com    psw: Cl8Bs1<2
 
 Url: https://sandbox.paypal.com
-Client ID: 'AVmyBFKdMgD7akvsZTJyN3XzaCCCubqa1eyXQGF1ixSmnfO4ahGpQRIun0jP8oM33bFUUwak_jgrvYAw'
-secret_id: 'EJH9ZZylfy5pYTX162szH-Y4uhA63dXQMloahpdWTeU-JJb3TfMAd7TqLEQgeulWpUb_6pP6G1HKglEm'
+Client ID: 'Aaz9E6dTLy3qr4dAOG4grsTx1o6PBCedhGNzI65uUfoyDGeInrGu1KTPg_xKL-lfM7TsqZvRDbaH31bF'
+secret_id: 'ED3nf1kRuf-5f9sk-IhWojbNzoko4JBleogAYQO3jk2PY8p-fVudZqB_I3kDXCqXrSLmUyDlS3V2ghKT'
 
-
-
-BUSINESS
-.................................................
-Sandbox account Business
-First name:
-John
-Last name:
-Doe
-Email ID:
-sb-qk1kf18073840@business.example.com
-System Generated Password: @=+zI@_1
-Password:
-
-<--------NVP/SOAP Sandbox API Credentials-------------------->
-Username:
-sb-qk1kf18073840_api1.business.example.com
-Password:
-U88YNPMD82SQ9J3F
-Signature:
-ANgXdVv8sjqFuicpIprBxtdHkRwtAQryqojvgyPPpztNXtS71rxXyFI9
-Phone Number: 4088175259
-4085477577
-Account type:
-Business  Upgrade to Pro
-Account ID:
-LFBDGAXRMQZV6
-Status:
-Verified
-Country:
-US
-Notes:
-
-<--------Funding-------------------->
-Bank Account
-Account Number:
-52106096537081
-Routing Number:
-325272063
-Credit Card
-Credit Card Number:
-4032032579796241
-Credit Card Type:
-VISA
-Expiration Date:
-03/2027
-
-
-PERSONAL
-.................................................
-First name:
-John
-Last name:
-Doe
-Email ID:
-sb-kc36l20362591@personal.example.com
-System Generated Password: 1u15Z+fK
-Notes:.........
-
-Phone Number:
-4084428708
-Account type:
-Personal
-Account ID:
-B7P4SZ5XSMY3G
-Status:
-Verified
-Country:
-US
-<--------Funding-------------------->
-Account Number:
-76375375124510
-Routing Number:
-325272063
-Credit Card
-Credit Card Number:
-4032036952969978
-Credit Card Type:
-VISA
-Expiration Date:
-05/2027
-PayPal
-Balance:
-5000.00 USD

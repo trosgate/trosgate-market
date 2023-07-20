@@ -81,13 +81,13 @@
 <!-- <div class="container"> -->
 <div class="row flex-checkout-page">
     <div class="col-md-6 col-sm-12 custom-checkout-left">
-    <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{hiring_box.get_total_price_before_fee_and_discount}}</span><br><br>
+    <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{hiring_box.get_total_price_after_discount_and_fee}}</span><br><br>
     <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
     <span style="font-size: 18px; font-weight:bold;">The original price + any fee deductible</span>
     </div>
     <div class="col-md-6 col-sm-12 custom-checkout-right">
         <div class="reposition-top checkout-to-show" style="display:none;">
-            <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{hiring_box.get_total_price_before_fee_and_discount}}</span><br><br>
+            <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{hiring_box.get_total_price_after_discount_and_fee}}</span><br><br>
             <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
             <span style="font-size: 18px; font-weight:bold;">The original price + any fee deductible</span><br><br>
         </div>
@@ -233,131 +233,7 @@
     <script 
         src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}">
     </script>
-    <script>
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        let csrftoken = getCookie('csrftoken');
-        {% comment %} <script src="{% static 'js/paypal_checkout.js' %}"></script> {% endcomment %}
-        {% comment %} function hiringPayPalButton() {
-            paypal.Buttons({
-                style: {
-                    layout: 'vertical', //or horizontal
-                    color: 'gold',
-                    shape: 'rect', //or pill
-                    label: 'paypal',
-                },
-                createOrder() {
-                    return fetch("/my-server/create-paypal-order", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      // use the "body" param to optionally pass additional order information
-                      // like product skus and quantities
-                      body: JSON.stringify({
-                        cart: [
-                          {
-                            sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
-                            quantity: "YOUR_PRODUCT_QUANTITY",
-                          },
-                        ],
-                      }),
-                    })
-                    .then((response) => response.json())
-                    .then((order) => order.id);
-                  },
-                createOrder: function (data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: '{{hiring_box.get_total_price_after_discount_and_fee}}'
-                            }
-                        }]
-                    });
-                },
-                onApprove: function (data, actions) {
-                    return actions.order.capture().then(function(){
-                        let url = "{% url 'transactions:paypal_payment_order' %}"
-                        return fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'content-type': 'application/json',
-                                'X-CSRFToken': csrftoken,
-                            },
-                            body: JSON.stringify({
-                                orderID: data.orderID
-                            })
-                        }).then(function () {
-                            swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                window.location.href = "{% url 'transactions:hiring_payment_success' %}"
-                            });              
-                            
-                        })
-                    })                    
-                    
-                },
-            }).render('#paypal-button-container');
-        }
-        hiringPayPalButton(); {% endcomment %}
-
-
-        const paypalButton = document.getElementById('paypal-button-container');
-
-        paypal.Buttons({
-            createOrder: function(data, actions) {
-                // This function will be called when the button is clicked
-                // Call your Django view to create a new PayPal order
-                return fetch("{% url 'transactions:paypal_payment_order' %}", {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                    },
-                    body: JSON.stringify({
-                        amount: '10.00', // Replace this with the actual amount you want to charge
-                        currency: 'USD', // Replace this with the currency code you want to use
-                        description: 'Test Payment', // Replace this with your order description
-                    }),
-                }).then(function(response) {
-                    return response.json();
-                }).then(function(orderData) {
-                    return orderData.paypal_order_key;
-                });
-            },
-            onApprove: function(data, actions) {
-                // This function will be called when the payment is approved
-                // Call your Django view to capture the payment
-                return fetch("{% url 'transactions:paypal_callback' %}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        paypal_order_key: data.orderID,
-                    }),
-                }).then(function(response) {
-                    return response.json();
-                }).then(function() {
-                    // Handle the captured payment data here (e.g., show a success message)
-                    swal("Perfect!", 'All looked good', "success").then((value) =>{
-                        window.location.href = "{% url 'transactions:proposal_transaction' %}"
-                    });              
-                });
-            }
-        }).render('#paypal-button-container');
-    </script>
+    <script src="{% static 'js/payments/paypal-checkout-proosal.js' %}"></script>
     {% endif %}
 
     {% if gateway_type.name == "Stripe" %}
@@ -365,7 +241,6 @@
         var CSRF_TOKEN = '{{ csrf_token }}';
     </script>    
     <script src="https://js.stripe.com/v3/"></script>
-    {% comment %} <script src="{% static 'js/payments/proposal-stripe-checkout.js' %}" data-rel-js></script> {% endcomment %}
     <script>
     function stripePay(event) {
         event.preventDefault();
