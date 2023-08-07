@@ -49,39 +49,34 @@
 											<li><span><i class="fa fa-arrow-up" style="color:red;"></i> Sales: {{overal_proposal_sales_count}}</span></li>
 											<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
 											<li><span><i class="far fa-clock" style="color:blue;"></i> Duration: {{proposal.get_duration_display }}</span></li>
-											{% if request.user.clients %}
-											<li><span><button class="btn btn-success btn-sm text-white"  data-toggle="modal" data-target="#oneClickProposalCheckout">1-Click Purchase</button></span></li>
-											{% endif %}
 										</ul>
 									</div>
-										{% if request.user.is_authenticated and request.user.clients %}
-										<div class="wt-btnarea"><a href="{% url 'transactions:hiring_summary' proposal.created_by.short_name proposal.slug %}" class="wt-btn">Hire Expert</a></div>
-										{% elif request.user.is_authenticated and request.user.freelancer %}
-										<div class="wt-btnarea"><button class="wt-btn"><strike style="color:white">... Hire Expert ...</strike></button></div>
-										{% elif not request.user.is_authenticated %}
-										<div class="wt-btnarea"><a href="{% url 'account:login' %}" class="wt-btn">Hire Expert</a></div>
+										<div class="wt-btnarea">
+										{% if request.user.is_authenticated %}
+											<button class="wt-btn" data-toggle="modal" data-target="#oneClickProposalCheckout" 
+											style='background-color:black; color:white;'>
+											Digital Product
+											</button>
+										{% else %}
+											<a href="{% url 'account:login' %}" class="wt-btn">Hire Expert</a>
 										{% endif %}
+										</div>
 									</div>
-								</div>
-								<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
-									<figure class="wt-companysimg">
-										<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="width:1920px;" alt="img description">
-									</figure>
 								</div>
 								
 								<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-8 float-left">
 									<div class="wt-projectdetail-holder">
 										<div class="wt-projectdetail">
 											
+												{% include 'proposals/partials/proposal_tier_fetcher.html' %}
+											</div>
 											<div class="wt-title">
 												<h4>Proposal Detail</h4>
 											</div>
 											
 											<div class="wt-description">
-											{% include 'proposals/components/proposal_addons.html' %}
-											
-											{{proposal.description|linebreaksbr}}
-										</div>
+												{{proposal.description|linebreaksbr}}
+											</div>
 									</div>
 									
 									{% include 'proposals/components/proposal_summary.html' %}
@@ -102,34 +97,183 @@
 		</div>
 		<!--Content Wrapper End-->
 	</div>
-
-	{% include 'client/partials/one_click_proposal_modal.html' %}
-
+	{% include 'proposals/partials/instant_product_modal.html' %}
 {% endblock content %}
 
+
 {% block scripts %}
+{% if proposal.pricing == False %}
 <script>
-	$(document).on('click', '#add-box', function (e) {
+	$(document).on('click', '#packageSingle', function (e) {
 	  e.preventDefault();
 	  $.ajax({
 		type: 'POST',
 		url: '{% url "transactions:add_to_hiring_box" %}',
 		data: {
-			proposalid: $('#add-box').val(),
-			memberqty: $('#select option:selected').text(),
+			proposalid: $('#proposal').val(),
+			salary: $('#salary').val(),
+			package: $('#package').val(),
+			memberqty: $('#select option:selected').val(),
 			csrfmiddlewaretoken: "{{csrf_token}}",
 			action: 'post'
 		},
 		success: function (json) {
 			document.getElementById("members-qty").innerHTML = json.member_qty
+			document.getElementById("salaryT0").innerHTML = json.salary
 			count = $('#select option:selected').text()
-			document.getElementById("addon-message").innerHTML = "Addon bucket modified with" + count + "staff"
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+	$(document).on('click', '#packageSingleNext', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal').val(),
+			salary: $('#salary').val(),
+			package: $('#package').val(),
+			memberqty: $('#select option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			window.location.href = '{% url "transactions:pricing_option_with_fees" %}'
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+</script>
+
+{% else %}
+<script>
+	$(document).on('click', '#packageOne', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal').val(),
+			salary: $('#salary').val(),
+			package: $('#package').val(),
+			memberqty: $('#select1 option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			document.getElementById("members-qty").innerHTML = json.member_qty
+			document.getElementById("salaryT1").innerHTML = json.salary
+			count = $('#select option:selected').text()
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+	$(document).on('click', '#packageBasic', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal').val(),
+			salary: $('#salary').val(),
+			package: $('#package').val(),
+			memberqty: $('#select1 option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			window.location.href = '{% url "transactions:pricing_option_with_fees" %}'
 		},
 		error: function (xhr, errmsg, err) {}
 	  });
 	})
   </script>
-
+  <script>
+	$(document).on('click', '#packageTwo', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal2').val(),
+			salary: $('#salary2').val(),
+			package: $('#package2').val(),
+			memberqty: $('#select2 option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			document.getElementById("members-qty").innerHTML = json.member_qty
+			document.getElementById("salaryT2").innerHTML = json.salary
+			count = $('#select option:selected').text()
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+	$(document).on('click', '#packageStandard', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal2').val(),
+			salary: $('#salary2').val(),
+			package: $('#package2').val(),
+			memberqty: $('#select2 option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			window.location.href = '{% url "transactions:pricing_option_with_fees" %}'
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+  </script>
+  <script>
+	$(document).on('click', '#packageThree', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal3').val(),
+			salary: $('#salary3').val(),
+			package: $('#package3').val(),
+			memberqty: $('#select3 option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			document.getElementById("members-qty").innerHTML = json.member_qty
+			document.getElementById("salaryT3").innerHTML = json.salary
+			count = $('#select option:selected').text()
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+	$(document).on('click', '#packagePremium', function (e) {
+	  e.preventDefault();
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "transactions:add_to_hiring_box" %}',
+		data: {
+			proposalid: $('#proposal3').val(),
+			salary: $('#salary3').val(),
+			package: $('#package3').val(),
+			memberqty: $('#select3 option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'post'
+		},
+		success: function (json) {
+			window.location.href = '{% url "transactions:pricing_option_with_fees" %}'
+		},
+		error: function (xhr, errmsg, err) {}
+	  });
+	})
+  </script>
+{% endif %}
   <script>
 	$(document).on('click', '#oneClickCheckout', function (e) {
 	  e.preventDefault();
@@ -170,6 +314,7 @@
 	<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
 	<!-- sharethis script ends-->
 {% endblock scripts %}
+
 
 
 

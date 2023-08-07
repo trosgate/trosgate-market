@@ -11,8 +11,8 @@ class ClientAdmin(admin.ModelAdmin):
     list_display = ['user', 'merchant', 'gender', 'tagline', 'image_tag']
     list_display_links = ['user', 'gender',]
     readonly_fields = [
-        'gender', 'merchant', 'address','profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 'company_logo', 'logo_tag',
-        'employees', 'announcement','brand_name', 'tagline', 'description', 'business_size'
+        'gender', 'merchant', 'address','profile_photo', 'image_tag', 'banner_photo',  'banner_tag', 'company_logo', 'logo_tag','employees',
+        'announcement','brand_name', 'tagline', 'description', 'business_size'
         ]
     search_fields = ['user__short_name', 'gender', 'tagline']
     fieldsets = (

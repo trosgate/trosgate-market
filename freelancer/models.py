@@ -23,7 +23,7 @@ from payments.models import PaymentRequest, AdminCredit
 from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email, lock_fund_email
 from PIL import Image
 from merchants.models import MerchantMaster
-
+from notification.tasks import send_pending_balance_email
 
 
 class ActiveFreelancer(models.Manager):
@@ -191,13 +191,14 @@ class FreelancerAccount(MerchantMaster):
 
 
     @classmethod
-    def credit_pending_balance(cls, user, pending_balance, purchase):
+    def credit_pending_balance(cls, user, paid_amount, purchase_model, purchase):
         with db_transaction.atomic():
             account = cls.objects.select_for_update().get(user=user)
-            account.pending_balance += pending_balance
+            account.pending_balance += paid_amount
             account.save(update_fields=['pending_balance'])           
 
-            db_transaction.on_commit(lambda: credit_pending_balance_email(account, pending_balance, purchase))
+            db_transaction.on_commit(lambda: send_pending_balance_email.delay(account.id, paid_amount, purchase_model, purchase.id))
+
             
         return account
  

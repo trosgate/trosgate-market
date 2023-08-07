@@ -28,6 +28,7 @@ def get_paypal_subscription_url():
 
     return url
 
+
 def get_subscription_access_token():
     paypalClient = PayPalClientConfig()
     data = {'grant_type':'client_credentials'}

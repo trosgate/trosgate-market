@@ -93,7 +93,8 @@
                             <span style="color:red;" role="alert">{{ paypalform.paypal_public_key.errors}}</span>
                         </td>
                     </tr>
-                    </body>												
+                    </body>
+                    												
                     <body>
                     <tr>
                         <td class="text-left">Secret Key</td>
@@ -102,7 +103,13 @@
                             <span style="color:red;" role="alert">{{ paypalform.paypal_secret_key.errors}}</span>
                         </td>
                     </tr>
-                    </body>													
+                    </body>
+                    <thead>
+                        <tr>
+                            <th class="text-left">Upselling</th>
+                            <th>Freelancer Subscription</th>
+                        </tr>
+                    </thead>													
                     <body>
                     <tr>
                         <td class="text-left">Subscription Key</td>
@@ -112,6 +119,12 @@
                         </td>
                     </tr>
                     </body>
+                    <thead>
+                        <tr>
+                            <th class="text-left">Environment</th>
+                            <th>Sandbox/Live</th>
+                        </tr>
+                    </thead>
                     <body>
                         <tr>
                             <td class="text-left">Sandbox Environment</td>
@@ -175,7 +188,7 @@
                             <span style="color:red;" role="alert">{{ flutterwaveform.flutterwave_secret_key.errors}}</span>
                         </td>
                     </tr>
-                    </body>													
+                    </body>										
                     <body>
                     <tr>
                         <td class="text-left">Subscription Key</td>

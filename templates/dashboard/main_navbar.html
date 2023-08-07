@@ -44,8 +44,8 @@
                         <li class="menu-item-has-children page_item_has_children"><span class="wt-dropdowarrow"><i class="lnr lnr-chevron-right"></i></span>
                           <a href="javascript:void(0);" {% if website.navbar_color %} style="color:black;" {% endif %}>Bucket</a>
                           <ul class="sub-menu">
-                            <li><a href="{% url 'transactions:pricing_option_with_fees' %}">Proposal Staffs &nbsp;<span id="members-qty">->({% with total_staff=hiring_box|length %}{% if total_staff > 0 %}{{total_staff}}{%else%}0{% endif %}{% endwith %})</span></a></li>
-                            <li><a href="{% url 'applications:application_multiple_summary' %}">Project Applicants &nbsp;<span id="applicantApproveCount">->({% with total_applicant=application_addon|length %}{% if total_applicant > 0 %}{{total_applicant}}{% else %}0{% endif %}{% endwith %})</span></a></li>
+                            <li><a href="{% url 'transactions:pricing_option_with_fees' %}">Proposals &nbsp;<span class="badge badge-success" id="members-qty">{% with total_staff=hiring_box|length %}{% if total_staff > 0 %}{{total_staff}}{% else %}0{% endif %}{% endwith %}</span></a></li>
+                            <li><a href="{% url 'applications:application_multiple_summary' %}">Applications &nbsp;<span class="badge badge-success" id="applicantApproveCount">{% with total_applicant=application_addon|length %}{% if total_applicant > 0 %}{{total_applicant}}{% else %}0{% endif %}{% endwith %}</span></a></li>
                           </ul>
                         </li>                        
                         <li

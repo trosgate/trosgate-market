@@ -28,8 +28,8 @@ def code_generator():
 class Package(models.Model):
     #
     # Team statuses
-    BASIC = 'Basic'
-    TEAM = 'Team'
+    BASIC = 'basic'
+    TEAM = 'team'
     STATUS =(
         (BASIC, _('Basic')),
         (TEAM, _('Subscription'))
@@ -51,7 +51,7 @@ class Package(models.Model):
         verbose_name_plural = _("Upsell Packages")
 
     def __str__(self):
-        return self.type 
+        return str(self.get_type_display())
 
 
 # team should have ability to add proposal extras
@@ -77,7 +77,7 @@ class Team(MerchantMaster):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
     package = models.ForeignKey(Package, verbose_name=_("Team Plan"), related_name="teampackage", on_delete=models.CASCADE)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
-    notice = models.TextField(_("Notice"), max_length=2000)
+    notice = models.TextField(_("Purpose/Mission"), max_length=2000)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     status = models.CharField(_("Team Status"), max_length=20, choices=STATUS, default=ACTIVE)
@@ -176,19 +176,26 @@ class Invitation(MerchantMaster):
         with db_transaction.atomic():
 
             if notice is None:
-                notice= ''    
+                notice= f'team founded by {created_by}'    
 
             if not (current_team.created_by == created_by):
                 raise InvitationException(_("You must be in your founded team to create new Teams"))
 
             new_team = Team.add_new_team(
-                title=title, created_by=created_by, package=package,notice=notice
+                title=title, 
+                created_by=created_by, 
+                package=package,
+                notice=notice
             )
             new_team.status = 'active'
             new_team.save()
 
             internal_invite = cls.objects.create(
-                team=new_team, type=type, sender=new_team.created_by, email=new_team.created_by.email, status=status
+                team=new_team, 
+                type=type, 
+                sender=new_team.created_by, 
+                email=new_team.created_by.email, 
+                status=status
             )
         return new_team, internal_invite
 
@@ -203,28 +210,28 @@ class Invitation(MerchantMaster):
             raise InvitationException(_("Bad and unknown request"))
 
         if not receiver:
-            raise InvitationException(_("credentials of invitee incomplete"))
+            raise InvitationException(_("credentials of invitee missing"))
 
         if not email:
-            raise InvitationException(_("credentials of invitee incomplete"))
+            raise InvitationException(_("credentials of invitee missing"))
 
         if not (team.package_status == 'active'):
             raise InvitationException(_("Please upgrade your team to invite others"))
 
-        if not (team.package.type == 'Team'):
+        if not (team.package.type == 'team'):
             raise InvitationException(_("Please activate subscription to invite others"))
 
         if team.created_by != sender:
-            raise InvitationException(_("This action requires upgraded team founder"))
+            raise InvitationException(_("You must invite from your upgraded team"))
 
         if team.created_by == receiver:
             raise InvitationException(_("You cannot invite youself"))
 
         if cls.objects.filter(team=team, receiver=receiver).exists():
-            raise InvitationException(_("User already invited"))     
+            raise InvitationException(_("User already invited"))  
 
         if cls.objects.filter(team=team, team__members__email=email).exists():
-            raise InvitationException(_("User already a member of your Team"))
+            raise InvitationException(_("User already a member"))
 
         if cls.objects.filter(team=team, receiver__email=email).exists():
             raise InvitationException(_("User of this email already invited"))
@@ -232,6 +239,9 @@ class Invitation(MerchantMaster):
         if receiver in team.members.all():
             raise InvitationException(_("User already a member"))
 
+        if not (team.package.max_member_per_team < team.members.all().count()):
+            raise InvitationException(_("Maximum invitation exceeded"))
+        
         internal_invite = cls.objects.create(
             team=team, 
             sender=sender, 
@@ -244,7 +254,6 @@ class Invitation(MerchantMaster):
 
     @classmethod
     def external_invitation(cls, team, sender, email, type):
-        #TODO Check for maximum number of members
         if not team:
             raise InvitationException(_("Your team is unknown"))
 
@@ -280,6 +289,9 @@ class Invitation(MerchantMaster):
 
         if team.created_by != sender:
             raise InvitationException(_("This action requires upgraded team founder"))
+          
+        if not (team.package.max_member_per_team < team.members.all().count()):
+            raise InvitationException(_("Maximum invitation exceeded"))
 
         external_invite = cls.objects.create(team=team, sender=sender, email=email, type=type)
         return external_invite

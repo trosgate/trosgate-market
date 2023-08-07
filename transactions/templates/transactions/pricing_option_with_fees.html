@@ -82,6 +82,8 @@
     </div> 
     </div>
 
+	{% include 'client/partials/one_click_proposal_modal.html' %}
+
     {% endblock content %}
     {% block scripts %}
     
@@ -173,7 +175,42 @@
         });
         })
     </script>
-
+    <script>
+        $(document).on('click', '#oneClickCheckout', function (e) {
+          e.preventDefault();
+    
+          let displayMessage = document.getElementById('oneClick-message');
+          let displayError = document.getElementById("oneClick-error")
+          $.ajax({
+            type: 'POST',
+            url: '{% url "client:one_click_proposal_checkout" %}',
+            data: {
+                proposalId:'{{proposal.id}}',
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'oneclick-pay'
+            },
+            beforeSend:function(){
+                $("#oneClickCheckout").attr("disabled", true);
+            },
+            success: function (json) {
+                if(json.errors != ''){
+                    displayError.innerHTML = json.errors;
+                    $("#oneClickCheckout").attr("disabled", false);
+                    return false
+                }
+                else{
+                    displayMessage.innerHTML = '';
+                    displayMessage.innerHTML = json.message;
+                    window.location.href = "{% url 'transactions:proposal_transaction' %}"
+                    $("#oneClickCheckout").attr("disabled", false);
+                }
+            },
+            error: function (xhr, errmsg, err) {
+                $("#oneClickCheckout").attr("disabled", false);
+            }
+          });
+        })
+      </script>
 
 {% endblock scripts %}
 

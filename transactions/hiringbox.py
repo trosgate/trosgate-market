@@ -27,6 +27,7 @@ class HiringBox():
             hiring_box = self.session[settings.HIRINGBOX_SESSION_ID] = {}
         self.hiring_box = hiring_box
 
+
     def set_pricing(self, proposal, package_name, package_price):
         self.session['selected_package'] = {
             'id': proposal,
@@ -38,7 +39,7 @@ class HiringBox():
         return self.session.get('selected_package')
 
 
-    def addon(self, proposal, member_qty, price, package_name):
+    def addon(self, proposal, member_qty, salary, package_name):
         """
         Apply to proposals excluding digital product
         This function will add proposal to session at its original price
@@ -47,12 +48,25 @@ class HiringBox():
         proposal_id = str(proposal.id)
         if proposal_id in self.hiring_box:
             self.hiring_box[proposal_id]["member_qty"] = member_qty
-            self.hiring_box[proposal_id]["salary"] = price
+            self.hiring_box[proposal_id]["salary"] = salary
             self.hiring_box[proposal_id]["package_name"] = package_name
         else:
-            self.hiring_box[proposal_id] = {'salary': int(price), 'package_name': package_name, 'member_qty': int(member_qty)}
+            self.hiring_box[proposal_id] = {'salary': int(salary), 'package_name': package_name, 'member_qty': int(member_qty)}
         self.commit()
 
+
+    def add_product(self, product):
+        proposal_session = product.id
+        if proposal_session in self.hiring_box:
+            self.hiring_box[proposal_session]["product_id"] = product.id
+            self.hiring_box[proposal_session]["price"] = product.price
+        else:
+            self.hiring_box[proposal_session] = {'product_id': product.id, 'price': int(product.price)}
+        self.commit()
+
+
+    # def get_products_price(self):
+    #     return self.get_p['price']
 
     def modify(self, proposal, member_qty, price):
         """
@@ -91,13 +105,15 @@ class HiringBox():
         """
         Get the hiring_box data and count the members
         """
-        return sum(member["member_qty"] for member in self.hiring_box.values())
+        return len(self.hiring_box.values())
+
 
     def get_total_freelancer(self):
-        return sum(member["member_qty"] for member in self.hiring_box.values())
+        return self.__len__()
+        # return sum(member["member_qty"] for member in self.hiring_box.values())
 
     def get_total_price_before_fee_and_discount(self):
-        self.subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        self.subtotal = sum((member["salary"] * member["member_qty"]) for member in self.hiring_box.values())
         return self.subtotal
         # return sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
 
@@ -165,13 +181,13 @@ class HiringBox():
         return saving_in_discount
 
     def get_total_price_after_discount_only(self):
-        subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        subtotal = sum((member["salary"] * member["member_qty"]) for member in self.hiring_box.values())
         subtotal = self.get_total_price_before_fee_and_discount()
         total_after_discount = (subtotal - self.get_discount_value())
         return total_after_discount
 
     def get_total_price_after_discount_and_fee(self):
-        subtotal = sum((member["salary"]) * member["member_qty"] for member in self.hiring_box.values())
+        subtotal = sum((member["salary"] * member["member_qty"]) for member in self.hiring_box.values())
         processing_fee = self.get_fee_payable()
         grandtotal = ((subtotal - self.get_discount_value()) + processing_fee)
         return grandtotal

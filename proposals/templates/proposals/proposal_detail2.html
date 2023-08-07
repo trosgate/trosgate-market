@@ -60,7 +60,7 @@
 								<div class="d-flex justify-content-between mb-3">
 									<span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_duration_display }}</i>
 								</div>
-								{% include 'proposals/partials/product_advert.html' %}
+								
 								{% if request.user.clients %}
 								<div class="d-flex justify-content-center">
 									<span class="addon-header">Add-On</span>
@@ -108,7 +108,7 @@
 								</li>
 							</ul>
 							<div class="tab-content" id="myTabContent">
-							{% include 'transactions/partials/proposal_tier.html' %}
+							{% include 'proposals/partials/proposal_tier.html' %}
 							</div>
 							
 							{% endif %}
@@ -354,42 +354,7 @@
 	})
   </script>
 {% endif %}
-  <script>
-	$(document).on('click', '#oneClickCheckout', function (e) {
-	  e.preventDefault();
 
-	  let displayMessage = document.getElementById('oneClick-message');
-	  let displayError = document.getElementById("oneClick-error")
-	  $.ajax({
-		type: 'POST',
-		url: '{% url "client:one_click_proposal_checkout" %}',
-		data: {
-			proposalId:'{{proposal.id}}',
-			csrfmiddlewaretoken: "{{csrf_token}}",
-			action: 'oneclick-pay'
-		},
-		beforeSend:function(){
-			$("#oneClickCheckout").attr("disabled", true);
-		},
-		success: function (json) {
-			if(json.errors != ''){
-				displayError.innerHTML = json.errors;
-				$("#oneClickCheckout").attr("disabled", false);
-				return false
-			}
-			else{
-				displayMessage.innerHTML = '';
-				displayMessage.innerHTML = json.message;
-				window.location.href = "{% url 'transactions:proposal_transaction' %}"
-				$("#oneClickCheckout").attr("disabled", false);
-			}
-		},
-		error: function (xhr, errmsg, err) {
-			$("#oneClickCheckout").attr("disabled", false);
-		}
-	  });
-	})
-  </script>
 	<!-- sharethis script begins-->	
 	<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
 	<!-- sharethis script ends-->

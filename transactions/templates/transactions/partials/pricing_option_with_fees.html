@@ -47,11 +47,14 @@
     <div class="d-flex justify-content-between mb-3"> 
         <span>Processing Fee (in {{base_currency}})</span><span id="totalFees" class="text-primary pt-1">{% if hiring_box.get_fee_payable %}{{hiring_box.get_fee_payable}} {% else %} {{selected_fee}} {% endif %}</span>
     </div>
-
-    <div class="proposal-total-btn">
+    <div class="proposal-action">
+        <button class="btn btn-info btn-block proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Buy with Balance <i class="fa fa-info badge badge-success" hx-on="click: alert('this is the total messages')"></i></button>
+    </div>
+    <div class="proposal-action">
         {% if gateway_type %}
-        <a href="{% url 'transactions:payment_checkout' %}" class="btn btn-primary fw-bold w-100"
-        type="button"><i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
+        <a href="{% url 'transactions:payment_checkout' %}" 
+        class="btn btn-info btn-block"
+        style="background-color:#007ee5; border-radius:20px;"><i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
         {% else %}
         <button class="btn btn-secondary fw-bold w-100" disabled>Select Pricing to pay</button>
         {% endif %}

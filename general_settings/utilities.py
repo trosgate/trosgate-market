@@ -7,6 +7,7 @@ def website_name():
     except:
         return None
 
+
 def get_protocol_only():
     try:
         website_setting = WebsiteSetting.objects.get(pk=1)

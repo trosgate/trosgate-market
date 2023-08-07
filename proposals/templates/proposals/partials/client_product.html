@@ -1,0 +1,38 @@
+
+{% for product in products %}
+<tr>
+    <tr>
+        <td class="text-center">{{product.team}}</td>
+        <input type="hidden" class="product-checked" name="product" 
+        id="{{product.id}}" value="{{product.id}}">
+        <td class="text-center">{{product.modified_at}}</td>
+        <td>
+            {% if product.product_type == False %}
+            <a href="{% url 'proposals:product_download' product.proposal.slug product.pk %}" 
+                class="btn btn-outline-info btn-sm"> 
+                {{product.get_product_type_display}}
+            </a>
+            {% else %}
+            <button type="button" class="btn btn-success btn-sm text-center"
+                hx-get=""
+                {% comment %} {% url 'proposals:purchase_product' product.proposal.slug product.pk %} {% endcomment %}
+                hx-include="input[name='merchant']" 
+                hx-target="#products-list">
+                Buy @ {{base_currency}} {{product.price}}
+            </button>
+            {% endif %}
+        </td>
+    </tr>
+    
+    </tr>
+</tr>
+{% endfor %}
+<thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
+    <tr>
+        <th>Total</th>
+        <th></th>
+        <th id='productTotal'>0</th>
+    </tr>
+</thead>
+
+

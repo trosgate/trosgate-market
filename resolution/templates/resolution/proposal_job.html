@@ -1,0 +1,210 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+
+<!--Main Start-->
+<div class="wt-haslayout wt-innerbannerholder">
+	<div class="container">
+		<div class="row justify-content-md-center">
+			<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+				<div class="wt-innerbannercontent">
+					<div class="wt-title">
+						<h3 style="color:white">
+							{{product.team}} <> vrs <>{{product.purchase.client.get_short_name}}
+						</h3>
+					</div>
+						<ol class="wt-breadcrumb">
+							<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+							<li class="wt-active">Manager</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<section class="container">
+		<div class="row justify-content-md-center">				
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+				<div class="wt-dashboardbox">
+					<div class="wt-dashboardboxcontent">
+						<div class="wt-rcvproposalholder">
+							<div class="text-center">
+								<a href="{% url 'teams:teamchatroom' %}" class="btn btn-danger">Chat Client</a>
+								<a href="/" class="btn btn-success">Go Back</a>
+							</div>
+							<div class="wt-sectiontitle">
+								<span>Job Status: {{ product.get_status_display }}</span>
+							</div>
+							<div class="wt-jobdescription wt-tabsinfo">
+
+								{% if not task %}
+								{% if active_team.created_by == request.user %}
+								<div id="jobloaded" class="text-center">
+									{% include 'resolution/component/task_started.html' %}
+								</div>
+								<div id = 'startwork-begins' class="wt-updatall">
+									<span>Your {{currency}} {{product.total_sales_price}} is waiting. Click the button to start work</span>
+									<input type="number" name="product" value="{{product.id}}" id="product" hidden />
+									<button id="start-work-now" type="button" class="wt-btn"
+										hx-get={% url 'resolution:proposal_start_work' %}
+										hx-include="input[name='product']"
+										hx-target="#jobloaded">
+										Start Work
+									</button>
+								</div>
+								
+								{% elif product.purchase.client %}
+								<div class="wt-updatall">
+									<span>Team founder has not started work Yet. Please check back or contact them</span>
+									<button class="wt-btn">Pending Team Action</button>
+								</div>
+								{% endif %}
+								
+								{% endif %} 
+								</div>
+							
+							{% if task %}
+							<div class="row justify-content-md-center">
+								<div class="wt-sectionhead wt-textcenter">
+									<div id="startwork-timer" style="color: green; font-weight: bold; display: none;">{{ duration_end_time|date:"M d, Y H:m:s"}} </div>
+									<div class="alert alert-info" role="alert">
+										<strong>Expires In: </strong>{{ duration_end_time|date:"M d, Y H:m:s"}}<span id="duration-countdown-timer" style="color: green; font-weight: bold;"></span>
+									</div>
+								</div>
+							</div>
+							<section class="wt-haslayout wt-dbsectionspace wt-padding-add-top wt-moredetailsholder">
+								<div class="row">
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<figure>
+												<svg xmlns="http://www.w3.org/2000/svg" width="50" style="color:green" height="50" fill="currentColor" class="bi bi-hourglass-top" viewBox="0 0 16 16">
+													<path d="M2 14.5a.5.5 0 0 0 .5.5h11a.5.5 0 1 0 0-1h-1v-1a4.5 4.5 0 0 0-2.557-4.06c-.29-.139-.443-.377-.443-.59v-.7c0-.213.154-.451.443-.59A4.5 4.5 0 0 0 12.5 3V2h1a.5.5 0 0 0 0-1h-11a.5.5 0 0 0 0 1h1v1a4.5 4.5 0 0 0 2.557 4.06c.29.139.443.377.443.59v.7c0 .213-.154.451-.443.59A4.5 4.5 0 0 0 3.5 13v1h-1a.5.5 0 0 0-.5.5zm2.5-.5v-1a3.5 3.5 0 0 1 1.989-3.158c.533-.256 1.011-.79 1.011-1.491v-.702s.18.101.5.101.5-.1.5-.1v.7c0 .701.478 1.236 1.011 1.492A3.5 3.5 0 0 1 11.5 13v1h-7z"/>
+												</svg>
+											</figure>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													
+													<h3 id="days" style="color:green">0</h3>
+													<span>Days</span>
+													
+												</div>													
+											</div>	
+										</div>
+									</div>
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<figure>
+												<svg xmlns="http://www.w3.org/2000/svg" width="50" style="color:blue" height="50" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16">
+													<path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2h-7zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48V8.35zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+												</svg>
+											</figure>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<h3 id="hours" style="color:green">0</h3>
+													<span>Hours</span>
+												</div>													
+											</div>	
+										</div>
+									</div>												
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<figure>
+												<svg xmlns="http://www.w3.org/2000/svg" width="50" style="color:violet" height="50" fill="currentColor" class="bi bi-hourglass-bottom" viewBox="0 0 16 16">
+													<path d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5zm2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2h-7z"/>
+												</svg>
+											</figure>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<h3 id="minutes" style="color:violet">0</h3>
+													<span>Minutes</span>
+												</div>													
+											</div>	
+										</div>
+									</div>	
+									<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+										<div class="wt-insightsitem wt-dashboardbox wt-box-shadow">
+											<figure>
+												<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" style="color:red" fill="currentColor" class="bi bi-alarm" viewBox="0 0 16 16">
+													<path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5z"/>
+													<path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1h-3zm1.038 3.018a6.093 6.093 0 0 1 .924 0 6 6 0 1 1-.924 0zM0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5zM13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1z"/>
+												</svg>
+											</figure>
+											<div class="wt-insightdetails">
+												<div class="wt-title">
+													<h3 id="seconds" style="color:red">0</h3>
+													<span>Seconds</span>
+												</div>													
+											</div>	
+										</div>
+									</div>	
+								</div>
+							</section>
+							{% endif %}
+							
+							<div class="wt-sectiontitle">
+								<h3>cancellation Request</h3>
+								<span style="color: green; font-weight: bold;"> We hope both parties could come to terms. <a href="{% url 'proposals:proposal_chat_messages' product.proposal.slug %}" class="btn btn-outline-danger btn-sm"><i class="fa fa-envelope"> Let us Chat</i></a></span>
+							</div>
+							
+							{% if product.cancel_status != 'completed' %}
+								 <div class="container">
+									
+										<div id="proposal-cancelled" class='col-md-12'>
+											{% include 'resolution/component/proposal_cancelled.html' %}
+										</div>
+									
+									
+								</div>
+							{% endif %}
+
+
+							{% comment %} {% endif %} {% endcomment %}
+							<div class="wt-sectiontitle">
+								<span>Latest Applications</span>
+							</div>
+							
+							</div>	<br>
+
+							<div class="wt-sectiontitle">
+								<span>Members Profile</span>
+							</div>
+							
+							<div>
+						</div>
+					</div>
+				</div>
+			</div>
+	</section>	
+	
+<div class="wt-proposalholder">
+	<div class="row justify-content-md-center">
+		<div class="wt-sectionhead wt-textcenter">
+			<span>Copyright @ {{website.site.name}}</span>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+{% block scripts %}
+{% comment %} 
+<script>
+	function jobStarted() {
+		console.log('Job now started')
+		swal("Perfect!", 'Start tracking progress', "success").then((value) =>{
+			window.location.href = '';
+		});
+		
+	};
+	function jobNotStarted() {
+		console.log('Job NOT started')
+		swal("Perfect!", 'Job not Started. Try again', "error");
+	}
+</script> {% endcomment %}
+
+{% if product.status == 'ongoing' %}
+<script src={% static 'js/startwork.js' %} ></script>
+{% endif %}
+{% endblock %}
+				
+

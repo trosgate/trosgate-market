@@ -1,8 +1,13 @@
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnvironment
 import requests
+import paypalrestsdk
 from payments.models import MerchantAPIs
 from django.conf import settings
 from django.contrib.sites.models import Site
+import requests
+from requests.auth import HTTPBasicAuth
+import json
+
 
 
 class PayPalClientConfig:
@@ -10,6 +15,7 @@ class PayPalClientConfig:
         self.name = 'paypal'
         self.mysite = Site.objects.get_current()
         self.site = self.mysite.merchant
+
 
     def get_payment_gateway(self):
         merchant = MerchantAPIs.objects.filter(merchant=self.site, paypal_active=True).first()
@@ -99,6 +105,117 @@ class PayPalClientConfig:
             raise Exception(f'Failed to capture payment with PayPal: {response.text}')
 
 
+    def create_paypal_plan(subscription): #This assumes Restsdk and that i have a model object
+        paypalrestsdk.configure({
+            'mode': settings.PAYPAL_MODE,
+            'client_id': settings.PAYPAL_CLIENT_ID,
+            'client_secret': settings.PAYPAL_CLIENT_SECRET,
+        })
+
+        plan = paypalrestsdk.Plan({
+            "name": subscription.name,
+            "description": subscription.description,
+            "type": "fixed",
+            "payment_definitions": [
+                {
+                    "name": "Regular payment definition",
+                    "type": "REGULAR",
+                    "frequency": "MONTH",
+                    "frequency_interval": "1",
+                    "amount": {
+                        "currency": "USD",
+                        "value": str(subscription.price),
+                    },
+                    "cycles": "0",
+                }
+            ],
+            "merchant_preferences": {
+                "return_url": "http://your-return-url.com",
+                "cancel_url": "http://your-cancel-url.com",
+                "auto_bill_amount": "YES",
+                "initial_fail_amount_action": "CONTINUE",
+                "max_fail_attempts": "2",
+            },
+        })
+
+        if plan.create():
+            subscription.paypal_plan_id = plan.id
+            subscription.save()
+            return plan
+        else:
+            return None
+
+
+    def get_approval_url(plan):
+        for link in plan.links:
+            if link.rel == "approval_url":
+                return link.href
+
+        return None
+
+
+    def create_paypal_plan(plan_name, description, price):
+        url = 'https://api.sandbox.paypal.com/v1/billing/plans'  
+        # Use 'https://api.paypal.com/v1/billing/plans' for live mode
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        # REMEMBER TO CHANGE HTTPBasicAuth TO AUTHORIZATION IMPLEMENTED ABOVE
+        auth = HTTPBasicAuth('YOUR_PAYPAL_CLIENT_ID', 'YOUR_PAYPAL_CLIENT_SECRET')
+
+        data = {
+            # "product_id": "PROD-PRODUCT_ID",  # Replace with your product ID
+            "name": plan_name,
+            "description": description,
+            "billing_cycles": [
+                {
+                    "frequency": {
+                        "interval_unit": "MONTH",
+                        "interval_count": 1
+                    },
+                    "tenure_type": "REGULAR",
+                    "sequence": 1,
+                    "total_cycles": 0,
+                    "pricing_scheme": {
+                        "fixed_price": {
+                            "value": price,
+                            "currency_code": "USD"
+                        }
+                    }
+                }
+            ],
+            "payment_preferences": {
+                "auto_bill_outstanding": True,
+                "setup_fee": {
+                    "value": "0",
+                    "currency_code": "USD"
+                },
+                "setup_fee_failure_action": "CONTINUE",
+                "payment_failure_threshold": 3
+            },
+            "taxes": {
+                "percentage": "0",
+                "inclusive": False
+            }
+        }
+
+        response = requests.post(url, headers=headers, data=json.dumps(data), auth=auth)
+        if response.status_code == 201:
+            plan_id = response.json()['id']
+            return plan_id
+        else:
+            raise Exception(f'Failed to create PayPal plan: {response.text}')
+
+
+    # Example usage:
+    # plan_name = "Monthly Plan"
+    # description = "Monthly subscription plan"
+    # price = "9.99"
+
+    # plan_id = create_paypal_plan(plan_name, description, price)
+    # print(f"Created PayPal plan with ID: {plan_id}")
+
+
     def create_subscription(self, plan_id, quantity=1):
         url = f'{self.get_base_url()}/v1/billing/subscriptions'
         headers = {
@@ -127,6 +244,7 @@ class PayPalClientConfig:
             return True
         else:
             raise Exception(f'Failed to cancel subscription with PayPal: {response.text}')
+
 
     def refund_payment(self, sale_id, amount, currency='USD', note=''):
         url = f'{self.get_base_url()}/v2/payments/captures/{sale_id}/refund'

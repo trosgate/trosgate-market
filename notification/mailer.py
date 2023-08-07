@@ -15,6 +15,8 @@ from general_settings.utilities import (
     get_youtube_path, 
     get_twitter_path
 )
+from django.contrib.sites.models import Site
+
 
 #
 # Utility function for sending Test email using celery
@@ -108,19 +110,22 @@ def application_notification(application):
 
 
 #Yet to test this.....................................
-def credit_pending_balance_email(account, paid_amount, purchase):
+def credit_pending_balance_email(account, paid_amount, purchase_model, purchase):
     # Blueprint for sending mail when checkout is complete
+    # site = Site.objects.get_current()
+    # merchant = account.merchant
+    product = purchase_model.capitalize()
     from_email = get_from_email()
-    subject = f'Congrats. Your proposal was purchased'
-    preview = f'Proposal paid for {paid_amount}'
-    text_content = f'A New Checkout was paid_amount.'
+    subject = f'Congrats. Your {product} was purchased'
+    preview = f'Your {product} paid on {account.merchant.site.name}'
+    text_content = f'Your {product} was purchased on {account.merchant.site.name}'
     html_content = render_to_string('notification/credit_pending_balance_for_sales.html', {
         'subject': subject,
         'preview': preview,
         'account': account,
         'purchase': purchase,
+        'product': product,
         'paid_amount': paid_amount,
-        # 'mywebsite': website(),
         'website_name': website_name(),
         'protocol_with_domain': get_protocol_with_domain_path(),
         'instagram_path': get_instagram_path(),

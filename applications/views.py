@@ -28,7 +28,9 @@ from general_settings.forms import CurrencyForm
 from django.views.decorators.csrf import csrf_exempt
 from transactions.models import Purchase, ApplicationSale, ProposalSale, ContractSale
 from paypalcheckoutsdk.orders import OrdersGetRequest
-from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
+from payments.paypal import PayPalClientConfig
+from payments.stripe import StripeClientConfig
+from general_settings.gateways import FlutterwaveClientConfig, RazorpayClientConfig
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_control

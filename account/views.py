@@ -10,6 +10,7 @@ from django.contrib import auth, messages
 from .forms import SearchTypeForm, MerchantRegisterForm, CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer, Country, Package, Merchant, TwoFactorAuth
+from teams.models import Package as Plan
 from proposals.models import Proposal
 from teams.models import Invitation, Team
 from teams.forms import TeamCreationForm
@@ -152,13 +153,17 @@ def searchtype(request):
         return JsonResponse({'searchvalue':searchvalue})
 
 
-# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def loginView(request):
 
     # Admin is exempted from two step verification via sms
-    # Otherwise if there is server error in sms sending, admin is also lock out 
+    # Otherwise if there is bug in mail sending, admin is also lock out 
     # TODO to have a token authenticator separate for admin and staffs
-    #  
+    #
+    if request.user.is_authenticated:
+        messages.info(request, f'Welcome back {request.user.short_name}')
+        return redirect('account:dashboard')
+      
     session = request.session
     loginform = UserLoginForm(request.POST or None)
     if request.method == 'POST':
@@ -204,14 +209,12 @@ def loginView(request):
                 return redirect('account:dashboard')
 
             elif user.is_merchant and get_sms_feature():
-                print(user.site, request.site)
                 if "twofactoruser" not in session:
                     session["twofactoruser"] = {"user_pk": user.pk}
                     session.modified = True
                     return redirect('account:two_factor_auth')
 
                 return redirect('account:two_factor_auth')
-
 
             elif user.is_merchant and not get_sms_feature():
                 
@@ -220,6 +223,7 @@ def loginView(request):
                 messages.info(request, f'Welcome back {user.get_short_name()}')
 
                 return redirect('account:dashboard')  
+            
             else:
                 messages.error(request, f'Invalid email or Password.')
 
@@ -237,36 +241,6 @@ def loginView(request):
         return render(request, "account/merchant_login.html", context)
 
 
-# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-# def loginView(request):
-
-#     # Admin is exempted from two step verification via sms
-#     # Otherwise if there is server error in sms sending, admin is also lock out 
-#     # TODO to have a token authenticator separate for admin and staffs
-#     #  
-
-#     loginform = UserLoginForm(request.POST or None)
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
-        
-#         if not Customer.objects.filter(email=email).exists():
-#             messages.error(request, f'Invalid email or password!')  
-
-#         else:
-#             user = authenticate(request, email=email, password=password)
-#             auth_backend = CustomAuthBackend()
-#             return auth_backend.user_type_redirect(request, user)
-        
-#     else:
-#         loginform = UserLoginForm()
-
-#     context = {
-#         'loginform': loginform
-#     }
-#     return render(request, "account/login.html", context)
-
-
 def two_factor_auth(request):
 
     if "twofactoruser" not in request.session:
@@ -274,7 +248,6 @@ def two_factor_auth(request):
 
     try:
         returned_user_pk = request.session["twofactoruser"]["user_pk"]
-        print('returned_user_pk', returned_user_pk)
         returned_user = TwoFactorAuth.objects.get(user__pk=returned_user_pk, user__is_active=True)
         pass_code = returned_user.pass_code
         user = Customer.objects.get(pk=returned_user_pk, is_active=True)
@@ -288,6 +261,7 @@ def two_factor_auth(request):
     if not request.POST:
         try:
             two_factor_auth_mailer(user, pass_code)
+            messages.info(request, f'Token sent to your email')
         except:
             print('Activation token not sent')
    
@@ -298,7 +272,6 @@ def two_factor_auth(request):
             returned_user.save()
 
             login(request, user)
-            # login(request, user, backend='account.backend.CustomAuthBackend')
 
             messages.info(request, f'Welcome back {request.user.get_short_name()}')
 
@@ -429,7 +402,7 @@ def user_dashboard(request):
         teams = request.user.team_member.all().exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
 
-        package=Package.objects.get_or_create(id=1)[0]
+        package=Plan.objects.get_or_create(type=Plan.BASIC)[0]
 
         base_currency = get_base_currency_symbol()
 

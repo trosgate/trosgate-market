@@ -17,7 +17,9 @@ from django.contrib.auth.decorators import login_required
 from account.fund_exception import FundException
 from payments.models import PaymentGateway
 from paypalcheckoutsdk.orders import OrdersGetRequest
-from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
+from payments.paypal import PayPalClientConfig
+from payments.stripe import StripeClientConfig
+from general_settings.gateways import FlutterwaveClientConfig, RazorpayClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.fund_control import get_min_depositor_balance, get_max_depositor_balance, get_min_deposit, get_max_deposit
 from django.contrib.sites.shortcuts import get_current_site

@@ -10,7 +10,7 @@
     </div>
     <div class="d-flex justify-content-center mb-3">
         <div class="text-center">
-            <a href="{% url 'proposals:create_product_view' proposal.slug %}" class="btn btn-primary btn-sm" target="_blank"> + Digital product</a>
+            <a href="{% url 'proposals:create_product_view' proposal.identifier %}" class="btn btn-primary btn-sm" target="_blank"> + Digital product</a>
         </div>
     </div>
 </div>
@@ -27,7 +27,7 @@
     </div>
     <div class="d-flex justify-content-center mb-3">
         <div class="text-center">
-            <a href="{% url 'proposals:create_product_view' proposal.slug %}" class="btn btn-primary btn-sm" target="_blank">View & Download</a>
+            <a href="{% url 'proposals:product_detail' proposal.slug %}" class="btn btn-primary btn-sm" target="_blank">View & Download</a>
         </div>
     </div>
 </div>

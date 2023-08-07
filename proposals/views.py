@@ -13,13 +13,13 @@ from .forms import (
     ProposalStepThreeForm, 
     ProposalStepFourForm, 
     ProposalChatForm,
-    ProposalStepFourForm
+    ProposalProductForm
 )
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from freelancer.models import Freelancer
-from account.permission import user_is_freelancer
+from account.permission import user_is_freelancer, user_is_client
 from general_settings.models import Category, Skill
 from django.contrib import auth, messages
 from django.views.decorators.cache import cache_control #prevent back button on browser after form submission
@@ -33,7 +33,7 @@ from resolution.reviews import (
     proposal_review_average, 
     contract_review_average,
 )
-from resolution.models import (ApplicationReview, ProposalReview, ContractReview)
+# from resolution.models import (ApplicationReview, ProposalReview, ContractReview)
 from analytics.analytic import (
     proposal_sales_count_by_proposal,
     proposal_sales_count_by_contract,
@@ -46,6 +46,8 @@ from django.http import JsonResponse, FileResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib.sites.shortcuts import get_current_site
+from transactions.hiringbox import HiringBox
+
 
 
 def merchant_proposal(request):
@@ -625,12 +627,27 @@ def proposal_preview(request, short_name, proposal_slug):
 
 
 @login_required
+@user_is_client
+def product_detail(request, proposal_slug):
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, status=Proposal.ACTIVE)
+    products = ProposalProduct.objects.filter(proposal=proposal, status=True).order_by('created_at')
+    base_currency = get_base_currency_symbol()
+    context = {
+        "proposal": proposal,
+        "products": products,
+        'base_currency':base_currency,
+    }
+    
+    return render(request, 'proposals/product_detail.html', context)
+
+
+@login_required
 @user_is_freelancer
-def create_product_view(request, proposal_slug):
+def create_product_view(request, proposal_ref):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
-    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
+    proposal = get_object_or_404(Proposal, identifier=proposal_ref, team=team)
     products = ProposalProduct.objects.filter(proposal=proposal, team=team)
-    productform = ProposalStepFourForm()
+    productform = ProposalProductForm()
     base_currency = get_base_currency_symbol()
     context = {
         "proposal": proposal,
@@ -643,13 +660,49 @@ def create_product_view(request, proposal_slug):
 
 
 @login_required
+@user_is_client
+def add_products(request, proposal_id):
+    proposal = get_object_or_404(Proposal, pk=proposal_id, status=Proposal.ACTIVE)
+    product_ids = request.GET.getlist('products[]')
+    # product = get_object_or_404(ProposalProduct, proposal=proposal, pk=product_id, status=True)
+    # print('product_id ::', product_ids)
+
+    hiringbox = HiringBox(request)
+    session = request.session
+    selected_session = session.get('selected_product', {})
+    print('BEFORE ::',selected_session)
+
+    for product_id in product_ids:
+        products = ProposalProduct.objects.filter(proposal=proposal, id=int(product_id)).first()
+        # if products is not None and f'proposal_product' not in session:
+
+        #     selected_session['proposal_product']['product_id'] = products.id
+        #     selected_session['proposal_product']['price'] = products.price
+        #     session.modified = True
+
+        if products is not None:
+            hiringbox.add_product(products)
+            print(hiringbox.add_product(products))
+
+    # selected_session = hiringbox.get_products()
+    # products_price = hiringbox.get_products_price()
+    # print('AFTER ::',selected_session)
+    # print('TOTAL ::',products_price)
+
+    
+    # print('selected_product ::', selected_product)
+    
+    return JsonResponse({'totalprice':10})
+
+
+@login_required
 @user_is_freelancer
 def add_product_attachment(request, proposal_id):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
     proposal = get_object_or_404(Proposal, pk=proposal_id, team=team)
     
     if request.method == 'POST':
-        productform = ProposalStepFourForm(request.POST or None, request.FILES or None)
+        productform = ProposalProductForm(request.POST or None, request.FILES or None)
         if productform.is_valid():
             product = productform.save(commit=False)
             product.proposal = proposal
@@ -658,8 +711,10 @@ def add_product_attachment(request, proposal_id):
             product.merchant=request.merchant.merchant
             product.save()
 
-            proposal.digital = True
-            proposal.save()
+            if proposal.digital == False:
+                proposal.digital = True
+                proposal.save()
+
             context = {
                 "proposal": proposal,
                 "productform": productform,
@@ -667,13 +722,35 @@ def add_product_attachment(request, proposal_id):
             }
             return render(request, 'proposals/partials/list_product.html', context)
 
-    productform = ProposalStepFourForm()
+    productform = ProposalProductForm()
     context = {
         "proposal": proposal,
         "productform": productform
     }
     
     return render(request, 'proposals/partials/create_product.html', context)
+
+
+@login_required
+@user_is_freelancer
+def product_update(request, proposal_slug, product_id):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+    proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
+    product = get_object_or_404(ProposalProduct, proposal=proposal, pk=product_id)
+    
+    if product.status == True:
+        product.status = False
+        product.save()
+    else:
+        product.status = True
+        product.save()
+
+    context = {
+        'proposal':proposal,
+        'product':product,
+    }
+    return render(request, 'proposals/partials/list_product.html', context)
+    # return redirect('proposals:create_product_view', proposal_slug=proposal.slug)
 
 
 @login_required
@@ -695,16 +772,16 @@ def proposal_detail(request, short_name, proposal_slug):
     other_proposals = Proposal.active.exclude(pk=proposal.id)[:4]    
     team_members = proposal.team.members.all()
 
-    proposal_review_msg = ProposalReview.objects.filter(
-        resolution__proposal_sale__proposal__team=proposal.team, 
-        resolution__proposal_sale__proposal=proposal,
-        status = True
-    )[:15]
+    # proposal_review_msg = ProposalReview.objects.filter(
+    #     resolution__proposal_sale__proposal__team=proposal.team, 
+    #     resolution__proposal_sale__proposal=proposal,
+    #     status = True
+    # )[:15]
 
-    review_status = (proposal_review_msg.count() < 1)
+    # review_status = (proposal_review_msg.count() < 1)
 
-    proposal_review_avg = proposal_review_average(proposal.team, proposal)
-    contract_review_avg = contract_review_average(proposal.team, proposal)
+    # proposal_review_avg = proposal_review_average(proposal.team, proposal)
+    # contract_review_avg = contract_review_average(proposal.team, proposal)
 
     sales_count_by_proposal = proposal_sales_count_by_proposal(proposal.team, proposal)['sales_count']
     sales_count_by_contract = proposal_sales_count_by_contract(proposal.team, proposal)['sales_count'] 
@@ -744,10 +821,10 @@ def proposal_detail(request, short_name, proposal_slug):
         "other_proposals": other_proposals,
         "team_members": team_members,
         "profile_view": profile_view,
-        "proposal_review_avg": proposal_review_avg,
-        "contract_review_avg": contract_review_avg,
-        "proposal_review_msg":proposal_review_msg,
-        "review_status":review_status,
+        # "proposal_review_avg": proposal_review_avg,
+        # "contract_review_avg": contract_review_avg,
+        # "proposal_review_msg":proposal_review_msg,
+        # "review_status":review_status,
         "sesion_proposal":sesion_proposal,
         "all_viewed_proposals":all_viewed_proposals,
     }

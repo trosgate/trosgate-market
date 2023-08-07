@@ -13,10 +13,13 @@ from client.models import ClientAccount
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator, get_external_contract_fee_calculator
 from account.fund_exception import FundException
 from teams.models import Team
-from client.models import ClientAccount
-from resolution.models import ProposalResolution, ProjectResolution, ContractResolution, ExtContractResolution
+from resolution.models import ProposalJob #ProjectResolution, ContractResolution, ExtContractResolution
 from merchants.models import MerchantMaster
 from applications.models import Application
+from datetime import timedelta
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+import uuid
 
 
 class PurchaseMaster(MerchantMaster):
@@ -55,6 +58,7 @@ class Purchase(PurchaseMaster):
     paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, null=True, blank=True)
     paypal_transaction_id = models.CharField(_("PayPal Transaction ID"), max_length=200, null=True, blank=True)
     flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=200, null=True, blank=True)
+    flutterwave_transaction_id = models.CharField(_("Flutterwave Transaction ID"), max_length=200, null=True, blank=True)
     stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=200, null=True, blank=True)
     razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=200, null=True, blank=True)
     razorpay_payment_id = models.CharField(_("Razorpay Payment ID"), max_length=200, null=True, blank=True)
@@ -105,7 +109,7 @@ class Purchase(PurchaseMaster):
             
             ClientAccount.debit_available_balance(user=sales.client, available_balance=sales.salary_paid)
 
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=sales.salary_paid, purchase=purchass)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, paid_amount=sales.salary_paid, purchase=purchass)
         
         return account, sales, purchass
 
@@ -156,7 +160,7 @@ class Purchase(PurchaseMaster):
             selected_contract.reaction = 'paid'
             selected_contract.save()
             
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, purchase=selected_contract)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, paid_amount=purchass.total_earning, purchase=selected_contract)
 
         return account, purchass, selected_contract
 
@@ -207,7 +211,7 @@ class Purchase(PurchaseMaster):
             selected_contract.reaction = 'paid'
             selected_contract.save()
             
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, pending_balance=purchass.total_earning, purchase=selected_contract)
+            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, paid_amount=purchass.total_earning, purchase=selected_contract)
 
         return account, purchass, selected_contract
 
@@ -218,28 +222,39 @@ class Purchase(PurchaseMaster):
             purchase = cls.objects.select_for_update().get(stripe_order_key=stripe_order_key)
             if purchase.status != Purchase.FAILED:
                 raise Exception(_("This purchase already succeeded"))
+
             purchase.status = Purchase.SUCCESS
             purchase.save()
-
+            
             contract = None
             contract_item = None
             
             if purchase.category == Purchase.PROPOSAL:
-                for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
+                for item in ProposalSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROPOSAL,
+                        purchase=item.proposal
+                    )
                     
             if purchase.category == Purchase.PROJECT:
-                for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
+                for item in ApplicationSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROPOSAL, 
+                        purchase=item.project
+                    )
                     project = item.project
                     # applications = Application.objects.filter(project=project)) change the statuses
                     print(project)
                     # print(applications)
 
             if purchase.category == Purchase.CONTRACT:
-                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -247,7 +262,7 @@ class Purchase(PurchaseMaster):
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -270,16 +285,21 @@ class Purchase(PurchaseMaster):
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROPOSAL, 
+                        purchase=item.proposal
+                    )
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -287,7 +307,7 @@ class Purchase(PurchaseMaster):
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -296,31 +316,36 @@ class Purchase(PurchaseMaster):
 
 
     @classmethod
-    def flutterwave_order_confirmation(cls, unique_reference, flutterwave_order_key):
+    def flutterwave_order_confirmation(cls, flutterwave_order_key, flutterwave_transaction_id):
         with db_transaction.atomic():
-            purchase = cls.objects.select_for_update().get(unique_reference=unique_reference)
+            purchase = cls.objects.select_for_update().get(flutterwave_order_key=flutterwave_order_key)
             if purchase.status != Purchase.FAILED:
                 raise Exception(_("This purchase already succeeded"))
 
             purchase.status = Purchase.SUCCESS
-            purchase.flutterwave_order_key = flutterwave_order_key
+            purchase.flutterwave_transaction_id = flutterwave_transaction_id
             purchase.save()
 
             contract = None
             contract_item = None
 
             if purchase.category == Purchase.PROPOSAL:
-                for item in ProposalSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
+                for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROPOSAL, 
+                        purchase=item.proposal
+                    )
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -328,7 +353,7 @@ class Purchase(PurchaseMaster):
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -353,16 +378,21 @@ class Purchase(PurchaseMaster):
 
             if purchase.category == Purchase.PROPOSAL:
                 for item in ProposalSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.proposal)
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROPOSAL,
+                        purchase=item.proposal
+                    )
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, pending_balance=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -370,7 +400,7 @@ class Purchase(PurchaseMaster):
             if purchase.category == Purchase.EX_CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, pending_balance=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
@@ -379,6 +409,45 @@ class Purchase(PurchaseMaster):
 
 
 class MerchantTransaction(MerchantMaster):
+    PENDING = 'pending'
+    ONGOING = 'ongoing'
+    DISPUTED = 'disputed'
+    CANCELLED = 'cancelled'
+    COMPLETED = 'completed'
+    STATUS_CHOICES = (
+        (PENDING, _("Not Started")),
+        (ONGOING, _("Ongoing")),
+        (DISPUTED, _("Disputed")),
+        (CANCELLED, _("Cancelled")),
+        (COMPLETED, _("Completed")),
+    )
+
+    # Cancel Reasons
+    EXCEEDED_DEADLINE = 'deadline_exceeded'
+    WORK_ABANDONED = 'user_abandoned_work'
+    USER_NOT_RESPONDING = 'user_not_responding'
+    USER_IS_ABUSIVE = 'user_is_abusive'
+    ORDERED_WRONG_PRODUCT = 'ordered_wrong_product'
+    DIFFERENT_PRODUCT_DELIVERED = 'different_product_delivered'
+    CANCELLATION_TYPE = (
+        (EXCEEDED_DEADLINE, 'Deadline Exceeded'),
+        (WORK_ABANDONED, 'Work Abandoned'),
+        (USER_NOT_RESPONDING, 'Client not Responding to Chat'),
+        (USER_IS_ABUSIVE, 'User is Abusive'),
+        (ORDERED_WRONG_PRODUCT, 'Wrong Product Ordered'),
+        (DIFFERENT_PRODUCT_DELIVERED, 'A different service/product submitted')
+    )
+
+    # Cancel Choices
+    NOT_CANCELLED = 'not_cancelled'
+    INITIATED = 'initiated'
+    APPROVED = 'approved'
+    CANCEL_CHOICES = (
+        (NOT_CANCELLED, 'Not cancelled'),
+        (INITIATED, 'Initiated'),
+        (APPROVED, 'Approved')
+    )    
+
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"), default=0)
@@ -394,7 +463,30 @@ class MerchantTransaction(MerchantMaster):
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
+    start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
+    end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)   
+    status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=PENDING)
 
+    # Job cancellation
+    cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, blank=True, null=True)
+    cancel_status = models.CharField(_("Status"), max_length=100, choices=CANCEL_CHOICES, default=NOT_CANCELLED)
+    cancel_message = models.TextField(_("Additional Message"), max_length=500, blank=True, null=True)
+    cancelled_at = models.DateTimeField(_("Cancelled On"), auto_now_add=False, auto_now=False, blank=True, null=True)
+
+
+    # reference = models.CharField(max_length=20, unique=True, editable=False)
+
+
+    def generate_reference_number(self):
+        # Customize this method to generate your desired reference number
+        # For example, you can combine a prefix, date, and a unique identifier
+        # to create a human-readable reference number.
+        # prefix = "TRANS"
+        # date_part = timezone.now().strftime("%Y%m%d")
+        unique_id = str(uuid.uuid4().fields[-1])[:5]  # Take the last part of the UUID as a string
+        # return f"{prefix}-{date_part}-{unique_id}"
+        return f"{unique_id}"
+   
     class Meta:
         abstract = True
 
@@ -435,6 +527,13 @@ class ProposalSale(MerchantTransaction):
         else:
             self.revision = self.proposal.revision
             self.duration = self.proposal.duration
+
+        if self.status != self.PENDING and self.start_time is None:
+            self.start_time = timezone.now()
+
+        if self.status != self.PENDING and self.end_time is None:
+            self.end_time = (timezone.now() + timedelta(days = self.duration))
+
         super(ProposalSale, self).save(*args, **kwargs)
 
 
@@ -462,6 +561,21 @@ class ProposalSale(MerchantTransaction):
     def status_value(self):
         return self.purchase.get_status_display()
 
+    def get_absolute_url(self):
+        return reverse('resolution:proposal_resolution', kwargs={'product_id': self.pk, 'product_slug':self.proposal.slug})
+
+    @classmethod
+    def start_task(cls, pk:int):
+        with db_transaction.atomic():  
+            product = cls.objects.select_for_update().get(pk=pk)
+            product.status = ProposalSale.ONGOING
+            product.save()
+
+            task = ProposalJob.objects.get_or_create(product=product)[0]
+
+        return task, product
+
+
     @classmethod
     def proposal_refund(cls, pk:int):
         with db_transaction.atomic():
@@ -470,7 +584,7 @@ class ProposalSale(MerchantTransaction):
             freelancer = FreelancerAccount.objects.select_for_update().get(user=proposal_sale.team.created_by)
             
             try:
-                resolution = ProposalResolution.objects.select_for_update().get(proposal_sale=proposal_sale)            
+                resolution = ProposalJob.objects.select_for_update().get(proposal_sale=proposal_sale)            
             except:
                 raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
             
@@ -480,10 +594,10 @@ class ProposalSale(MerchantTransaction):
             # if proposal_sale.purchase.status != Purchase.SUCCESS:
             #     raise Exception(_("You cannot issue refund for a failed transaction"))
 
-            if resolution.status == ProposalResolution.COMPLETED:
+            if resolution.status == ProposalJob.COMPLETED:
                 raise Exception(_("This transaction was completed and closed so cannot be refunded"))
 
-            resolution.status = ProposalResolution.CANCELLED
+            resolution.status = ProposalJob.CANCELLED
             resolution.save()
 
             proposal_sale.is_refunded = True

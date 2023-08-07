@@ -103,14 +103,14 @@ class PurchaseAdmin(admin.ModelAdmin):
     list_filter = ['category', 'status']
     readonly_fields = [
         'client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',
-        'paypal_order_key', 'paypal_transaction_id', 'stripe_order_key', 'flutterwave_order_key','razorpay_order_key', 
-        'razorpay_payment_id', 'razorpay_signature'
+        'paypal_order_key', 'paypal_transaction_id', 'stripe_order_key', 'flutterwave_order_key','flutterwave_transaction_id',
+        'razorpay_order_key', 'razorpay_payment_id', 'razorpay_signature'
         ]  
     fieldsets = (
         ('Transaction Details', {'fields': ('client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',)}),
         ('PayPal Payment Mode (If PayPal was used)', {'fields': ('paypal_transaction_id',)}),
         ('Stripe Payment Mode (If Stripe was used)', {'fields': ('stripe_order_key',)}),
-        ('Flutterwave Payment Mode (If Flutterwave was used)', {'fields': ('flutterwave_order_key',)}),
+        ('Flutterwave Payment Mode (If Flutterwave was used)', {'fields': ('flutterwave_order_key','flutterwave_transaction_id',)}),
         ('Razorpay Payment Mode (If Razorpay was used)', {'fields': ('razorpay_order_key', 'razorpay_payment_id', 'razorpay_signature',)}),
     )
 
@@ -224,7 +224,8 @@ class ProposalSaleAdmin(admin.ModelAdmin):
     search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
         'team', 'purchase','proposal', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
-        'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged'
+        'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged', #'start_time', 'end_time', 'status',
+        'package_name','revision','duration',
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','proposal',)}),
@@ -234,6 +235,7 @@ class ProposalSaleAdmin(admin.ModelAdmin):
         )}),
         ('Earning/Profit', {'fields': ('staff_hired','earning','total_earning',)}),
         ('Product Attributes', {'fields': ('package_name','revision','duration',)}),
+        ('Transaction Manager', {'fields': ( 'start_time', 'end_time', 'status')}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 

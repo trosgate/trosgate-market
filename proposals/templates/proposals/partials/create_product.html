@@ -2,23 +2,28 @@
     hx-swap="beforeend" hx-on="htmx:afterRequest: this.remove()"
     hx-trigger="click from:#submit-all">
     <div class="row justify-content-between">
-        <div class="col-4 col-md-3">
+        <div class="col-md-4">
             {{productform.attachment.label}}
             {{productform.attachment}}
             <span style="color:red;" role="alert">{{productform.attachment.errors}}</span>	
         </div>
-        <div class="col-4 col-md-3">
+        <div class="col-md-2">
             {{productform.product_type.label}}
             {{productform.product_type}}
             <span style="color:red;" role="alert">{{productform.product_type.errors}}</span>
         </div>
-        <div class="col-4 col-md-3">
+        <div class="col-md-2">
+            {{productform.price.label}}
+            {{productform.price}}
+            <span style="color:red;" role="alert">{{productform.price.errors}}</span>
+        </div>
+        <div class="col-md-2">
             {{productform.status.label}}
             {{productform.status}}
             {{productform.status.errors}}
             <span style="color:red;" role="alert">{{productform.status.errors}}</span>
         </div>
-        <div class="col-3 allign-self-end"><br>
+        <div class="col-md-2 allign-self-end"><br>
             <button type="button" class="btn btn-danger"
                 hx-on="click: this.closest('form').remove()">
                 Remove

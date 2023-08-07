@@ -6,9 +6,9 @@
             hx-get="{% url 'proposals:pricing_type' %}"
             hx-target="#pricingPlanBtn"
             {% if pricing_type_data %}
-            style="width:20%; background-color:green; font-weight: bold; border-radius:10%;"
+            style="background-color:green; font-weight: bold; border-radius:20%;"
             {% else %}
-            style="width:20%; background-color:blue; font-weight: bold; border-radius:10%;"
+            style="background-color:blue; font-weight: bold; border-radius:20%;"
             {% endif %}
             >
             {% if pricing_type_data %}

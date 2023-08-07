@@ -1,0 +1,47 @@
+	{% comment %} Modal section for 1 Click Checkout {% endcomment %}
+	<div class="wt-uploadimages modal fade" id="oneClickProposalCheckout" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="wt-modaldialog modal-dialog" role="document">
+			<div class="wt-modalcontent modal-content">
+				<div class="wt-boxtitle">
+					<h2><i class=" wt-btncancel fa fa-times" data-dismiss="modal" aria-label="Close"></i></h2>
+				</div>
+
+				<div class="wt-modalbody modal-body">
+					<div class="text-left">
+						<div class="wt-sectiontitle">
+							<span style="font-weight:bold; text-decoration: none;">
+                                {% if request.user.freelancer %}
+                                Have Digital Product?
+                                {% elif request.user.clients %}
+                                Need Instant Product?
+                                {% endif %}
+                            </span>
+						</div>
+						
+					
+					{% if request.user in active_team.members.all %}
+                        <div class="justify-content-center mb-3">
+                            <div class="text-center mb-3">
+                                <span>Some buyers want it instant. if this service can have already-made product, then why not give them opportunity to make instant purchase.</span>
+                            </div>
+                            <div class="text-center">
+                                <a href="{% url 'proposals:create_product_view' proposal.identifier %}" class="btn btn-primary btn-sm" target="_blank"> + Digital product</a>
+                            </div>
+                        </div>
+                        
+                    {% endif %}
+                    {% if request.user.clients %}
+                        <div class="justify-content-center">
+                            <div class="text-center mb-3">
+                                <span>Don't worry if it's urgent. Get end-product of this service for instant purchase.</span>
+                            </div>
+                            <div class="text-center">
+                                <a href="{% url 'proposals:product_detail' proposal.slug %}" class="btn btn-primary btn-sm" target="_blank">View & Download</a>
+                            </div>
+                        </div>
+                        
+                    {% endif %}
+				</div>
+			</div>
+		</div>
+	</div>

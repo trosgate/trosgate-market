@@ -13,7 +13,7 @@
     </div>
     {% if request.user.clients %}
     <div class="d-flex justify-content-center">
-        <span class="addon-header">Add-On</span>
+        <span style="font-weight:bold;">Add-On</span>
     </div>
     <div class="d-flex justify-content-between mb-3">
         <span>Available Staffs</span><i class="text-primary pt-1"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</i>
@@ -36,9 +36,6 @@
         </div>
     </form>
     <div class="proposal-action">
-        <button class="btn btn-info btn-block proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Instant Hire <i class="fa fa-info badge badge-success" hx-on="click: window.confirm('this is the total messages')"></i></button>
-    </div>
-    <div class="proposal-action">
         <button id="packageBasic" type="button" class="btn btn-info proposal-btn-state">Continue Basic</button>
     </div>
     
@@ -59,7 +56,7 @@
     </div>
     {% if request.user.clients %}
     <div class="d-flex justify-content-center">
-        <span class="addon-header">Add-On</span>
+        <span style="font-weight:bold;">Add-On</span>
     </div>
     <div class="d-flex justify-content-between mb-3">
         <span>Available Staffs</span><i class="text-primary pt-1"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</i>
@@ -83,9 +80,6 @@
     </form>
 
     <div class="proposal-action">
-        <button class="btn btn-info btn-block proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Instant Hire <i class="fa fa-info badge badge-success"  hx-on="click: window.confirm('this is the total messages')"></i></button>
-    </div>
-    <div class="proposal-action">
         <button id="packageStandard" type="button" class="btn btn-info proposal-btn-state">Continue Standard</button>
     </div>
     {% endif %} 
@@ -105,7 +99,7 @@
     </div>
     {% if request.user.clients %}
     <div class="d-flex justify-content-center">
-        <span class="addon-header">Add-On</span>
+        <span style="font-weight:bold;">Add-On</span>
     </div>
     <div class="d-flex justify-content-between mb-3">
         <span>Available Staffs</span><i class="text-primary pt-1"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</i>
@@ -129,15 +123,10 @@
     </form>
     
     <div class="proposal-action">
-        <button class="btn btn-info btn-block proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Instant Hire <i class="fa fa-info badge badge-success" hx-on="click: window.confirm('this is the total messages')"></i></button>
-    </div>
-    <div class="proposal-action">
         <button  id="packagePremium" type="button" class="btn btn-info proposal-btn-state">Continue Premium</button>
     </div>
     {% endif %}
 </div>
-{% include 'proposals/partials/product_advert.html' %}
-
 
 
 

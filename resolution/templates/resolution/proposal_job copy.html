@@ -309,7 +309,11 @@
 						</div>
 					</div>
 				</div>
-				<div id="confirm-cancelled" hx-get='{% url "resolution:remove_message" %}' hx-trigger='load delay:3s'></div>
+				<div id="confirm-cancelled" 
+					hx-get='' 
+					{% comment %} {% url "resolution:remove_message" %} {% endcomment %}
+					hx-trigger='load delay:3s'>
+				</div>
 				
 				<div class="row">
 					<div id="proposal-cancelled" class='col-md-6'>

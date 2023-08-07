@@ -153,7 +153,7 @@ class ProposalStepFourForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['skill'].widget.attrs['class'] = 'form-control chosen-select Skills'
+        self.fields['skill'].widget.attrs['class'] = 'chosen-select Skills form-control'
         # self.fields['skill'].widget.attrs['style'] = 'height: 50px;'
         self.fields['thumbnail'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': ''})
@@ -168,11 +168,11 @@ class ProposalStepFourForm(forms.ModelForm):
         return skill_count
 
 
-class ProposalStepFourForm(forms.ModelForm):
+class ProposalProductForm(forms.ModelForm):
     attachment = forms.FileField(widget=forms.FileInput,)
     class Meta:
         model = ProposalProduct
-        fields = ['product_type', 'status', 'attachment']
+        fields = ['product_type', 'price', 'status', 'attachment']
         required = ['product_type', 'status', 'attachment']
         custom_class = ['product_type', 'status']
 
@@ -181,6 +181,9 @@ class ProposalStepFourForm(forms.ModelForm):
 
         self.fields['attachment'].widget.attrs['style'] = 'height: 40px;'
         self.fields['attachment'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': ''})
+        self.fields['price'].widget.attrs['style'] = 'height: 40px;'
+        self.fields['price'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': ''})
 
         for field in self.Meta.required:
@@ -191,7 +194,6 @@ class ProposalStepFourForm(forms.ModelForm):
             {'class': 'form-control custom-select'})
 
    
-
 class ProposalChatForm(forms.ModelForm):
     content = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-6 float-center', 'placeholder': 'send a message',}))
 

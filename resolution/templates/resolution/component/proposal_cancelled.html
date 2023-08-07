@@ -1,63 +1,78 @@
-{% if messages %}
-{% for message in messages %}        
-<span class="wt-jobalerts" hx-get="{% url 'resolution:remove_message' %}" hx-trigger="load delay:3s">
-    <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
-        <span> {{ message}} </span>
-        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
-    </div>
-</span>
-{% endfor %}
-{% endif %}  	
-{% if cancellation_message %}	
-<div class="wt-userlistinghold wt-userlistingsingle wt-bgcolor">
-    <div class="wt-userlistingcontent">
-        <div class="wt-contenthead">
-            <ul class="wt-userlisting-breadcrumb">
-                <li><span><strong>Type:</strong> {{cancellation_message.get_cancel_type_display}}</span></li>
-                <li><span><strong>Status:</strong> {{cancellation_message.get_status_display}}</span></li>
-                <li><span><strong>Date:</strong> {{cancellation_message.created_at|date:'d-m-Y'}}</span></li>
-            </ul>
-        </div>
-    </div>
-    <br>
-    <div> 
-        {{cancellation_message.message|linebreaksbr}}
-    </div>
-    <br>
-    <br>  
-    {% if active_team.created_by == request.user and resolution.status == 'disputed' %}
-    <form> {% csrf_token %}
-    <input type='hidden' name='confirmcancelproposal' value='{{resolution.id}}'/>  
-    <button id="confirmCancellation" 
-        hx-post="{% url 'resolution:confirm_proposal_cancel' %}" 
-        hx-target="#confirm-cancelled"
-        hx-swap='outerhtml'
-        hx-trigger='click' 
-        hx-confirm="Are you sure you want to approve? In that case payment will reverse to client"
-        type="submit" 
-        class="btn btn-success"><i class="fa fa-check"> Approve Now</i>
-    </button>
-    <form> 
-    {% endif %}
-</div>
-{% else %}
-
-<div class="row justify-content-md-center">				
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
-        <div class="wt-dashboardbox">
-            <div class="wt-dashboardboxcontent wt-rcvproposala">
-                <div class="wt-freelancerholder wt-rcvproposalholder">												
-                    <div class="wt-tabscontenttitle">
-                        <h4 class="mb-4">Keep it Going</h4>
-                        <div class="alert alert-info" role="alert">
-                            <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-                                Info: This product is not cancelled. Keep doing great
-                            </span>
-                        </div>
-                    </div>									 
-                </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="a" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <div class='col-md-4'>
+                <span><strong>Type:</strong> {{product.get_cancel_type_display}}</span>
+            </div>
+            <div class='col-md-4'>
+                <span><strong>Status:</strong> {{product.get_cancel_status_display}}</span>
+            </div>
+            <div class='col-md-4'>
+                <span><strong>Date:</strong> {{product.cancelled_at|date:'d-m-Y'}}</span>
             </div>
         </div>
     </div>
 </div>
-{% endif %}
+<div class="row">
+									
+    <div class='col-md-6'>
+        {% if product.cancel_status == 'not_cancelled' %}
+        <div class="alert alert-info" role="alert">
+            <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
+                Info: This product is not cancelled. Keep doing great
+            </span>
+        </div>
+
+        <form id="cancelandclose" class="wt-formtheme wt-formfeedback">
+            {% csrf_token %}
+
+            <input type='hidden' name='resolution' value='{{resolution.id}}'/>
+            <div class="form-group">
+                {{cancellation_form.cancel_type.label}}
+                {{cancellation_form.cancel_type}}
+            </div>
+            <div class="form-group">
+                {{cancellation_form.cancel_message.label}}
+                {{cancellation_form.cancel_message}}
+            </div>
+            <button id="newCancellation" 
+                hx-post=""
+                {% comment %} {% url 'resolution:proposal_cancelled' %} {% endcomment %}
+                hx-target="#proposal-cancelled"
+                hx-confirm="Are you sure you want to cancel?" 
+                type="submit" class="btn btn-danger"><i class="fa fa-ban"> Cancel Now</i>
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    <div class='col-md-6'>
+        <div class="alert alert-info" role="alert">
+            <span style="color: green; font-weight: bold;">
+                Cancellation message
+            </span>
+        </div>
+        {% if product.cancel_status == 'initiated' %}        
+        <form> {% csrf_token %}
+            <input type='hidden' name='confirmcancelproposal' value='{{resolution.id}}'/>  
+            <button id="confirmCancellation" 
+                hx-post=""
+                {% comment %} {% url 'resolution:confirm_proposal_cancel' %}  {% endcomment %}
+                hx-target="#confirm-cancelled"
+                hx-swap='outerhtml'
+                hx-trigger='click' 
+                hx-confirm="Are you sure you want to approve? In that case payment will reverse to client"
+                type="submit" 
+                class="btn btn-success"><i class="fa fa-check"> Approve Now</i>
+            </button>
+        <form>
+        {% endif %}
+        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo nisi cumque porro eos non in doloribus, <br> molestias eaque reiciendis ipsa reprehenderit. Provident, eius dolorum quis laboriosam <br> quia ut molestiae accusamus.</p>
+        {{cancel_message.message|linebreaksbr}}
+        <div class="text-center">
+            <i class="fa fa-question fa-5x"></i>
+        </div> 
+    </div> 
+</div> 
+
+
+

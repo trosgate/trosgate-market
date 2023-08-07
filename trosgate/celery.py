@@ -20,20 +20,15 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 # ### Celery beat settings ### only required if you want to schedule mail at some specific time
 
 app.conf.beat_schedule ={
-    # Will execute everyday 1 minutes interval to update domain file for nginx
-    # 'sync-domains':{
-    #     'task':'sync_domains',
-    #     'schedule': crontab(minute='*/1')
-    # },
-    # # Will execute at 7pm-7pm everyday of the week at an interval of 10min
-    # 'ongoing-tickets-paused-between-7pm-to-11pm':{
-    #     'task':'ongoing_ticket_paused_by_end_of_working_hours',
-    #     'schedule': crontab(minute='*/30', hour='19-23', day_of_week='sun-sat')
-    # },
+#     # Will execute everyday 1 minutes interval to update domain file for nginx
+#     # 'sync-domains':{
+#     #     'task':'sync_domains',
+#     #     'schedule': crontab(minute='*/1')
+#     # },
+#     # # Will execute at 7pm-7pm everyday of the week at an interval of 10min
+#     # 'ongoing-tickets-paused-between-7pm-to-11pm':{
+#     #     'task':'ongoing_ticket_paused_by_end_of_working_hours',
+#     #     'schedule': crontab(minute='*/30', hour='19-23', day_of_week='sun-sat')
+#     # },
 
 }
-
-
-# @app.task(bind = True)
-# def debug_task(self):
-#     print(f'request: {self.request!r}')

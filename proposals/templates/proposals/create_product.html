@@ -69,6 +69,7 @@
 		<div class="container">
 			<div class="wt-tabscontenttitle">
 				<h3>Sell themes, templates and more</h3>
+				<span style='color:blue;'> You can only create one of each product type</span>
 			</div>
 			<div id="digital-product">
 				{% include 'proposals/partials/create_product.html'%}
@@ -90,47 +91,23 @@
 					<tr>
 						<th>Product License</th>
 						<th>Product Type</th>
-						<th>Status</th>
-						<th>Date</th>
 						<th>Price ({{base_currency}})</th>
-						<th>Action</th>
+						<th>Date</th>
+						<th>Pull</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 				
 				<tbody id="products-list">
-		
 					{% for product in products %}
 						{% include 'proposals/partials/list_product.html' %}
 					{% endfor %}
 				</tbody>
 			</table>
-			{% comment %} {% if not products %}
-				<div class="text-center">
-					<span style="font-weight: bold;"> You donnot have any product at the moment</span>
-				</div>
-			{% endif %} {% endcomment %}
+			
 		</div>
-		</div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+	</div>
+
 <br>
 <br>
 	</div>

@@ -13,7 +13,6 @@ from account.fund_exception import GatewayModuleNotFound, GatewayNotConfigured, 
 
 
 
-
 def ref_generator():
     new_unique_reference = ''
     generated_reference = secrets.token_urlsafe(30)[:30]
@@ -75,114 +74,6 @@ class PayPalClientConfig:
         return None
 
 # ------------------> PAYPAL PAYMENT GATEWAY ENDS< ------------------#
-
-# ------------------> STRIPE PAYMENT GATEWAY START< ------------------#
-
-class StripeClientConfig:
-    def __init__(self):
-        self.name = 'stripe'
-        self.currency = 'usd'
-        self.mysite = Site.objects.get_current()
-        self.site = self.mysite.merchant
-
-    def get_payment_gateway(self):
-        merchant = MerchantAPIs.objects.filter(merchant=self.site, stripe_active=True).first()
-        return merchant
-
-    def stripe_public_key(self):
-        gateway = self.get_payment_gateway()
-        if gateway:
-            return gateway.stripe_public_key
-        return None
-
-    def stripe_secret_key(self):
-        gateway = self.get_payment_gateway()
-        if gateway:
-            return gateway.stripe_secret_key
-        return None
-    
-    def stripe_webhook_key(self):
-        gateway = self.get_payment_gateway()
-        if gateway:
-            return gateway.stripe_webhook_key
-        return None
-
-    def get_gateway_status(self):
-        gateway = self.get_payment_gateway()
-        if gateway:
-            return gateway.stripe_sandbox
-        return False
-    
-    def get_gateway_status(self):
-        gateway = self.get_payment_gateway()
-        if gateway:
-            return gateway.stripe_sandbox
-        return False
-
-
-    def tokenize(self, card_number, exp_month, exp_year, cvc):
-        try:
-            token = stripe.Token.create(
-                card={
-                    'object': 'card',
-                    'number': card_number,
-                    'exp_month': exp_month,
-                    'exp_year': exp_year,
-                    'cvc': cvc
-                },
-            )
-            # print('Tokenize :', token)
-            return token
-        except stripe.error.StripeError as error:
-            print(str(error))
-            raise InvalidData(f"Error! {error}")
-
-
-    def checkout(self, amount, card_token):
-
-        try:
-            response = stripe.Charge.create(
-                amount=int(amount * 100),
-                currency= self.currency,
-                source=card_token
-            )
-
-        except (stripe.error.StripeError, stripe.CardError, stripe.InvalidRequestError) as e:
-            raise InvalidData(f"Error! {e}")
-
-        return response
-    
-         
-# class StripeClientConfig:
-#     def __init__(self):
-#         print('Stripe')
-
-#     def stripe_public_key(self):
-#         try:
-#             return PaymentGateway.objects.get(name='stripe').public_key 
-#         except:
-#             return None
-
-#     def stripe_secret_key(self):
-#         try:
-#             return PaymentGateway.objects.get(name='stripe').secret_key 
-#         except:
-#             return None
-
-#     def stripe_webhook_key(self):
-#         try:
-#             return PaymentGateway.objects.get(name='stripe').webhook_key 
-#         except:
-#             return None    
-
-#     def stripe_subscription_price_id(self):
-#         try:
-#             return PaymentGateway.objects.get(name='stripe').subscription_price_id 
-#         except:
-#             return None 
-
-
-# ------------------> STRIPE PAYMENT GATEWAY ENDS< ------------------#
 
 
 # ------------------> FLUTTERWAVE PAYMENT GATEWAY START< ------------------#

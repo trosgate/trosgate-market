@@ -20,7 +20,12 @@ from .contract import BaseContract
 from django.views.decorators.csrf import csrf_exempt
 from transactions.models import Purchase, ContractSale, ExtContract
 from paypalcheckoutsdk.orders import OrdersGetRequest
-from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
+from general_settings.gateways import (
+    FlutterwaveClientConfig, 
+    RazorpayClientConfig
+)
+from payments.paypal import PayPalClientConfig
+from payments.stripe import StripeClientConfig
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.fees_and_charges import get_contract_fee_calculator,get_external_contract_gross_earning, get_external_contract_fee_calculator

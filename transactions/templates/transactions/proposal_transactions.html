@@ -68,9 +68,7 @@
 							<th>Team</th>
 							<th>Purchase Date</th>
 							<th>Method</th>
-							<th>Purchase</th>
-							<th>Hired</th>
-							<th>Total</th>
+							<th>Purchase ({{base_currency}}) </th>
 							<th>Manager</th>
 						</tr>
 					</thead>
@@ -82,9 +80,7 @@
 							<td>{{proposal.proposal.team|capfirst}}</td>
 							<td>{{proposal.created_at}}</td>
 							<td>{{proposal.purchase.payment_method|capfirst}}</td>
-							<td>{{proposal.disc_sales_price}}</td>
-							<td>{{proposal.staff_hired}}</td>
-							<td>{{proposal.total_sales_price}}</td>     
+							<td>{{proposal.total_sales_price}} = ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td>      
 							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Manage</button></a></td>
 						</tr>
 						{% endfor %}

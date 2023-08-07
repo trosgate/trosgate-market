@@ -171,33 +171,38 @@ class Proposal(MerchantProduct):
 
 
 class ProposalProduct(MerchantMaster):
-
-    BASIC = 'basic'
-    PREMIUM = 'premium'
-    PRODUCT_TYPE = (
-        (BASIC, _("Basic")),
-        (PREMIUM, _("Premium")),
-    )
     id = models.AutoField(primary_key=True),
     license = models.URLField(editable=False, unique=True, default=uuid.uuid4, verbose_name='Product License')    
     team = models.ForeignKey('teams.Team', verbose_name=_("Product Team"), on_delete=models.CASCADE)
     proposal = models.ForeignKey(Proposal, verbose_name=_("Proposal"), on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), on_delete=models.CASCADE)
-    product_type = models.BooleanField(_("Product Type"), choices=((False, 'Free Download'), (True, 'Paid Download')))
+    product_type = models.BooleanField(_("Product Type"), choices=((False, 'Free Download'), (True, 'Premium Download')))
     status = models.BooleanField(_("Status"), choices=((False, 'Not Active'), (True, 'Active')))
-    attachment = models.FileField(_("Attachment"), help_text=_("image must be any of these 'ZIP', 'RAR','JPEG','JPG','PNG','PSD'"), upload_to=product_storage, storage=product_attachment, validators=[FileExtensionValidator(allowed_extensions=['ZIP', 'RAR', 'JPG', 'JPEG', 'PNG', 'PSD'])])
+    attachment = models.FileField(
+        _("Attachment"), 
+        help_text=_("image must be any of these 'ZIP', 'RAR','JPEG','JPG','PNG','PSD'"), 
+        upload_to=product_storage, storage=product_attachment, validators=[FileExtensionValidator(allowed_extensions=['ZIP', 'RAR', 'JPG', 'JPEG', 'PNG', 'PSD'])]
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-
+    price = models.PositiveIntegerField(_("Custom Price"), blank=True, null=True)
     
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('created_at',)
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
+        unique_together = ['product_type', 'proposal']
 
     def __str__(self):
         return f'{self.team.title}'
-            
+
+    def save(self, *args, **kwargs):
+        if self.price is None or self.price == '' and self.product_type == True:
+            self.price = self.proposal.salary
+        if self.product_type == False:
+            self.price = 0
+        super(ProposalProduct, self).save(*args, **kwargs)
+
 
 class ProposalSupport(Proposal):
     class Meta:

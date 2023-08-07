@@ -30,7 +30,9 @@ from django.utils import timezone
 from .controller import PackageController
 # from django.views.decorators.http import require_http_methods
 from freelancer.models import Freelancer
-from general_settings.gateways import PayPalClientConfig, StripeClientConfig, FlutterwaveClientConfig, RazorpayClientConfig
+from payments.paypal import PayPalClientConfig
+from payments.stripe import StripeClientConfig
+from general_settings.gateways import FlutterwaveClientConfig, RazorpayClientConfig
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from transactions.models import Purchase, SubscriptionItem
 from django.conf import settings
@@ -457,8 +459,16 @@ def proposal_tracking(request,  proposal_slug, assign_id):
         date = '%s %s' % (request.POST.get('date'), datetime.now().time())
         total_minutes = (hours * 60) + minutes
 
-        Tracking.objects.create(team=team, proposal=proposal, assigned=assigned, tasks=tasks,
-                                minutes=total_minutes, created_by=request.user, created_at=date, is_tracked=True)
+        Tracking.objects.create(
+            team=team, 
+            proposal=proposal, 
+            assigned=assigned, 
+            tasks=tasks,
+            minutes=total_minutes, 
+            created_by=request.user, 
+            created_at=date, 
+            is_tracked=True
+        )
         messages.info(request, 'tracking logged successfuly')
 
         # return redirect('teams:team_single', team_id=team.id)
@@ -517,7 +527,11 @@ def delete_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
     proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
     assigned = get_object_or_404(AssignMember, pk=assign_id, team=team)
     tracking = get_object_or_404(
-        Tracking, pk=tracking_id, team=team, is_tracked=True)
+        Tracking, 
+        pk=tracking_id, 
+        team=team, 
+        is_tracked=True
+    )
     tracking.delete()
 
     messages.info(request, 'The tracking activity was deleted successfully!')
@@ -527,15 +541,14 @@ def delete_proposal_tracking(request,  proposal_slug, assign_id, tracking_id):
 
 @login_required
 def purchase_package(request, type):
-    payPalClient = PayPalClientConfig(merchant=request.merchant)
+    payPalClient = PayPalClientConfig()
     paypal_public_key = payPalClient.paypal_public_key()
     paypal_subscription_price_id = payPalClient.paypal_subscription_price_id()
     stripe_public_key = StripeClientConfig().stripe_public_key()
     razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
     if not team.created_by == request.user:
-        messages.error(
-            request, 'You must be the owner of this team to access subscription page')
+        messages.error(request, 'You must be the owner of this team')
         return redirect("account:dashboard")
 
     package = ''
@@ -572,7 +585,7 @@ def packages(request):
     error = ''
     subscription = ''
     stripeClient = StripeClientConfig()
-    paypalClient = PayPalClientConfig(merchant=request.merchant)
+    paypalClient = PayPalClientConfig()
     razorpay_client = RazorpayClientConfig()
     access_token = ''
     headers = ''

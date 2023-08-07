@@ -1,11 +1,22 @@
 from django.contrib import admin
 from . models import (
-    ProjectResolution, ProposalResolution, 
-    ContractResolution, ExtContractResolution, ApplicationCancellation,
-    ApplicationReview,ApplicationCancellation, ProjectCompletionFiles, 
-    ProposalCompletionFiles, ProposalReview, ContractCancellation, 
-    ContractReview, ProposalCancellation,
+     ProposalJob, 
+    # ContractResolution, ExtContractResolution, ApplicationCancellation,
+    # ApplicationReview,ApplicationCancellation, ProjectCompletionFiles, 
+    # ProposalReview, ContractCancellation, ProjectResolution,
+    # ContractReview, ProposalCancellation,
 )
+
+
+
+@admin.register(ProposalJob)
+class ProposalManagerAdmin(admin.ModelAdmin):
+    model = ProposalJob
+    list_display = ['merchant', 'review_status']
+    readonly_fields = ['merchant', 'review_status', 'product']    
+
+    def has_add_permission(self, request):        
+        return False
 
 
 # @admin.register(OneClickResolution)
@@ -29,35 +40,26 @@ from . models import (
 #         return actions
 
 
-@admin.register(ProjectResolution)
-class ProjectResolutionAdmin(admin.ModelAdmin):
-    model = ProjectResolution
-    list_display = ['team','start_time', 'end_time', 'status']    
-    readonly_fields = ['team','start_time', 'end_time', 'status', 'application']
+# @admin.register(ProjectResolution)
+# class ProjectResolutionAdmin(admin.ModelAdmin):
+#     model = ProjectResolution
+#     list_display = ['team','start_time', 'end_time', 'status']    
+#     readonly_fields = ['team','start_time', 'end_time', 'status', 'application']
 
 
-    def has_add_permission(self, request):        
-        return False
+#     def has_add_permission(self, request):        
+#         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
-
-@admin.register(ProposalResolution)
-class ProposalResolutionAdmin(admin.ModelAdmin):
-    model = ProposalResolution
-    list_display = ['team','start_time', 'end_time', 'status']
-    readonly_fields = ['team','start_time', 'end_time', 'status', 'proposal_sale']    
-
-    def has_add_permission(self, request):        
-        return False
 
     # def has_delete_permission(self, request, obj=None):
     #     return False
@@ -70,44 +72,44 @@ class ProposalResolutionAdmin(admin.ModelAdmin):
     #     return actions
 
 
-@admin.register(ContractResolution)
-class ContractResolutionAdmin(admin.ModelAdmin):
-    model = ContractResolution
-    list_display = ['team','start_time', 'end_time', 'status'] 
-    readonly_fields = ['team','start_time', 'end_time', 'status', 'contract_sale']
+# @admin.register(ContractResolution)
+# class ContractResolutionAdmin(admin.ModelAdmin):
+#     model = ContractResolution
+#     list_display = ['team','start_time', 'end_time', 'status'] 
+#     readonly_fields = ['team','start_time', 'end_time', 'status', 'contract_sale']
     
-    def has_add_permission(self, request):        
-        return False
+#     def has_add_permission(self, request):        
+#         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
-@admin.register(ExtContractResolution)
-class ExtContractResolutionAdmin(admin.ModelAdmin):
-    model = ExtContractResolution
-    list_display = ['team','start_time', 'end_time', 'status']     
-    readonly_fields = ['team','start_time', 'end_time', 'status', 'contract_sale']
+# @admin.register(ExtContractResolution)
+# class ExtContractResolutionAdmin(admin.ModelAdmin):
+#     model = ExtContractResolution
+#     list_display = ['team','start_time', 'end_time', 'status']     
+#     readonly_fields = ['team','start_time', 'end_time', 'status', 'contract_sale']
 
-    def has_add_permission(self, request):        
-        return False
+#     def has_add_permission(self, request):        
+#         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+#     def get_actions(self, request):
+#         actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+#         if 'delete_selected' in actions:
+#             del actions['delete_selected']
+#         return actions
 
 
 # @admin.register(OneClickCancellation)

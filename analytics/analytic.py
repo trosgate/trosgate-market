@@ -1,13 +1,13 @@
 from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
 from django.db.models import Avg, F, Count, Sum, Aggregate
 from resolution.models import (
-    ApplicationReview, 
-    ProposalReview, 
-    ContractReview,
-    ProjectResolution,
-    ProposalResolution,
-    ContractResolution,
-    ExtContractResolution
+    # ApplicationReview, 
+    # ProposalReview, 
+    # ContractReview,
+    # ProjectResolution,
+    ProposalJob,
+    # ContractResolution,
+    # ExtContractResolution
 )
 from proposals.models import Proposal
 from freelancer.models import Freelancer
@@ -20,28 +20,32 @@ from contract.models import InternalContract, Contract
 from django.utils import timezone
 
 def ongoing_founder_projects(team):
-    roposal_tasks = ProposalResolution.objects.filter(team=team, status='ongoing').count()
-    applied_tasks = ProjectResolution.objects.filter(team=team, status='ongoing').count()
-    int_contract_tasks = ContractResolution.objects.filter(team=team, status='ongoing').count()
-    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='ongoing').count()
+    # roposal_tasks = ProposalJob.objects.filter(team=team, status='ongoing').count()
+    # applied_tasks = ProjectResolution.objects.filter(team=team, status='ongoing').count()
+    # int_contract_tasks = ContractResolution.objects.filter(team=team, status='ongoing').count()
+    # ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='ongoing').count()
  
-    return roposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+    # return roposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+    return 0
 
 def cancelled_founder_projects(team):
-    proposal_tasks = ProposalResolution.objects.filter(team=team, status='cancelled').count()
-    applied_tasks = ProjectResolution.objects.filter(team=team, status='cancelled').count()
-    int_contract_tasks = ContractResolution.objects.filter(team=team, status='cancelled').count()
-    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='cancelled').count()
+    # proposal_tasks = ProposalJob.objects.filter(team=team, status='cancelled').count()
+    # applied_tasks = ProjectResolution.objects.filter(team=team, status='cancelled').count()
+    # int_contract_tasks = ContractResolution.objects.filter(team=team, status='cancelled').count()
+    # ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='cancelled').count()
   
-    return proposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+    # return proposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+    return 0
 
 def completed_founder_projects(team):
-    proposal_tasks = ProposalResolution.objects.filter(team=team, status='completed').count()
-    applied_tasks = ProjectResolution.objects.filter(team=team, status='completed').count()
-    int_contract_tasks = ContractResolution.objects.filter(team=team, status='completed').count()
-    ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='completed').count()
+    # proposal_tasks = ProposalJob.objects.filter(team=team, status='completed').count()
+    # applied_tasks = ProjectResolution.objects.filter(team=team, status='completed').count()
+    # int_contract_tasks = ContractResolution.objects.filter(team=team, status='completed').count()
+    # ext_contract_tasks = ExtContractResolution.objects.filter(team=team, status='completed').count()
 
-    return proposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+    # return proposal_tasks + applied_tasks + int_contract_tasks + ext_contract_tasks
+    return 0
+
 
 def total_verified_sale(team):
     proposal_total_sales = ProposalSale.objects.filter(team=team, purchase__status='success').count() 
@@ -57,12 +61,13 @@ def total_projects_in_queue(team):
     return int(all_tasks - started)
 
 def user_review_rate(team):
-    proposal_reviews = ProposalReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()
-    contract_reviews = ContractReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()
-    application_review = ApplicationReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()
+    # proposal_reviews = ProposalReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()
+    # contract_reviews = ContractReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()
+    # application_review = ApplicationReview.objects.filter(resolution__team=team, status=True, rating__gte=3).count()
 
-    totals = proposal_reviews + contract_reviews + contract_reviews + application_review
-    return totals
+    # totals = proposal_reviews + contract_reviews + contract_reviews + application_review
+    # return totals
+    return 0
 
 # PROPOSAL SALES RECORD FOR PROPOSAL
 def proposal_sales_count_by_proposal(team, proposal):
@@ -113,9 +118,10 @@ def total_proposal_hired():
     return direct_proposal + intern_contract
 
 def total_proposal_review_rate():
-    proposal_reviews = ProposalReview.objects.filter(status=True).count()
-    contract_reviews = ContractReview.objects.filter(status=True).count()
-    return proposal_reviews + contract_reviews
+    # proposal_reviews = ProposalReview.objects.filter(status=True).count()
+    # contract_reviews = ContractReview.objects.filter(status=True).count()
+    # return proposal_reviews + contract_reviews
+    return 0
 
 def total_internal_contracts():
     return InternalContract.objects.all().count()

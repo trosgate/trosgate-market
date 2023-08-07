@@ -6,7 +6,9 @@ python manage.py dumpdata --exclude=auth --exclude=contenttypes --indent 4 > bac
 
 
 //this will dumpdata
-python manage.py dumpdata teams.Team > new.json
+python manage.py dumpdata account.Country --indent 4 > countries.json
+python manage.py dumpdata account.State --indent 4> states.json
+python manage.py dumpdata account.City --indent 4 > cities.json
 python manage.py dumpdata account.package > new.json
 python manage.py dumpdata proposals.Proposal > db_proposals.json
 python manage.py dumpdata > railway.json

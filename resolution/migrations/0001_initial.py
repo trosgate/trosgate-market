@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
             name='ProposalCompletionFiles',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('attachment', models.FileField(blank=True, help_text="image must be any of these 'jpeg','pdf','jpg','png','psd',", null=True, upload_to=resolution.models.proposal_file_directory, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])], verbose_name='Attachment')),
+                ('attachment', models.FileField(blank=True, help_text="image must be any of these 'jpeg','pdf','jpg','png','psd',", null=True, upload_to=resolution.models.jobs_attachment, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])], verbose_name='Attachment')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created On')),
                 ('proposal', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applicantcompletionfiles', to='resolution.proposalresolution', verbose_name='Proposal File')),
             ],
@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
             name='ProjectCompletionFiles',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('attachment', models.FileField(blank=True, help_text="image must be any of these 'jpeg','pdf','jpg','png','psd',", null=True, upload_to=resolution.models.application_file_directory, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])], verbose_name='Attachment')),
+                ('attachment', models.FileField(blank=True, help_text="image must be any of these 'jpeg','pdf','jpg','png','psd',", null=True, upload_to=resolution.models.jobs_attachment, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])], verbose_name='Attachment')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created On')),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applicantcompletionfiles', to='resolution.projectresolution', verbose_name='Project File')),
             ],
@@ -235,7 +235,7 @@ class Migration(migrations.Migration):
             name='ContractCompletionFiles',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('attachment', models.FileField(blank=True, help_text="image must be any of these 'jpeg','pdf','jpg','png','psd',", null=True, upload_to=resolution.models.contract_file_directory, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])], verbose_name='Attachment')),
+                ('attachment', models.FileField(blank=True, help_text="image must be any of these 'jpeg','pdf','jpg','png','psd',", null=True, upload_to=resolution.models.jobs_attachment, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['JPG', 'PDF', 'JPEG', 'PNG', 'PSD'])], verbose_name='Attachment')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created On')),
                 ('contract', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contractcompletionfiles', to='resolution.contractresolution', verbose_name='Contract File')),
             ],
