@@ -144,10 +144,16 @@ class MerchantAPIs(models.Model):
     sandbox = models.BooleanField(_("Sandbox Mode"), choices=((False, 'No'), (True, 'Yes')), default=True)
     paypal_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
     
+    # Paystack API Credentials
+    paystack_public_key = encrypt(models.CharField(_("PAYSTACK PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
+    paystack_secret_key = encrypt(models.CharField(_("PAYSTACK SECRET KEY"), max_length=255, blank=True, null=True))
+    paystack_subscription_price_id = encrypt(models.CharField(_("PAYSTACK SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
+    paystack_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
+    
+    
     # Flutterwave API Credentials
     flutterwave_public_key = encrypt(models.CharField(_("FLUTTERWAVE PUBLISHABLE KEY"), max_length=255, blank=True, null=True))
     flutterwave_secret_key = encrypt(models.CharField(_("FLUTTERWAVE SECRET KEY"), max_length=255, blank=True, null=True))
-    flutterwave_secret_hash = models.UUIDField(unique=True, verbose_name="Flutterwave secret Hash", editable=True, default=uuid.uuid4,)
     flutterwave_subscription_price_id = encrypt(models.CharField(_("FLUTTERWAVE SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     flutterwave_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
     

@@ -22,8 +22,10 @@ class MerchantAPIAdmin(admin.ModelAdmin):
          'stripe_secret_key', 'stripe_webhook_key','stripe_subscription_price_id','stripe_active')}),
         ('PayPal API', {
          'fields': ('paypal_public_key', 'paypal_secret_key', 'paypal_subscription_price_id', 'paypal_active')}),
+        ('Paystack API', {
+         'fields': ('paystack_public_key', 'paystack_secret_key','paystack_subscription_price_id','paystack_active',)}),
         ('Flutterwave API', {
-         'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_secret_hash',)}),
+         'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_subscription_price_id','flutterwave_active',)}),
         ('Razorpay API', {
          'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
         ('MTN API', {

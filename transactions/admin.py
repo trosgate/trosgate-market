@@ -102,15 +102,17 @@ class PurchaseAdmin(admin.ModelAdmin):
     list_display = ['client', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
     list_filter = ['category', 'status']
     readonly_fields = [
-        'client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',
-        'paypal_order_key', 'paypal_transaction_id', 'stripe_order_key', 'flutterwave_order_key','flutterwave_transaction_id',
+        'client', 'category', 'status','salary_paid', 'created_at',
+        'paypal_order_key', 'paypal_transaction_id', 'stripe_order_key', 
+        'paystack_transaction_id','flutterwave_transaction_id','reference',
         'razorpay_order_key', 'razorpay_payment_id', 'razorpay_signature'
         ]  
     fieldsets = (
-        ('Transaction Details', {'fields': ('client', 'category', 'status','salary_paid', 'unique_reference', 'created_at',)}),
+        ('Transaction Details', {'fields': ('client', 'category', 'status','reference', 'salary_paid','created_at',)}),
         ('PayPal Payment Mode (If PayPal was used)', {'fields': ('paypal_transaction_id',)}),
         ('Stripe Payment Mode (If Stripe was used)', {'fields': ('stripe_order_key',)}),
-        ('Flutterwave Payment Mode (If Flutterwave was used)', {'fields': ('flutterwave_order_key','flutterwave_transaction_id',)}),
+        ('Paystack Payment Mode (If Paystack was used)', {'fields': ('paystack_transaction_id',)}),
+        ('Flutterwave Payment Mode (If Flutterwave was used)', {'fields': ('flutterwave_transaction_id',)}),
         ('Razorpay Payment Mode (If Razorpay was used)', {'fields': ('razorpay_order_key', 'razorpay_payment_id', 'razorpay_signature',)}),
     )
 

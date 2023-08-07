@@ -55,13 +55,36 @@ class PayPalMerchantForm(forms.ModelForm):
             {'class': 'form-control'})
 
 
+class PaystackMerchantForm(forms.ModelForm):
+    class Meta:
+        model = MerchantAPIs
+        fields = [
+            # Stripe
+            'paystack_public_key', 'paystack_secret_key', 
+            'paystack_subscription_price_id', 'paystack_active',  
+        ]
+        
+    def __init__(self, *args, **kwargs):
+        super(PaystackMerchantForm, self).__init__(*args, **kwargs)
+
+        # Flutterwave
+        self.fields['paystack_public_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paystack_secret_key'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paystack_subscription_price_id'].widget.attrs.update(
+            {'class': 'form-control'})
+        self.fields['paystack_active'].widget.attrs.update(
+            {'class': 'form-control'})
+
+
 class FlutterwaveMerchantForm(forms.ModelForm):
     class Meta:
         model = MerchantAPIs
         fields = [
             # Stripe
             'flutterwave_public_key', 'flutterwave_secret_key', 
-            'flutterwave_subscription_price_id', 'sandbox',  
+            'flutterwave_subscription_price_id', 'flutterwave_active',  
         ]
         
     def __init__(self, *args, **kwargs):
@@ -74,7 +97,7 @@ class FlutterwaveMerchantForm(forms.ModelForm):
             {'class': 'form-control'})
         self.fields['flutterwave_subscription_price_id'].widget.attrs.update(
             {'class': 'form-control'})
-        self.fields['sandbox'].widget.attrs.update(
+        self.fields['flutterwave_active'].widget.attrs.update(
             {'class': 'form-control'})
 
 

@@ -1,0 +1,2 @@
+Public key: pk_test_94bde3f5b6ca63f6100fff0bed954b548fcfbab9
+Secret key: sk_test_eac9f60218cce96443506a17380a53ab546bf6a5

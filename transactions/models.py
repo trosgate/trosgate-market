@@ -45,7 +45,7 @@ class PurchaseMaster(MerchantMaster):
     payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
     category = models.CharField(_("Purchase Category"), max_length=20, choices=PURCHASE_CATEGORY, default='')    
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default=FAILED)    
-    unique_reference = models.CharField(_("Unique Reference"), max_length=100, blank=True)
+
     created_at = models.DateTimeField(_("Ordered On"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Modified On"), auto_now=True)
 
@@ -57,7 +57,8 @@ class Purchase(PurchaseMaster):
     client_fee = models.PositiveIntegerField(_("Client Fee"), default=0)
     paypal_order_key = models.CharField(_("PayPal Order Key"), max_length=200, null=True, blank=True)
     paypal_transaction_id = models.CharField(_("PayPal Transaction ID"), max_length=200, null=True, blank=True)
-    flutterwave_order_key = models.CharField(_("Flutterwave Order Key"), max_length=200, null=True, blank=True)
+    reference = models.CharField(_("Order Key"), max_length=200, blank=True, null=True, unique=True)
+    paystack_transaction_id = models.CharField(_("Paystack Transaction ID"), max_length=200, null=True, blank=True)
     flutterwave_transaction_id = models.CharField(_("Flutterwave Transaction ID"), max_length=200, null=True, blank=True)
     stripe_order_key = models.CharField(_("Stripe Order Key"), max_length=200, null=True, blank=True)
     razorpay_order_key = models.CharField(_("Razorpay Order Key"), max_length=200, null=True, blank=True)
@@ -69,6 +70,28 @@ class Purchase(PurchaseMaster):
 
     def __str__(self):
         return f'{self.payment_method} purchase made by {self.client.get_full_name()}'
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            self.reference = self.generate_unique_reference()
+
+        super().save(*args, **kwargs)
+
+    def generate_unique_reference(self):
+        max_attempts = 1000
+        attempts = 0
+
+        while attempts < max_attempts:
+            # Generate a random UUID and convert it to a human-readable string
+            reference = str(uuid.uuid4()).replace('-', '')[:12].upper()
+
+            # Check if the generated reference is unique
+            if not Purchase.objects.filter(reference=reference).exists():
+                return reference
+
+            attempts += 1
+
+        raise ValueError("Failed to generate a unique reference.")
 
 
     @classmethod
@@ -316,14 +339,60 @@ class Purchase(PurchaseMaster):
 
 
     @classmethod
-    def flutterwave_order_confirmation(cls, flutterwave_order_key, flutterwave_transaction_id):
+    def flutterwave_order_confirmation(cls, reference, flutterwave_transaction_id):
         with db_transaction.atomic():
-            purchase = cls.objects.select_for_update().get(flutterwave_order_key=flutterwave_order_key)
+            purchase = cls.objects.select_for_update().get(reference=reference)
             if purchase.status != Purchase.FAILED:
                 raise Exception(_("This purchase already succeeded"))
 
             purchase.status = Purchase.SUCCESS
             purchase.flutterwave_transaction_id = flutterwave_transaction_id
+            purchase.save()
+
+            contract = None
+            contract_item = None
+
+            if purchase.category == Purchase.PROPOSAL:
+                for item in ProposalSale.objects.filter(purchase=purchase, purchase__status='success'):
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROPOSAL, 
+                        purchase=item.proposal
+                    )
+            
+            if purchase.category == Purchase.PROJECT:
+                for item in ApplicationSale.objects.filter(purchase=purchase):
+                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
+            
+            if purchase.category == Purchase.CONTRACT:
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                contract.reaction = 'paid'
+                contract.save()
+                # contract.save(update_fields=['reaction'])
+
+            if purchase.category == Purchase.EX_CONTRACT:
+                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
+                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                contract.reaction = 'paid'
+                contract.save()
+                # contract.save(update_fields=['reaction'])
+
+        return purchase, contract_item, contract
+        
+
+    @classmethod
+    def paystack_order_confirmation(cls, payment_reference, transaction_id):
+        with db_transaction.atomic():
+            purchase = cls.objects.select_for_update().get(reference=payment_reference)
+            if purchase.status != Purchase.FAILED:
+                raise Exception(_("This purchase already succeeded"))
+
+            purchase.status = Purchase.SUCCESS
+            purchase.paystack_transaction_id = transaction_id
             purchase.save()
 
             contract = None

@@ -99,9 +99,16 @@
         {% if gateway_type == "flutterwave" %}
         <br><br><br><br><br><br>
         <div class="reposition-top">
-            {% comment %} onclick='flutterwavePay(event)'  {% endcomment %}
             <button id="flutterwaveButton" class="btn btn-success w-100 fw-bold">
-                Pay with flutterwave
+                Pay with Flutterwave
+            </button>
+        </div>
+        {% endif %}
+        {% if gateway_type == "paystack" %}
+        <br><br><br><br><br><br>
+        <div class="reposition-top">
+            <button id="paystackButton" class="btn btn-success w-100 fw-bold">
+                Pay with Paystack
             </button>
         </div>
         {% endif %}
@@ -293,39 +300,20 @@
 
     {% endif %}
 
+    {% if gateway_type == "paystack" %}
+    <script>
+        const paystack_public_key = '{{ paystack_public_key }}';
+    </script> 
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="{% static 'js/payments/paystack-checkout.js' %}"></script>
+    {% endif %}
+
     {% if gateway_type == "flutterwave" %}
     <script>
         const flutterwave_public_key = '{{ flutterwave_public_key }}';
     </script> 
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script>
-
-    {% comment %} <script>
-        function flutterwavePay(){
-            FlutterwaveCheckout({
-              public_key: flutterwave_public_key,
-              tx_ref: "t489814873dsd43MDI0NzMx",
-              amount: 200,
-              currency: "USD",
-              payment_options: "card, mobilemoneyghana, ussd",
-              redirect_url: "/transaction/flutterwave_success/",
-              meta: {
-                consumer_id: 23,
-                consumer_mac: "92a3-912ba-1192a",
-              },
-              customer: {
-                email: "rose@unsinkableship.com",
-                phone_number: "08102909304",
-                name: "Rose DeWitt Bukater",
-              },
-              customizations: {
-                title: "The Titanic Store",
-                description: "Payment for an awesome cruise",
-                logo: "",
-              },
-            });
-          }
-    </script> {% endcomment %}
     {% endif %}
 
     {% if gateway_type == "razorpay" %}

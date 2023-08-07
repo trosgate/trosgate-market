@@ -8,7 +8,7 @@
             hx-target="#selectGateway"
             style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
             {% if gateway in request.merchant.gateways.all %}
-            <span><em class="badge badge-primary" style="border-radius; 50%;"> <i class="fa fa-check"></i> </em>&nbsp; &nbsp; {{gateway.get_name_display}} Activated</span>
+            <span><em class="badge badge-primary" style="border-radius; 50%;"> <i class="fa fa-check"></i> </em>&nbsp; &nbsp; {{gateway.get_name_display}}</span>
             {% else %}
             <span><em class="badge badge-danger" style="border-radius; 50%;"> <i class="fa fa-close"></i> </em>&nbsp; &nbsp; Switch {{gateway.get_name_display}}</span>
             {% endif %}

@@ -156,6 +156,79 @@
 </form>
 {% endif %}
 
+{% if paystackform %}
+<form method="POST", autocomplete='off'> {% csrf_token %}
+    <div class="wt-jobdescription wt-tabsinfo">
+        <div class="wt-jobdetails wt-tabsinfo">
+            <div class="wt-tabscontenttitle">
+                <h2>Paystack Account</h2>
+            </div>                                          
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="text-left">Account</th>
+                        <th>API Credential</th>
+                    </tr>
+                    </thead>
+                    <body>
+                    <tr>
+                        <td class="text-left">Publishable Key</td>
+                        <td>
+                            {{paystackform.paystack_public_key}}
+                            <span style="color:red;" role="alert">{{ paystackform.paystack_public_key.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>												
+                    <body>
+                    <tr>
+                        <td class="text-left">Secret Key</td>
+                        <td>
+                            {{paystackform.paystack_secret_key}}
+                            <span style="color:red;" role="alert">{{ paystackform.paystack_secret_key.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>										
+                    <body>
+                    <tr>
+                        <td class="text-left">Subscription Key</td>
+                        <td>
+                            {{paystackform.paystack_subscription_price_id}}
+                            <span style="color:red;" role="alert">{{ paystackform.paystack_subscription_price_id.errors}}</span>
+                        </td>
+                    </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td class="text-left">Gateway Status</td>
+                            <td>
+                                {{paystackform.paystack_active}}
+                                <span style="color:red;" role="alert">{{ paystackform.paystack_active.errors}}</span>
+                            </td>
+                        </tr>
+                        </body>														
+                    <body>
+                </table> 
+            </div>
+            <div>
+                <div>
+                    <div class="wt-updatall">
+                        <i class="far fa-money-bill-alt"></i>
+                        <span> click on "Save Paystack API" button</span>
+                        <button type="button" class="wt-btn"
+                            hx-post="{% url 'merchants:add_paystack_api' %}"
+                            hx-target="#paymentApi"
+                            style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                            Save Paystack API
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+
 {% if flutterwaveform %}
 <form method="POST", autocomplete='off'> {% csrf_token %}
     <div class="wt-jobdescription wt-tabsinfo">
@@ -202,8 +275,8 @@
                         <tr>
                             <td class="text-left">Sandbox Environment</td>
                             <td>
-                                {{flutterwaveform.sandbox}}
-                                <span style="color:red;" role="alert">{{ flutterwaveform.sandbox.errors}}</span>
+                                {{flutterwaveform.flutterwave_active}}
+                                <span style="color:red;" role="alert">{{ flutterwaveform.flutterwave_active.errors}}</span>
                             </td>
                         </tr>
                         </body>														

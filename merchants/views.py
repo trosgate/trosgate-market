@@ -20,6 +20,7 @@ from payments.models import (
 from payments.forms import (
     StripeMerchantForm, 
     PayPalMerchantForm, 
+    PaystackMerchantForm,
     FlutterwaveMerchantForm, 
     RazorpayMerchantForm, 
     MTNMerchantForm,
@@ -223,12 +224,14 @@ def payment_settings(request):
     stripeform = StripeMerchantForm(request.POST or None, instance=merchant_api)
     paypalform = PayPalMerchantForm(request.POST or None, instance=merchant_api)
     flutterwaveform = FlutterwaveMerchantForm(request.POST or None, instance=merchant_api)
+    paystackform = PaystackMerchantForm(request.POST or None, instance=merchant_api)
     razorpayform = RazorpayMerchantForm(request.POST or None, instance=merchant_api)
     mtnform = MTNMerchantForm(request.POST or None, instance=merchant_api)
     context = {
         'merchant_api': merchant_api,
         'stripeform': stripeform,
         'paypalform': paypalform,
+        'paystackform': paystackform,
         'flutterwaveform': flutterwaveform,
         'razorpayform': razorpayform,
         'mtnform': mtnform,
@@ -241,16 +244,8 @@ def payment_settings(request):
 @user_is_merchant
 def add_or_remove_gateway(request):
     gateway_pk = request.POST.get('mygateway')
-
-    try:
-        gateway = PaymentGateway.objects.get(pk=gateway_pk, status=True)
-    except MerchantAPIs.DoesNotExist:
-        gateway = None
-
-    try:
-        merchant_api = MerchantAPIs.objects.get(merchant=request.merchant)
-    except MerchantAPIs.DoesNotExist:
-        merchant_api = None
+    gateway = PaymentGateway.objects.filter(pk=gateway_pk, status=True).first()
+    merchant_api = MerchantAPIs.objects.filter(merchant=request.merchant).first()
 
     if merchant_api and merchant_api.stripe_active == True and gateway and gateway.name == 'stripe':
         merchant = request.merchant
@@ -266,7 +261,14 @@ def add_or_remove_gateway(request):
         else:
             merchant.gateways.add(gateway) 
     
-    elif merchant_api and merchant_api.flutterwave_active == True and gateway and gateway.name == 'flutterwave':
+    elif merchant_api and merchant_api.flutterwave_active == True and gateway and gateway.name == 'paystack':
+        merchant = request.merchant
+        if gateway in merchant.gateways.all():
+            merchant.gateways.remove(gateway)
+        else:
+            merchant.gateways.add(gateway)
+
+    elif merchant_api and merchant_api.paystack_active == True and gateway and gateway.name == 'flutterwave':
         merchant = request.merchant
         if gateway in merchant.gateways.all():
             merchant.gateways.remove(gateway)
@@ -300,22 +302,25 @@ def add_or_remove_gateway(request):
 @login_required
 @user_is_merchant
 def add_stripe_api(request):
-    stripeform = StripeMerchantForm(request.POST or None, instance=request.merchant)
+    merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
+    stripeform = StripeMerchantForm(request.POST or None, instance=merchant_api)
     
     if stripeform.is_valid():
+        stripeform.save()
         
-        data = stripeform.cleaned_data
-        merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
-        merchant_api.stripe_public_key = data['stripe_public_key']
-        merchant_api.stripe_secret_key = data['stripe_secret_key']
-        merchant_api.stripe_webhook_key = data['stripe_webhook_key']
-        merchant_api.stripe_subscription_price_id = data['stripe_subscription_price_id']
-        merchant_api.stripe_active = True
-        merchant_api.save()
+        # data = stripeform.cleaned_data
+        # merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
+        # merchant_api.stripe_public_key = data['stripe_public_key']
+        # merchant_api.stripe_secret_key = data['stripe_secret_key']
+        # merchant_api.stripe_webhook_key = data['stripe_webhook_key']
+        # merchant_api.stripe_subscription_price_id = data['stripe_subscription_price_id']
+        # merchant_api.stripe_active = True
+        # merchant_api.save()
 
     context = {
         'merchant_api': merchant_api,
         'stripeform': stripeform,
+        'paystackform' : PaystackMerchantForm(instance=merchant_api),
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
@@ -327,22 +332,24 @@ def add_stripe_api(request):
 @login_required
 @user_is_merchant
 def add_paypal_api(request):
-    paypalform = PayPalMerchantForm(request.POST or None, instance=request.merchant)
+    merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
+    paypalform = PayPalMerchantForm(request.POST or None, instance=merchant_api)
     
     if paypalform.is_valid():
+        paypalform.save()
 
-        data = paypalform.cleaned_data
+        # data = paypalform.cleaned_data
 
-        merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
-        merchant_api.paypal_public_key = data['paypal_public_key']
-        merchant_api.paypal_secret_key = data['paypal_secret_key']
-        merchant_api.paypal_subscription_price_id = data['paypal_subscription_price_id']
-        merchant_api.sandbox = data['sandbox']
-        merchant_api.paypal_active = True
-        merchant_api.save()
+        # merchant_api.paypal_public_key = data['paypal_public_key']
+        # merchant_api.paypal_secret_key = data['paypal_secret_key']
+        # merchant_api.paypal_subscription_price_id = data['paypal_subscription_price_id']
+        # merchant_api.sandbox = data['sandbox']
+        # merchant_api.paypal_active = True
+        # merchant_api.save()
 
     context = {
         'paypalform': paypalform,
+        'paystackform' : PaystackMerchantForm(instance=merchant_api),
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
@@ -353,23 +360,45 @@ def add_paypal_api(request):
 
 @login_required
 @user_is_merchant
+def add_paystack_api(request):
+    merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
+    paystackform = PaystackMerchantForm(request.POST or None, instance=merchant_api)
+
+    if paystackform.is_valid():
+        paystackform.save()
+            
+    context = {
+        'paystackform': paystackform,
+        'stripeform' : FlutterwaveMerchantForm(instance=merchant_api),
+        'stripeform' : StripeMerchantForm(instance=merchant_api),
+        'paypalform' : PayPalMerchantForm(instance=merchant_api),
+        'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
+        'mtnform' : MTNMerchantForm(instance=merchant_api),
+    }
+    return render(request, "merchants/partials/create_payment.html", context)
+
+
+@login_required
+@user_is_merchant
 def add_flutterwave_api(request):
+    merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
     flutterwaveform = FlutterwaveMerchantForm(request.POST or None, instance=request.merchant)
     
     if flutterwaveform.is_valid():
+        flutterwaveform.save()
 
-        data = flutterwaveform.cleaned_data
+        # data = flutterwaveform.cleaned_data
 
-        merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
-        merchant_api.flutterwave_public_key = data['flutterwave_public_key']
-        merchant_api.flutterwave_secret_key = data['flutterwave_secret_key']
-        merchant_api.flutterwave_subscription_price_id = data['flutterwave_subscription_price_id']
-        merchant_api.sandbox = data['sandbox']
-        merchant_api.flutterwave_active = True
-        merchant_api.save()
+        # merchant_api.flutterwave_public_key = data['flutterwave_public_key']
+        # merchant_api.flutterwave_secret_key = data['flutterwave_secret_key']
+        # merchant_api.flutterwave_subscription_price_id = data['flutterwave_subscription_price_id']
+        # merchant_api.sandbox = data['sandbox']
+        # merchant_api.flutterwave_active = True
+        # merchant_api.save()
             
     context = {
         'flutterwaveform': flutterwaveform,
+        'paystackform' : PaystackMerchantForm(instance=merchant_api),
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
@@ -381,22 +410,24 @@ def add_flutterwave_api(request):
 @login_required
 @user_is_merchant
 def add_razorpay_api(request):
-    razorpayform = RazorpayMerchantForm(request.POST or None, instance=request.merchant)
+    merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
+    razorpayform = RazorpayMerchantForm(request.POST or None, instance=merchant_api)
     
     if razorpayform.is_valid():
+        razorpayform.save()
+        # data = razorpayform.cleaned_data
 
-        data = razorpayform.cleaned_data
-
-        merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
-        merchant_api.razorpay_public_key_id = data['razorpay_public_key_id']
-        merchant_api.razorpay_secret_key_id = data['razorpay_secret_key_id']
-        merchant_api.razorpay_subscription_price_id = data['razorpay_subscription_price_id']
-        merchant_api.sandbox = data['sandbox']
-        merchant_api.razorpay_active = True
-        merchant_api.save()
+        # merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
+        # merchant_api.razorpay_public_key_id = data['razorpay_public_key_id']
+        # merchant_api.razorpay_secret_key_id = data['razorpay_secret_key_id']
+        # merchant_api.razorpay_subscription_price_id = data['razorpay_subscription_price_id']
+        # merchant_api.sandbox = data['sandbox']
+        # merchant_api.razorpay_active = True
+        # merchant_api.save()
 
     context = {
         'razorpayform': razorpayform,
+        'paystackform' : PaystackMerchantForm(instance=merchant_api),
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),

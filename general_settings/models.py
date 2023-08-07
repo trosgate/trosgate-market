@@ -580,6 +580,7 @@ class ExachangeRateAPI(models.Model):
         help_text=_('grab your key from https://exchangerate-api.com/'), 
         blank=True, 
         null=True))
+    status = models.BooleanField(default=True, unique=True)
 
     class Meta:
         verbose_name = _("Exchange Rates API")
