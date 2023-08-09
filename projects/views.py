@@ -20,6 +20,7 @@ from general_settings.models import ProposalGuides
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 
 
+
 def merchant_project(request):
     projects = Project.objects.filter(merchant__site=request.user.merchant.site.id)
     
@@ -89,7 +90,8 @@ def project_single(request, project_slug):
 @login_required
 @user_is_client
 def reopen_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug, duration__lt=timezone.now(), reopen_count=0, status=Project.ACTIVE, created_by=request.user)
+    project = get_object_or_404(Project, slug=project_slug, duration__lt=timezone.now(), status=Project.ACTIVE, created_by=request.user)
+    #reopen_count=0, 
 
     if request.method == 'POST':
         projectform = ProjectReopenForm(request.POST or None, instance=project)

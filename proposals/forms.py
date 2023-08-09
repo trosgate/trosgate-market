@@ -8,6 +8,8 @@ from datetime import datetime, timezone, timedelta
 from django.contrib.sites.models import Site
 from django.utils.text import slugify
 
+
+
 # a class to output datepicker on template
 class DateInput(forms.DateInput):
     input_type = 'date'

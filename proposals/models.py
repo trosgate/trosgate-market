@@ -119,6 +119,7 @@ class Proposal(MerchantProduct):
         ordering = ('-created_at',)
         verbose_name = _("Proposal")
         verbose_name_plural = _("Proposals")
+        unique_together = ['slug', 'merchant']
 
     def __str__(self):
         if self.pricing:

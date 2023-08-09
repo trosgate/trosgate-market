@@ -340,30 +340,11 @@ def account_activate(request, uidb64, token):
         user = Customer.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, request.user.DoesNotExist):
         user = None
-    # try:
-    #     package = Package.objects.get(pk=1, type='Basic')
-    # except Exception as e:
-    #     print(str(e))
-    #     package = Package.objects.create(pk=1, type='Basic')
-    
+
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-       
-        # Team.objects.filter(
-        #     title=user.short_name, created_by=user, 
-        #     status = Team.INACTIVE, package = package, 
-        # ).update(status = Team.ACTIVE)
-
-        # Invitation.objects.filter(
-        #     email=user.email, sender=user, 
-        #     team__package=package, status = Invitation.INVITED
-        # ).update(status = Invitation.ACCEPTED)
-
-        # Contract.objects.filter(
-        #     client__email=user.email, reaction=Contract.AWAITING
-        # ).update(reaction=Contract.ACCEPTED)
-            
+    
         return redirect('account:login')
     else:
         return render(request, 'account/registration/register_activation_invalid.html')
@@ -432,8 +413,6 @@ def user_dashboard(request):
         else:
             teamform = TeamCreationForm()
 
-        # merchant = Proposal.objects.filter(team=user_active_team)
-
         context = {
             'proposals': proposals,
             'open_projects': open_projects,
@@ -455,7 +434,7 @@ def user_dashboard(request):
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
         base_currency = get_base_currency_symbol()
-      
+        print(request.user)
         context = {
             'open_projects': open_projects,
             'closed_projects': closed_projects,

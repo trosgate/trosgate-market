@@ -36,57 +36,30 @@
 									</div>
 									
 									{% endif %}
-																								
 									<div class="wt-jobdescription wt-tabsinfo">
 										<div class="wt-tabscontenttitle">
 											<h2>Project Description</h2>
 										</div>
 											{% csrf_token %}
-											<div class="form-group">
-												{{projectform.title.label}}
-												{{projectform.title}}
-												<span style="color:red;" role="alert">{{ projectform.title.errors}}</span>
-											</div>	
+											<div class="row">
+												<div class="col-md-12">
+													{{projectform.title.label}}
+													{{projectform.title}}
+													<span style="color:red;" role="alert">{{ projectform.title.errors}}</span>
+												</div>	
 
-											<div class="form-group">
-												{{projectform.preview.label}}
-												{{projectform.preview}}
-												<span style="color:red;" role="alert">{{ projectform.preview.errors}}</span>
+												<div class="col-md-12">
+													{{projectform.preview.label}}
+													{{projectform.preview}}
+													<span style="color:blue;">{{ projectform.preview.help_text}}</span>
+													<span style="color:red;" role="alert">{{ projectform.preview.errors}}</span>
+												</div>
+												<div class="col-md-12">
+													{{projectform.skill.label}}
+													{{ projectform.skill}}
+													<span style="color:red;" role="alert">{{ projectform.skill.errors}}</span>
+												</div>
 											</div>
-											
-											<div class="form-group form-group-half">																																		
-												{{projectform.category.label}}
-												{{projectform.category}}
-												<span style="color:red;" role="alert">{{ projectform.category.errors}}</span>
-											</div>
-											<div class="form-group form-group-half">
-												{{projectform.salary.label}}
-												{{projectform.salary}}
-												<span style="color:red;" role="alert">{{ projectform.salary.errors}}</span>			
-											</div>	
-											<div class="form-group form-group-half">
-												{{projectform.completion_time.label}}
-												{{projectform.completion_time}}
-												<span style="color:red;" role="alert">{{ projectform.completion_time.errors}}</span>
-											</div>
-											<div class="form-group form-group-half">																																														
-												{{projectform.service_level.label}}
-												{{projectform.service_level}}
-												<span style="color:red;" role="alert">{{ projectform.service_level.errors}}</span>
-											</div>	
-											
-											<div class="form-group form-group-half">
-												{{projectform.dura_converter.label}} in
-												{{projectform.dura_converter}}
-												<span style="color:red;" role="alert">{{ projectform.dura_converter.errors}}</span>
-											</div>									
-
-											<div class="form-group form-group-half">
-												{{projectform.rating.label}}
-												{{projectform.rating}}
-												<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>			
-											</div>	
-
 										</div>
 										<div class="wt-jobdetails wt-tabsinfo">
 											<div class="wt-tabscontenttitle">
@@ -101,16 +74,44 @@
 												<italics> {{projectform.sample_link.label}}</italics>
 												{{projectform.sample_link}}	
 												<span style="color:red;" role="alert">{{ projectform.sample_link.errors}}</span>														
-											</div>																						
-
+											</div>
 										<div class="wt-jobskills wt-tabsinfo">
 											<div class="wt-tabscontenttitle">
-												<h2>Specialties Required (Up to 5)</h2>
+												<h2>Pricing and Specialty</h2>
 											</div>
-											<div class="form-group">
-												{{projectform.skill.label}}
-												{{ projectform.skill}}
-												<span style="color:red;" role="alert">{{ projectform.skill.errors}}</span>
+											<div class="row">
+												<div class="col-md-6">
+													{{projectform.category.label}}
+													{{projectform.category}}
+													<span style="color:red;" role="alert">{{ projectform.category.errors}}</span>
+												</div>
+												<div class="col-md-6">
+													{{projectform.salary.label}}
+													{{projectform.salary}}
+													<span style="color:red;" role="alert">{{ projectform.salary.errors}}</span>			
+												</div>	
+												<div class="col-md-6">
+													{{projectform.completion_time.label}}
+													{{projectform.completion_time}}
+													<span style="color:red;" role="alert">{{ projectform.completion_time.errors}}</span>
+												</div>
+												<div class="col-md-6">		
+													{{projectform.service_level.label}}
+													{{projectform.service_level}}
+													<span style="color:red;" role="alert">{{ projectform.service_level.errors}}</span>
+												</div>	
+												
+												<div class="col-md-6">
+													{{projectform.dura_converter.label}} in
+													{{projectform.dura_converter}}
+													<span style="color:red;" role="alert">{{ projectform.dura_converter.errors}}</span>
+												</div>									
+
+												<div class="col-md-6">
+													{{projectform.rating.label}}
+													{{projectform.rating}}
+													<span style="color:red;" role="alert">{{ projectform.rating.errors}}</span>			
+												</div>
 											</div>
 										</div>
 										</div>

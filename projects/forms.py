@@ -10,52 +10,52 @@ from datetime import datetime, timezone, timedelta
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+
 class ProjectCreationForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'preview', 'category', 'service_level', 'completion_time', 'dura_converter', 
-                'skill', 'description', 'rating', 'salary', 'sample_link',]
-        required = ['title', 'preview', 'category', 'service_level', 'completion_time', 'dura_converter', 
-                'skill', 'description', 'rating', 'salary']
+        fields = [
+            'title', 'preview', 'category', 'service_level', 
+            'completion_time', 'dura_converter', 'skill', 
+            'description', 'rating', 'salary', 'sample_link',
+        ]
+        required = [
+            'title', 'preview', 'category', 'service_level', 
+            'completion_time', 'dura_converter', 'rating', 'salary'
+        ]
+        description = ['description']
+        skill = ['skill']
+
+        custom_select_class = [
+            'category', 'service_level', 'dura_converter', 'rating',
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['title'].widget.attrs['class'] = 'form-control'
-        self.fields['title'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['preview'].widget.attrs['class'] = 'form-control'
-        self.fields['preview'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['category'].widget.attrs['class'] = 'custom-select'
-        self.fields['category'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['salary'].widget.attrs['class'] = 'form-control'
-        self.fields['salary'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['description'].widget.attrs['class'] = 'form-control'
-        self.fields['description'].widget.attrs['style'] = 'height: 150px;'
-
-        self.fields['service_level'].widget.attrs['class'] = 'custom-select'
-        self.fields['service_level'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['completion_time'].widget.attrs['class'] = 'custom-select'
-        self.fields['completion_time'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['dura_converter'].widget.attrs['class'] = 'custom-select'
-        self.fields['dura_converter'].widget.attrs['style'] = 'height: 40px;'
-
-        self.fields['rating'].widget.attrs['class'] = 'custom-select'
-        self.fields['rating'].widget.attrs['style'] = 'height: 40px;'
-
         self.fields['sample_link'].widget.attrs['class'] = 'form-control'
         self.fields['sample_link'].widget.attrs['style'] = 'height: 40px;'
 
-        self.fields['skill'].widget.attrs['class'] = 'form-control chosen-select Skills'
-        self.fields['skill'].widget.attrs['style'] = 'height: 40px;'
+        for field in self.Meta.skill:
+            self.fields[field].required = True
+            self.fields[field].widget.attrs['class'] = 'form-control chosen-select Skills'
+            self.fields[field].widget.attrs['style'] = 'height: 40px;'
+        
+        for field in self.Meta.description:
+            self.fields[field].required = True
+            self.fields[field].widget.attrs['class'] = 'form-control'
+            self.fields[field].widget.attrs['style'] = 'height: 150px;'
 
         for field in self.Meta.required:
             self.fields[field].required = True
+            self.fields[field].widget.attrs['style'] = 'height: 40px;'
+            self.fields[field].widget.attrs.update(
+            {'class': 'form-control'})
+
+        for field in self.Meta.custom_select_class:
+            self.fields[field].widget.attrs.update(
+            {'class': 'custom-select'})
+
 
     def clean_skill(self):
         skill_count = self.cleaned_data['skill']
@@ -68,12 +68,14 @@ class ProjectReopenForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ['dura_converter', 'rating']
+        required = ['dura_converter', 'rating']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['dura_converter'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Title'},) 
-        self.fields['rating'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Project Category'})
-
+        for field in self.Meta.required:
+            self.fields[field].required = True
+            self.fields[field].widget.attrs['style'] = 'height: 40px; color:red;'
+            self.fields[field].widget.attrs.update(
+            {'class': 'custom-select'})
+            

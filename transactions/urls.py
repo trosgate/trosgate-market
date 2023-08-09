@@ -20,11 +20,11 @@ urlpatterns = [
 
     path('bucket-review/', views.pricing_option_with_fees, name='pricing_option_with_fees'),
     path('payment-fee-structure/', views.payment_fee_structure,name='payment_fee_structure'),
-    path('api/checkout/', views.final_checkout, name='payment_checkout'),
+    path('checkout/', views.final_checkout, name='payment_checkout'),
     path('flutter_payment_intent/', views.flutter_payment_intent, name='flutter_payment_intent'),
     path('flutter_success/', views.flutter_success, name='flutter_success'),
     
-    path('create_payment_intent/', views.create_payment_intent, name='create_payment_intent'),
+    path('stripe_payment_intent/', views.stripe_payment_intent, name='stripe_payment_intent'),
     path('stripe_payment_order/', views.stripe_payment_order, name='stripe_payment_order'),
     path('paypal/api/', views.paypal_payment_order, name='paypal_payment_order'),
     path('paypal/callback/', views.paypal_callback, name='paypal_callback'),

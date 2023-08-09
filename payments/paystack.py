@@ -35,15 +35,22 @@ class PaystackClientConfig:
 
     def _make_api_request(self, method, endpoint, data=None):
         url = f"{self.PAYSTACK_BASE_URL}/{endpoint}"
+
+        method_map ={
+            'GET':requests.get,
+            'POST':requests.post,
+            'PUT':requests.put,
+            'DELETE':requests.delete,
+        }
         headers = {
             'Authorization': f'Bearer {self.paystack_secret_key}',
             'Content-Type': 'application/json',
         }
 
+        request = method_map.get(method)
         try:
-            response = method(url, headers=headers, json=data)
-            print(response)
-            response.raise_for_status()
+            response = request(url, headers=headers, json=data)
+            print('Headers ::', response)
             return response.json()
         except requests.RequestException as e:
             # Handle the error here or re-raise the exception if needed
@@ -70,17 +77,19 @@ class PaystackClientConfig:
         return None
 
 
-    def create_order(self, amount, currency):
+    def create_order(self, amount):
         if not self.paystack_secret_key:
             raise InvalidData("Paystack secret key not found")
 
         data = {
             'amount': amount,
-            'currency': currency,
+            'currency': self.currency,
+            'email': 'example@a.com',
         }
 
         try:
-            response_data = self._make_api_request(requests.post, 'transaction/initialize', data)
+            response_data = self._make_api_request('POST', 'transaction/initialize', data)
+            print('response_data ::', response_data)
             if response_data and response_data['status']:
                 transaction_reference = response_data['data']['reference']
                 return transaction_reference
@@ -109,16 +118,14 @@ class PaystackClientConfig:
 
 
     def get_supported_currencies(self):
-        api_url = f"{self.PAYSTACK_BASE_URL}/transaction/initialize"
-        headers = {
-            'Authorization': f'Bearer {self.paystack_secret_key}',
-            'Content-Type': 'application/json',
-        }
-        response = requests.get(api_url, headers=headers)
-        print(response)
-        # if response and response['status']:
-        #     supported_currencies = response_data['data']['currencies']
-        return response
+        api_url = "transaction/initialize"  # Notice, removed the leading "/"
+
+        response_data = self._make_api_request('GET', api_url)
+        if response_data and response_data['status']:
+            supported_currencies = response_data['data']['currencies']
+            return supported_currencies
+        return None
+
 
         # return None
     # def get_supported_currencies(self):

@@ -28,8 +28,9 @@ from django.contrib.sites.models import Site
 class PublishedProjects(models.Manager):
     def publish_project(self):
         site = Site.objects.get_current()
-        return super(PublishedProjects, self).get_queryset().filter(merchant__site=site.id, published=True, status='active', duration__gte=timezone.now())
-
+        return super(PublishedProjects, self).get_queryset().filter(
+            merchant__site=site.id, published=True, status='active', duration__gte=timezone.now()
+        )
 
 
 class Project(MerchantProduct):
@@ -69,7 +70,7 @@ class Project(MerchantProduct):
     duration = models.DateTimeField(_("Duration"), null=True, blank=True, help_text=_("deadline for expiration of project"))
     completion_time = models.CharField(_("Completion In"), max_length=100, choices=PROJECT_COMPLETION, default = ONE_DAY)
     action = models.BooleanField(_("Action"), default = False)
-    reopen_count = models.PositiveSmallIntegerField(_("Reopen Count"), default=0, validators=[MinValueValidator(0), MaxValueValidator(1)],)
+    reopen_count = models.PositiveSmallIntegerField(_("Reopen Count"), default=0)
 
     public = PublishedProjects()
 
@@ -77,6 +78,7 @@ class Project(MerchantProduct):
         ordering = ('-created_at',)
         verbose_name = _("Project")
         verbose_name_plural = _("Projects")
+        unique_together = ['slug', 'merchant']
 
     def __str__(self):
         return self.title

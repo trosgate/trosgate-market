@@ -1,30 +1,4 @@
 
-// function flutterwavePay(){
-//     FlutterwaveCheckout({
-//       public_key: flutterwave_public_key,
-//       tx_ref: "t489814873dsd43MDI0NzMx",
-//       amount: 200,
-//       currency: "USD",
-//       payment_options: "card, mobilemoneyghana, ussd",
-//       redirect_url: "/transaction/flutterwave_success/",
-//       meta: {
-//         consumer_id: 23,
-//         consumer_mac: "92a3-912ba-1192a",
-//       },
-//       customer: {
-//         email: "rose@unsinkableship.com",
-//         phone_number: "08102909304",
-//         name: "Rose DeWitt Bukater",
-//       },
-//       customizations: {
-//         title: "The Titanic Store",
-//         description: "Payment for an awesome cruise",
-//         logo: "",
-//       },
-//     });
-//   }
-
-
 const flutterwaveButton = document.getElementById('flutterwaveButton')
 flutterwaveButton.addEventListener('click', function () {
     flutterwaveButton.disabled = true;
@@ -37,12 +11,12 @@ flutterwaveButton.addEventListener('click', function () {
     .then(response => response.json())
     .then(data => {
         if (data) {
+            console.log(data)
             FlutterwaveCheckout({
                 public_key: flutterwave_public_key,
                 tx_ref: data.tx_ref,
                 amount: data.amount,
-                currency: "USD",
-                redirect_url: data.redirect_url,
+                currency: data.currency,
                 payment_options: "card, banktransfer, ussd, mobilemoneyghana",
                 meta: {
                     consumer_id: 23,
@@ -67,15 +41,14 @@ flutterwaveButton.addEventListener('click', function () {
                     })
                     .then(response => response.json())
                     .then(function(data) {
+                        flutterwaveButton.disabled = false;
                         if (data.status === 'success') {
                           // Handle success message or redirect to a success page
-                          flutterwaveButton.disabled = true;
                           swal("Perfect!", 'Payment Successful', "success").then((value) =>{
                             window.location.href = data.transaction_url;
                           });
                         } else {
                           // Handle payment error or redirect to an error page
-                          flutterwaveButton.disabled = false;
                           swal("Ooops!!", 'Payment Unsuccessful', "error");
                         }
                     })

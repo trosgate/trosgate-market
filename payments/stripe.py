@@ -14,9 +14,9 @@ class StripeClientConfig:
 
     def __init__(self):
         self.name = 'stripe'
-        self.currency = get_base_currency_code() if get_base_currency_code() else 'usd'
         self.mysite = Site.objects.get_current()
         self.site = self.mysite.merchant
+        self.currency = self.default_currency()
         stripe.api_key = self.stripe_secret_key()
         self.stripe = stripe
 
@@ -25,6 +25,9 @@ class StripeClientConfig:
         merchant = MerchantAPIs.objects.filter(merchant=self.site, stripe_active=True).first()
         return merchant
 
+    def default_currency(self):
+        currency = self.site.merchant.merchant.merchant.country.currency.lower()
+        return currency if currency else 'usd'
 
     def stripe_public_key(self):
         gateway = self.get_payment_gateway()

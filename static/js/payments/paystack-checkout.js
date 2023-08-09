@@ -24,6 +24,7 @@
         email: data.email,
         currency: data.currency,
         onClose: function(){
+          paystackButton.disabled = false;
           alert('Window closed.');
         },
         callback: function(response) {

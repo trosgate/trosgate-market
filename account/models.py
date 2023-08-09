@@ -18,19 +18,25 @@ import datetime
 from general_settings.models import SettingsMaster
 
 
+
 class Country(models.Model):
-    name = models.CharField(_("Country Name"), max_length=100, unique=True)
-    country_code = models.CharField(
-        _("Country Code"), max_length=10, blank=True)
+    name = models.CharField(_("Country Name"), max_length=255, unique=True)
+    country_code = models.CharField(_("Country Code"), max_length=150, blank=True)
+    region = models.CharField(_("Continent"), max_length=255, null=True, blank=True)
+    subregion = models.CharField(_("Sub Continent"), max_length=255, null=True, blank=True)
+    latitude = models.CharField(_("Latitude"), max_length=255, null=True, blank=True)
+    longitude = models.CharField(_("Longitude"), max_length=255, null=True, blank=True)
+    currency_name = models.CharField(_("Currency"), max_length=255, null=True, blank=True)
+    currency = models.CharField(_("Currency"), max_length=255, blank=True)
+    phone_code = models.CharField(_("Phone Code"), max_length=255, blank=True)
+    
     flag = models.ImageField(
         _("Country Flag"), upload_to='country_flag/', null=True, blank=True)
     ordering = models.PositiveIntegerField(
         _("Order Priority"), null=True, blank=True)
     supported = models.BooleanField(_("Supported"), choices=(
         (False, 'No'), (True, 'Yes')), default=True)
-    official_name = models.CharField(
-        _("Official Name"), max_length=100, blank=True)
-
+    
     class Meta:
         ordering = ["ordering"]
         verbose_name = _("Country")
@@ -46,6 +52,51 @@ class Country(models.Model):
             return self.country_code
 
     flag_tag.short_description = 'flag'
+
+
+class State(models.Model):
+    name = models.CharField(_("State Name"), max_length=255, blank=True)
+    state_code = models.CharField(_("State Code"), max_length=100, blank=True)
+    latitude = models.CharField(_("latitude"), max_length=255, blank=True, null=True)
+    longitude = models.CharField(_("longitude"), max_length=255,blank=True, null=True)
+    country = models.ForeignKey(Country, 
+        verbose_name=_("Country"), 
+        related_name="states", 
+        on_delete=models.CASCADE
+    )
+    ordering = models.PositiveIntegerField(
+        _("Order Priority"), null=True, blank=True)
+    
+    class Meta:
+        ordering = ["ordering"]
+        verbose_name = _("State")
+        verbose_name_plural = _("States")
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(_("City Name"), max_length=255, blank=True)
+    latitude = models.CharField(_("latitude"), max_length=255, blank=True, null=True)
+    longitude = models.CharField(_("longitude"), max_length=255,blank=True, null=True)
+    wikidata = models.CharField(_("Wiki Data Id"), max_length=255,blank=True, null=True)
+    country = models.ForeignKey(Country, 
+        verbose_name=_("Country"), 
+        related_name="cities", 
+        on_delete=models.CASCADE
+    )
+    state = models.ForeignKey(State, verbose_name=_("State"), related_name="cities", on_delete=models.CASCADE)
+    ordering = models.PositiveIntegerField(
+        _("Order Priority"), null=True, blank=True)
+    
+    class Meta:
+        ordering = ["ordering"]
+        verbose_name = _("City")
+        verbose_name_plural = _("Cities")
+
+    def __str__(self):
+        return self.name
 
 
 class Customer(AbstractBaseUser, PermissionsMixin):

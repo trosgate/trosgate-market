@@ -9,9 +9,16 @@ python manage.py dumpdata --exclude=auth --exclude=contenttypes --indent 4 > bac
 python manage.py dumpdata account.Country --indent 4 > countries.json
 python manage.py dumpdata account.State --indent 4> states.json
 python manage.py dumpdata account.City --indent 4 > cities.json
-python manage.py dumpdata account.package > new.json
-python manage.py dumpdata proposals.Proposal > db_proposals.json
-python manage.py dumpdata > railway.json
+
+# Dump all data for the Country model into a single file
+python manage.py dumpdata account.Country --indent 4 > all_countries.json
+
+# Dump all data for the State model into a single file
+python manage.py dumpdata account.State --indent 4 > all_states.json
+
+# Dump all data for the City model into a single file
+python manage.py dumpdata account.City --indent 4 > all_cities.json
+
 
 
 # MAIL SMTP SETTINGS

@@ -5003,6 +5003,7 @@ body.wt-login .wt-userlogedin{display: block;}
 .chosen-container-single .chosen-search input[type="text"]{height: 40px;border-color: #ddd;}
 .mce-branding-powered-by{display: none !important;}
 .wt-btndisbaled{pointer-events: none;}
+
 @keyframes floating {
 	0% {
 		transform: translateY(0%);	

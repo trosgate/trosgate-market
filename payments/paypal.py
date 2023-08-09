@@ -15,12 +15,16 @@ class PayPalClientConfig:
         self.name = 'paypal'
         self.mysite = Site.objects.get_current()
         self.site = self.mysite.merchant
+        self.currency = self.default_currency()
 
 
     def get_payment_gateway(self):
         merchant = MerchantAPIs.objects.filter(merchant=self.site, paypal_active=True).first()
         return merchant
 
+    def default_currency(self):
+        currency = self.site.merchant.merchant.merchant.country.currency.lower()
+        return currency if currency else 'usd'
 
     def paypal_public_key(self):
         gateway = self.get_payment_gateway()      
@@ -64,7 +68,7 @@ class PayPalClientConfig:
             raise Exception(f'Error: {response.text}')
 
 
-    def create_order(self, amount, currency='USD', description='purchase of service'):
+    def create_order(self, amount, description='purchase of service'):
         url = f'{self.get_base_url()}/v2/checkout/orders'
         headers = {
             'Content-Type': 'application/json',
@@ -75,7 +79,7 @@ class PayPalClientConfig:
             'purchase_units': [
                 {
                     'amount': {
-                        'currency_code': currency,
+                        'currency_code': self.currency,
                         'value': amount,
                     },
                     'description': description,

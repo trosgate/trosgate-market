@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
-from .models import Customer, Country, Package, Merchant, TwoFactorAuth
+from .models import Customer, Country, State, City, Package, Merchant, TwoFactorAuth
 from django.utils.translation import gettext_lazy as _
 import sys
 from django.contrib.admin.models import LogEntry
@@ -213,7 +213,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ['flag_tag', 'name', 'country_code', 'ordering', 'supported']
+    list_display = ['flag_tag', 'name', 'currency_name', 'ordering', 'supported']
     readonly_fields = ['flag_tag']
     list_display_links = ['flag_tag', 'name']
     list_editable = ['ordering', 'supported']
@@ -237,6 +237,22 @@ class CountryAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(State)
+class StateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'country','state_code', 'ordering']
+    list_display_links = ['name', 'country']
+    list_filter = ('country',)
+    search_fields = ('name', 'country__name',)
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ['name', 'country','state', 'ordering']
+    list_display_links = ['name', 'country']
+    list_filter = ('state',)
+    search_fields = ('name', 'country__name', 'state__name',)
 
 
 @admin.register(Package)

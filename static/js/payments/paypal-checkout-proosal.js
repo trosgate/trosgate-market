@@ -18,9 +18,17 @@ const paypalButton = document.getElementById('paypal-button-container');
 
 paypal.Buttons({
     createOrder(){
-        // This function will be called when the button is clicked
-        // Call your Django view to create a new PayPal order
-        // return fetch("{% url 'transactions:paypal_payment_order' %}", {
+        // createOrder: function(data, actions) {
+        //     // Set up the transaction details
+        //     const actions = actions.order.create({
+        //         purchase_units: [{
+        //             amount: {
+        //                 value: "{{hiring_box.get_total_price_after_discount_and_fee}}"
+        //             }
+        //         }]
+        //     });
+        //     console.log('PayPal', actions.id)    
+        //     console.log('PayPalD', actions.orderID) 
         return fetch("/transaction/paypal/api/", {
             method: 'POST',
             headers: {
@@ -66,3 +74,5 @@ paypal.Buttons({
         });
     }
 }).render('#paypal-button-container');
+
+

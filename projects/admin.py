@@ -4,14 +4,14 @@ from .models import Project #ProjectLanguageRequired,
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'salary', 'dura_converter', 'published', 'status']                 
+    list_display = ['title', 'category', 'salary', 'dura_converter', 'reopen_count', 'status']                 
     list_filter = ['published',]
-    list_editable = ['published', 'status']
+    list_editable = ['reopen_count', 'status']
     search_fields = ['title']
     readonly_fields = [
         'merchant', 'category', 'preview', 'salary','rating',
         'service_level', 'skill','reference','created_by',
-        'description','sample_link','dura_converter','duration','reopen_count', 'completion_time'
+        'description','sample_link','dura_converter','duration',#'reopen_count', 'completion_time'
     ]
     actions = ['Feature_on_home', 'Unfeature_from_home']
     fieldsets = (

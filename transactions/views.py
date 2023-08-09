@@ -22,7 +22,7 @@ from payments.stripe import StripeClientConfig
 from payments.razorpay import RazorpayClientConfig
 from payments.flutterwave import FlutterwaveClientConfig
 from payments.paystack import PaystackClientConfig
-
+from .utilities import calculate_payment_data, PurchaseAndSaleCreator
 
 from django.views.decorators.csrf import csrf_exempt
 from .models import (
@@ -49,6 +49,8 @@ from general_settings.utilities import get_protocol_only
 from client.models import ClientAccount
 from django_htmx.http import HttpResponseClientRedirect
 from payments.forms import StripeCardCardForm
+from account.models import Merchant
+
 
 
 @login_required
@@ -237,7 +239,11 @@ def final_checkout(request):
     subtotal = hiringbox.get_total_price_before_fee_and_discount()
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
     subtotal = hiringbox.get_total_price_before_fee_and_discount()
-    base_currency = get_base_currency_code()
+    merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
+    base_currency = merchant.merchant.country.currency.upper()
+
+    if not base_currency:
+        base_currency = request.merchant.merchant.merchant.country.currency.upper()
 
     paypal_public_key = ''
     stripeClient = ''
@@ -267,8 +273,8 @@ def final_checkout(request):
     # Paystack payment api
     elif gateway_type == 'paystack':
         paystack_public_key = PaystackClientConfig().paystack_public_key  
-        # print(PaystackClientConfig().get_supported_currencies())
-    # print(request.build_absolute_uri(reverse('transactions:proposal_transaction')))
+
+
     context = {
         'subtotal': subtotal,
         'grand_total': grand_total,
@@ -290,59 +296,28 @@ def final_checkout(request):
 @user_is_client
 def paystack_payment_intent(request):
     hiringbox = HiringBox(request)
-    discount_value = hiringbox.get_discount_value()
-    total_gateway_fee = hiringbox.get_fee_payable()
-    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-    grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    gateway_type = str(hiringbox.get_gateway())
-    base_currency = str(get_base_currency_code()).upper()
-
+    payment_data = calculate_payment_data(hiringbox)
     purchase = None
+
     try:
-        purchase = Purchase.objects.create(
+        creator = PurchaseAndSaleCreator()
+        purchase = creator.create_purchase_and_sales(
             client=request.user,
-            payment_method=str(gateway_type),
-            client_fee = int(total_gateway_fee),
-            category = Purchase.PROPOSAL,
-            salary_paid=grand_total,
-            status = Purchase.FAILED
+            **payment_data,
+            category=Purchase.PROPOSAL,
+            hiringbox=hiringbox,
         )
-    except Exception as e:
-        print('%s' % (str(e)))
-
-    try:
-        for proposal in hiringbox:
-            ProposalSale.objects.create(
-                package_name = proposal['package_name'],
-                team=proposal["proposal"].team, 
-                purchase=purchase,
-                proposal=proposal["proposal"], 
-                sales_price=int(proposal["salary"]), 
-                staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-            )
-        return JsonResponse({
-            'reference': purchase.reference, 
-            'amount': (purchase.salary_paid *100),
+        response_data = {
+            'reference': purchase.reference,
+            'amount': (purchase.salary_paid * 100),
             'email': request.user.email,
-            'currency': base_currency,
-        })
+            'currency': str(purchase.merchant.merchant.country.currency).upper(),
+        }
+        
+        return JsonResponse(response_data)
     except Exception as e:
         print('%s' % (str(e)))
-
         return JsonResponse({'error': 'Error Occured'})
-
 
 
 @csrf_exempt
@@ -374,60 +349,31 @@ def paystack_callback(request):
 @user_is_client
 def flutter_payment_intent(request):
     hiringbox = HiringBox(request)
-    discount_value = hiringbox.get_discount_value()
-    total_gateway_fee = hiringbox.get_fee_payable()
-    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-    grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    gateway_type = str(hiringbox.get_gateway())
-    base_currency = str(get_base_currency_code()).lower()
-
+    payment_data = calculate_payment_data(hiringbox)
     purchase = None
-    try:
-        purchase = Purchase.objects.create(
-            client=request.user,
-            payment_method=str(gateway_type),
-            client_fee = int(total_gateway_fee),
-            category = Purchase.PROPOSAL,
-            salary_paid=grand_total,
-            status = Purchase.FAILED
-        )
-    except Exception as e:
-        print('%s' % (str(e)))
 
     try:
-        for proposal in hiringbox:
-            ProposalSale.objects.create(
-                package_name = proposal['package_name'],
-                team=proposal["proposal"].team, 
-                purchase=purchase,
-                proposal=proposal["proposal"], 
-                sales_price=int(proposal["salary"]), 
-                staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-            )
-        return JsonResponse({
+        creator = PurchaseAndSaleCreator()
+        purchase = creator.create_purchase_and_sales(
+            client=request.user,
+            **payment_data,
+            category=Purchase.PROPOSAL,
+            hiringbox=hiringbox,
+        )
+        currency = str(purchase.merchant.merchant.country.currency).upper()
+        base_currency = str(get_base_currency_code()).upper()
+        response_data = {
             'tx_ref': purchase.reference, 
-            'amount': grand_total,
-            'currency':base_currency,
-            'redirect_url':'/transaction/flutter_success/',
             'email':request.user.email,
             'phone':request.user.phone,
             'customer':request.user.get_full_name(),
-        })
+            'amount': (purchase.salary_paid),
+            'currency': currency if currency else base_currency,
+        }
+
+        return JsonResponse(response_data)
     except Exception as e:
         print('%s' % (str(e)))
-
         return JsonResponse({'error': 'Error Occured'})
 
     
@@ -437,7 +383,6 @@ def flutter_success(request):
     hiringbox = HiringBox(request)
     status = request.GET.get('status')
     tx_ref = request.GET.get('tx_ref', '')
-    print(tx_ref)
     transaction_id = request.GET.get('transaction_id', '')
 
     flutterwave = FlutterwaveClientConfig()
@@ -450,74 +395,74 @@ def flutter_success(request):
                 flutterwave_transaction_id=product['data']['id']
             )
 
-            data = {"transaction_url": '/transaction/proposals/', "status": 'success',}
             hiringbox.clean_box()
+            data = {"status": "success", 'redirect_url':'/transaction/flutter_success/'}
             return JsonResponse(data)
         else:
-            data = {"transaction_url": '.', "status": 'failed'}
-            hiringbox.clean_box()
+            data = {"status": 'failed'}
             return JsonResponse(data)
     else:
-        data = {"transaction_url": '.', "status": 'failed'}
+        data = {"status": 'failed'}
         return JsonResponse(data)
+
+
+# @login_required
+# @require_http_methods(['GET'])
+# def flutter_success(request):
+#     hiringbox = HiringBox(request)
+#     status = request.GET.get('status')
+#     tx_ref = request.GET.get('tx_ref', '')
+#     transaction_id = request.GET.get('transaction_id', '')
+
+#     flutterwave = FlutterwaveClientConfig()
+#     if status == 'successful' and tx_ref != '' and transaction_id != '':
+#         product = flutterwave.verify_payment(transaction_id)
+#         if product['status'] == 'success':
+
+#             Purchase.flutterwave_order_confirmation(
+#                 reference=product['data']['tx_ref'], 
+#                 flutterwave_transaction_id=product['data']['id']
+#             )
+
+#             hiringbox.clean_box()
+#             return redirect('transactions:proposal_transaction')
+#         else:
+#             return redirect('transactions:payment_checkout')
+#     else:
+#         return redirect('transactions:payment_checkout')
+
 
 
 @login_required
 @require_http_methods(['POST'])
-def create_payment_intent(request):
+def stripe_payment_intent(request):
     hiringbox = HiringBox(request)
-    discount_value = hiringbox.get_discount_value()
-    total_gateway_fee = hiringbox.get_fee_payable()
-    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
+    payment_data = calculate_payment_data(hiringbox)
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    gateway_type = str(hiringbox.get_gateway())
-    
+
     card_token = request.POST.get('card_token')
-    payment_id, client_secret = StripeClientConfig().create_payment_intent(grand_total, card_token)
-
+    stripe_client = StripeClientConfig()
+    payment_id, client_secret = stripe_client.create_payment_intent(grand_total,card_token) 
     purchase = None
-    if payment_id:
-        try:
-            purchase = Purchase.objects.create(
-                client=request.user,
-                payment_method=str(gateway_type),
-                client_fee = int(total_gateway_fee),
-                category = Purchase.PROPOSAL,
-                salary_paid=grand_total,
-                stripe_order_key=payment_id,
-                status = Purchase.FAILED
-            )
-        except Exception as e:
-            print('%s' % (str(e)))
+    try:
+        creator = PurchaseAndSaleCreator()
+        purchase = creator.create_purchase_and_sales(
+            client=request.user,
+            **payment_data,
+            category=Purchase.PROPOSAL,
+            stripe_order_key=payment_id,
+            hiringbox=hiringbox,
+        )
+        response_data = {
+            'client_secret': client_secret,
+            'payment_intent': payment_id,
+        }
+        print('purchase ID ::', purchase.id)
+        return JsonResponse(response_data)
+    except Exception as e:
+        print('%s' % (str(e)))
+        return JsonResponse({'status': 'failed'})
 
-        try:
-            for proposal in hiringbox:
-                ProposalSale.objects.create(
-                    package_name = proposal['package_name'],
-                    team=proposal["proposal"].team, 
-                    purchase=purchase,
-                    proposal=proposal["proposal"], 
-                    sales_price=int(proposal["salary"]), 
-                    staff_hired=proposal["member_qty"],
-                    earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                    total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                    discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                    total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                    total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                    total_earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-                )
-        except Exception as e:
-            print('%s' % (str(e)))
-
-        return JsonResponse({'client_secret': client_secret, 'payment_intent': payment_id})
-    else:
-        return JsonResponse({'client_secret': None})
 
 
 @login_required
@@ -535,62 +480,31 @@ def stripe_payment_order(request):
 @login_required
 def paypal_payment_order(request):
     hiringbox = HiringBox(request)
-    discount_value = hiringbox.get_discount_value()
-    total_gateway_fee = hiringbox.get_fee_payable()
-    gateway_type = hiringbox.get_gateway()
-    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    base_currency = str(get_base_currency_code()).lower()
+    payment_data = calculate_payment_data(hiringbox)
     purchase = None
 
-    PayPalClient = PayPalClientConfig()
-    purchase = None
-
-    paypal_order_key = PayPalClient.create_order(grand_total, base_currency)
+    paypal_order_key = PayPalClientConfig().create_order(grand_total)
     if paypal_order_key:
         try:
-            purchase = Purchase.objects.create(
+            creator = PurchaseAndSaleCreator()
+            purchase = creator.create_purchase_and_sales(
                 client=request.user,
-                payment_method=str(gateway_type),
-                client_fee = int(total_gateway_fee),
-                category = Purchase.PROPOSAL,
-                salary_paid=grand_total,
+                **payment_data,
+                category=Purchase.PROPOSAL,
                 paypal_order_key=paypal_order_key,
-                status = Purchase.FAILED
+                hiringbox=hiringbox,
             )
-
+            response_data = {
+                'paypal_order_key': paypal_order_key,
+            }
+            print('purchase ID ::', purchase.id)
+            return JsonResponse(response_data)
         except Exception as e:
-            print('%s' % (str(e)))
-        
-        try:
-            for proposal in hiringbox:
-                ProposalSale.objects.create(
-                    package_name = proposal['package_name'],
-                    team=proposal["proposal"].team, 
-                    purchase=purchase,
-                    proposal=proposal["proposal"], 
-                    sales_price=int(proposal["salary"]), 
-                    staff_hired=proposal["member_qty"],
-                    earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                    total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                    discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                    total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                    total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                    earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                    total_earning=int(get_earning_calculator(
-                        (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                        get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-                )
-        except Exception as e:
-            print('%s' % (str(e)))
-
-        # hiringbox.clean_box()
-
-        return JsonResponse({'paypal_order_key': paypal_order_key})
+            print('purchase ID ::', str(e))
+            return JsonResponse({'error': 'Invalid request method'})
     else:
+        print('purchase ID ::', str(e))
         return JsonResponse({'error': 'Invalid request method'})
 
 
@@ -616,6 +530,45 @@ def paypal_callback(request):
 @login_required
 @user_is_client
 def razorpay_application_intent(request):
+
+    hiringbox = HiringBox(request)
+    grand_total = hiringbox.get_total_price_after_discount_and_fee()
+    payment_data = calculate_payment_data(hiringbox)
+    purchase = None
+    merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
+    base_currency = merchant.merchant.country.currency.upper()
+
+    if not base_currency:
+        base_currency = request.merchant.merchant.merchant.country.currency.upper()
+
+    razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
+    if razorpay_order_key:
+        try:
+            creator = PurchaseAndSaleCreator()
+            purchase = creator.create_purchase_and_sales(
+                client=request.user,
+                **payment_data,
+                category=Purchase.PROPOSAL,
+                razorpay_order_key=razorpay_order_key,
+                hiringbox=hiringbox,
+            )
+                response = JsonResponse({'currency':base_currency_code, 'amount': (purchase.salary_paid), 'razorpay_order_key': purchase.razorpay_order_key})
+            response_data = {
+                'razorpay_order_key': razorpay_order_key,
+                'currency': base_currency,
+                'amount': purchase.salary_paid,
+                'razorpay_order_key': razorpay_order_key,
+            }
+            print('purchase ID ::', purchase.id)
+            return JsonResponse(response_data)
+        except Exception as e:
+            print('purchase ID ::', str(e))
+            return JsonResponse({'error': 'Invalid request method'})
+    else:
+        print('purchase ID ::', str(e))
+        return JsonResponse({'error': 'Invalid request method'})
+
+
     hiringbox = HiringBox(request)
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
     gateway_type = hiringbox.get_gateway()
@@ -636,36 +589,10 @@ def razorpay_application_intent(request):
             razorpay_order_key=razorpay_order_key,
             status = Purchase.FAILED
         )
+            response = JsonResponse({'currency':base_currency_code, 'amount': (purchase.salary_paid), 'razorpay_order_key': purchase.razorpay_order_key})
+        return response
     except Exception as e:
         print('%s' % (str(e)))
-
-    try:
-        for proposal in hiringbox:
-            ProposalSale.objects.create(
-                package_name = proposal['package_name'],
-                team=proposal["proposal"].team, 
-                purchase=purchase,
-                proposal=proposal["proposal"], 
-                sales_price=int(proposal["salary"]), 
-                staff_hired=proposal["member_qty"],
-                earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
-                total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
-                discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
-                total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
-                earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
-                    get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
-            )
-    except Exception as e:
-        print('%s' % (str(e)))
-
-    response = JsonResponse({'currency':base_currency_code, 'amount': (purchase.salary_paid), 'razorpay_order_key': purchase.razorpay_order_key})
-    return response
 
 
 @login_required
