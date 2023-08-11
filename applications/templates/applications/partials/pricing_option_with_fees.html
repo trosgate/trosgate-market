@@ -1,0 +1,119 @@
+<div class="col-md-8">
+    <div class="table-responsive">
+        <table class="table" style="border:none;">
+            <thead class="addon-header">
+                <tr>
+                <th>Action</th>
+                    <th>Name</th>
+                    <th>Fee</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for gateway in payment_gateways %}
+                <tr>
+                    <td>
+                        <form>
+                        <input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"
+                            hx-post="{% url 'applications:pricing_option_with_fees' %}"
+                            hx-target="#payment-method">
+                        </input>
+                        </form>
+                    </td>
+                    <td class="text-left">{{gateway.get_name_display}}
+                        {% if gateway_type|lower == gateway.name %} 
+                        <i class="fa fa-check" style="color:green;"></i>
+                        {% else %}
+                        <i class="fa fa-close" style="color:red;"></i>
+                        {% endif %}
+                    </td>
+                    <td> {{base_currency}} {{gateway.processing_fee}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="d-flex justify-content-between mb-3">
+        <span>Price</span><span id="grandTotal2" class="text-primary pt-1">{{base_currency}} {% if applicant_box.get_total_price_before_fee_and_discount %}{{applicant_box.get_total_price_before_fee_and_discount}}{% else %} 0 {% endif %}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Freelancer </span><span id="totalFreelancer" class="text-primary pt-1"> {{applicant_box.get_total_applicants}}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Discount </span><span id="totalDiscount" class="text-primary pt-1"> Up to {% if applicant_box.get_discount_value %}{{applicant_box.get_discount_value}}% {% else %} {{discount}}% {% endif %}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3"> 
+        <span>Processing Fee (in {{base_currency}})</span><span id="totalFees" class="text-primary pt-1">{% if applicant_box.get_fee_payable %}{{applicant_box.get_fee_payable}} {% else %} {{selected_fee}} {% endif %}</span>
+    </div>
+    <div class="proposal-action">
+        <button class="btn btn-info btn-block proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Buy with Balance <i class="fa fa-info badge badge-success" hx-on="click: alert('this is the total messages')"></i></button>
+    </div>
+    <div class="proposal-action">
+        {% if gateway_type %}
+        <a href="{% url 'transactions:payment_checkout' %}" 
+        class="btn btn-info btn-block"
+        style="background-color:#007ee5; border-radius:20px;"><i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
+        {% else %}
+        <button class="btn btn-secondary fw-bold w-100" disabled>Select Pricing to pay</button>
+        {% endif %}
+    </div>
+</div>
+{% comment %} <div class="col-md-12">
+    <div id="paypal-button-container" style="margin:5px 0px;"></div>
+</div>
+   
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6 align-items-center justify-content-center">
+        <form id="cardform">{% csrf_token %}
+            
+            <div class="form-group col-md-12 text-left">
+                {{creditcardform.number.label}}
+                {{creditcardform.number}}
+                <span style="color:red;" role="alert">{{creditcardform.number.errors}}</span>
+            </div>
+            <div class="form-group col-md-4">
+                {{creditcardform.cvc.label}}
+                {{creditcardform.cvc}}
+                <span style="color:red;" role="alert">{{creditcardform.cvc.errors}}</span>
+            </div>
+            <div class="form-group col-md-4">
+                {{creditcardform.month.label}}
+                {{creditcardform.month}}
+                <span style="color:red;" role="alert">{{creditcardform.month.errors}}</span>
+            </div>
+            <div class="form-group col-md-4">
+                {{creditcardform.year.label}}
+                {{creditcardform.year}}
+                <span style="color:red;" role="alert">{{creditcardform.year.errors}}</span>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}        
+                <div class="row justify-content-md-center" hx-get="{% url 'account:remove_message' %}" hx-trigger="load delay:3s">        
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                        <span class="wt-jobalerts">
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                                <span> {{ message}} </span>
+                                <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %} 
+                
+            <div class="text-center">
+                <button type="button" class="btn btn-info btn-sm text-center" 
+                    hx-post="{% url 'transactions:stripe_payment_order' %}"
+                    hx-target="#payment-method"
+                    style="background-color:rgb(29, 118, 90); font-weight: bold; margin:2px;">
+                    Pay Now with Stripe
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3"></div>
+</div> {% endcomment %}

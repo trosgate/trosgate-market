@@ -22,7 +22,7 @@ from payments.stripe import StripeClientConfig
 from payments.razorpay import RazorpayClientConfig
 from payments.flutterwave import FlutterwaveClientConfig
 from payments.paystack import PaystackClientConfig
-from .utilities import calculate_payment_data, PurchaseAndSaleCreator
+from .utilities import get_base_currency, calculate_payment_data, PurchaseAndSaleCreator
 
 from django.views.decorators.csrf import csrf_exempt
 from .models import (
@@ -34,7 +34,7 @@ from .models import (
 )
 from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
-from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+# from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -75,7 +75,7 @@ def add_proposal_to_box(request):
         
         memberqty = hiringbox.__len__()
         total = package_price * member_qty
-        base_currency = get_base_currency_symbol()
+        base_currency = get_base_currency(request)
         readable_amount = f'{base_currency} {total}'
         
         response = JsonResponse(
@@ -93,18 +93,19 @@ def remove_from_hiring_box(request):
     if request.POST.get('action') == 'post':
         proposal_id = int(request.POST.get('proposalid'))
         hiringbox.remove(proposal=proposal_id)
+        payment_data = calculate_payment_data(hiringbox)
         freelancers = hiringbox.__len__()
-        grand_total = hiringbox.get_total_price_before_fee_and_discount()
-        base_currency = get_base_currency_symbol()
-        discount = hiringbox.get_discount_value()
+        base_currency = get_base_currency(request)
         response = JsonResponse({
-            'freelancers': freelancers, 
-            'grandtotal': grand_total,
+            'freelancers': freelancers,
             'base_currency':base_currency,
-            'discount':discount
+            'subtotal': payment_data['grand_total_before_expense'],
+            'grand_total': payment_data['grand_total'],
+            'selected_fee': payment_data['total_gateway_fee'],
+            "discount": payment_data['discount_value'],
         })
         return response
-
+        
 
 @login_required
 def modify_from_hiring_box(request):
@@ -123,7 +124,7 @@ def modify_from_hiring_box(request):
         line_total_price = member_qty * proposal.salary
         freelancers = hiringbox.__len__()
         grand_total = hiringbox.get_total_price_before_fee_and_discount()
-        base_currency = get_base_currency_symbol()
+        base_currency = get_base_currency(request)
         discount = hiringbox.get_discount_value()
         response = JsonResponse({
             'freelancers': freelancers, 
@@ -137,44 +138,36 @@ def modify_from_hiring_box(request):
 
 @login_required
 def pricing_option_with_fees(request):
-    # function for selecting checkout payment option
+    hiringbox = HiringBox(request)
+    base_currency = get_base_currency(request)
     payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
 
-    hiringbox = HiringBox(request)
-    base_currency = get_base_currency_symbol()
-    base_currency_code = get_base_currency_code()
-    gateway_type = hiringbox.get_gateway()
-    selected_fee = hiringbox.get_fee_payable()
-    discount = hiringbox.get_discount_value()
-    subtotal = hiringbox.get_total_price_before_fee_and_discount()
-    grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    
     if request.method == 'POST':
         gateways = int(request.POST.get('paymentGateway'))
-        gateway = PaymentGateway.objects.get(id=gateways)
-        selected_fee = gateway.processing_fee
-        gateway_type = gateway.name
+        gateway = PaymentGateway.objects.filter(id=gateways).first()
         session = request.session
 
-        if "proposalgateway" not in request.session:
-            session["proposalgateway"] = {"gateway_id": gateway.id}
-            session.modified = True
+        if gateway: 
+            if "proposalgateway" not in request.session:
+                session["proposalgateway"] = {"gateway_id": gateway.id}
+                session.modified = True
+            else:
+                session["proposalgateway"]["gateway_id"] = gateway.id
+                session.modified = True
         else:
-            session["proposalgateway"]["gateway_id"] = gateway.id
-            session.modified = True
-
+            pass
+    payment_data = calculate_payment_data(hiringbox)
     context ={
         'selected': 'selected',
         'hiringbox': hiringbox,
         'payment_gateways': payment_gateways,
         'base_currency': base_currency,
-        'base_currency_code': base_currency_code,
         'payment_method': 'Payment Summary',
-        'subtotal': subtotal,
-        'grand_total': grand_total,
-        'selected_fee': selected_fee,
-        "gateway_type": gateway_type,
-        "discount": discount,
+        "discount": payment_data['discount_value'],
+        'subtotal': payment_data['grand_total_before_expense'],
+        'grand_total': payment_data['grand_total'],
+        'selected_fee': payment_data['total_gateway_fee'],
+        "gateway_type": payment_data['gateway_type'],
     
     }
     if request.htmx:
@@ -190,7 +183,7 @@ def payment_fee_structure(request):
     gateway = PaymentGateway.objects.get(id=gateway_type)
     selected_fee = gateway.processing_fee
     payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
-    base_currency = get_base_currency_symbol()
+    base_currency = get_base_currency(request)
     discount = hiringbox.get_discount_value()
     subtotal = hiringbox.get_total_price_before_fee_and_discount()
     
@@ -223,6 +216,7 @@ def payment_fee_structure(request):
 @login_required
 def final_checkout(request):
     hiringbox = HiringBox(request)
+    payment_data = calculate_payment_data(hiringbox)
     num_of_freelancers = hiringbox.__len__()
 
     if num_of_freelancers < 1:
@@ -233,18 +227,9 @@ def final_checkout(request):
         messages.error(request, "Please select payment option")
         return redirect("transactions:pricing_option_with_fees")
 
-    gateway_type = hiringbox.get_gateway().name
+    gateway_type = str(payment_data['gateway_type']).lower()
 
-    selected_fee = hiringbox.get_fee_payable()
-    subtotal = hiringbox.get_total_price_before_fee_and_discount()
-    grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    subtotal = hiringbox.get_total_price_before_fee_and_discount()
-    merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
-    base_currency = merchant.merchant.country.currency.upper()
-
-    if not base_currency:
-        base_currency = request.merchant.merchant.merchant.country.currency.upper()
-
+    base_currency = get_base_currency(request)
     paypal_public_key = ''
     stripeClient = ''
     razorpay_public_key = ''
@@ -276,9 +261,10 @@ def final_checkout(request):
 
 
     context = {
-        'subtotal': subtotal,
-        'grand_total': grand_total,
-        'selected_fee': selected_fee,
+        "discount": payment_data['discount_value'],
+        'subtotal': payment_data['grand_total_before_expense'],
+        'grand_total': payment_data['grand_total'],
+        'selected_fee': payment_data['total_gateway_fee'],
         "gateway_type": gateway_type,
         "paystack_public_key": paystack_public_key,
         "paypal_public_key": paypal_public_key,
@@ -361,14 +347,14 @@ def flutter_payment_intent(request):
             hiringbox=hiringbox,
         )
         currency = str(purchase.merchant.merchant.country.currency).upper()
-        base_currency = str(get_base_currency_code()).upper()
+        base_currency = get_base_currency(request)
         response_data = {
             'tx_ref': purchase.reference, 
             'email':request.user.email,
             'phone':request.user.phone,
             'customer':request.user.get_full_name(),
             'amount': (purchase.salary_paid),
-            'currency': currency if currency else base_currency,
+            'currency': base_currency,
         }
 
         return JsonResponse(response_data)
@@ -406,33 +392,6 @@ def flutter_success(request):
         return JsonResponse(data)
 
 
-# @login_required
-# @require_http_methods(['GET'])
-# def flutter_success(request):
-#     hiringbox = HiringBox(request)
-#     status = request.GET.get('status')
-#     tx_ref = request.GET.get('tx_ref', '')
-#     transaction_id = request.GET.get('transaction_id', '')
-
-#     flutterwave = FlutterwaveClientConfig()
-#     if status == 'successful' and tx_ref != '' and transaction_id != '':
-#         product = flutterwave.verify_payment(transaction_id)
-#         if product['status'] == 'success':
-
-#             Purchase.flutterwave_order_confirmation(
-#                 reference=product['data']['tx_ref'], 
-#                 flutterwave_transaction_id=product['data']['id']
-#             )
-
-#             hiringbox.clean_box()
-#             return redirect('transactions:proposal_transaction')
-#         else:
-#             return redirect('transactions:payment_checkout')
-#     else:
-#         return redirect('transactions:payment_checkout')
-
-
-
 @login_required
 @require_http_methods(['POST'])
 def stripe_payment_intent(request):
@@ -462,7 +421,6 @@ def stripe_payment_intent(request):
     except Exception as e:
         print('%s' % (str(e)))
         return JsonResponse({'status': 'failed'})
-
 
 
 @login_required
@@ -536,11 +494,7 @@ def razorpay_application_intent(request):
     payment_data = calculate_payment_data(hiringbox)
     purchase = None
     merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
-    base_currency = merchant.merchant.country.currency.upper()
-
-    if not base_currency:
-        base_currency = request.merchant.merchant.merchant.country.currency.upper()
-
+    base_currency = get_base_currency(request)
     razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
     if razorpay_order_key:
         try:
@@ -552,12 +506,12 @@ def razorpay_application_intent(request):
                 razorpay_order_key=razorpay_order_key,
                 hiringbox=hiringbox,
             )
-                response = JsonResponse({'currency':base_currency_code, 'amount': (purchase.salary_paid), 'razorpay_order_key': purchase.razorpay_order_key})
+
             response_data = {
                 'razorpay_order_key': razorpay_order_key,
                 'currency': base_currency,
                 'amount': purchase.salary_paid,
-                'razorpay_order_key': razorpay_order_key,
+                'razorpay_order_key': purchase.razorpay_order_key,
             }
             print('purchase ID ::', purchase.id)
             return JsonResponse(response_data)
@@ -567,32 +521,6 @@ def razorpay_application_intent(request):
     else:
         print('purchase ID ::', str(e))
         return JsonResponse({'error': 'Invalid request method'})
-
-
-    hiringbox = HiringBox(request)
-    grand_total = hiringbox.get_total_price_after_discount_and_fee()
-    gateway_type = hiringbox.get_gateway()
-    base_currency_code = get_base_currency_code()
-    total_gateway_fee = hiringbox.get_fee_payable()
-    discount_value = hiringbox.get_discount_value()
-    grand_total_before_expense = hiringbox.get_total_price_before_fee_and_discount()
-
-    purchase = None
-    razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
-    try:
-        purchase = Purchase.objects.create(
-            client=request.user,
-            payment_method=str(gateway_type),
-            client_fee = int(total_gateway_fee),
-            category = Purchase.PROPOSAL,
-            salary_paid=grand_total,
-            razorpay_order_key=razorpay_order_key,
-            status = Purchase.FAILED
-        )
-            response = JsonResponse({'currency':base_currency_code, 'amount': (purchase.salary_paid), 'razorpay_order_key': purchase.razorpay_order_key})
-        return response
-    except Exception as e:
-        print('%s' % (str(e)))
 
 
 @login_required
@@ -611,7 +539,6 @@ def razorpay_callback(request):
         'razorpay_signature': razorpay_signature
     }
     signature = razorpay_client.utility.verify_payment_signature(data)
-    # transaction_url = reverse('transactions:proposal_transaction')
 
     if signature == True:
         try:
@@ -637,7 +564,7 @@ def payment_success(request):
 
 @login_required
 def proposal_transaction(request):
-    base_currency = get_base_currency_code()
+    base_currency = get_base_currency(request)
     proposals = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
@@ -656,7 +583,7 @@ def proposal_transaction(request):
 
 @login_required
 def application_transaction(request):
-    base_currency = get_base_currency_code()
+    base_currency = get_base_currency(request)
     applications = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
@@ -674,7 +601,7 @@ def application_transaction(request):
 
 @login_required
 def contract_transaction(request):
-    base_currency = get_base_currency_code()
+    base_currency = get_base_currency(request)
     contracts = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   

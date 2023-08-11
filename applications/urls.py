@@ -5,10 +5,10 @@ app_name = 'applications'
 
 urlpatterns = [
     # Urls for application addon table
-    path('addon/', views.application_multiple_summary, name='application_multiple_summary'),
-    path('addon-add/', views.add_application, name='add_application'),
+    path('gateway/', views.pricing_option_with_fees, name='pricing_option_with_fees'),
+    path('select-applicant/', views.add_or_remove_application, name='add_or_remove_application'),
     path('addon-remove/', views.remove_application, name='remove_application'),
-    path('fees-structure/', views.application_fee_structure, name='application_fee_structure'),
+    # path('fees-structure/', views.application_fee_structure, name='application_fee_structure'),
     path('application-fee/', views.application_fee, name='application_fee'),
 
     # Urls for application table

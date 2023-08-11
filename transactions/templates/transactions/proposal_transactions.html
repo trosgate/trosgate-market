@@ -45,7 +45,8 @@
 							<td>{{proposal.purchase.payment_method|capfirst}}</td>
 							<td>{{proposal.total_sales_price}} ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td> 
 							{% if active_team.created_by == request.user %}
-							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fa fa-window-restore"></i> Manage</button></a></td>
+							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-{% if proposal.status == 'pending' %}danger {% else %}info {% endif %} btn-sm"><i class="fa fa-window-restore"></i> {{proposal.get_status_display}}</button></a>
+							</td>
 							{% endif %}
 						</tr>
 						{% endfor %}

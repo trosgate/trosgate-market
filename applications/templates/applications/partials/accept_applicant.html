@@ -24,18 +24,18 @@
                 <input type="text" name="application" value="{{application.pk}}" id="id_application" hidden>
                 {% if application.accept == False %} 
                 <button type="submit" class="btn btn-danger btn-sm"
-                    hx-post="{% url "applications:add_application" %}"
+                    hx-post="{% url "applications:add_or_remove_application" %}"
                     hx-target="#approve-applicant">
                     Add to Box
                 </button>
-                <a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm" target="_blank">View Box</a> 
+                <a href="{% url 'applications:pricing_option_with_fees'%}" class="btn btn-success btn-sm">View Box</a> 
                 {% elif application.accept == True %} 
                 <button type="submit" class="btn btn-danger btn-sm"
-                    hx-post="{% url "applications:add_application" %}"
+                    hx-post="{% url "applications:add_or_remove_application" %}"
                     hx-target="#approve-applicant">
                     Remove
                 </button>
-                <a href="{% url 'applications:application_multiple_summary'%}" class="btn btn-success btn-sm" target="_blank">View Box</a> 
+                <a href="{% url 'applications:pricing_option_with_fees'%}" class="btn btn-success btn-sm">View Box</a> 
                 {% endif %}
             </form>
             

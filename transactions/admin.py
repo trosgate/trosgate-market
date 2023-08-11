@@ -226,7 +226,7 @@ class ProposalSaleAdmin(admin.ModelAdmin):
     search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
         'team', 'purchase','proposal', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
-        'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged', #'start_time', 'end_time', 'status',
+        'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged', 'start_time', 'end_time', 'status',
         'package_name','revision','duration',
     ]
     fieldsets = (

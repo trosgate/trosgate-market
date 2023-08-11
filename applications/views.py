@@ -35,7 +35,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_control
 from django.contrib.sites.shortcuts import get_current_site
-from general_settings.currency import get_base_currency_symbol, get_base_currency_code
+# from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.fees_and_charges import get_application_fee_calculator
 from django.db import transaction as db_transaction
@@ -44,6 +44,8 @@ from teams.controller import PackageController
 from notification.mailer import application_notification
 from general_settings.utilities import get_protocol_only
 from analytics.analytic import user_review_rate
+from transactions.utilities import get_base_currency, calculate_payment_data #, PurchaseAndSaleCreator
+
 
 @login_required
 @user_is_freelancer
@@ -53,7 +55,7 @@ def apply_for_project(request, project_slug):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
     can_apply_for_project = PackageController(team).monthly_projects_applicable_per_team()
     applied = Application.objects.filter(team=team, project=project)
-    base_currency = get_base_currency_symbol()
+    base_currency = get_base_currency(request)
 
     if applied:
         messages.error(request, 'Your team already applied for this job!')
@@ -116,7 +118,7 @@ def freelancer_application_view(request):
 @login_required
 def application_detail(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
-    base_currency = get_base_currency_symbol()
+    base_currency = get_base_currency(request)
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
         applications = Application.objects.filter(project=project, team=team)
@@ -133,17 +135,50 @@ def application_detail(request, project_slug):
 
 
 @login_required
-def application_multiple_summary(request):
+def pricing_option_with_fees(request):
     applicant_box = ApplicationAddon(request)
-    context = {
-        'applicant_box': applicant_box
-    }    
-    return render(request, "applications/application_multiple_summary.html", context)
+    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
+
+    base_currency = get_base_currency(request)
+
+    if request.method == 'POST':
+        gateways = int(request.POST.get('paymentGateway'))
+        gateway = PaymentGateway.objects.filter(id=gateways).first()
+
+        session = request.session
+
+        if gateway:
+            if "applicationgateway" not in session:
+                session["applicationgateway"] = {"gateway_id": gateway.id}
+                session.modified = True
+            else:
+                session["applicationgateway"]["gateway_id"] = gateway.id
+                session.modified = True
+        else:
+            pass
+    payment_data = calculate_payment_data(applicant_box)
+
+    context ={
+        'applicant_box': applicant_box,
+        'selected': 'selected',
+        'payment_gateways': payment_gateways,
+        'base_currency': base_currency,
+        'payment_method': 'Payment Summary',
+        "discount": payment_data['discount_value'],
+        'subtotal': payment_data['grand_total_before_expense'],
+        'grand_total': payment_data['grand_total'],
+        'selected_fee': payment_data['total_gateway_fee'],
+        "gateway_type": payment_data['gateway_type'],
+    }
+    if request.htmx:
+        return render(request, "applications/partials/pricing_option_with_fees.html", context)
+
+    return render(request, "applications/pricing_option_with_fees.html", context)
 
 
 @login_required
 @user_is_client
-def add_application(request):
+def add_or_remove_application(request):
     applicant_box = ApplicationAddon(request)
     project_id = int(request.POST.get('project'))
     application_id = int(request.POST.get('application'))
@@ -156,7 +191,7 @@ def add_application(request):
         application.save()
         applicant_box.addon(application=application)
 
-    elif application.accept == True:
+    else:
         application.accept = False
         application.save()
         applicant_box.remove(application=application_id) 
@@ -179,28 +214,36 @@ def remove_application(request):
         application.accept = False
         application.save()        
         applicant_box.remove(application=application_id)
+        freelancers = applicant_box.__len__()
+        payment_data = calculate_payment_data(applicant_box)
+        base_currency = get_base_currency(request)
 
-        subtotal = applicant_box.get_total_price_before_fee_and_discount()
-        response = JsonResponse({'subtotal': subtotal})
+        response = JsonResponse({
+            'freelancers': freelancers,
+            'base_currency':base_currency,
+            'grandtotal': payment_data['grand_total'],
+            'selected_fee': payment_data['total_gateway_fee'],
+            "discount": payment_data['discount_value'],
+        })
         return response
 
 
-@login_required
-@user_is_client
-def application_fee_structure(request):
-    applicant_box = ApplicationAddon(request)
-    base_currency = get_base_currency_symbol()
-    if applicant_box.__len__() < 1:
-        messages.error(request, "Please add atleast one applicant to proceed")
-        return redirect("applications:application_multiple_summary")
+# @login_required
+# @user_is_client
+# def application_fee_structure(request):
+#     applicant_box = ApplicationAddon(request)
+#     base_currency = get_base_currency_symbol()
+#     if applicant_box.__len__() < 1:
+#         messages.error(request, "Please add atleast one applicant to proceed")
+#         return redirect("applications:application_multiple_summary")
 
-    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
-    context = {
-        'applicant_box': applicant_box,
-        'base_currency': base_currency,
-        'payment_gateways': payment_gateways,
-    }
-    return render(request, "applications/application_fee_structure.html", context)
+#     payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
+#     context = {
+#         'applicant_box': applicant_box,
+#         'base_currency': base_currency,
+#         'payment_gateways': payment_gateways,
+#     }
+#     return render(request, "applications/application_fee_structure.html", context)
 
 
 @login_required
@@ -247,11 +290,9 @@ def final_application_checkout(request):
     if "applicationgateway" not in request.session:
         messages.error(request, "Please select payment option")
         return redirect("applications:application_fee_structure")
+    
+    payment_data = calculate_payment_data(applicant_box)
 
-    gateway_type = applicant_box.get_gateway()
-    selected_fee = applicant_box.get_fee_payable()
-    subtotal = applicant_box.get_total_price_before_fee_and_discount()
-    grand_total = applicant_box.get_total_price_after_discount_and_fee()
     # Stripe payment api
     stripe_public_key = StripeClientConfig().stripe_public_key()
     # Paypal payment api
@@ -262,13 +303,13 @@ def final_application_checkout(request):
     razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
 
     currency = CurrencyForm()
-    base_currency = get_base_currency_code()
+    base_currency = get_base_currency(request)
 
     context = {
-        'subtotal': subtotal,
-        'grand_total': grand_total,
-        'selected_fee': selected_fee,
-        "gateway_type": gateway_type,
+        'subtotal': payment_data.subtotal,
+        'grand_total': payment_data.grand_total,
+        'selected_fee': payment_data.total_gateway_fee,
+        "gateway_type": payment_data.gateway_type,
         "paypal_public_key": paypal_public_key,
         "stripe_public_key": stripe_public_key,
         "flutterwave_public_key": flutterwave_public_key,
@@ -283,6 +324,8 @@ def final_application_checkout(request):
 @user_is_client
 def stripe_application_intent(request):
     applicant_box = ApplicationAddon(request)
+    payment_data = calculate_payment_data(applicant_box)
+
     discount_value = applicant_box.get_discount_value()
     total_gateway_fee = applicant_box.get_fee_payable()
     grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
@@ -442,7 +485,7 @@ def flutter_payment_intent(request):
     total_gateway_fee = applicant_box.get_fee_payable()
     grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
     grand_total = applicant_box.get_total_price_after_discount_and_fee()
-    base_currency = get_base_currency_code()
+    base_currency = get_base_currency(request)
 
     flutterwaveClient = FlutterwaveClientConfig()
     tx_ref = flutterwaveClient.flutterwave_unique_reference()
@@ -553,7 +596,7 @@ def razorpay_application_intent(request):
     applicant_box = ApplicationAddon(request)
     grand_total = applicant_box.get_total_price_after_discount_and_fee()
     gateway_type = applicant_box.get_gateway()
-    base_currency_code = get_base_currency_code()
+    base_currency = get_base_currency(request)
     discount_value = applicant_box.get_discount_value()
     total_gateway_fee = applicant_box.get_fee_payable()
     grand_total_before_expense = applicant_box.get_total_price_before_fee_and_discount()
@@ -599,7 +642,7 @@ def razorpay_application_intent(request):
     except Exception as e:
         print('%s' % (str(e)))
     notes = {'Total Price': 'The total amount may change with discount'}
-    currency = base_currency_code
+    currency = base_currency
     razorpay_client = razorpay_api.get_razorpay_client()
     razorpay_order = razorpay_client.order.create(dict(
         amount=grand_total * 100,

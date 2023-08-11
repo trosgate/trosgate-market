@@ -1,4 +1,4 @@
-{% extends "dashboard/main_base.html" %}
+{% comment %} {% extends "dashboard/main_base.html" %}
 {% load static %}
 {% block content %}
 
@@ -78,7 +78,6 @@
 				</div>
 			</div>
 		</div>
-   {% comment %} Script to delete proposal in session {% endcomment %}
 	<script>
 		$(document).on('click', '.remove-applicant', function (e) {
 		  e.preventDefault();
@@ -101,4 +100,4 @@
 		})
 	  </script>
 
-{% endblock %}
+{% endblock %} {% endcomment %}

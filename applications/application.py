@@ -85,6 +85,7 @@ class ApplicationAddon():
             newprocessing_fee = self.get_gateway().processing_fee
         return newprocessing_fee
 
+    
     def get_discount_value(self):
         discount = 0
         subtotal = self.get_total_price_before_fee_and_discount()

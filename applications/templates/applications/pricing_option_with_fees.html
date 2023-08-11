@@ -9,43 +9,29 @@
                 <div class="col-md-12">
                     <div class="wt-tabscontenttitle proposal-total-btn">
                         <h5>Bucket preview</h5>
-                        <button id="grandTotal" type="button" class="proposal-btn-state">{{base_currency}}  {% if hiring_box.get_total_price_before_fee_and_discount %}{{hiring_box.get_total_price_before_fee_and_discount}}{% else %} 0 {% endif %}</button>
+                        <button id="grandTotal" type="button" class="proposal-btn-state">{{base_currency}}  {% if applicant_box.get_total_price_before_fee_and_discount %}{{applicant_box.get_total_price_before_fee_and_discount}}{% else %} 0 {% endif %}</button>
                     </div>
                     <div class="table-responsive">
                         <table class="table" style="border:none;">
                         <thead class="addon-header">
                             <tr>
                                 <th>#</th>
-                                <th>Thumbnail</th>
-                                <th>Proposals</th>
-                                <th>Addons</th>
+                                <th>Team lead</th>
+                                <th>Jobs Applied</th>
+                                <th>Bid Price</th>
                                 <th>Action</th>
-                                <th>Salary</th>
                             </tr>
                         </thead>
                             
-                        {% for member in hiringbox %}
-                        {% with proposal=member.proposal %}
-                        <tbody data-index="{{proposal.id}}" class="proposal-item">
+                        {% for applicant in applicant_box %}
+						{% with application=applicant.application %}
+                        <tbody data-index="{{application.id}}" class="proposal-item">
                             <tr>
                                 <td>{{forloop.counter}}</td> 
-                                <td><img src="{{proposal.thumbnail.url}}" alt='product in bucket' style="width:60px; height:40px; min-width:60px;"></td>
-                                <td class="text-left">{{proposal.title|truncatechars:60}}</td>
-                                <td>
-                                    <div class="proposal-action">
-                                        <select id="select{{proposal.id}}" class="custom-select" style="width:100%;">
-                                            <option selected disabled hidden value="1"> {{member.member_qty}} Worker{{member.member_qty|pluralize}}</option>
-                                            {% if proposal.team.members.count >= 1 %}<option value="1"> 1 Worker</option>{% endif %}
-                                            {% if proposal.team.members.count >= 2 %}<option value="2"> 2 Workers</option>{% endif %}
-                                            {% if proposal.team.members.count >= 3 %}<option value="3"> 3 Workers</option>{% endif %}
-                                            {% if proposal.team.members.count >= 4 %}<option value="4"> 4 Workers</option>{% endif %}
-                                            {% if proposal.team.members.count >= 5 %}<option value="5"> 5 Workers</option>{% endif %}
-                                        </select>                                                                                                                    
-                                        <button type="button" id="modify-box" data-index="{{proposal.id}}" class="badge badge-success addon-btn modify-box"> + / - </button>
-                                    </div>
-                                </td>
-                                <td><button type="button" id="remove-box" data-index="{{proposal.id}}" class="badge badge-danger btn-sm mt-2 remove-box"><i class="fa fa-trash"></i></button></td>
-                                <td><button class="btn btn-outline-success btn-sm mt-2" type="button" disabled> {{base_currency}} {{member.salary}}</a></button></td>
+                                <td><img src="{{application.team.created_by.freelancer.profile_photo.url}}" alt='product in bucket' style="width:60px; height:40px; min-width:60px;"></td>
+                                <td class="text-left">{{application.project.title|truncatechars:60}}</td>
+                                <td><button class="btn btn-outline-primary btn-sm mt-2" type="button" disabled> {{base_currency}} {{application.budget}}</a></button></td>
+                                <td><button type="button" id="remove-box" data-index="{{application.id}}" class="badge badge-danger btn-sm mt-2 remove-box"><i class="fa fa-trash"></i></button></td>
                             </tr>
                         </tbody>
                         {% endwith %}
@@ -62,7 +48,7 @@
                 <h5>Product pricing</h5>
             </div>
             <div id="payment-method" class="row">
-                {% include 'transactions/partials/pricing_option_with_fees.html' %}
+                {% include 'applications/partials/pricing_option_with_fees.html' %}
             </div>
             {% comment %} <br>
             <br>
@@ -91,17 +77,17 @@
         //Script to delete proposal in session
         $(document).on('click', '.remove-box', function (e) {
             e.preventDefault();
-            var propid = $(this).data('index');
+            var applicId = $(this).data('index');
             $.ajax({
             type: 'POST',
-            url: '{% url "transactions:remove_from_hiring_box" %}',
+            url: '{% url "applications:remove_application" %}',
             data: {
-                proposalid: $(this).data('index'),
+                applicationid: $(this).data('index'),
                 csrfmiddlewaretoken: "{{csrf_token}}",
                 action: 'post'
             },
             success: function (json) {
-                $('.proposal-item[data-index="' + propid + '"]').remove();
+                $('.proposal-item[data-index="' + applicId + '"]').remove();
                 document.getElementById("totalFreelancer").innerHTML = json.freelancers;
                 document.getElementById("totalDiscount").innerHTML = `Up to ${json.discount}%`;
                 document.getElementById("grandTotal").innerHTML = `${json.base_currency} ${json.grandtotal}`
@@ -111,31 +97,7 @@
             });
         })
     </script>
-    <script>
-        //Script to modify proposal in session
-        $(document).on('click', '.modify-box', function (e) {
-            e.preventDefault();
-            var propid = $(this).data('index');
-            $.ajax({
-            type: 'POST',
-            url: '{% url "transactions:modify_from_hiring_box" %}',
-            data: {
-                proposalid: $(this).data('index'),
-                memberqty: $('#select' + propid +' option:selected').val(),
-                csrfmiddlewaretoken: "{{csrf_token}}",
-                action: 'post'
-            },
-            success: function (json) {
-                document.getElementById("totalFreelancer").innerHTML = json.freelancers
-                document.getElementById("totalDiscount").innerHTML = `Up to ${json.discount}%`;
-                document.getElementById("grandTotal").innerHTML = `${json.base_currency} ${json.grandtotal}`
-                document.getElementById("grandTotal2").innerHTML = `${json.base_currency} ${json.grandtotal}`
-            },
-            error: function (xhr, errmsg, err) {}
-            });
-        })
-    </script>
-
+    
     <script>
         //Script to add proposal quantity in session             
         $(document).on('click', '#convert-currency', function (e) {
