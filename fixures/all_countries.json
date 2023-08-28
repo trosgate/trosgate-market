@@ -1,0 +1,4502 @@
+[
+{
+    "model": "account.country",
+    "pk": 1,
+    "fields": {
+        "name": "Afghanistan",
+        "country_code": "AF",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "33.00000000",
+        "longitude": "65.00000000",
+        "currency_name": "Afghan afghani",
+        "currency": "AFN",
+        "phone_code": "93",
+        "flag": "country_flag/afghanistan-16x16-32928.png",
+        "ordering": 1,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 2,
+    "fields": {
+        "name": "Aland Islands",
+        "country_code": "AX",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "60.11666700",
+        "longitude": "19.90000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "+358-18",
+        "flag": "country_flag/aland-16x16-32908.png",
+        "ordering": 2,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 3,
+    "fields": {
+        "name": "Albania",
+        "country_code": "AL",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "41.00000000",
+        "longitude": "20.00000000",
+        "currency_name": "Albanian lek",
+        "currency": "ALL",
+        "phone_code": "355",
+        "flag": "country_flag/albania-16x16-32909.png",
+        "ordering": 3,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 4,
+    "fields": {
+        "name": "Algeria",
+        "country_code": "DZ",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "28.00000000",
+        "longitude": "3.00000000",
+        "currency_name": "Algerian dinar",
+        "currency": "DZD",
+        "phone_code": "213",
+        "flag": "country_flag/algeria-16x16-32972.png",
+        "ordering": 4,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 5,
+    "fields": {
+        "name": "American Samoa",
+        "country_code": "AS",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-14.33333333",
+        "longitude": "-170.00000000",
+        "currency_name": "US Dollar",
+        "currency": "USD",
+        "phone_code": "+1-684",
+        "flag": "country_flag/american-16x16-32917.png",
+        "ordering": 5,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 6,
+    "fields": {
+        "name": "Andorra",
+        "country_code": "AD",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "42.50000000",
+        "longitude": "1.50000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "376",
+        "flag": "country_flag/andorra-16x16-32921.png",
+        "ordering": 6,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 7,
+    "fields": {
+        "name": "Angola",
+        "country_code": "AO",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "-12.50000000",
+        "longitude": "18.50000000",
+        "currency_name": "Angolan kwanza",
+        "currency": "AOA",
+        "phone_code": "244",
+        "flag": "country_flag/angola-16x16-32914.png",
+        "ordering": 7,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 8,
+    "fields": {
+        "name": "Anguilla",
+        "country_code": "AI",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.25000000",
+        "longitude": "-63.16666666",
+        "currency_name": "East Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-264",
+        "flag": "country_flag/anguilla-16x16-32924.png",
+        "ordering": 8,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 9,
+    "fields": {
+        "name": "Antarctica",
+        "country_code": "AQ",
+        "region": "Polar",
+        "subregion": "",
+        "latitude": "-74.65000000",
+        "longitude": "4.48000000",
+        "currency_name": "Antarctican dollar",
+        "currency": "AAD",
+        "phone_code": "672",
+        "flag": "country_flag/antarctica-16x16-33151.png",
+        "ordering": 9,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 10,
+    "fields": {
+        "name": "Antigua And Barbuda",
+        "country_code": "AG",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "17.05000000",
+        "longitude": "-61.80000000",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-268",
+        "flag": "country_flag/antigua-16x16-32910.png",
+        "ordering": 10,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 11,
+    "fields": {
+        "name": "Argentina",
+        "country_code": "AR",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-34.00000000",
+        "longitude": "-64.00000000",
+        "currency_name": "Argentine peso",
+        "currency": "ARS",
+        "phone_code": "54",
+        "flag": "country_flag/argentina-16x16-32919.png",
+        "ordering": 11,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 12,
+    "fields": {
+        "name": "Armenia",
+        "country_code": "AM",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "40.00000000",
+        "longitude": "45.00000000",
+        "currency_name": "Armenian dram",
+        "currency": "AMD",
+        "phone_code": "374",
+        "flag": "country_flag/armenia-16x16-32925.png",
+        "ordering": 12,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 13,
+    "fields": {
+        "name": "Aruba",
+        "country_code": "AW",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "12.50000000",
+        "longitude": "-69.96666666",
+        "currency_name": "Aruban florin",
+        "currency": "AWG",
+        "phone_code": "297",
+        "flag": "country_flag/aruba-16x16-32923.png",
+        "ordering": 13,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 14,
+    "fields": {
+        "name": "Australia",
+        "country_code": "AU",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "latitude": "-27.00000000",
+        "longitude": "133.00000000",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "61",
+        "flag": "country_flag/austallia-16x16-32912.png",
+        "ordering": 14,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 15,
+    "fields": {
+        "name": "Austria",
+        "country_code": "AT",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "47.33333333",
+        "longitude": "13.33333333",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "43",
+        "flag": "country_flag/austria-16x16-32920.png",
+        "ordering": 15,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 16,
+    "fields": {
+        "name": "Azerbaijan",
+        "country_code": "AZ",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "40.50000000",
+        "longitude": "47.50000000",
+        "currency_name": "Azerbaijani manat",
+        "currency": "AZN",
+        "phone_code": "994",
+        "flag": "country_flag/azerbaijan-16x16-32926.png",
+        "ordering": 16,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 17,
+    "fields": {
+        "name": "The Bahamas",
+        "country_code": "BS",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "24.25000000",
+        "longitude": "-76.00000000",
+        "currency_name": "Bahamian dollar",
+        "currency": "BSD",
+        "phone_code": "+1-242",
+        "flag": "country_flag/bahamas-16x16-32915.png",
+        "ordering": 17,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 18,
+    "fields": {
+        "name": "Bahrain",
+        "country_code": "BH",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "26.00000000",
+        "longitude": "50.55000000",
+        "currency_name": "Bahraini dinar",
+        "currency": "BHD",
+        "phone_code": "973",
+        "flag": "country_flag/bahrain-16x16-32974.png",
+        "ordering": 18,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 19,
+    "fields": {
+        "name": "Bangladesh",
+        "country_code": "BD",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "24.00000000",
+        "longitude": "90.00000000",
+        "currency_name": "Bangladeshi taka",
+        "currency": "BDT",
+        "phone_code": "880",
+        "flag": "country_flag/bangladesh-16x16-32916.png",
+        "ordering": 19,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 20,
+    "fields": {
+        "name": "Barbados",
+        "country_code": "BB",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "13.16666666",
+        "longitude": "-59.53333333",
+        "currency_name": "Barbadian dollar",
+        "currency": "BBD",
+        "phone_code": "+1-246",
+        "flag": "country_flag/barbados-16x16-32913.png",
+        "ordering": 20,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 21,
+    "fields": {
+        "name": "Belarus",
+        "country_code": "BY",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "53.00000000",
+        "longitude": "28.00000000",
+        "currency_name": "Belarusian ruble",
+        "currency": "BYN",
+        "phone_code": "375",
+        "flag": "country_flag/belarus-16x16-32918.png",
+        "ordering": 21,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 22,
+    "fields": {
+        "name": "Belgium",
+        "country_code": "BE",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "50.83333333",
+        "longitude": "4.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "32",
+        "flag": "country_flag/belgium-16x16-32911.png",
+        "ordering": 22,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 23,
+    "fields": {
+        "name": "Belize",
+        "country_code": "BZ",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "17.25000000",
+        "longitude": "-88.75000000",
+        "currency_name": "Belize dollar",
+        "currency": "BZD",
+        "phone_code": "501",
+        "flag": "country_flag/belize-16x16-32927.png",
+        "ordering": 23,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 24,
+    "fields": {
+        "name": "Benin",
+        "country_code": "BJ",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "9.50000000",
+        "longitude": "2.25000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "229",
+        "flag": "country_flag/benin-16x16-32922.png",
+        "ordering": 24,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 25,
+    "fields": {
+        "name": "Bermuda",
+        "country_code": "BM",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "latitude": "32.33333333",
+        "longitude": "-64.75000000",
+        "currency_name": "Bermudian dollar",
+        "currency": "BMD",
+        "phone_code": "+1-441",
+        "flag": "country_flag/bermuda-16x16-32929.png",
+        "ordering": 25,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 26,
+    "fields": {
+        "name": "Bhutan",
+        "country_code": "BT",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "27.50000000",
+        "longitude": "90.50000000",
+        "currency_name": "Bhutanese ngultrum",
+        "currency": "BTN",
+        "phone_code": "975",
+        "flag": "country_flag/bhutan-16x16-32931.png",
+        "ordering": 26,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 27,
+    "fields": {
+        "name": "Bolivia",
+        "country_code": "BO",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-17.00000000",
+        "longitude": "-65.00000000",
+        "currency_name": "Bolivian boliviano",
+        "currency": "BOB",
+        "phone_code": "591",
+        "flag": "country_flag/bolivia-16x16-32945.png",
+        "ordering": 27,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 28,
+    "fields": {
+        "name": "Bosnia and Herzegovina",
+        "country_code": "BA",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "44.00000000",
+        "longitude": "18.00000000",
+        "currency_name": "Bosnia and Herzegovina convertible mark",
+        "currency": "BAM",
+        "phone_code": "387",
+        "flag": "country_flag/bosnia-16x16-32932.png",
+        "ordering": 28,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 29,
+    "fields": {
+        "name": "Botswana",
+        "country_code": "BW",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "latitude": "-22.00000000",
+        "longitude": "24.00000000",
+        "currency_name": "Botswana pula",
+        "currency": "BWP",
+        "phone_code": "267",
+        "flag": "country_flag/bostwana-16x16-32933.png",
+        "ordering": 29,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 30,
+    "fields": {
+        "name": "Bouvet Island",
+        "country_code": "BV",
+        "region": "",
+        "subregion": "",
+        "latitude": "-54.43333333",
+        "longitude": "3.40000000",
+        "currency_name": "Norwegian Krone",
+        "currency": "NOK",
+        "phone_code": "0055",
+        "flag": "country_flag/bouvet-16x16-33156.png",
+        "ordering": 30,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 31,
+    "fields": {
+        "name": "Brazil",
+        "country_code": "BR",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-10.00000000",
+        "longitude": "-55.00000000",
+        "currency_name": "Brazilian real",
+        "currency": "BRL",
+        "phone_code": "55",
+        "flag": "country_flag/brazil-16x16-32937.png",
+        "ordering": 31,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 32,
+    "fields": {
+        "name": "British Indian Ocean Territory",
+        "country_code": "IO",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-6.00000000",
+        "longitude": "71.50000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "246",
+        "flag": "country_flag/british-16x16-33159.png",
+        "ordering": 32,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 33,
+    "fields": {
+        "name": "Brunei",
+        "country_code": "BN",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "4.50000000",
+        "longitude": "114.66666666",
+        "currency_name": "Brunei dollar",
+        "currency": "BND",
+        "phone_code": "673",
+        "flag": "country_flag/brunei-16x16-32944.png",
+        "ordering": 33,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 34,
+    "fields": {
+        "name": "Bulgaria",
+        "country_code": "BG",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "43.00000000",
+        "longitude": "25.00000000",
+        "currency_name": "Bulgarian lev",
+        "currency": "BGN",
+        "phone_code": "359",
+        "flag": "country_flag/bulgaria-16x16-32973.png",
+        "ordering": 34,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 35,
+    "fields": {
+        "name": "Burkina Faso",
+        "country_code": "BF",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "13.00000000",
+        "longitude": "-2.00000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "226",
+        "flag": "country_flag/burkina-16x16-32934.png",
+        "ordering": 35,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 36,
+    "fields": {
+        "name": "Burundi",
+        "country_code": "BI",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-3.50000000",
+        "longitude": "30.00000000",
+        "currency_name": "Burundian franc",
+        "currency": "BIF",
+        "phone_code": "257",
+        "flag": "country_flag/burundi-16x16-32935.png",
+        "ordering": 36,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 37,
+    "fields": {
+        "name": "Cambodia",
+        "country_code": "KH",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "13.00000000",
+        "longitude": "105.00000000",
+        "currency_name": "Cambodian riel",
+        "currency": "KHR",
+        "phone_code": "855",
+        "flag": "country_flag/cambodia-16x16-32978.png",
+        "ordering": 37,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 38,
+    "fields": {
+        "name": "Cameroon",
+        "country_code": "CM",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "6.00000000",
+        "longitude": "12.00000000",
+        "currency_name": "Central African CFA franc",
+        "currency": "XAF",
+        "phone_code": "237",
+        "flag": "country_flag/cameroon-16x16-32936.png",
+        "ordering": 38,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 39,
+    "fields": {
+        "name": "Canada",
+        "country_code": "CA",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "latitude": "60.00000000",
+        "longitude": "-95.00000000",
+        "currency_name": "Canadian dollar",
+        "currency": "CAD",
+        "phone_code": "1",
+        "flag": "country_flag/canada-16x16-32938.png",
+        "ordering": 39,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 40,
+    "fields": {
+        "name": "Cape Verde",
+        "country_code": "CV",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "16.00000000",
+        "longitude": "-24.00000000",
+        "currency_name": "Cape Verdean escudo",
+        "currency": "CVE",
+        "phone_code": "238",
+        "flag": "",
+        "ordering": 40,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 41,
+    "fields": {
+        "name": "Cayman Islands",
+        "country_code": "KY",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "19.50000000",
+        "longitude": "-80.50000000",
+        "currency_name": "Cayman Islands dollar",
+        "currency": "KYD",
+        "phone_code": "+1-345",
+        "flag": "country_flag/cayman-16x16-32986.png",
+        "ordering": 41,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 42,
+    "fields": {
+        "name": "Central African Republic",
+        "country_code": "CF",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "7.00000000",
+        "longitude": "21.00000000",
+        "currency_name": "Central African CFA franc",
+        "currency": "XAF",
+        "phone_code": "236",
+        "flag": "country_flag/central-16x16-32940.png",
+        "ordering": 42,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 43,
+    "fields": {
+        "name": "Chad",
+        "country_code": "TD",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "15.00000000",
+        "longitude": "19.00000000",
+        "currency_name": "Central African CFA franc",
+        "currency": "XAF",
+        "phone_code": "235",
+        "flag": "country_flag/chad-16x16-32985.png",
+        "ordering": 43,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 44,
+    "fields": {
+        "name": "Chile",
+        "country_code": "CL",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-30.00000000",
+        "longitude": "-71.00000000",
+        "currency_name": "Chilean peso",
+        "currency": "CLP",
+        "phone_code": "56",
+        "flag": "country_flag/chile-16x16-32939.png",
+        "ordering": 44,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 45,
+    "fields": {
+        "name": "China",
+        "country_code": "CN",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "35.00000000",
+        "longitude": "105.00000000",
+        "currency_name": "Chinese yuan",
+        "currency": "CNY",
+        "phone_code": "86",
+        "flag": "country_flag/china-16x16-32942.png",
+        "ordering": 45,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 46,
+    "fields": {
+        "name": "Christmas Island",
+        "country_code": "CX",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "latitude": "-10.50000000",
+        "longitude": "105.66666666",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "61",
+        "flag": "country_flag/christmas-16x16-32943.png",
+        "ordering": 46,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 47,
+    "fields": {
+        "name": "Cocos (Keeling) Islands",
+        "country_code": "CC",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "latitude": "-12.50000000",
+        "longitude": "96.83333333",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "61",
+        "flag": "country_flag/cocos-16x16-32947.png",
+        "ordering": 47,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 48,
+    "fields": {
+        "name": "Colombia",
+        "country_code": "CO",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "4.00000000",
+        "longitude": "-72.00000000",
+        "currency_name": "Colombian peso",
+        "currency": "COP",
+        "phone_code": "57",
+        "flag": "country_flag/colombia-16x16-32946.png",
+        "ordering": 48,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 49,
+    "fields": {
+        "name": "Comoros",
+        "country_code": "KM",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-12.16666666",
+        "longitude": "44.25000000",
+        "currency_name": "Comorian franc",
+        "currency": "KMF",
+        "phone_code": "269",
+        "flag": "country_flag/comoros-16x16-32981.png",
+        "ordering": 49,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 50,
+    "fields": {
+        "name": "Congo",
+        "country_code": "CG",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "-1.00000000",
+        "longitude": "15.00000000",
+        "currency_name": "Central African CFA franc",
+        "currency": "XAF",
+        "phone_code": "242",
+        "flag": "",
+        "ordering": 50,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 51,
+    "fields": {
+        "name": "Democratic Republic of the Congo",
+        "country_code": "CD",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "0.00000000",
+        "longitude": "25.00000000",
+        "currency_name": "Congolese Franc",
+        "currency": "CDF",
+        "phone_code": "243",
+        "flag": "",
+        "ordering": 51,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 52,
+    "fields": {
+        "name": "Cook Islands",
+        "country_code": "CK",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-21.23333333",
+        "longitude": "-159.76666666",
+        "currency_name": "Cook Islands dollar",
+        "currency": "NZD",
+        "phone_code": "682",
+        "flag": "country_flag/cook-16x16-32954.png",
+        "ordering": 52,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 53,
+    "fields": {
+        "name": "Costa Rica",
+        "country_code": "CR",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "10.00000000",
+        "longitude": "-84.00000000",
+        "currency_name": "Costa Rican col≤n",
+        "currency": "CRC",
+        "phone_code": "506",
+        "flag": "country_flag/costa-16x16-32948.png",
+        "ordering": 53,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 54,
+    "fields": {
+        "name": "Cote D'Ivoire (Ivory Coast)",
+        "country_code": "CI",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "8.00000000",
+        "longitude": "-5.00000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "225",
+        "flag": "country_flag/cote-16x16-32949.png",
+        "ordering": 54,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 55,
+    "fields": {
+        "name": "Croatia",
+        "country_code": "HR",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "45.16666666",
+        "longitude": "15.50000000",
+        "currency_name": "Croatian kuna",
+        "currency": "HRK",
+        "phone_code": "385",
+        "flag": "country_flag/croatia-16x16-32995.png",
+        "ordering": 55,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 56,
+    "fields": {
+        "name": "Cuba",
+        "country_code": "CU",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "21.50000000",
+        "longitude": "-80.00000000",
+        "currency_name": "Cuban peso",
+        "currency": "CUP",
+        "phone_code": "53",
+        "flag": "country_flag/cuba-16x16-32951.png",
+        "ordering": 56,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 57,
+    "fields": {
+        "name": "Cyprus",
+        "country_code": "CY",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "35.00000000",
+        "longitude": "33.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "357",
+        "flag": "country_flag/cyprus-16x16-32953.png",
+        "ordering": 57,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 58,
+    "fields": {
+        "name": "Czech Republic",
+        "country_code": "CZ",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "49.75000000",
+        "longitude": "15.50000000",
+        "currency_name": "Czech koruna",
+        "currency": "CZK",
+        "phone_code": "420",
+        "flag": "country_flag/czech-16x16-32956.png",
+        "ordering": 58,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 59,
+    "fields": {
+        "name": "Denmark",
+        "country_code": "DK",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "56.00000000",
+        "longitude": "10.00000000",
+        "currency_name": "Danish krone",
+        "currency": "DKK",
+        "phone_code": "45",
+        "flag": "country_flag/denmark-16x16-32955.png",
+        "ordering": 59,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 60,
+    "fields": {
+        "name": "Djibouti",
+        "country_code": "DJ",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "11.50000000",
+        "longitude": "43.00000000",
+        "currency_name": "Djiboutian franc",
+        "currency": "DJF",
+        "phone_code": "253",
+        "flag": "country_flag/djibouti-16x16-32957.png",
+        "ordering": 60,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 61,
+    "fields": {
+        "name": "Dominica",
+        "country_code": "DM",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "15.41666666",
+        "longitude": "-61.33333333",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-767",
+        "flag": "country_flag/dominica-16x16-32960.png",
+        "ordering": 61,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 62,
+    "fields": {
+        "name": "Dominican Republic",
+        "country_code": "DO",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "19.00000000",
+        "longitude": "-70.66666666",
+        "currency_name": "Dominican peso",
+        "currency": "DOP",
+        "phone_code": "+1-809 and 1-829",
+        "flag": "country_flag/dominican-16x16-32993.png",
+        "ordering": 62,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 63,
+    "fields": {
+        "name": "East Timor",
+        "country_code": "TL",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "-8.83333333",
+        "longitude": "125.91666666",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "670",
+        "flag": "country_flag/timor-16x16-33103.png",
+        "ordering": 63,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 64,
+    "fields": {
+        "name": "Ecuador",
+        "country_code": "EC",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-2.00000000",
+        "longitude": "-77.50000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "593",
+        "flag": "country_flag/ecuador-16x16-32962.png",
+        "ordering": 64,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 65,
+    "fields": {
+        "name": "Egypt",
+        "country_code": "EG",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "27.00000000",
+        "longitude": "30.00000000",
+        "currency_name": "Egyptian pound",
+        "currency": "EGP",
+        "phone_code": "20",
+        "flag": "country_flag/egypt-16x16-32961.png",
+        "ordering": 65,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 66,
+    "fields": {
+        "name": "El Salvador",
+        "country_code": "SV",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "13.83333333",
+        "longitude": "-88.91666666",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "503",
+        "flag": "country_flag/el-16x16-33011.png",
+        "ordering": 66,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 67,
+    "fields": {
+        "name": "Equatorial Guinea",
+        "country_code": "GQ",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "2.00000000",
+        "longitude": "10.00000000",
+        "currency_name": "Central African CFA franc",
+        "currency": "XAF",
+        "phone_code": "240",
+        "flag": "country_flag/equatorial-16x16-32971.png",
+        "ordering": 67,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 68,
+    "fields": {
+        "name": "Eritrea",
+        "country_code": "ER",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "15.00000000",
+        "longitude": "39.00000000",
+        "currency_name": "Eritrean nakfa",
+        "currency": "ERN",
+        "phone_code": "291",
+        "flag": "country_flag/eritrea-16x16-32964.png",
+        "ordering": 68,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 69,
+    "fields": {
+        "name": "Estonia",
+        "country_code": "EE",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "59.00000000",
+        "longitude": "26.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "372",
+        "flag": "country_flag/estonia-16x16-32959.png",
+        "ordering": 69,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 70,
+    "fields": {
+        "name": "Ethiopia",
+        "country_code": "ET",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "8.00000000",
+        "longitude": "38.00000000",
+        "currency_name": "Ethiopian birr",
+        "currency": "ETB",
+        "phone_code": "251",
+        "flag": "country_flag/ethiopia-16x16-32958.png",
+        "ordering": 70,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 71,
+    "fields": {
+        "name": "Falkland Islands",
+        "country_code": "FK",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-51.75000000",
+        "longitude": "-59.00000000",
+        "currency_name": "Falkland Islands pound",
+        "currency": "FKP",
+        "phone_code": "500",
+        "flag": "country_flag/falkland-16x16-32963.png",
+        "ordering": 71,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 72,
+    "fields": {
+        "name": "Faroe Islands",
+        "country_code": "FO",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "62.00000000",
+        "longitude": "-7.00000000",
+        "currency_name": "Danish krone",
+        "currency": "DKK",
+        "phone_code": "298",
+        "flag": "country_flag/faroe-16x16-32965.png",
+        "ordering": 72,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 73,
+    "fields": {
+        "name": "Fiji Islands",
+        "country_code": "FJ",
+        "region": "Oceania",
+        "subregion": "Melanesia",
+        "latitude": "-18.00000000",
+        "longitude": "175.00000000",
+        "currency_name": "Fijian dollar",
+        "currency": "FJD",
+        "phone_code": "679",
+        "flag": "country_flag/fiji-16x16-32970.png",
+        "ordering": 73,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 74,
+    "fields": {
+        "name": "Finland",
+        "country_code": "FI",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "64.00000000",
+        "longitude": "26.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "358",
+        "flag": "country_flag/finland-16x16-32966.png",
+        "ordering": 74,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 75,
+    "fields": {
+        "name": "France",
+        "country_code": "FR",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "46.00000000",
+        "longitude": "2.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "33",
+        "flag": "country_flag/france-16x16-32967.png",
+        "ordering": 75,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 76,
+    "fields": {
+        "name": "French Guiana",
+        "country_code": "GF",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "4.00000000",
+        "longitude": "-53.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "594",
+        "flag": "country_flag/french-16x16-32975.png",
+        "ordering": 76,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 77,
+    "fields": {
+        "name": "French Polynesia",
+        "country_code": "PF",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-15.00000000",
+        "longitude": "-140.00000000",
+        "currency_name": "CFP franc",
+        "currency": "XPF",
+        "phone_code": "689",
+        "flag": "country_flag/french-16x16-32977.png",
+        "ordering": 77,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 78,
+    "fields": {
+        "name": "French Southern Territories",
+        "country_code": "TF",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "latitude": "-49.25000000",
+        "longitude": "69.16700000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "262",
+        "flag": "country_flag/french-16x16-33024.png",
+        "ordering": 78,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 79,
+    "fields": {
+        "name": "Gabon",
+        "country_code": "GA",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "-1.00000000",
+        "longitude": "11.75000000",
+        "currency_name": "Central African CFA franc",
+        "currency": "XAF",
+        "phone_code": "241",
+        "flag": "country_flag/gabon-16x16-32968.png",
+        "ordering": 79,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 80,
+    "fields": {
+        "name": "Gambia The",
+        "country_code": "GM",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "13.46666666",
+        "longitude": "-16.56666666",
+        "currency_name": "Gambian dalasi",
+        "currency": "GMD",
+        "phone_code": "220",
+        "flag": "country_flag/gambia-16x16-32976.png",
+        "ordering": 80,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 81,
+    "fields": {
+        "name": "Georgia",
+        "country_code": "GE",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "42.00000000",
+        "longitude": "43.50000000",
+        "currency_name": "Georgian lari",
+        "currency": "GEL",
+        "phone_code": "995",
+        "flag": "country_flag/georgia-16x16-32979.png",
+        "ordering": 81,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 82,
+    "fields": {
+        "name": "Germany",
+        "country_code": "DE",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "51.00000000",
+        "longitude": "9.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "49",
+        "flag": "country_flag/germany-16x16-32989.png",
+        "ordering": 82,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 83,
+    "fields": {
+        "name": "Ghana",
+        "country_code": "GH",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "8.00000000",
+        "longitude": "-2.00000000",
+        "currency_name": "Ghanaian cedi",
+        "currency": "GHS",
+        "phone_code": "233",
+        "flag": "country_flag/ghana-16x16-32990.png",
+        "ordering": 83,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 84,
+    "fields": {
+        "name": "Gibraltar",
+        "country_code": "GI",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "36.13333333",
+        "longitude": "-5.35000000",
+        "currency_name": "Gibraltar pound",
+        "currency": "GIP",
+        "phone_code": "350",
+        "flag": "country_flag/gibraltar-16x16-32992.png",
+        "ordering": 84,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 85,
+    "fields": {
+        "name": "Greece",
+        "country_code": "GR",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "39.00000000",
+        "longitude": "22.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "30",
+        "flag": "country_flag/greece-16x16-32991.png",
+        "ordering": 85,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 86,
+    "fields": {
+        "name": "Greenland",
+        "country_code": "GL",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "latitude": "72.00000000",
+        "longitude": "-40.00000000",
+        "currency_name": "Danish krone",
+        "currency": "DKK",
+        "phone_code": "299",
+        "flag": "country_flag/greenland-16x16-33003.png",
+        "ordering": 86,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 87,
+    "fields": {
+        "name": "Grenada",
+        "country_code": "GD",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "12.11666666",
+        "longitude": "-61.66666666",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-473",
+        "flag": "country_flag/grenada-16x16-33002.png",
+        "ordering": 87,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 88,
+    "fields": {
+        "name": "Guadeloupe",
+        "country_code": "GP",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "16.25000000",
+        "longitude": "-61.58333300",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "590",
+        "flag": "country_flag/guadeloupe-16x16-32982.png",
+        "ordering": 88,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 89,
+    "fields": {
+        "name": "Guam",
+        "country_code": "GU",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "13.46666666",
+        "longitude": "144.78333333",
+        "currency_name": "US Dollar",
+        "currency": "USD",
+        "phone_code": "+1-671",
+        "flag": "country_flag/guam-16x16-33006.png",
+        "ordering": 89,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 90,
+    "fields": {
+        "name": "Guatemala",
+        "country_code": "GT",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "15.50000000",
+        "longitude": "-90.25000000",
+        "currency_name": "Guatemalan quetzal",
+        "currency": "GTQ",
+        "phone_code": "502",
+        "flag": "country_flag/guatemala-16x16-33009.png",
+        "ordering": 90,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 91,
+    "fields": {
+        "name": "Guernsey and Alderney",
+        "country_code": "GG",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "49.46666666",
+        "longitude": "-2.58333333",
+        "currency_name": "British pound",
+        "currency": "GBP",
+        "phone_code": "+44-1481",
+        "flag": "country_flag/guernsey-16x16-32980.png",
+        "ordering": 91,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 92,
+    "fields": {
+        "name": "Guinea",
+        "country_code": "GN",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "11.00000000",
+        "longitude": "-10.00000000",
+        "currency_name": "Guinean franc",
+        "currency": "GNF",
+        "phone_code": "224",
+        "flag": "country_flag/guinea-16x16-32983.png",
+        "ordering": 92,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 93,
+    "fields": {
+        "name": "Guinea-Bissau",
+        "country_code": "GW",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "12.00000000",
+        "longitude": "-15.00000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "245",
+        "flag": "country_flag/guinea-16x16-33008.png",
+        "ordering": 93,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 94,
+    "fields": {
+        "name": "Guyana",
+        "country_code": "GY",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "5.00000000",
+        "longitude": "-59.00000000",
+        "currency_name": "Guyanese dollar",
+        "currency": "GYD",
+        "phone_code": "592",
+        "flag": "country_flag/guyana-16x16-33007.png",
+        "ordering": 94,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 95,
+    "fields": {
+        "name": "Haiti",
+        "country_code": "HT",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "19.00000000",
+        "longitude": "-72.41666666",
+        "currency_name": "Haitian gourde",
+        "currency": "HTG",
+        "phone_code": "509",
+        "flag": "country_flag/haiti-16x16-32984.png",
+        "ordering": 95,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 96,
+    "fields": {
+        "name": "Heard Island and McDonald Islands",
+        "country_code": "HM",
+        "region": "",
+        "subregion": "",
+        "latitude": "-53.10000000",
+        "longitude": "72.51666666",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "672",
+        "flag": "country_flag/heard-16x16-33153.png",
+        "ordering": 96,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 97,
+    "fields": {
+        "name": "Honduras",
+        "country_code": "HN",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "15.00000000",
+        "longitude": "-86.50000000",
+        "currency_name": "Honduran lempira",
+        "currency": "HNL",
+        "phone_code": "504",
+        "flag": "country_flag/honduras-16x16-33020.png",
+        "ordering": 97,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 98,
+    "fields": {
+        "name": "Hong Kong S.A.R.",
+        "country_code": "HK",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "22.25000000",
+        "longitude": "114.16666666",
+        "currency_name": "Hong Kong dollar",
+        "currency": "HKD",
+        "phone_code": "852",
+        "flag": "country_flag/hong-16x16-32987.png",
+        "ordering": 98,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 99,
+    "fields": {
+        "name": "Hungary",
+        "country_code": "HU",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "47.00000000",
+        "longitude": "20.00000000",
+        "currency_name": "Hungarian forint",
+        "currency": "HUF",
+        "phone_code": "36",
+        "flag": "country_flag/hungary-16x16-33019.png",
+        "ordering": 99,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 100,
+    "fields": {
+        "name": "Iceland",
+        "country_code": "IS",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "65.00000000",
+        "longitude": "-18.00000000",
+        "currency_name": "Icelandic kr≤na",
+        "currency": "ISK",
+        "phone_code": "354",
+        "flag": "country_flag/iceland-16x16-33152.png",
+        "ordering": 100,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 101,
+    "fields": {
+        "name": "India",
+        "country_code": "IN",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "20.00000000",
+        "longitude": "77.00000000",
+        "currency_name": "Indian rupee",
+        "currency": "INR",
+        "phone_code": "91",
+        "flag": "country_flag/india-16x16-32988.png",
+        "ordering": 101,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 102,
+    "fields": {
+        "name": "Indonesia",
+        "country_code": "ID",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "-5.00000000",
+        "longitude": "120.00000000",
+        "currency_name": "Indonesian rupiah",
+        "currency": "IDR",
+        "phone_code": "62",
+        "flag": "country_flag/indonesia-16x16-32994.png",
+        "ordering": 102,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 103,
+    "fields": {
+        "name": "Iran",
+        "country_code": "IR",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "32.00000000",
+        "longitude": "53.00000000",
+        "currency_name": "Iranian rial",
+        "currency": "IRR",
+        "phone_code": "98",
+        "flag": "country_flag/iran-16x16-33022.png",
+        "ordering": 103,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 104,
+    "fields": {
+        "name": "Iraq",
+        "country_code": "IQ",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "33.00000000",
+        "longitude": "44.00000000",
+        "currency_name": "Iraqi dinar",
+        "currency": "IQD",
+        "phone_code": "964",
+        "flag": "country_flag/iraq-16x16-33017.png",
+        "ordering": 104,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 105,
+    "fields": {
+        "name": "Ireland",
+        "country_code": "IE",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "53.00000000",
+        "longitude": "-8.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "353",
+        "flag": "country_flag/ireland-16x16-32996.png",
+        "ordering": 105,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 106,
+    "fields": {
+        "name": "Israel",
+        "country_code": "IL",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "31.50000000",
+        "longitude": "34.75000000",
+        "currency_name": "Israeli new shekel",
+        "currency": "ILS",
+        "phone_code": "972",
+        "flag": "country_flag/israel-16x16-32997.png",
+        "ordering": 106,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 107,
+    "fields": {
+        "name": "Italy",
+        "country_code": "IT",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "42.83333333",
+        "longitude": "12.83333333",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "39",
+        "flag": "country_flag/italy-16x16-32999.png",
+        "ordering": 107,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 108,
+    "fields": {
+        "name": "Jamaica",
+        "country_code": "JM",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.25000000",
+        "longitude": "-77.50000000",
+        "currency_name": "Jamaican dollar",
+        "currency": "JMD",
+        "phone_code": "+1-876",
+        "flag": "country_flag/jamaica-16x16-33000.png",
+        "ordering": 108,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 109,
+    "fields": {
+        "name": "Japan",
+        "country_code": "JP",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "36.00000000",
+        "longitude": "138.00000000",
+        "currency_name": "Japanese yen",
+        "currency": "JPY",
+        "phone_code": "81",
+        "flag": "country_flag/japan-16x16-33001.png",
+        "ordering": 109,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 110,
+    "fields": {
+        "name": "Jersey",
+        "country_code": "JE",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "49.25000000",
+        "longitude": "-2.16666666",
+        "currency_name": "British pound",
+        "currency": "GBP",
+        "phone_code": "+44-1534",
+        "flag": "country_flag/jersey-16x16-33004.png",
+        "ordering": 110,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 111,
+    "fields": {
+        "name": "Jordan",
+        "country_code": "JO",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "31.00000000",
+        "longitude": "36.00000000",
+        "currency_name": "Jordanian dinar",
+        "currency": "JOD",
+        "phone_code": "962",
+        "flag": "country_flag/jordan-16x16-33005.png",
+        "ordering": 111,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 112,
+    "fields": {
+        "name": "Kazakhstan",
+        "country_code": "KZ",
+        "region": "Asia",
+        "subregion": "Central Asia",
+        "latitude": "48.00000000",
+        "longitude": "68.00000000",
+        "currency_name": "Kazakhstani tenge",
+        "currency": "KZT",
+        "phone_code": "7",
+        "flag": "country_flag/kazakhstan-16x16-33021.png",
+        "ordering": 112,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 113,
+    "fields": {
+        "name": "Kenya",
+        "country_code": "KE",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "1.00000000",
+        "longitude": "38.00000000",
+        "currency_name": "Kenyan shilling",
+        "currency": "KES",
+        "phone_code": "254",
+        "flag": "country_flag/kenya-16x16-33010.png",
+        "ordering": 113,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 114,
+    "fields": {
+        "name": "Kiribati",
+        "country_code": "KI",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "1.41666666",
+        "longitude": "173.00000000",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "686",
+        "flag": "country_flag/kiribati-16x16-33012.png",
+        "ordering": 114,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 115,
+    "fields": {
+        "name": "North Korea",
+        "country_code": "KP",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "40.00000000",
+        "longitude": "127.00000000",
+        "currency_name": "North Korean Won",
+        "currency": "KPW",
+        "phone_code": "850",
+        "flag": "",
+        "ordering": 115,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 116,
+    "fields": {
+        "name": "South Korea",
+        "country_code": "KR",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "37.00000000",
+        "longitude": "127.50000000",
+        "currency_name": "Won",
+        "currency": "KRW",
+        "phone_code": "82",
+        "flag": "",
+        "ordering": 116,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 117,
+    "fields": {
+        "name": "Kuwait",
+        "country_code": "KW",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "29.50000000",
+        "longitude": "45.75000000",
+        "currency_name": "Kuwaiti dinar",
+        "currency": "KWD",
+        "phone_code": "965",
+        "flag": "country_flag/kuwait-16x16-33013.png",
+        "ordering": 117,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 118,
+    "fields": {
+        "name": "Kyrgyzstan",
+        "country_code": "KG",
+        "region": "Asia",
+        "subregion": "Central Asia",
+        "latitude": "41.00000000",
+        "longitude": "75.00000000",
+        "currency_name": "Kyrgyzstani som",
+        "currency": "KGS",
+        "phone_code": "996",
+        "flag": "country_flag/kyrgyzstan-16x16-33014.png",
+        "ordering": 118,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 119,
+    "fields": {
+        "name": "Laos",
+        "country_code": "LA",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "18.00000000",
+        "longitude": "105.00000000",
+        "currency_name": "Lao kip",
+        "currency": "LAK",
+        "phone_code": "856",
+        "flag": "country_flag/laos-16x16-33018.png",
+        "ordering": 119,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 120,
+    "fields": {
+        "name": "Latvia",
+        "country_code": "LV",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "57.00000000",
+        "longitude": "25.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "371",
+        "flag": "country_flag/latvia-16x16-33031.png",
+        "ordering": 120,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 121,
+    "fields": {
+        "name": "Lebanon",
+        "country_code": "LB",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "33.83333333",
+        "longitude": "35.83333333",
+        "currency_name": "Lebanese pound",
+        "currency": "LBP",
+        "phone_code": "961",
+        "flag": "country_flag/lebanon-16x16-33015.png",
+        "ordering": 121,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 122,
+    "fields": {
+        "name": "Lesotho",
+        "country_code": "LS",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "latitude": "-29.50000000",
+        "longitude": "28.50000000",
+        "currency_name": "Lesotho loti",
+        "currency": "LSL",
+        "phone_code": "266",
+        "flag": "country_flag/lesotho-16x16-33029.png",
+        "ordering": 122,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 123,
+    "fields": {
+        "name": "Liberia",
+        "country_code": "LR",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "6.50000000",
+        "longitude": "-9.50000000",
+        "currency_name": "Liberian dollar",
+        "currency": "LRD",
+        "phone_code": "231",
+        "flag": "country_flag/liberia-16x16-33032.png",
+        "ordering": 123,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 124,
+    "fields": {
+        "name": "Libya",
+        "country_code": "LY",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "25.00000000",
+        "longitude": "17.00000000",
+        "currency_name": "Libyan dinar",
+        "currency": "LYD",
+        "phone_code": "218",
+        "flag": "country_flag/libya-16x16-33026.png",
+        "ordering": 124,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 125,
+    "fields": {
+        "name": "Liechtenstein",
+        "country_code": "LI",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "47.26666666",
+        "longitude": "9.53333333",
+        "currency_name": "Swiss franc",
+        "currency": "CHF",
+        "phone_code": "423",
+        "flag": "country_flag/liechtenstein-16x16-33016.png",
+        "ordering": 125,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 126,
+    "fields": {
+        "name": "Lithuania",
+        "country_code": "LT",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "56.00000000",
+        "longitude": "24.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "370",
+        "flag": "country_flag/lithuania-16x16-33043.png",
+        "ordering": 126,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 127,
+    "fields": {
+        "name": "Luxembourg",
+        "country_code": "LU",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "49.75000000",
+        "longitude": "6.16666666",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "352",
+        "flag": "country_flag/luxembourg-16x16-33041.png",
+        "ordering": 127,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 128,
+    "fields": {
+        "name": "Macau S.A.R.",
+        "country_code": "MO",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "22.16666666",
+        "longitude": "113.55000000",
+        "currency_name": "Macanese pataca",
+        "currency": "MOP",
+        "phone_code": "853",
+        "flag": "",
+        "ordering": 128,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 129,
+    "fields": {
+        "name": "North Macedonia",
+        "country_code": "MK",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "41.83333333",
+        "longitude": "22.00000000",
+        "currency_name": "Denar",
+        "currency": "MKD",
+        "phone_code": "389",
+        "flag": "",
+        "ordering": 129,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 130,
+    "fields": {
+        "name": "Madagascar",
+        "country_code": "MG",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-20.00000000",
+        "longitude": "47.00000000",
+        "currency_name": "Malagasy ariary",
+        "currency": "MGA",
+        "phone_code": "261",
+        "flag": "country_flag/madagascar-16x16-33042.png",
+        "ordering": 130,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 131,
+    "fields": {
+        "name": "Malawi",
+        "country_code": "MW",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-13.50000000",
+        "longitude": "34.00000000",
+        "currency_name": "Malawian kwacha",
+        "currency": "MWK",
+        "phone_code": "265",
+        "flag": "country_flag/malawi-16x16-33116.png",
+        "ordering": 131,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 132,
+    "fields": {
+        "name": "Malaysia",
+        "country_code": "MY",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "2.50000000",
+        "longitude": "112.50000000",
+        "currency_name": "Malaysian ringgit",
+        "currency": "MYR",
+        "phone_code": "60",
+        "flag": "country_flag/malaysia-16x16-33134.png",
+        "ordering": 132,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 133,
+    "fields": {
+        "name": "Maldives",
+        "country_code": "MV",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "3.25000000",
+        "longitude": "73.00000000",
+        "currency_name": "Maldivian rufiyaa",
+        "currency": "MVR",
+        "phone_code": "960",
+        "flag": "country_flag/maldives-16x16-33122.png",
+        "ordering": 133,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 134,
+    "fields": {
+        "name": "Mali",
+        "country_code": "ML",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "17.00000000",
+        "longitude": "-4.00000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "223",
+        "flag": "country_flag/mali-16x16-33025.png",
+        "ordering": 134,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 135,
+    "fields": {
+        "name": "Malta",
+        "country_code": "MT",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "35.83333333",
+        "longitude": "14.58333333",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "356",
+        "flag": "country_flag/malta-16x16-33120.png",
+        "ordering": 135,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 136,
+    "fields": {
+        "name": "Man (Isle of)",
+        "country_code": "IM",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "54.25000000",
+        "longitude": "-4.50000000",
+        "currency_name": "British pound",
+        "currency": "GBP",
+        "phone_code": "+44-1624",
+        "flag": "country_flag/isle-16x16-32998.png",
+        "ordering": 136,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 137,
+    "fields": {
+        "name": "Marshall Islands",
+        "country_code": "MH",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "9.00000000",
+        "longitude": "168.00000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "692",
+        "flag": "country_flag/marshall-16x16-33054.png",
+        "ordering": 137,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 138,
+    "fields": {
+        "name": "Martinique",
+        "country_code": "MQ",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "14.66666700",
+        "longitude": "-61.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "596",
+        "flag": "country_flag/martinique-16x16-33119.png",
+        "ordering": 138,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 139,
+    "fields": {
+        "name": "Mauritania",
+        "country_code": "MR",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "20.00000000",
+        "longitude": "-12.00000000",
+        "currency_name": "Mauritanian ouguiya",
+        "currency": "MRO",
+        "phone_code": "222",
+        "flag": "country_flag/mauritania-16x16-33125.png",
+        "ordering": 139,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 140,
+    "fields": {
+        "name": "Mauritius",
+        "country_code": "MU",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-20.28333333",
+        "longitude": "57.55000000",
+        "currency_name": "Mauritian rupee",
+        "currency": "MUR",
+        "phone_code": "230",
+        "flag": "country_flag/mauritius-16x16-33121.png",
+        "ordering": 140,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 141,
+    "fields": {
+        "name": "Mayotte",
+        "country_code": "YT",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-12.83333333",
+        "longitude": "45.16666666",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "262",
+        "flag": "country_flag/mayotte-16x16-33123.png",
+        "ordering": 141,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 142,
+    "fields": {
+        "name": "Mexico",
+        "country_code": "MX",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "23.00000000",
+        "longitude": "-102.00000000",
+        "currency_name": "Mexican peso",
+        "currency": "MXN",
+        "phone_code": "52",
+        "flag": "country_flag/mexico-16x16-33133.png",
+        "ordering": 142,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 143,
+    "fields": {
+        "name": "Micronesia",
+        "country_code": "FM",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "6.91666666",
+        "longitude": "158.25000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "691",
+        "flag": "country_flag/mn-16x16-33117.png",
+        "ordering": 143,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 144,
+    "fields": {
+        "name": "Moldova",
+        "country_code": "MD",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "47.00000000",
+        "longitude": "29.00000000",
+        "currency_name": "Moldovan leu",
+        "currency": "MDL",
+        "phone_code": "373",
+        "flag": "country_flag/mo-16x16-33127.png",
+        "ordering": 144,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 145,
+    "fields": {
+        "name": "Monaco",
+        "country_code": "MC",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "43.73333333",
+        "longitude": "7.40000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "377",
+        "flag": "country_flag/monaco-16x16-33053.png",
+        "ordering": 145,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 146,
+    "fields": {
+        "name": "Mongolia",
+        "country_code": "MN",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "46.00000000",
+        "longitude": "105.00000000",
+        "currency_name": "Mongolian t÷gr÷g",
+        "currency": "MNT",
+        "phone_code": "976",
+        "flag": "country_flag/mo-16x16-33127_N1Ri3Xp.png",
+        "ordering": 146,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 147,
+    "fields": {
+        "name": "Montenegro",
+        "country_code": "ME",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "42.50000000",
+        "longitude": "19.30000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "382",
+        "flag": "country_flag/montenegro-16x16-33056.png",
+        "ordering": 147,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 148,
+    "fields": {
+        "name": "Montserrat",
+        "country_code": "MS",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "16.75000000",
+        "longitude": "-62.20000000",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-664",
+        "flag": "country_flag/montserrat-16x16-33126.png",
+        "ordering": 148,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 149,
+    "fields": {
+        "name": "Morocco",
+        "country_code": "MA",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "32.00000000",
+        "longitude": "-5.00000000",
+        "currency_name": "Moroccan dirham",
+        "currency": "MAD",
+        "phone_code": "212",
+        "flag": "country_flag/morocco-16x16-33027.png",
+        "ordering": 149,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 150,
+    "fields": {
+        "name": "Mozambique",
+        "country_code": "MZ",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-18.25000000",
+        "longitude": "35.00000000",
+        "currency_name": "Mozambican metical",
+        "currency": "MZN",
+        "phone_code": "258",
+        "flag": "country_flag/mozambique-16x16-33033.png",
+        "ordering": 150,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 151,
+    "fields": {
+        "name": "Myanmar",
+        "country_code": "MM",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "22.00000000",
+        "longitude": "98.00000000",
+        "currency_name": "Burmese kyat",
+        "currency": "MMK",
+        "phone_code": "95",
+        "flag": "country_flag/myanmar-16x16-33118.png",
+        "ordering": 151,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 152,
+    "fields": {
+        "name": "Namibia",
+        "country_code": "NA",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "latitude": "-22.00000000",
+        "longitude": "17.00000000",
+        "currency_name": "Namibian dollar",
+        "currency": "NAD",
+        "phone_code": "264",
+        "flag": "country_flag/namibia-16x16-33132.png",
+        "ordering": 152,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 153,
+    "fields": {
+        "name": "Nauru",
+        "country_code": "NR",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "-0.53333333",
+        "longitude": "166.91666666",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "674",
+        "flag": "country_flag/nauru-16x16-33030.png",
+        "ordering": 153,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 154,
+    "fields": {
+        "name": "Nepal",
+        "country_code": "NP",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "28.00000000",
+        "longitude": "84.00000000",
+        "currency_name": "Nepalese rupee",
+        "currency": "NPR",
+        "phone_code": "977",
+        "flag": "country_flag/nepal-16x16-33028.png",
+        "ordering": 154,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 155,
+    "fields": {
+        "name": "Bonaire, Sint Eustatius and Saba",
+        "country_code": "BQ",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "12.15000000",
+        "longitude": "-68.26666700",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "599",
+        "flag": "",
+        "ordering": 155,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 156,
+    "fields": {
+        "name": "Netherlands",
+        "country_code": "NL",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "52.50000000",
+        "longitude": "5.75000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "31",
+        "flag": "country_flag/netherlands-16x16-33035.png",
+        "ordering": 156,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 157,
+    "fields": {
+        "name": "New Caledonia",
+        "country_code": "NC",
+        "region": "Oceania",
+        "subregion": "Melanesia",
+        "latitude": "-21.50000000",
+        "longitude": "165.50000000",
+        "currency_name": "CFP franc",
+        "currency": "XPF",
+        "phone_code": "687",
+        "flag": "country_flag/new-16x16-33036.png",
+        "ordering": 157,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 158,
+    "fields": {
+        "name": "New Zealand",
+        "country_code": "NZ",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "latitude": "-41.00000000",
+        "longitude": "174.00000000",
+        "currency_name": "New Zealand dollar",
+        "currency": "NZD",
+        "phone_code": "64",
+        "flag": "country_flag/new-16x16-33065.png",
+        "ordering": 158,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 159,
+    "fields": {
+        "name": "Nicaragua",
+        "country_code": "NI",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "13.00000000",
+        "longitude": "-85.00000000",
+        "currency_name": "Nicaraguan c≤rdoba",
+        "currency": "NIO",
+        "phone_code": "505",
+        "flag": "country_flag/nicaragua-16x16-33037.png",
+        "ordering": 159,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 160,
+    "fields": {
+        "name": "Niger",
+        "country_code": "NE",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "16.00000000",
+        "longitude": "8.00000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "227",
+        "flag": "country_flag/niger-16x16-33038.png",
+        "ordering": 160,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 161,
+    "fields": {
+        "name": "Nigeria",
+        "country_code": "NG",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "10.00000000",
+        "longitude": "8.00000000",
+        "currency_name": "Nigerian naira",
+        "currency": "NGN",
+        "phone_code": "234",
+        "flag": "country_flag/nigeria-16x16-33039.png",
+        "ordering": 161,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 162,
+    "fields": {
+        "name": "Niue",
+        "country_code": "NU",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-19.03333333",
+        "longitude": "-169.86666666",
+        "currency_name": "New Zealand dollar",
+        "currency": "NZD",
+        "phone_code": "683",
+        "flag": "",
+        "ordering": 162,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 163,
+    "fields": {
+        "name": "Norfolk Island",
+        "country_code": "NF",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "latitude": "-29.03333333",
+        "longitude": "167.95000000",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "672",
+        "flag": "country_flag/norfolk-16x16-33044.png",
+        "ordering": 163,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 164,
+    "fields": {
+        "name": "Northern Mariana Islands",
+        "country_code": "MP",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "15.20000000",
+        "longitude": "145.75000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "+1-670",
+        "flag": "country_flag/northern-16x16-33128.png",
+        "ordering": 164,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 165,
+    "fields": {
+        "name": "Norway",
+        "country_code": "NO",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "62.00000000",
+        "longitude": "10.00000000",
+        "currency_name": "Norwegian krone",
+        "currency": "NOK",
+        "phone_code": "47",
+        "flag": "country_flag/norway-16x16-33155.png",
+        "ordering": 165,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 166,
+    "fields": {
+        "name": "Oman",
+        "country_code": "OM",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "21.00000000",
+        "longitude": "57.00000000",
+        "currency_name": "Omani rial",
+        "currency": "OMR",
+        "phone_code": "968",
+        "flag": "country_flag/oman-16x16-33046.png",
+        "ordering": 166,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 167,
+    "fields": {
+        "name": "Pakistan",
+        "country_code": "PK",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "30.00000000",
+        "longitude": "70.00000000",
+        "currency_name": "Pakistani rupee",
+        "currency": "PKR",
+        "phone_code": "92",
+        "flag": "country_flag/pakistan-16x16-33047.png",
+        "ordering": 167,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 168,
+    "fields": {
+        "name": "Palau",
+        "country_code": "PW",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "latitude": "7.50000000",
+        "longitude": "134.50000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "680",
+        "flag": "country_flag/palau-16x16-33048.png",
+        "ordering": 168,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 169,
+    "fields": {
+        "name": "Palestinian Territory Occupied",
+        "country_code": "PS",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "31.90000000",
+        "longitude": "35.20000000",
+        "currency_name": "Israeli new shekel",
+        "currency": "ILS",
+        "phone_code": "970",
+        "flag": "",
+        "ordering": 169,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 170,
+    "fields": {
+        "name": "Panama",
+        "country_code": "PA",
+        "region": "Americas",
+        "subregion": "Central America",
+        "latitude": "9.00000000",
+        "longitude": "-80.00000000",
+        "currency_name": "Panamanian balboa",
+        "currency": "PAB",
+        "phone_code": "507",
+        "flag": "country_flag/panama-16x16-33049.png",
+        "ordering": 170,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 171,
+    "fields": {
+        "name": "Papua new Guinea",
+        "country_code": "PG",
+        "region": "Oceania",
+        "subregion": "Melanesia",
+        "latitude": "-6.00000000",
+        "longitude": "147.00000000",
+        "currency_name": "Papua New Guinean kina",
+        "currency": "PGK",
+        "phone_code": "675",
+        "flag": "country_flag/papua-16x16-33050.png",
+        "ordering": 171,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 172,
+    "fields": {
+        "name": "Paraguay",
+        "country_code": "PY",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-23.00000000",
+        "longitude": "-58.00000000",
+        "currency_name": "Paraguayan guarani",
+        "currency": "PYG",
+        "phone_code": "595",
+        "flag": "country_flag/paraguay-16x16-33066.png",
+        "ordering": 172,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 173,
+    "fields": {
+        "name": "Peru",
+        "country_code": "PE",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-10.00000000",
+        "longitude": "-76.00000000",
+        "currency_name": "Peruvian sol",
+        "currency": "PEN",
+        "phone_code": "51",
+        "flag": "country_flag/peru-16x16-33051.png",
+        "ordering": 173,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 174,
+    "fields": {
+        "name": "Philippines",
+        "country_code": "PH",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "13.00000000",
+        "longitude": "122.00000000",
+        "currency_name": "Philippine peso",
+        "currency": "PHP",
+        "phone_code": "63",
+        "flag": "country_flag/philippines-16x16-33052.png",
+        "ordering": 174,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 175,
+    "fields": {
+        "name": "Pitcairn Island",
+        "country_code": "PN",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-25.06666666",
+        "longitude": "-130.10000000",
+        "currency_name": "New Zealand dollar",
+        "currency": "NZD",
+        "phone_code": "870",
+        "flag": "",
+        "ordering": 175,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 176,
+    "fields": {
+        "name": "Poland",
+        "country_code": "PL",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "52.00000000",
+        "longitude": "20.00000000",
+        "currency_name": "Polish",
+        "currency": "PLN",
+        "phone_code": "48",
+        "flag": "country_flag/poland-16x16-33057.png",
+        "ordering": 176,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 177,
+    "fields": {
+        "name": "Portugal",
+        "country_code": "PT",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "39.50000000",
+        "longitude": "-8.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "351",
+        "flag": "country_flag/portugal-16x16-33058.png",
+        "ordering": 177,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 178,
+    "fields": {
+        "name": "Puerto Rico",
+        "country_code": "PR",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.25000000",
+        "longitude": "-66.50000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "+1-787 and 1-939",
+        "flag": "country_flag/puerto-16x16-33059.png",
+        "ordering": 178,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 179,
+    "fields": {
+        "name": "Qatar",
+        "country_code": "QA",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "25.50000000",
+        "longitude": "51.25000000",
+        "currency_name": "Qatari riyal",
+        "currency": "QAR",
+        "phone_code": "974",
+        "flag": "country_flag/qatar-16x16-33060.png",
+        "ordering": 179,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 180,
+    "fields": {
+        "name": "Reunion",
+        "country_code": "RE",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-21.15000000",
+        "longitude": "55.50000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "262",
+        "flag": "country_flag/runion-16x16-33062.png",
+        "ordering": 180,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 181,
+    "fields": {
+        "name": "Romania",
+        "country_code": "RO",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "46.00000000",
+        "longitude": "25.00000000",
+        "currency_name": "Romanian leu",
+        "currency": "RON",
+        "phone_code": "40",
+        "flag": "country_flag/romania-16x16-33063.png",
+        "ordering": 181,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 182,
+    "fields": {
+        "name": "Russia",
+        "country_code": "RU",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "60.00000000",
+        "longitude": "100.00000000",
+        "currency_name": "Russian ruble",
+        "currency": "RUB",
+        "phone_code": "7",
+        "flag": "country_flag/russia-16x16-33064.png",
+        "ordering": 182,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 183,
+    "fields": {
+        "name": "Rwanda",
+        "country_code": "RW",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-2.00000000",
+        "longitude": "30.00000000",
+        "currency_name": "Rwandan franc",
+        "currency": "RWF",
+        "phone_code": "250",
+        "flag": "country_flag/rwanda-16x16-33067.png",
+        "ordering": 183,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 184,
+    "fields": {
+        "name": "Saint Helena",
+        "country_code": "SH",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "-15.95000000",
+        "longitude": "-5.70000000",
+        "currency_name": "Saint Helena pound",
+        "currency": "SHP",
+        "phone_code": "290",
+        "flag": "country_flag/saint-16x16-33069.png",
+        "ordering": 184,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 185,
+    "fields": {
+        "name": "Saint Kitts And Nevis",
+        "country_code": "KN",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "17.33333333",
+        "longitude": "-62.75000000",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-869",
+        "flag": "country_flag/saint-16x16-33070.png",
+        "ordering": 185,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 186,
+    "fields": {
+        "name": "Saint Lucia",
+        "country_code": "LC",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "13.88333333",
+        "longitude": "-60.96666666",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-758",
+        "flag": "country_flag/saint-16x16-33071.png",
+        "ordering": 186,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 187,
+    "fields": {
+        "name": "Saint Pierre and Miquelon",
+        "country_code": "PM",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "latitude": "46.83333333",
+        "longitude": "-56.33333333",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "508",
+        "flag": "country_flag/saint-16x16-33073.png",
+        "ordering": 187,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 188,
+    "fields": {
+        "name": "Saint Vincent And The Grenadines",
+        "country_code": "VC",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "13.25000000",
+        "longitude": "-61.20000000",
+        "currency_name": "Eastern Caribbean dollar",
+        "currency": "XCD",
+        "phone_code": "+1-784",
+        "flag": "country_flag/saint-16x16-33131.png",
+        "ordering": 188,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 189,
+    "fields": {
+        "name": "Saint-Barthelemy",
+        "country_code": "BL",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.50000000",
+        "longitude": "-63.41666666",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "590",
+        "flag": "country_flag/saint-16x16-33068.png",
+        "ordering": 189,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 190,
+    "fields": {
+        "name": "Saint-Martin (French part)",
+        "country_code": "MF",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.08333333",
+        "longitude": "-63.95000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "590",
+        "flag": "country_flag/saint-16x16-33072.png",
+        "ordering": 190,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 191,
+    "fields": {
+        "name": "Samoa",
+        "country_code": "WS",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-13.58333333",
+        "longitude": "-172.33333333",
+        "currency_name": "Samoan tala",
+        "currency": "WST",
+        "phone_code": "685",
+        "flag": "country_flag/samoa-16x16-33124.png",
+        "ordering": 191,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 192,
+    "fields": {
+        "name": "San Marino",
+        "country_code": "SM",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "43.76666666",
+        "longitude": "12.41666666",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "378",
+        "flag": "country_flag/san-16x16-33074.png",
+        "ordering": 192,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 193,
+    "fields": {
+        "name": "Sao Tome and Principe",
+        "country_code": "ST",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "1.00000000",
+        "longitude": "7.00000000",
+        "currency_name": "Dobra",
+        "currency": "STD",
+        "phone_code": "239",
+        "flag": "country_flag/sao-16x16-33075.png",
+        "ordering": 193,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 194,
+    "fields": {
+        "name": "Saudi Arabia",
+        "country_code": "SA",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "25.00000000",
+        "longitude": "45.00000000",
+        "currency_name": "Saudi riyal",
+        "currency": "SAR",
+        "phone_code": "966",
+        "flag": "country_flag/saudi-16x16-33076.png",
+        "ordering": 194,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 195,
+    "fields": {
+        "name": "Senegal",
+        "country_code": "SN",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "14.00000000",
+        "longitude": "-14.00000000",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "221",
+        "flag": "country_flag/senegal-16x16-33077.png",
+        "ordering": 195,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 196,
+    "fields": {
+        "name": "Serbia",
+        "country_code": "RS",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "44.00000000",
+        "longitude": "21.00000000",
+        "currency_name": "Serbian dinar",
+        "currency": "RSD",
+        "phone_code": "381",
+        "flag": "country_flag/serbia-16x16-33099.png",
+        "ordering": 196,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 197,
+    "fields": {
+        "name": "Seychelles",
+        "country_code": "SC",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-4.58333333",
+        "longitude": "55.66666666",
+        "currency_name": "Seychellois rupee",
+        "currency": "SCR",
+        "phone_code": "248",
+        "flag": "country_flag/seychelles-16x16-33078.png",
+        "ordering": 197,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 198,
+    "fields": {
+        "name": "Sierra Leone",
+        "country_code": "SL",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "8.50000000",
+        "longitude": "-11.50000000",
+        "currency_name": "Sierra Leonean leone",
+        "currency": "SLL",
+        "phone_code": "232",
+        "flag": "country_flag/sierra-16x16-33079.png",
+        "ordering": 198,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 199,
+    "fields": {
+        "name": "Singapore",
+        "country_code": "SG",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "1.36666666",
+        "longitude": "103.80000000",
+        "currency_name": "Singapore dollar",
+        "currency": "SGD",
+        "phone_code": "65",
+        "flag": "country_flag/singapore-16x16-33080.png",
+        "ordering": 199,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 200,
+    "fields": {
+        "name": "Slovakia",
+        "country_code": "SK",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "48.66666666",
+        "longitude": "19.50000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "421",
+        "flag": "country_flag/slovakia-16x16-33082.png",
+        "ordering": 200,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 201,
+    "fields": {
+        "name": "Slovenia",
+        "country_code": "SI",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "46.11666666",
+        "longitude": "14.81666666",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "386",
+        "flag": "country_flag/slovenia-16x16-33084.png",
+        "ordering": 201,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 202,
+    "fields": {
+        "name": "Solomon Islands",
+        "country_code": "SB",
+        "region": "Oceania",
+        "subregion": "Melanesia",
+        "latitude": "-8.00000000",
+        "longitude": "159.00000000",
+        "currency_name": "Solomon Islands dollar",
+        "currency": "SBD",
+        "phone_code": "677",
+        "flag": "country_flag/solomon-16x16-33083.png",
+        "ordering": 202,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 203,
+    "fields": {
+        "name": "Somalia",
+        "country_code": "SO",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "10.00000000",
+        "longitude": "49.00000000",
+        "currency_name": "Somali shilling",
+        "currency": "SOS",
+        "phone_code": "252",
+        "flag": "country_flag/somalia-16x16-33085.png",
+        "ordering": 203,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 204,
+    "fields": {
+        "name": "South Africa",
+        "country_code": "ZA",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "latitude": "-29.00000000",
+        "longitude": "24.00000000",
+        "currency_name": "South African rand",
+        "currency": "ZAR",
+        "phone_code": "27",
+        "flag": "country_flag/belarus-16x16-32918.png",
+        "ordering": 204,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 205,
+    "fields": {
+        "name": "South Georgia",
+        "country_code": "GS",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-54.50000000",
+        "longitude": "-37.00000000",
+        "currency_name": "British pound",
+        "currency": "GBP",
+        "phone_code": "500",
+        "flag": "country_flag/south-16x16-33130.png",
+        "ordering": 205,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 206,
+    "fields": {
+        "name": "South Sudan",
+        "country_code": "SS",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "latitude": "7.00000000",
+        "longitude": "30.00000000",
+        "currency_name": "South Sudanese pound",
+        "currency": "SSP",
+        "phone_code": "211",
+        "flag": "",
+        "ordering": 206,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 207,
+    "fields": {
+        "name": "Spain",
+        "country_code": "ES",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "40.00000000",
+        "longitude": "-4.00000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "34",
+        "flag": "country_flag/spain-16x16-33105.png",
+        "ordering": 207,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 208,
+    "fields": {
+        "name": "Sri Lanka",
+        "country_code": "LK",
+        "region": "Asia",
+        "subregion": "Southern Asia",
+        "latitude": "7.00000000",
+        "longitude": "81.00000000",
+        "currency_name": "Sri Lankan rupee",
+        "currency": "LKR",
+        "phone_code": "94",
+        "flag": "country_flag/sri-16x16-33091.png",
+        "ordering": 208,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 209,
+    "fields": {
+        "name": "Sudan",
+        "country_code": "SD",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "15.00000000",
+        "longitude": "30.00000000",
+        "currency_name": "Sudanese pound",
+        "currency": "SDG",
+        "phone_code": "249",
+        "flag": "country_flag/sudan-16x16-33090.png",
+        "ordering": 209,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 210,
+    "fields": {
+        "name": "Suriname",
+        "country_code": "SR",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "4.00000000",
+        "longitude": "-56.00000000",
+        "currency_name": "Surinamese dollar",
+        "currency": "SRD",
+        "phone_code": "597",
+        "flag": "country_flag/suriname-16x16-33092.png",
+        "ordering": 210,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 211,
+    "fields": {
+        "name": "Svalbard And Jan Mayen Islands",
+        "country_code": "SJ",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "78.00000000",
+        "longitude": "20.00000000",
+        "currency_name": "Norwegian Krone",
+        "currency": "NOK",
+        "phone_code": "47",
+        "flag": "country_flag/svalbard-16x16-33093.png",
+        "ordering": 211,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 212,
+    "fields": {
+        "name": "Swaziland",
+        "country_code": "SZ",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "latitude": "-26.50000000",
+        "longitude": "31.50000000",
+        "currency_name": "Lilangeni",
+        "currency": "SZL",
+        "phone_code": "268",
+        "flag": "country_flag/swaziland-16x16-33094.png",
+        "ordering": 212,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 213,
+    "fields": {
+        "name": "Sweden",
+        "country_code": "SE",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "62.00000000",
+        "longitude": "15.00000000",
+        "currency_name": "Swedish krona",
+        "currency": "SEK",
+        "phone_code": "46",
+        "flag": "country_flag/sweden-16x16-33096.png",
+        "ordering": 213,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 214,
+    "fields": {
+        "name": "Switzerland",
+        "country_code": "CH",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "latitude": "47.00000000",
+        "longitude": "8.00000000",
+        "currency_name": "Swiss franc",
+        "currency": "CHF",
+        "phone_code": "41",
+        "flag": "country_flag/switzerland-16x16-33095.png",
+        "ordering": 214,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 215,
+    "fields": {
+        "name": "Syria",
+        "country_code": "SY",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "35.00000000",
+        "longitude": "38.00000000",
+        "currency_name": "Syrian pound",
+        "currency": "SYP",
+        "phone_code": "963",
+        "flag": "country_flag/syrian-16x16-33097.png",
+        "ordering": 215,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 216,
+    "fields": {
+        "name": "Taiwan",
+        "country_code": "TW",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "latitude": "23.50000000",
+        "longitude": "121.00000000",
+        "currency_name": "New Taiwan dollar",
+        "currency": "TWD",
+        "phone_code": "886",
+        "flag": "country_flag/taiwan-16x16-33098.png",
+        "ordering": 216,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 217,
+    "fields": {
+        "name": "Tajikistan",
+        "country_code": "TJ",
+        "region": "Asia",
+        "subregion": "Central Asia",
+        "latitude": "39.00000000",
+        "longitude": "71.00000000",
+        "currency_name": "Tajikistani somoni",
+        "currency": "TJS",
+        "phone_code": "992",
+        "flag": "country_flag/tajikistan-16x16-33100.png",
+        "ordering": 217,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 218,
+    "fields": {
+        "name": "Tanzania",
+        "country_code": "TZ",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-6.00000000",
+        "longitude": "35.00000000",
+        "currency_name": "Tanzanian shilling",
+        "currency": "TZS",
+        "phone_code": "255",
+        "flag": "country_flag/tanzania-16x16-33101.png",
+        "ordering": 218,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 219,
+    "fields": {
+        "name": "Thailand",
+        "country_code": "TH",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "15.00000000",
+        "longitude": "100.00000000",
+        "currency_name": "Thai baht",
+        "currency": "THB",
+        "phone_code": "66",
+        "flag": "country_flag/thailand-16x16-33102.png",
+        "ordering": 219,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 220,
+    "fields": {
+        "name": "Togo",
+        "country_code": "TG",
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "latitude": "8.00000000",
+        "longitude": "1.16666666",
+        "currency_name": "West African CFA franc",
+        "currency": "XOF",
+        "phone_code": "228",
+        "flag": "country_flag/togo-16x16-33106.png",
+        "ordering": 220,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 221,
+    "fields": {
+        "name": "Tokelau",
+        "country_code": "TK",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-9.00000000",
+        "longitude": "-172.00000000",
+        "currency_name": "New Zealand dollar",
+        "currency": "NZD",
+        "phone_code": "690",
+        "flag": "country_flag/tokelau-16x16-33104.png",
+        "ordering": 221,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 222,
+    "fields": {
+        "name": "Tonga",
+        "country_code": "TO",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-20.00000000",
+        "longitude": "-175.00000000",
+        "currency_name": "Tongan paanga",
+        "currency": "TOP",
+        "phone_code": "676",
+        "flag": "country_flag/tonga-16x16-33107.png",
+        "ordering": 222,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 223,
+    "fields": {
+        "name": "Trinidad And Tobago",
+        "country_code": "TT",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "11.00000000",
+        "longitude": "-61.00000000",
+        "currency_name": "Trinidad and Tobago dollar",
+        "currency": "TTD",
+        "phone_code": "+1-868",
+        "flag": "country_flag/trinidad-16x16-33108.png",
+        "ordering": 223,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 224,
+    "fields": {
+        "name": "Tunisia",
+        "country_code": "TN",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "34.00000000",
+        "longitude": "9.00000000",
+        "currency_name": "Tunisian dinar",
+        "currency": "TND",
+        "phone_code": "216",
+        "flag": "country_flag/tunisia-16x16-33110.png",
+        "ordering": 224,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 225,
+    "fields": {
+        "name": "Turkey",
+        "country_code": "TR",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "39.00000000",
+        "longitude": "35.00000000",
+        "currency_name": "Turkish lira",
+        "currency": "TRY",
+        "phone_code": "90",
+        "flag": "country_flag/turkey-16x16-33109.png",
+        "ordering": 225,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 226,
+    "fields": {
+        "name": "Turkmenistan",
+        "country_code": "TM",
+        "region": "Asia",
+        "subregion": "Central Asia",
+        "latitude": "40.00000000",
+        "longitude": "60.00000000",
+        "currency_name": "Turkmenistan manat",
+        "currency": "TMT",
+        "phone_code": "993",
+        "flag": "country_flag/turkmenistan-16x16-33111.png",
+        "ordering": 226,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 227,
+    "fields": {
+        "name": "Turks And Caicos Islands",
+        "country_code": "TC",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "21.75000000",
+        "longitude": "-71.58333333",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "+1-649",
+        "flag": "country_flag/turks-16x16-33112.png",
+        "ordering": 227,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 228,
+    "fields": {
+        "name": "Tuvalu",
+        "country_code": "TV",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-8.00000000",
+        "longitude": "178.00000000",
+        "currency_name": "Australian dollar",
+        "currency": "AUD",
+        "phone_code": "688",
+        "flag": "country_flag/tuvalu-16x16-33113.png",
+        "ordering": 228,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 229,
+    "fields": {
+        "name": "Uganda",
+        "country_code": "UG",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "1.00000000",
+        "longitude": "32.00000000",
+        "currency_name": "Ugandan shilling",
+        "currency": "UGX",
+        "phone_code": "256",
+        "flag": "country_flag/uganda-16x16-33129.png",
+        "ordering": 229,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 230,
+    "fields": {
+        "name": "Ukraine",
+        "country_code": "UA",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "49.00000000",
+        "longitude": "32.00000000",
+        "currency_name": "Ukrainian hryvnia",
+        "currency": "UAH",
+        "phone_code": "380",
+        "flag": "country_flag/ukraine-16x16-33145.png",
+        "ordering": 230,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 231,
+    "fields": {
+        "name": "United Arab Emirates",
+        "country_code": "AE",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "24.00000000",
+        "longitude": "54.00000000",
+        "currency_name": "United Arab Emirates dirham",
+        "currency": "AED",
+        "phone_code": "971",
+        "flag": "country_flag/ukraine-16x16-33145_nFMGiby.png",
+        "ordering": 231,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 232,
+    "fields": {
+        "name": "United Kingdom",
+        "country_code": "GB",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "latitude": "54.00000000",
+        "longitude": "-2.00000000",
+        "currency_name": "British pound",
+        "currency": "GBP",
+        "phone_code": "44",
+        "flag": "country_flag/united-16x16-33114.png",
+        "ordering": 232,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 233,
+    "fields": {
+        "name": "United States",
+        "country_code": "US",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "latitude": "38.00000000",
+        "longitude": "-97.00000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "1",
+        "flag": "country_flag/united-16x16-33115.png",
+        "ordering": 233,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 234,
+    "fields": {
+        "name": "United States Minor Outlying Islands",
+        "country_code": "UM",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "latitude": "0.00000000",
+        "longitude": "0.00000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "1",
+        "flag": "country_flag/united-16x16-33135.png",
+        "ordering": 234,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 235,
+    "fields": {
+        "name": "Uruguay",
+        "country_code": "UY",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "-33.00000000",
+        "longitude": "-56.00000000",
+        "currency_name": "Uruguayan peso",
+        "currency": "UYU",
+        "phone_code": "598",
+        "flag": "country_flag/uruguay-16x16-33140.png",
+        "ordering": 235,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 236,
+    "fields": {
+        "name": "Uzbekistan",
+        "country_code": "UZ",
+        "region": "Asia",
+        "subregion": "Central Asia",
+        "latitude": "41.00000000",
+        "longitude": "64.00000000",
+        "currency_name": "Uzbekistani som",
+        "currency": "UZS",
+        "phone_code": "998",
+        "flag": "country_flag/uzbekistan-16x16-33141.png",
+        "ordering": 236,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 237,
+    "fields": {
+        "name": "Vanuatu",
+        "country_code": "VU",
+        "region": "Oceania",
+        "subregion": "Melanesia",
+        "latitude": "-16.00000000",
+        "longitude": "167.00000000",
+        "currency_name": "Vanuatu vatu",
+        "currency": "VUV",
+        "phone_code": "678",
+        "flag": "country_flag/vanuatu-16x16-33142.png",
+        "ordering": 237,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 238,
+    "fields": {
+        "name": "Vatican City State (Holy See)",
+        "country_code": "VA",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "latitude": "41.90000000",
+        "longitude": "12.45000000",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "379",
+        "flag": "country_flag/holy-16x16-33136.png",
+        "ordering": 238,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 239,
+    "fields": {
+        "name": "Venezuela",
+        "country_code": "VE",
+        "region": "Americas",
+        "subregion": "South America",
+        "latitude": "8.00000000",
+        "longitude": "-66.00000000",
+        "currency_name": "Bolφvar",
+        "currency": "VEF",
+        "phone_code": "58",
+        "flag": "country_flag/venezuela-16x16-33138.png",
+        "ordering": 239,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 240,
+    "fields": {
+        "name": "Vietnam",
+        "country_code": "VN",
+        "region": "Asia",
+        "subregion": "South-Eastern Asia",
+        "latitude": "16.16666666",
+        "longitude": "107.83333333",
+        "currency_name": "Vietnamese dong",
+        "currency": "VND",
+        "phone_code": "84",
+        "flag": "country_flag/vietnam-16x16-33148.png",
+        "ordering": 240,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 241,
+    "fields": {
+        "name": "Virgin Islands (British)",
+        "country_code": "VG",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.43138300",
+        "longitude": "-64.62305000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "+1-284",
+        "flag": "country_flag/virgin-16x16-33147.png",
+        "ordering": 241,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 242,
+    "fields": {
+        "name": "Virgin Islands (US)",
+        "country_code": "VI",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.34000000",
+        "longitude": "-64.93000000",
+        "currency_name": "United States dollar",
+        "currency": "USD",
+        "phone_code": "+1-340",
+        "flag": "country_flag/virgin-16x16-33149.png",
+        "ordering": 242,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 243,
+    "fields": {
+        "name": "Wallis And Futuna Islands",
+        "country_code": "WF",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "latitude": "-13.30000000",
+        "longitude": "-176.20000000",
+        "currency_name": "CFP franc",
+        "currency": "XPF",
+        "phone_code": "681",
+        "flag": "country_flag/wallis-16x16-33144.png",
+        "ordering": 243,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 244,
+    "fields": {
+        "name": "Western Sahara",
+        "country_code": "EH",
+        "region": "Africa",
+        "subregion": "Northern Africa",
+        "latitude": "24.50000000",
+        "longitude": "-13.00000000",
+        "currency_name": "Moroccan Dirham",
+        "currency": "MAD",
+        "phone_code": "212",
+        "flag": "country_flag/western-16x16-33139.png",
+        "ordering": 244,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 245,
+    "fields": {
+        "name": "Yemen",
+        "country_code": "YE",
+        "region": "Asia",
+        "subregion": "Western Asia",
+        "latitude": "15.00000000",
+        "longitude": "48.00000000",
+        "currency_name": "Yemeni rial",
+        "currency": "YER",
+        "phone_code": "967",
+        "flag": "country_flag/yemen-16x16-33143.png",
+        "ordering": 245,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 246,
+    "fields": {
+        "name": "Zambia",
+        "country_code": "ZM",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-15.00000000",
+        "longitude": "30.00000000",
+        "currency_name": "Zambian kwacha",
+        "currency": "ZMW",
+        "phone_code": "260",
+        "flag": "country_flag/zambia-16x16-33146.png",
+        "ordering": 246,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 247,
+    "fields": {
+        "name": "Zimbabwe",
+        "country_code": "ZW",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "latitude": "-20.00000000",
+        "longitude": "30.00000000",
+        "currency_name": "Zimbabwe Dollar",
+        "currency": "ZWL",
+        "phone_code": "263",
+        "flag": "country_flag/zimbabwe-16x16-33150_SA4FUUO.png",
+        "ordering": 247,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 248,
+    "fields": {
+        "name": "Kosovo",
+        "country_code": "XK",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "latitude": "42.56129090",
+        "longitude": "20.34030350",
+        "currency_name": "Euro",
+        "currency": "EUR",
+        "phone_code": "383",
+        "flag": "",
+        "ordering": 248,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 249,
+    "fields": {
+        "name": "Curaτao",
+        "country_code": "CW",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "12.11666700",
+        "longitude": "-68.93333300",
+        "currency_name": "Netherlands Antillean guilder",
+        "currency": "ANG",
+        "phone_code": "599",
+        "flag": "",
+        "ordering": 249,
+        "supported": true
+    }
+},
+{
+    "model": "account.country",
+    "pk": 250,
+    "fields": {
+        "name": "Sint Maarten (Dutch part)",
+        "country_code": "SX",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "latitude": "18.03333300",
+        "longitude": "-63.05000000",
+        "currency_name": "Netherlands Antillean guilder",
+        "currency": "ANG",
+        "phone_code": "1721",
+        "flag": "",
+        "ordering": 250,
+        "supported": true
+    }
+}
+]

@@ -32,18 +32,18 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['localhost','127.0.0.1', 'trosgate.com', '.trosgate.com'] 
-# ALLOWED_HOSTS = ['138.68.147.16', 'trosgate.com', '.trosgate.com'] 
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
+# ALLOWED_HOSTS = ['138.68.147.16', 'trosgate.com', '.trosgate.com']
 # ALLOWED_HOSTS = ['gigred.website', '193.43.134.36', trosgate.great-site.net]
 #  
 SITE_ID = 1
 SITE_DOMAIN = 'localhost'
+SITE_NAME = 'Trosgate Market'
 AUTH_USER_MODEL = 'account.Customer'
-
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # custon Apps for trosgate site
-    'django.contrib.sites',
+    'daphne',
     'account',
     'control_settings',
     'general_settings',
@@ -88,17 +88,18 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'account.middleware_host.DynamicHostMiddleware',
+    # 'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',
     # Django htmx ends
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'account.middleware_gate.MerchantGateMiddleware',
     'account.middleware_admin.AdminGateMiddleware',
     'analytics.middleware.Middleware',
@@ -126,7 +127,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # custom processors
-                'account.context_processors.active_merchant',
+                # 'account.context_processors.active_merchant',
                 'teams.context_processors.active_team',
                 'general_settings.context_processors.categories',
                 'general_settings.context_processors.website',
@@ -294,6 +295,7 @@ USE_THOUSAND_SEPARATOR = True
 EMAIL_USE_LOCALTIME = True
 
 # if not DEBUG:
+# PREPEND_WWW = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_AGE = 1209600 #two weeks in seconds
@@ -326,7 +328,8 @@ MAXIMUM_INVITE_SIZE = 6
 
 # EXEMPTED PAGES IF MERCHANT IS NOT WITH ACTIVE ACCOUNT
 MERCHANT_GATE_ALLOW_LIST = [
-    "/logout/",
+    '/',
+    "/logout",
     "/marketing/support",
     "/marketing/articles",
     "/pages/how-it-works",

@@ -3,396 +3,132 @@
 {% block content%}
 
 
-<div class="wt-haslayout wt-innerbannerholder">
-    <div class="container">
-        <div class="row justify-content-md-center">
-            <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-                <div class="wt-innerbannercontent">
-                <div class="wt-title">
-                    <h2>
-                        {% if gateway_type.name == "paypal" %}
-                        PayPal
-                        {% elif gateway_type.name == "flutterwave" %} 
-                        Flutterwave
-                        {% elif gateway_type.name == "stripe" %}
-                        Stripe
-                        {% elif gateway_type.name == "razorpay" %}
-                        Razorpay
-                        {%endif%} 
-                        Checkout
-                    </h2>
-                </div>
-                </div>
+    <div class="row flex-checkout-page">
+        <div class="col-md-6 col-sm-12 custom-checkout-left">
+        <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{grand_total}}</span><br><br>
+        <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
+        <span style="font-size: 18px; font-weight:bold;">The discounted Price + fee deductible</span>
+        </div>
+        <div class="col-md-6 col-sm-12 custom-checkout-right"> 
+            <div class="reposition-top checkout-to-show" style="display:none;">
+                <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{grand_total}}</span><br><br>
+                <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
+                <span style="font-size: 18px; font-weight:bold;">The discounted price + any fee deductible</span><br><br>
             </div>
-        </div>
-    </div>
-</div>
+            {% if gateway_type == "paypal" %}
+            <br><br><br><br><br><br>
+            <div class="reposition-top">
+                <div id="paypal-button-container"></div>
+            </div>
+            {% endif %}
+            {% if gateway_type == "flutterwave" %}
+            <br><br><br><br><br><br>
+            <div class="reposition-top">
+                <button id="flutterwaveButton" class="btn btn-success w-100 fw-bold">
+                    Pay with Flutterwave
+                </button>
+            </div>
+            {% endif %}
+            {% if gateway_type == "paystack" %}
+            <br><br><br><br><br><br>
+            <div class="reposition-top">
+                <button id="paystackButton" class="btn btn-success w-100 fw-bold">
+                    Pay with Paystack
+                </button>
+            </div>
+            {% endif %}
+            {% if gateway_type == "razorpay" %}
+                <br><br><br><br><br><br>
+                <div class="reposition-top">
+                    <button id="razorpayButton" type="button" class="btn btn-success w-100 fw-bold">Pay with Razorpay</button>
+                </div>
+            {% endif %}
 
-<div class="wt-dashboardbox">
-    <div class="wt-proposalsr">
-        <div class="col-12">
-            <div class="wt-updatall">
-                <span>
-                    {% if application_addon.get_total_price_before_fee >= 500 %} 
-                    You just won yourself a 10% ({{base_currency}}{{application_addon.get_discount_value}}) discount on your total amount 
-                    {% else %}
-                    You could have saved 10% discount for every hire above $500 
-                    {% endif %}
-                </span>
-            </div>	
-        </div>
-        </div>
-
-        <div class="container">
-            <div class='row'>
-                <div class='col-md-7'>
-                    <div class='card' style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                        <div class='card-body'>
-                            <h3>Checkout Summary({{base_currency_symbol}})</h3>
-                            <div class="table-responsive">
-                                <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Total</th>
-                                        <th>Fees</th>
-                                        <th>Payable</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{{application_addon.get_total_price_before_fee_and_discount}} </td>
-                                        <td>{{application_addon.get_fee_payable}}</td>
-                                        <td>{{application_addon.get_total_price_after_discount_and_fee}}</td>
-                                    </tr> 
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class='row'>
-                        <div class='col-md-12 mt-2'>
-                            {% if gateway_type.name == "paypal" %}
-                            <div id="paypal-button-container"></div>
-                            {% endif %}
-                            {% if gateway_type.name == "flutterwave" %}
-                            <button onclick='flutterwavePay(event)' id="flutterwavecontsubmit" class="btn btn-success w-100 fw-bold" >
-                                Pay with flutterwave
-                            </button>
-                            {% endif %}
-                            {% if gateway_type.name == "stripe" %}
-                            <button 
-                            onclick='stripePay(event)' 
-                            id="stripesubmit" id="stripecontsubmit" class="btn btn-primary w-100 fw-bold" >
-                            Pay with Stripe
-                            </button>
-                            
-                        {% endif %}
-                            {% if gateway_type.name == "razorpay" %}
-                            <button id="rzp-button1" class="btn btn-success w-100 fw-bold">Pay with Razorpay</button>
-                            {% endif %} 
-                        </div>
-                        <div class='card-body'>
-                            <div class='col-md-12 mt-6'>
-                                <h3>Currency Converter</h3>
-                                {{ currency}}
-                            </div>
-                            <div class="p-2 bd-highlight">
-                                <span id="feedback-converter" style="color:green; text-align:right;">.</span>
-                            </div>
-                            <div class='col-md-12 mt-4'>
-                                <button id='convert-currency' class="btn btn-primary w-100 fw-bold" >Converter</button>
-                            </div>
-                            </div>
-                        </div>
+            {% if gateway_type == "stripe" %}
+            <div class="reposition-top"><br><br><br>
+                <form id="stripe-form">
+                    <!-- Error messages in this element -->
+                    <div id="card-errors" class="col-sm-12 text-center" role="alert">ssss</div>
+                    
+                    <br>
+                    <label for="card-element" style="font-weight:bold;">Credit or debit card</label>
+                    <div id="card-element" class="form-control">
+                    <!-- Payment elements will appear here -->
                     </div>
                     <br>
-                    <br>                        
-                </div>
-
-                <div class='col-md-5'>
-                    <div class='card' style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                        <div class='row'>
-                            <div class='card-body'>
-                            
-                            <div class="wt-dashboardboxcontent wt-offersidebar wt-dashboardbox-margin">
-                                <figure><img src="{% static 'images/save-img-01.jpg'%}" alt="img description"></figure>
-                                <div class="wt-offercontent">
-                                    <ul class="wt-projectliststyle">
-                                        
-                                        <li><span><i class="fa fa-check"></i>#1: For Customers with billing currencies different from {{base_currency}}, we present you a way to check your conversion rate and amount</span></li>
-                                        <li><span><i class="fa fa-check"></i>#2: Our conversion does not replace any conversion rate offered by our payment parties.</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <br>
+                    <button id="stripeButton" 
+                        type="submit" 
+                        class="btn btn-primary w-100 fw-bold" >
+                        Stripe Checkout
+                    </button>
+                </form>
+            </div>
+            {% endif %}
             </div>
         </div>
-    </div>
-</div>
-
-<div class="wt-proposalholder mt-6">
-    <div class="row justify-content-md-center">
-        <div class="wt-sectionhead wt-textcenter">
-            <span>Copyright @ {{website.site_name}}</span>
-        </div>
-    </div>
-</div> 
 
 
+        <div class="wt-proposalholder mt-6">
+            <div class="row justify-content-md-center">
+                <div class="wt-sectionhead wt-textcenter">
+                    <span>Copyright @ {{website.site_name}}</span>
+                </div>
+            </div>
+        </div> 
+    {{ request.user.get_full_name|json_script:"checkout_user"}}
+    {{ request.user.email|json_script:"checkout_user_email"}}
+    {{ website.site_logo_tag|json_script:"checkout_logo"}}
+    {{ website.site_name|json_script:"checkout_site"}}
     {% endblock content %}
 
     {% block scripts %}
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            const CSRF_TOKEN = '{{ csrf_token }}';
+            const USER = document.getElementById('checkout_user');
+            const USER_EMAIL = document.getElementById('checkout_user_email');
+            const SITE_NAME = document.getElementById('checkout_site');
+        </script>
 
-
-    <script>
-        //Script to add proposal quantity in session             
-        $(document).on('click', '#convert-currency', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: '{% url "general_settings:converter" %}',
-            data: {
-                currencyid: $('#id_currency option:selected').val(),
-                targetamount: '{{application_addon.get_total_price_after_discount_and_fee}}',
-                csrfmiddlewaretoken: "{{csrf_token}}",
-                action: 'currency'
-            },
-            success: function (json) {
-                document.getElementById('feedback-converter').innerHTML = json.message
-            },
-            error: function (xhr, errmsg, err) {}
-        });
-        })
-    </script>
-
-
-    {% if gateway_type.name == "PayPal" %}
+    {% if gateway_type == "paypal" %}
     <script 
-        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}"data-sdk-integration-source="button-factory">
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}">
     </script>
-    {% comment %} <script src="{% static 'js/payments/paypal-checkout.js' %}"></script>   {% endcomment %}
-    <script>
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
+    <script src="{% static 'js/payments/application/paypal-checkout.js' %}"></script>
+    {% endif %}
     
-    function hiringPayPalButton() {
-        paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color: 'gold',
-                shape: 'rect', //pill
-                label: 'paypal',
-            },
-            createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: '{{application_addon.get_total_price_after_discount_and_fee}}'
-                        }
-                    }]
-                });
-            },
-            onApprove: function (data, actions) {
-                return actions.order.capture().then(function(){
-                var url = "{% url 'applications:paypal_payment_order' %}"
-                return fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                    },
-                    body: JSON.stringify({
-                        orderID: data.orderID
-                    })
-                }).then(function () {
-                    swal("Perfect!", 'All looked good', "success").then((value) =>{
-                        window.location.href = '/application/congrats/'
-                    });
-                })
-            })
-            },
-        }).render('#paypal-button-container');
-    }
-    hiringPayPalButton();
-    </script>
+    {% if gateway_type == "stripe" %}
+    <script>
+        const STRIPE_PUBLIC_KEY = '{{ stripe_public_key }}';
+    </script>    
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="{% static 'js/payments/application/stripe-checkout.js' %}"></script>
+
     {% endif %}
 
-    
-    {% if gateway_type.name == "Stripe" %}
-    <script type="application/javascript" src="https://js.stripe.com/v3/"></script>
-    {% comment %} <script src="{% static 'js/payments/stripe-application-checkout.js' %}"></script> {% endcomment %}
+    {% if gateway_type == "paystack" %}
     <script>
-        function stripePay(event) {
-        event.preventDefault();
-
-          $("#stripecontsubmit").attr("disabled", true);
-          $("#convert-currency").attr("disabled", true);
-
-          let data = {
-            'stripepCustomer': '{{request.user.get_full_name}}', 
-            'stripepEmail': '{{request.user.email}}',
-            'stripepCountry': '{{request.user.country.name}}',
-          }
-      
-          let stripe = Stripe('{{stripe_public_key}}');
-      
-          fetch('/application/stripe/checkout/api/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{csrf_token}}'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-          })
-            .then(function (response) {
-              return response.json()
-            })
-            .then(function (session) {
-              return stripe.redirectToCheckout({ sessionId: session.session.id })
-            })
-            .then(function (result) {
-                $("#stripecontsubmit").attr("disabled", false);
-                $("#convert-currency").attr("disabled", false);
-                return console.log(result)
-            })
-            .catch(function (error) {
-              return console.log(error)
-            })
-        }
+        const paystack_public_key = '{{ paystack_public_key }}';
     </script> 
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="{% static 'js/payments/application/paystack-checkout.js' %}"></script>
     {% endif %}
 
-    {% if gateway_type.name == "Flutterwave" %}
+    {% if gateway_type == "flutterwave" %}
+    <script>
+        const flutterwave_public_key = '{{ flutterwave_public_key }}';
+    </script> 
     <script src="https://checkout.flutterwave.com/v3.js"></script>
-    {% comment %} <script src="{% static 'js/payments/flutterwave-checkout.js' %}"></script> {% endcomment %}
-    <script>
-        function flutterwavePay(event) {
-        event.preventDefault();
-
-          $("#flutterwavecontsubmit").attr("disabled", true);
-          $("#convert-currency").attr("disabled", true);
-
-          let data = {
-            'amount': "{{application_addon.get_total_price_after_discount_and_fee}}",
-            'name': "{{request.user.get_full_name}}",
-            'email': "{{request.user.email}}",
-            'consumerid': "{{request.user.id}}",
-      
-          }
-          fetch('{% url "applications:flutter_payment_intent" %}', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{csrf_token}}'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-          })
-            .then(function (response) {
-              return response.json()
-            })
-            .then(function (session) {
-                window.location.href = session.redirectToCheckout
-            })
-            .then(function (result) {
-                $("#flutterwavecontsubmit").attr("disabled", false);
-                $("#convert-currency").attr("disabled", false);
-                return console.log(result)
-            })
-            .catch(function (error) {
-              return console.log(error)
-            })
-        }
-
-    </script> 
-
+    <script src="{% static 'js/payments/application/flutterwave-checkout.js' %}"></script>
     {% endif %}
-    {% if gateway_type.name == "Razorpay" %}
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    {% comment %} <script src="{% static 'js/payments/razorpay-checkout.js' %}"></script> {% endcomment %}
 
+    {% if gateway_type == "razorpay" %}
     <script>
-        //Script to add proposal quantity in session             
-        $(document).on('click', '#rzp-button1', function (e) {
-        e.preventDefault();
-        $.ajax({
-            method: 'GET',
-            url: '{% url "applications:razorpay_application_intent" %}',
-            
-            beforeSend:function(){
-                $("#rzp-button1").attr("disabled", true);
-                $("#convert-currency").attr("disabled", true);
-            },
-            success: function (response) {
-                console.log(response)
-                var options = {
-                    "key": "{{razorpay_public_key}}", // Enter the Key ID generated from the Dashboard
-                    "amount": response.amount,//"{{application_addon.get_total_price_after_discount_and_fee}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                    "currency": response.currency,
-                    "name": "{{website.site_name}}",
-                    "description": "Hiring of Applicants",
-                    "image": "{{website.site_Logo.url}}",
-                    "order_id": response.razorpay_order_key, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                    "handler": function (responseOne) {
-                        $.ajax({
-                            type: "POST",
-                            url: "/application/razorpay_webhook/",
-                            data: {
-                                orderid: responseOne.razorpay_order_id,
-                                paymentid: responseOne.razorpay_payment_id,
-                                signature: responseOne.razorpay_signature,
-                                csrfmiddlewaretoken: "{{csrf_token}}",
-                                action: "razorpay-application",
-                            },
-                            success: function (responseTwo) {
-                                $("#rzp-button1").attr("disabled", false);
-                                $("#convert-currency").attr("disabled", false);
-                                swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                    window.location.href = '/application/congrats/'
-                                });                        
-                            }
-                        });
-                    },
-
-                    "prefill": {
-                        "name": "{{request.user.get_full_name}}",
-                        "email": "{{request.user.email}}",
-                        "contact": "{{request.user.phone}}"
-                    },
-                    "notes": {
-                        "address": "{{request.user.country}}"
-                    },
-                    "theme": {
-                        "color": "#3399cc"
-                    }
-                };
-                var rzp1 = new Razorpay(options);
-                rzp1.open();                
-            },
-            error: function (xhr, errmsg, err) {
-                $("#rzp-button1").attr("disabled", false);
-                $("#convert-currency").attr("disabled", false);
-            }
-        });
-        })
+        const razorpay_public_key = '{{ razorpay_public_key }}';
     </script>
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="{% static 'js/payments/application/razorpay-checkout.js' %}"></script>
     {% endif %}
+    
     {% endblock scripts %}
   

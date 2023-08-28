@@ -116,7 +116,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_("First Name"), max_length=50, blank=True, null=True)
     last_name = models.CharField(_("Last Name"), max_length=50, blank=True, null=True)
     phone = models.CharField(_("Phone"), max_length=20, blank=True, null=True)
-    country = models.ForeignKey(Country, 
+    country = models.ForeignKey(Country,
         verbose_name=_("Country"), 
         null=True, blank=True, 
         related_name="countries", 
@@ -142,7 +142,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = UserManager()
-    merchants = CurrentSiteManager()
+
 
     def save(self, *args, **kwargs):
         self.email = self.email.lower()
@@ -150,7 +150,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.get_full_name()
-
 
     def get_full_name(self):
         return f'{self.first_name} {self.last_name}'
@@ -206,7 +205,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         return super().clean()
 
 
-# NB ---> create seperate status for each of the fields and display to users
 class Package(models.Model):
     #
     # Package Type
@@ -279,7 +277,7 @@ class Merchant(SettingsMaster):
     type = models.PositiveIntegerField(_("Account Status"), choices=MERCHANT_TYPE, default=TRIALING)
     merchant = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant', on_delete=models.CASCADE)
     business_name = models.CharField(_("Business Name"), max_length=255)
-    default_domain = models.CharField(_("Default Domain"), max_length=255)
+    domain = models.CharField(_("Default Domain"), max_length=255)
     package = models.ForeignKey("account.Package", 
         verbose_name=_("Package"), 
         related_name="packages",
@@ -313,6 +311,10 @@ class Merchant(SettingsMaster):
         verbose_name = "Merchant"
         verbose_name_plural = "Merchants"
 
+    def save(self, *args, **kwargs):
+        self.domain = self.site.domain
+        self.business_name = self.site.name
+        super(Merchant, self).save(*args, **kwargs)
 
     def image_tag(self):
         return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.profile_photo))

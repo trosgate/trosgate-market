@@ -1,9 +1,8 @@
-{% extends "dashboard/main_base.html" %}
+{% comment %} {% extends "dashboard/main_base.html" %}
 {% load static %}
 {% block content%}
 {% include 'dashboard/main_sidebar.html' %}
 
-			<!--Main Start-->
 			<main id="wt-main" class="wt-main wt-haslayout">
 
 				<div class="wt-proposalholder">
@@ -15,7 +14,6 @@
 				</div>
 
 
-	<!--Register Form Start-->
 	<section class="wt-haslayout wt-dbsectionspace">
 		<div class="row justify-content-md-center">				
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
@@ -52,7 +50,6 @@
 											{% endfor %}	
 										</div> 
 										<div class="wt-rightarea">
-											{% comment %} <div class="wt-btnarea"> {% endcomment %}
 											{% if request.user == proposals.created_by and proposals.status == 'active' %}
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fa fa-info"></i> Details</a></div>
 											<div class="wt-btnarea"><a href="{% url 'proposals:update_proposal' proposals.created_by.short_name proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>Modify</a></div>
@@ -65,7 +62,6 @@
 											<div class="wt-btnarea"><a href="{% url 'proposals:proposal_detail' proposals.created_by.short_name proposals.slug %}" class="btn btn-success"><i class="fa fa-info"></i> Details</a></div>
 											<div class="wt-btnarea"><a href="{% url 'proposals:update_proposal' proposals.created_by.short_name proposals.slug %}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modify</a></div>
 											{% endif %}
-											{% comment %} </div> {% endcomment %}
 											<div class="wt-hireduserstatus">
 												<h4>{{proposals.team.members.count}}</h4><span>Team Members</span>
 												<ul class="wt-hireduserimgs">
@@ -151,7 +147,6 @@
 			</div>
 		</div>
 	</section>
-	<!--Register Form End-->
 
 
 {% endblock %}
@@ -164,4 +159,4 @@
 
 
 
-
+ {% endcomment %}

@@ -10,7 +10,7 @@ from django.contrib import auth, messages
 from .forms import SearchTypeForm, MerchantRegisterForm, CustomerRegisterForm, UserLoginForm, TwoFactorAuthForm, PasswordResetForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer, Country, Package, Merchant, TwoFactorAuth
-from teams.models import Package as Plan
+from teams.models import Package as TeamPlan
 from proposals.models import Proposal
 from teams.models import Invitation, Team
 from teams.forms import TeamCreationForm
@@ -105,9 +105,6 @@ def autoLogout(request):
 
 def homepage(request):
 
-    # print('request.site :', request.site.merchant)
-    # print('request.site :', request.site.websitesetting.protocol)
-
     if request.user.is_authenticated:
         return redirect('account:dashboard')
     
@@ -115,8 +112,8 @@ def homepage(request):
     pypist = AutoTyPist.objects.filter(is_active=True)
     packages = Package.objects.all()[0:3]
     proposals = Proposal.objects.filter(published=True).distinct()[0:12]   
-    projects = Project.objects.filter(published=True, status='active', duration__gte=timezone.now()).distinct()[0:6]
-    users = Freelancer.active.all().distinct()[0:12]
+    projects = Project.objects.filter(published=True, status='active', duration_time__gte=timezone.now()).distinct()[0:6]
+    users = Freelancer.objects.filter(created=True).distinct()[0:12]
     searchform = SearchTypeForm()
     form_submitted = False
 
@@ -128,7 +125,6 @@ def homepage(request):
         messages.info(request, f'Welcome back {request.user.short_name}')
         return redirect('/admin')
 
-    home_layout = request.site # -----------check again for all user types..........
     context = {
         'proposals': proposals,
         'projects': projects,
@@ -137,12 +133,11 @@ def homepage(request):
         'users': users,
         'base_currency': base_currency,
         'searchform': searchform,
-        'home_layout': home_layout,
+        'home_layout': request.site,
         'form_submitted': form_submitted,
     }
     if request.parent_site:
         return render(request, 'homepage.html', context)
-        # return render(request, 'homepage-copy.html', context)
     else:
         return render(request, 'merchant_home.html', context)
 
@@ -159,9 +154,9 @@ def loginView(request):
     # Admin is exempted from two step verification via sms
     # Otherwise if there is bug in mail sending, admin is also lock out 
     # TODO to have a token authenticator separate for admin and staffs
-    #
+    
     if request.user.is_authenticated:
-        messages.info(request, f'Welcome back {request.user.short_name}')
+        messages.info(request, f'Welcome back {request.user.get_short_name()}')
         return redirect('account:dashboard')
       
     session = request.session
@@ -368,22 +363,16 @@ def user_dashboard(request):
     # print('request.merchant :', request.merchant)
 
     if request.user.is_freelancer:
-        try:
-            user_active_team = Team.objects.get(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-            contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
-            proposals = Proposal.objects.filter(team=user_active_team)
-        except:
-            user_active_team = None
-        try:
-            freelancer_profile = Freelancer.active.get(user__id=request.user.id)
-        except:
-            freelancer_profile = None #merchant=request.merchant, 
-        open_projects = Project.objects.filter(status=Project.ACTIVE, duration__gte=timezone.now())[:10]
+        user_active_team = Team.objects.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE).first()
+        contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
+        proposals = Proposal.objects.filter(team=user_active_team)
+        freelancer_profile = Freelancer.objects.filter(created=True, user__id=request.user.id).first()
+        open_projects = Project.objects.filter(status=Project.ACTIVE, duration_time__gte=timezone.now())[:10]
         quizz = Quizes.objects.filter(is_published=True)[:10]
         teams = request.user.team_member.all().exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
 
-        package=Plan.objects.get_or_create(type=Plan.BASIC)[0]
+        package=TeamPlan.objects.get_or_create(type=TeamPlan.BASIC)[0]
 
         base_currency = get_base_currency_symbol()
 
@@ -391,15 +380,14 @@ def user_dashboard(request):
             teamform = TeamCreationForm(request.POST or None)
             if teamform.is_valid():
                 try:
-                    Invitation.new_team_and_invitation(
-                        current_team = user_active_team,
-                        created_by=request.user,
-                        type=Invitation.INTERNAL,
+                    Team.create_team_with_member(
                         title=teamform.cleaned_data['title'],
                         notice=teamform.cleaned_data['notice'],
+                        merchant = request.merchant,
+                        created_by=request.user,
                         package=package,
-                        status=Invitation.ACCEPTED
                     )
+                    
                     messages.success(request, f'The Team was created successfully!')
                 except Exception as e:
                     msg = str(e)
@@ -430,8 +418,8 @@ def user_dashboard(request):
     if request.user.is_client:
         client_profile = Client.objects.get(user=request.user)
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
-        open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration__gte=timezone.now())
-        closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration__lt=timezone.now())
+        open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration_time__gte=timezone.now())
+        closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration_time__lt=timezone.now())
         contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
         base_currency = get_base_currency_symbol()
         print(request.user)

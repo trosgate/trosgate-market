@@ -11,9 +11,16 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
 
 
+
 def site_path(instance, filename):
     return "site/%s/%s" % (instance.site.name, filename)
 
+
+
+# class SettingManager(models.Manager):
+#     def get_queryset(self):
+#         site = Site.objects.get_current()       
+#         return super().get_queryset().filter(site=site)
 
 class SettingsMaster(models.Model):
        
@@ -134,11 +141,10 @@ class SettingsMaster(models.Model):
         blank=True
     )
 
+    # objects = SettingManager()
     objects = models.Manager()
-    curr_merchant = CurrentSiteManager()    
-    
-    # image display in Admin
 
+    
     def site_logo_tag(self):
         if self.site_Logo:
             return mark_safe('<img src="/media/%s" width="185" height="50" />' % (self.site_Logo))
@@ -178,7 +184,7 @@ class WebsiteSetting(SettingsMaster):
 
     protocol = models.CharField(
         _("Protocol Type"), max_length=20, choices=PROTOCOL_TYPE, default=USE_HTTPS, help_text=_("Warning! Make sure you have SSL Certificate for your site before switing to Secure options"))
-    
+    is_parent_site = models.BooleanField(_("Site Ownership"), choices=((True, 'Parent Site'), (False, 'Merchant Site')), default=True)
 
     def __str__(self):
         return self.site.name

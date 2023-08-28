@@ -51,11 +51,11 @@
 					<div class="bg-light rounded">
 						<div class="p-3 pt-0">
 							<div class="d-flex justify-content-between mb-3" style="font-weight:bold; font-size:18px; width:100%; color:green;">
-								<span>Paid Download </span><span class="text-primary pt-1"> @ {{base_currency}}{{proposal.salary}}</span>
+								<span>Paid Download </span><span class="text-primary pt-1"> @ {{website.merchant.country.currency}}{{proposal.salary}}</span>
 							</div>
 							
 							<div class="d-flex justify-content-between mb-3">
-								<span>This price represents each of the paid downlaod you may specify. If you attach multiple paid products, each will be downloaded @ {{base_currency}} {{proposal.salary}}</span>
+								<span>This price represents each of the paid downlaod you may specify. If you attach multiple paid products, each will be downloaded @ {{website.merchant.country.currency}} {{proposal.salary}}</span>
 							</div>
 							<div class="d-flex justify-content-between mb-3">
 								<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="width:1920px; max-height:560px;" alt="img description">
@@ -91,7 +91,7 @@
 					<tr>
 						<th>Product License</th>
 						<th>Product Type</th>
-						<th>Price ({{base_currency}})</th>
+						<th>Price ({{website.merchant.country.currency}})</th>
 						<th>Date</th>
 						<th>Pull</th>
 						<th>Status</th>

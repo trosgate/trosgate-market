@@ -140,7 +140,7 @@ def modify_from_hiring_box(request):
 def pricing_option_with_fees(request):
     hiringbox = HiringBox(request)
     base_currency = get_base_currency(request)
-    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
+    payment_gateways = request.merchant.gateways.all().exclude(name='balance')
 
     if request.method == 'POST':
         gateways = int(request.POST.get('paymentGateway'))
@@ -182,7 +182,7 @@ def payment_fee_structure(request):
     gateway_type = int(request.POST.get('paymentGateway'))
     gateway = PaymentGateway.objects.get(id=gateway_type)
     selected_fee = gateway.processing_fee
-    payment_gateways = request.merchant.merchant.gateways.all().exclude(name='balance')
+    payment_gateways = request.merchant.gateways.all().exclude(name='balance')
     base_currency = get_base_currency(request)
     discount = hiringbox.get_discount_value()
     subtotal = hiringbox.get_total_price_before_fee_and_discount()
@@ -250,7 +250,6 @@ def final_checkout(request):
     elif gateway_type == 'razorpay':
         razorpay_public_key = RazorpayClientConfig().razorpay_key_id
 
-
     # Flutterwave payment api
     elif gateway_type == 'flutterwave':
         flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key  
@@ -284,7 +283,7 @@ def paystack_payment_intent(request):
     hiringbox = HiringBox(request)
     payment_data = calculate_payment_data(hiringbox)
     purchase = None
-
+    base_currency = get_base_currency(request)
     try:
         creator = PurchaseAndSaleCreator()
         purchase = creator.create_purchase_and_sales(
@@ -297,7 +296,7 @@ def paystack_payment_intent(request):
             'reference': purchase.reference,
             'amount': (purchase.salary_paid * 100),
             'email': request.user.email,
-            'currency': str(purchase.merchant.merchant.country.currency).upper(),
+            'currency': base_currency,
         }
         
         return JsonResponse(response_data)
@@ -338,6 +337,7 @@ def flutter_payment_intent(request):
     payment_data = calculate_payment_data(hiringbox)
     purchase = None
 
+    base_currency = get_base_currency(request)
     try:
         creator = PurchaseAndSaleCreator()
         purchase = creator.create_purchase_and_sales(
@@ -346,8 +346,6 @@ def flutter_payment_intent(request):
             category=Purchase.PROPOSAL,
             hiringbox=hiringbox,
         )
-        currency = str(purchase.merchant.merchant.country.currency).upper()
-        base_currency = get_base_currency(request)
         response_data = {
             'tx_ref': purchase.reference, 
             'email':request.user.email,
@@ -436,6 +434,7 @@ def stripe_payment_order(request):
     
 
 @login_required
+@require_http_methods(['GET'])
 def paypal_payment_order(request):
     hiringbox = HiringBox(request)
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
@@ -466,7 +465,6 @@ def paypal_payment_order(request):
         return JsonResponse({'error': 'Invalid request method'})
 
 
-@login_required
 @csrf_exempt
 @require_http_methods(['POST'])
 def paypal_callback(request):
@@ -475,7 +473,7 @@ def paypal_callback(request):
     body = json.loads(request.body)
     paypal_order_key = body["paypal_order_key"]
 
-    capture_data = PayPalClientConfig().capture_order(paypal_order_key,)
+    capture_data = PayPalClientConfig().capture_order(paypal_order_key)
     capture_data_id = capture_data['purchase_units'][0]['payments']['captures'][0]['id']
     if capture_data['status'] == 'COMPLETED':
         Purchase.paypal_order_confirmation(paypal_order_key, capture_data_id)
@@ -493,7 +491,7 @@ def razorpay_application_intent(request):
     grand_total = hiringbox.get_total_price_after_discount_and_fee()
     payment_data = calculate_payment_data(hiringbox)
     purchase = None
-    merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
+    
     base_currency = get_base_currency(request)
     razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
     if razorpay_order_key:
@@ -551,20 +549,10 @@ def razorpay_callback(request):
 
     else:
         return JsonResponse({'status':'error'})
- 
+
                 
 @login_required
-def payment_success(request):
-
-    context = {
-        "good": "good"
-    }
-    return render(request, "transactions/payment_success.html", context)
-
-
-@login_required
 def proposal_transaction(request):
-    base_currency = get_base_currency(request)
     proposals = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
@@ -572,11 +560,12 @@ def proposal_transaction(request):
 
     elif request.user.user_type == Customer.CLIENT:
         proposals = ProposalSale.objects.filter(purchase__client=request.user, purchase__status=Purchase.SUCCESS)
+    
+    elif request.user.user_type == Customer.MERCHANT:
+        proposals = ProposalSale.objects.filter(merchant=request.merchant)
 
     context = {
         'proposals': proposals,
-        'base_currency': base_currency,
-
     }
     return render(request, 'transactions/proposal_transactions.html', context)
 

@@ -10,10 +10,10 @@
 						<div class="row justify-content-md-center">
 							<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
 								<div class="wt-innerbannercontent">
-								<div class="wt-title"><h2>Invitation to Team</h2></div>
+								<div class="wt-title"><h2>Shareholders</h2></div>
 								<ol class="wt-breadcrumb">
 									<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
-									<li class="wt-active">Invites </li>
+									<li class="wt-active">Earning and Membership </li>
 								</ol>
 								</div>
 							</div>
@@ -23,12 +23,40 @@
 				<div class="wt-proposalholder">
 					<div class="row justify-content-md-center">
 						<div class="wt-hireduserstatus">
-							<h4>Invitation to "{{ teams.title }}"</h4>
-							<em>There are two options available to invite users. (1) Internal Users & (2) External Freelancers</em>
+							<h4>Membership of "{{ team.title }}"</h4>
+							<em>Split Profit, or invite in multiple ways: (1) Internal Freelancers & (2) External Users</em>
 						</div>											
 					</div>
 				</div>
+				<section class="wt-haslayout wt-dbsectionspace">
+					<div class="row justify-content-md-center">				
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+						<div class="wt-dashboardbox">
+							<div class="wt-dashboardboxcontent wt-rcvproposala">
+							<div class="wt-sectiontitle">
+								<span>Team Members</span>
+							</div>
+										
+							<div class="wt-freelancerholder wt-rcvproposalholder">
+								<div class="wt-tabscontenttitle" style="display: flex; justify-content:space-between;">
+									<h2>Member Shareholding</h2>
+									<button class="btn btn-danger btn-sm"
+										id="shareholding"
+										type="button"
+										hx-get= "{% url 'teams:change_shareholding' %}"
+										hx-target="#earning-ratio">
+										<i class="fa fa-edit"> Change Ratio</i>
+									</button>
+								</div>
+																		
+								<div id="earning-ratio" class="table-responsive">
+									{% include 'teams/components/team_earning.html'%}			
+								</div> 
 
+							</div>								
+						</div>
+					</div>
+				</section>
 				<section class="wt-haslayout wt-dbsectionspace">
 					<div class="row justify-content-md-center">				
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
@@ -118,62 +146,17 @@
 					</div>
 				</div>
 		</section>
-		<section class="wt-haslayout wt-dbsectionspace">
-			<div class="row justify-content-md-center">				
-			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
-				<div class="wt-dashboardbox">
-					<div class="wt-dashboardboxcontent wt-rcvproposala">
-						<div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-							<div class="wt-freelancerholder wt-rcvproposalholder">												
-								<div class="wt-sectiontitle">
-									<span>Team Members</span>
-								</div>
-								
-								<div class="wt-freelancerholder wt-rcvproposalholder">
-									<div class="wt-tabscontenttitle">
-										<h2>Accepted Members</h2>
-									</div>									 
-									<div class="table-responsive">
-									<table class="table">
-										<thead>
-											<tr>
-												<th>#</th>
-												<th>Email</th>
-												<th>Sent on </th>
-												<th>Code Sent</th>
-												<th>Status</th>
-											</tr>
-										</thead>
-										<tbody>
-										{% for accept in accepted %}
-											<tr>
-											<td>{{forloop.counter}} </td>
-											<td>{{accept.email}}</td>
-											<td>{{accept.sent_on}}</td>
-											<td>{{accept.code}}</td>
-											<td><span class="badge badge-success badge-sm">{{accept.get_status_display}}</span></td>
-											</tr> 
-										{% endfor %}					
-											</tbody>
-										</table>
-										{% if not accepted %}
-										<p><strong>No Accepted Member to show yet.</strong></p>
-										{% endif %}											
-									</div> 
-								</div>								
-							</div>
-						</div>
-					</section>
-    			    <div class="wt-proposalholder">
-						<div class="row justify-content-md-center">
-							<div class="wt-sectionhead wt-textcenter">
-								<span>Copyright @ {{website.site_name}}</span>
-							</div>
-						</div>
-					</div>
+		
+		<div class="wt-proposalholder">
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site_name}}</span>
+				</div>
+			</div>
+		</div>
 
-			</main>
-			<!--Main End-->	
+		</main>
+	
 
 				
 {% endblock %}

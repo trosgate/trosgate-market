@@ -86,10 +86,8 @@ class CustomerAdmin(BaseUserAdmin,):
         else:
             return qs.filter(pk=request.user.id, is_staff=True)  
 
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -97,12 +95,10 @@ class CustomerAdmin(BaseUserAdmin,):
             del actions['delete_selected']
         return actions
 
-
     def has_add_permission(self, request):
         if not request.user.is_superuser:
             return False
         return super().has_add_permission(request)
-
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -235,15 +231,14 @@ class CountryAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
 
 @admin.register(State)
 class StateAdmin(admin.ModelAdmin):
     list_display = ['name', 'country','state_code', 'ordering']
     list_display_links = ['name', 'country']
-    list_filter = ('country',)
     search_fields = ('name', 'country__name',)
 
 
@@ -251,7 +246,6 @@ class StateAdmin(admin.ModelAdmin):
 class CityAdmin(admin.ModelAdmin):
     list_display = ['name', 'country','state', 'ordering']
     list_display_links = ['name', 'country']
-    list_filter = ('state',)
     search_fields = ('name', 'country__name', 'state__name',)
 
 
@@ -344,8 +338,8 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -357,7 +351,7 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
 
 @admin.register(Merchant)
 class MerchantAdmin(admin.ModelAdmin):   
-    list_display = ['site_logo_tag', 'business_name', 'merchant', 'type', 'package', 'created_at']
+    list_display = ['business_name', 'domain', 'merchant', 'type', 'package', 'created_at']
     radio_fields = {
         'type': admin.HORIZONTAL,
         'category_type': admin.HORIZONTAL,
@@ -365,6 +359,7 @@ class MerchantAdmin(admin.ModelAdmin):
         'promo_type': admin.HORIZONTAL,
     }    
     readonly_fields = [
+        'business_name', 'domain', 
         'get_merchant', 'get_site', 'site_logo_tag', 'image_tag', 'banner_tag',
         'merchant', 'package', 'members', 'created_at', 'modified', 'promo_image_tag',
         # 'business_name', 'gender', 'tagline', 'description', 'address', 'announcement',
@@ -376,7 +371,7 @@ class MerchantAdmin(admin.ModelAdmin):
             'get_merchant', 'gender', 'profile_photo','image_tag', 
         )}),
         ('Business Background', {'fields': (
-            'business_name', 'type', 'address','created_at', 'modified',
+            'business_name', 'domain', 'type', 'address','created_at', 'modified',
             'site_Logo','site_logo_tag', 'banner_image','banner_tag', 
         )}),
         ('Website, Banner & Color Scheme', {'fields': (
@@ -423,8 +418,8 @@ class MerchantAdmin(admin.ModelAdmin):
             return True
         return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
     def get_actions(self, request):
         actions = super().get_actions(request)

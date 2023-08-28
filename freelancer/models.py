@@ -26,10 +26,6 @@ from merchants.models import MerchantMaster
 from notification.tasks import send_pending_balance_email
 
 
-class ActiveFreelancer(models.Manager):
-    def get_queryset(self):
-        return super(ActiveFreelancer, self).get_queryset().filter(user__is_active=True, user__user_type=Customer.FREELANCER)
-
 
 class Freelancer(MerchantMaster):
     # STORAGE = activate_storage_type()
@@ -87,7 +83,6 @@ class Freelancer(MerchantMaster):
     slug = models.SlugField(_("Slug"), max_length=30, null=True, blank=True,)
     active_team_id = models.PositiveIntegerField(_("Active Team ID"), default=0)
     created = models.BooleanField(_("user Created"), default=False,)
-    active = ActiveFreelancer()
 
     class Meta:
         verbose_name = 'Freelancer Profile'

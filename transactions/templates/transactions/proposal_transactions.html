@@ -27,9 +27,9 @@
 						<tr>
 							<th>#</th>
 							<th>Client</th>
-							<th>Purchase Date</th>
+							<th>Date</th>
 							<th>Method</th>
-							<th>Sales ({{base_currency}}) </th>
+							<th>Amount</th>
 							{% if active_team.created_by == request.user %}
 							<th>Manager</th>
 							{% endif %}
@@ -43,9 +43,12 @@
 							<td>{{proposal.purchase.client.get_full_name|capfirst}}</td>
 							<td>{{proposal.created_at}}</td>
 							<td>{{proposal.purchase.payment_method|capfirst}}</td>
-							<td>{{proposal.total_sales_price}} ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td> 
+							<td>{{proposal.totalsales}} = ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td> 
 							{% if active_team.created_by == request.user %}
-							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-{% if proposal.status == 'pending' %}danger {% else %}info {% endif %} btn-sm"><i class="fa fa-window-restore"></i> {{proposal.get_status_display}}</button></a>
+							<td>
+								<a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}">
+								<button type="button" class="btn btn-outline-{% if proposal.status == 'pending' %}danger {% else %}info {% endif %} btn-sm"><i class="fa fa-window-restore"></i> {{proposal.get_status_display}}</button>
+								</a>
 							</td>
 							{% endif %}
 						</tr>
@@ -67,10 +70,10 @@
 						<tr>
 							<th>#</th>
 							<th>Team</th>
-							<th>Purchase Date</th>
+							<th>Date</th>
 							<th>Method</th>
-							<th>Purchase ({{base_currency}}) </th>
-							<th>Manager</th>
+							<th>Amount</th>
+							<th>Status</th>
 						</tr>
 					</thead>
 					
@@ -81,8 +84,56 @@
 							<td>{{proposal.proposal.team|capfirst}}</td>
 							<td>{{proposal.created_at}}</td>
 							<td>{{proposal.purchase.payment_method|capfirst}}</td>
-							<td>{{proposal.total_sales_price}} = ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td>      
-							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}"><button type="button" class="btn btn-outline-danger btn-sm"><i class="fas fa-spinner fa-spin"></i> Manage</button></a></td>
+							<td>{{proposal.totalsales}} = ({{proposal.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td>      
+							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}">
+								<button type="button" class="btn btn-outline-{% if proposal.status == 'pending' %}danger {% else %}info {% endif %} btn-sm"><i class="fa fa-window-restore"></i> {{proposal.get_status_display}}</button>
+								</a>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+					{% if not proposals %}
+					<div class="alert alert-info text-center" role="alert">
+						<span style="color: blue; font-weight: bold;"> Hmmm! No applications made Yet. Keep hope alive</span>
+					</div>
+					{% endif %}
+				</div>  
+			{% endif %}
+			{% if request.user.is_merchant %}
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Team</th>
+							<th>Purchase Date</th>
+							<th>Method</th>
+							<th>Amount</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						{% for proposal in proposals %}
+						<tr>
+							<td>{{forloop.counter}}</td>
+							<td><a href="{% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %}">{{proposal.proposal.team|capfirst}}</a></td>
+							<td>{{proposal.created_at}}</td>
+							<td>{{proposal.purchase.payment_method|capfirst}} | <span class='text-primary'>{{proposal.purchase.get_status_display}}</span></td>
+							<td>{{proposal.totalsales}}</td>
+							<td>
+								<button class="btn btn-outline-{% if proposal.status == 'pending' %}danger{% else %}primary{% endif %} btn-sm" disabled>
+									{% if proposal.status == 'ongoing' %}
+									<i class="fas fa-spinner fa-spin"></i>
+									{% elif proposal.status == 'disputed' %}
+									<i class="fa fa-warning"></i>
+									{% elif proposal.status == 'cancelled' %}
+									<i class="fa fa-warning"></i>
+									{% endif %}
+									{{proposal.get_status_display}}
+								</button>
+							</td>
 						</tr>
 						{% endfor %}
 					</tbody>

@@ -1,0 +1,68 @@
+[
+{
+    "model": "client.client",
+    "pk": 1,
+    "fields": {
+        "user": 6,
+        "merchant": 1,
+        "gender": "",
+        "tagline": "",
+        "description": "",
+        "brand_name": null,
+        "profile_photo": "client/avatar5.png",
+        "company_logo": "client/logo.png",
+        "banner_photo": "client/banner.png",
+        "business_size": null,
+        "department": null,
+        "address": null,
+        "announcement": null,
+        "skill": [],
+        "employees": [
+            10,
+            8
+        ]
+    }
+},
+{
+    "model": "client.client",
+    "pk": 2,
+    "fields": {
+        "user": 7,
+        "merchant": 2,
+        "gender": "",
+        "tagline": "",
+        "description": "",
+        "brand_name": null,
+        "profile_photo": "client/avatar5.png",
+        "company_logo": "client/logo.png",
+        "banner_photo": "client/banner.png",
+        "business_size": null,
+        "department": null,
+        "address": null,
+        "announcement": null,
+        "skill": [],
+        "employees": []
+    }
+},
+{
+    "model": "client.client",
+    "pk": 3,
+    "fields": {
+        "user": 8,
+        "merchant": 1,
+        "gender": "",
+        "tagline": "",
+        "description": "",
+        "brand_name": null,
+        "profile_photo": "client/avatar5.png",
+        "company_logo": "client/logo.png",
+        "banner_photo": "client/banner.png",
+        "business_size": null,
+        "department": null,
+        "address": null,
+        "announcement": null,
+        "skill": [],
+        "employees": []
+    }
+}
+]

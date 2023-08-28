@@ -1,15 +1,15 @@
 [
     {
         "model": "account.customer",
-        "pk": 2,
+        "pk": 1,
         "fields": {
-            "password": "pbkdf2_sha256$260000$7R0hi6qdTwmtuJEzcGU3Wr$VtDZT7HyuTnfDG2jBuI2IHj8ZxHq5KuY9CFmGpHj3OI=",
+            "password": "pbkdf2_sha256$390000$WyVnuh2vLzYUicuKDPZKij$lNZr6BxW8+RqrqTOdBcDzTLP9wYawY1DFq5U5f5jiDI=",
             "email": "isaacagbedam@gmail.com",
-            "short_name": null,
-            "first_name": "Admin",
-            "last_name": "Katey",
+            "short_name": "Kateyson",
+            "first_name": "Isaac",
+            "last_name": "Admin",
             "phone": null,
-            "country": null,
+            "country": 6,
             "is_active": true,
             "is_staff": true,
             "is_superuser": true,
@@ -17,58 +17,11 @@
             "user_type": "admin",
             "site": 1,
             "active_merchant_id": 0,
-            "date_joined": "2023-04-21T23:55:20.799Z",
-            "last_login": "2023-04-22T15:39:18.619Z",
-            "groups": [],
-            "user_permissions": []
-        }
-    },
-    {
-        "model": "account.customer",
-        "pk": 3,
-        "fields": {
-            "password": "pbkdf2_sha256$260000$EA7nq8Pm7vPX7gdHAiCusm$OjjqPE5DGgetjGgJGZpXF+fKoQn6OrXCSECpdOluxfg=",
-            "email": "kateygh@a.com",
-            "short_name": null,
-            "first_name": "isaac",
-            "last_name": "agbedam",
-            "phone": null,
-            "country": 82,
-            "is_active": true,
-            "is_staff": false,
-            "is_superuser": false,
-            "is_assistant": false,
-            "user_type": "merchant",
-            "site": 1,
-            "active_merchant_id": 1,
-            "date_joined": "2023-04-22T01:54:09.569Z",
-            "last_login": "2023-04-23T13:46:16.807Z",
-            "groups": [],
-            "user_permissions": []
-        }
-    },
-    {
-        "model": "account.customer",
-        "pk": 4,
-        "fields": {
-            "password": "pbkdf2_sha256$260000$nnEhC10RvbIJWlGAxj5MUr$hgrzuhBW2ZV0IDwn2DojOXhd0BbOqRBCD/IBJmz2gP0=",
-            "email": "legend@a.com",
-            "short_name": null,
-            "first_name": "legend",
-            "last_name": "Katey",
-            "phone": null,
-            "country": 11,
-            "is_active": true,
-            "is_staff": false,
-            "is_superuser": false,
-            "is_assistant": false,
-            "user_type": "merchant",
-            "site": 1,
-            "active_merchant_id": 2,
-            "date_joined": "2023-04-22T02:05:45.306Z",
-            "last_login": "2023-04-22T02:18:05.808Z",
+            "date_joined": "2023-05-14T18:19:21.993Z",
+            "last_login": "2023-08-11T18:09:39.052Z",
             "groups": [],
             "user_permissions": []
         }
     }
+    
 ]

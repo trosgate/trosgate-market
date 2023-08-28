@@ -43,15 +43,17 @@
 					</div>
 				</div>
 				<div class="text-center">
-					<input type="number" name="product" value="{{product.id}}" id="product" hidden/>
-					<button style="background:rgb(43, 80, 43); color:#fff; cursor:pointer;"
+					<form>
+						<input type="number" name="product" value="{{product.id}}" id="product" hidden/>
+						<button style="background:rgb(43, 80, 43); color:#fff; cursor:pointer;"
 						type="button" 
 						class="btn btn-sucess" 
-						hx-get={% url 'resolution:proposal_start_work' %} 
-						hx-include="input[name='product']" 
+						hx-post={% url 'resolution:proposal_start_work' %} 
+						{% comment %} hx-include="input[name='product']"  {% endcomment %}
 						hx-target="#jobloaded">
 						Click to Start Work
 					</button>
+				</form>
 				</div>
 				{% elif request.user.clients %}
 				

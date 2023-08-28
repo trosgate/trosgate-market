@@ -129,22 +129,39 @@ class PurchaseAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
-
-
+    
+    # def get_queryset(self, request):
+    #     qs = super(PurchaseAdmin, self).get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs.all()  
+    #     else:
+    #         return qs.none() 
+    
+    
 @admin.register(ApplicationSale)
 class ApplicationSaleAdmin(admin.ModelAdmin):
     model = ApplicationSale
-    list_display = ['team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action']    
+    list_display = [
+        'team', 'created_at','totalsales', 'status_value', 'is_refunded', 'admin_action'
+    ]    
     list_filter = ['purchase__status','is_refunded']
     search_fields = ['team__title', 'total_sales_price']    
     readonly_fields = [
-         'team', 'purchase','project', 'sales_price', 'earning_fee_charged', 'total_earning', 'total_sales_price', 'discount_offered',
-        'staff_hired','earning','created_at','updated_at','status_value', 'is_refunded'
+        'team', 'purchase','project', 'sales_price', 'total_sales_price', 
+        'total_earning', 'earning_fee_charged','discount_offered',
+        'staff_hired','earning','created_at','updated_at','status_value',
+        'is_refunded','total_earning_fee_charged', 'start_time', 'end_time', 'status',
+        'revision','duration',
     ]
     fieldsets = (
         ('Classification', {'fields': ('team', 'purchase','project',)}),
-        ('Revenue', {'fields': ('total_sales_price', 'earning_fee_charged','discount_offered','is_refunded',)}),
+        ('Revenue', {'fields': (
+            'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
+            'discount_offered','is_refunded',
+        )}),
         ('Earning/Profit', {'fields': ('staff_hired','earning','total_earning',)}),
+        ('Product Attributes', {'fields': ('revision','duration',)}),
+        ('Transaction Manager', {'fields': ( 'start_time', 'end_time', 'status')}),
         ('Timestamp', {'fields': ('created_at','updated_at','status_value',)}),
     )
 
@@ -220,17 +237,17 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
 class ProposalSaleAdmin(admin.ModelAdmin):
     model = ProposalSale
     list_display = [
-        'team', 'created_at','total_sales_price', 'status_value', 'is_refunded', 'admin_action'
+        'team', 'created_at','totalsales', 'status_value', 'is_refunded', 'admin_action'
     ]    
     list_filter = ['purchase__status','is_refunded']
-    search_fields = ['team__title', 'total_sales_price']    
+    search_fields = ['team__title', 'reference', 'total_sales_price']    
     readonly_fields = [
         'team', 'purchase','proposal', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged', 'start_time', 'end_time', 'status',
-        'package_name','revision','duration',
+        'package_name','revision','duration','reference'
     ]
     fieldsets = (
-        ('Classification', {'fields': ('team', 'purchase','proposal',)}),
+        ('Classification', {'fields': ('team', 'purchase','proposal', 'reference')}),
         ('Revenue', {'fields': (
             'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
             'discount_offered','is_refunded',

@@ -13,6 +13,7 @@ app_name = 'teams'
 urlpatterns = [
     path('', views.team, name='team'),
     path('send-test-email', views.send_email_to_all_users, name='send_email_to_all_users'),
+    path('change_shareholding', views.change_shareholding, name='change_shareholding'),
 
     # payment subscription urls
     path('packages/', views.packages, name='packages'),

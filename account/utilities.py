@@ -3,8 +3,8 @@
 from django.contrib.sites.models import Site
 from django.conf import settings
 from django.apps import apps
-
 import random
+from general_settings.models import WebsiteSetting
 
 
 def auth_code():
@@ -19,20 +19,13 @@ def auth_code():
     return passcode
 
 
-def load_allowed_hosts():
-    domains = set(settings.ALLOWED_HOSTS)
-    Site = apps.get_model('sites', 'Site')
-    sites = Site.objects.all()
-    for site in sites:
-        domains.add(site.domain)
-    return list(domains)
-
-
-
-
-
-
-
+# def load_allowed_hosts():
+#     domains = set(settings.ALLOWED_HOSTS)
+#     Site = apps.get_model('sites', 'Site')
+#     sites = Site.objects.all()
+#     for site in sites:
+#         domains.add(site.domain)
+#     return list(domains)
 
 
 

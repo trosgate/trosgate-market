@@ -26,7 +26,7 @@
 												<li><span class="wt-dashboraddoller"><i class="fa fa-graduation-cap"></i>{{application.project.get_service_level_display}}</span></li>
 												<li><span>{% if application.project.created_by.country.flag %}<img src="{{application.project.created_by.country.flag.url}}" alt="img description"> {% else %}{{application.project.created_by.country.country_code}} - {% endif %} {{application.project.created_by.country.name|truncatechars:30}}</span></li>
 												<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{application.project.get_specification_display}}</span></li>
-												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{application.project.get_dura_converter_display}}</span></li>															
+												<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{application.project.get_duration_display}}</span></li>															
 											</ul>
 										</div>
 										<div class="wt-description">

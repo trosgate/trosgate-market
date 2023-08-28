@@ -74,7 +74,6 @@ class Purchase(PurchaseMaster):
     def save(self, *args, **kwargs):
         if not self.reference:
             self.reference = self.generate_unique_reference()
-
         super().save(*args, **kwargs)
 
     def generate_unique_reference(self):
@@ -91,7 +90,7 @@ class Purchase(PurchaseMaster):
 
             attempts += 1
 
-        raise ValueError("Failed to generate a unique reference.")
+        raise ValueError("Failed to create transaction")
 
 
     @classmethod
@@ -515,8 +514,8 @@ class MerchantTransaction(MerchantMaster):
         (NOT_CANCELLED, 'Not cancelled'),
         (INITIATED, 'Initiated'),
         (APPROVED, 'Approved')
-    )    
-
+    )
+    reference = models.CharField(max_length=60, blank=True, null=True, unique=True, verbose_name='Reference')
     team = models.ForeignKey("teams.Team", verbose_name=_("Team"), on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, verbose_name=_("Purchase Client"), on_delete=models.CASCADE)
     sales_price = models.PositiveIntegerField(_("Sales Price"), default=0)
@@ -535,29 +534,41 @@ class MerchantTransaction(MerchantMaster):
     start_time = models.DateTimeField(_("Start Time"), auto_now_add=False, auto_now=False, blank=True, null=True)
     end_time = models.DateTimeField(_("End Time"), auto_now_add=False, auto_now=False, blank=True, null=True)   
     status = models.CharField(_("Action Type"), max_length=20, choices=STATUS_CHOICES, default=PENDING)
-
+    revision = models.PositiveIntegerField(_("Revision"))
+    duration = models.PositiveIntegerField(_("Duration"))
     # Job cancellation
     cancel_type = models.CharField(_("Issue Type"), max_length=100, choices=CANCELLATION_TYPE, blank=True, null=True)
     cancel_status = models.CharField(_("Status"), max_length=100, choices=CANCEL_CHOICES, default=NOT_CANCELLED)
     cancel_message = models.TextField(_("Additional Message"), max_length=500, blank=True, null=True)
     cancelled_at = models.DateTimeField(_("Cancelled On"), auto_now_add=False, auto_now=False, blank=True, null=True)
 
-
-    # reference = models.CharField(max_length=20, unique=True, editable=False)
-
-
-    def generate_reference_number(self):
-        # Customize this method to generate your desired reference number
-        # For example, you can combine a prefix, date, and a unique identifier
-        # to create a human-readable reference number.
-        # prefix = "TRANS"
-        # date_part = timezone.now().strftime("%Y%m%d")
-        unique_id = str(uuid.uuid4().fields[-1])[:5]  # Take the last part of the UUID as a string
-        # return f"{prefix}-{date_part}-{unique_id}"
-        return f"{unique_id}"
-   
     class Meta:
         abstract = True
+
+
+    def earning_fee(self):
+        return f'{self.merchant.merchant.country.currency} {self.earning_fee_charged}'
+
+    def total_earning_fee(self):
+        return f'{self.merchant.merchant.country.currency} {self.total_earning_fee_charged}'
+
+    def total_discount(self):
+        return f'{self.merchant.merchant.country.currency} {self.discount_offered}'
+
+    def total_discount(self):
+        return f'{self.merchant.merchant.country.currency} {self.total_discount_offered}'
+
+    def earnings(self):
+        return f'{self.merchant.merchant.country.currency} {self.earning}'
+
+    def earnings(self):
+        return f'{self.merchant.merchant.country.currency} {self.total_earning}'
+    
+    def totalsales(self):
+        return f'{self.merchant.merchant.country.currency} {self.total_sales_price}'
+
+    def status_value(self):
+        return self.purchase.get_status_display()
 
 
 class ProposalSale(MerchantTransaction):
@@ -570,12 +581,11 @@ class ProposalSale(MerchantTransaction):
         (PREMIUM, _("Premium")),
     )    
     proposal = models.ForeignKey("proposals.Proposal", verbose_name=_("Proposal Hired"), related_name="proposalhired", on_delete=models.CASCADE)
-    revision = models.PositiveIntegerField(_("Revision"))
-    duration = models.PositiveIntegerField(_("Duration"))
     package_name = models.CharField(_("Selected Package"), max_length=20)
 
     class Meta:
         ordering = ("-created_at",)
+
 
     def save(self, *args, **kwargs):
 
@@ -603,35 +613,34 @@ class ProposalSale(MerchantTransaction):
         if self.status != self.PENDING and self.end_time is None:
             self.end_time = (timezone.now() + timedelta(days = self.duration))
 
+        if not self.reference:
+            self.reference = self.generate_unique_reference()
         super(ProposalSale, self).save(*args, **kwargs)
+
+
+    def generate_unique_reference(self):
+        max_attempts = 2000
+        attempts = 0
+
+        while attempts < max_attempts:
+            # Generate a random UUID and convert it to a human-readable string
+            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
+
+            # Check if the generated reference is unique
+            if not ProposalSale.objects.filter(reference=reference).exists():
+                return reference
+
+            attempts += 1
+
+        raise ValueError("Failed to create transaction")
 
 
     def __str__(self):
         return str(self.proposal)
 
-    def earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
-
-    def total_earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.total_earning_fee_charged}'
-
-    def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.discount_offered}'
-
-    def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.Total_discount_offered}'
-
-    def earnings(self):
-        return f'{get_base_currency_symbol()} {self.earning}'
-
-    def earnings(self):
-        return f'{get_base_currency_symbol()} {self.total_earning}'
-
-    def status_value(self):
-        return self.purchase.get_status_display()
-
     def get_absolute_url(self):
         return reverse('resolution:proposal_resolution', kwargs={'product_id': self.pk, 'product_slug':self.proposal.slug})
+
 
     @classmethod
     def start_task(cls, pk:int):
@@ -681,6 +690,70 @@ class ProposalSale(MerchantTransaction):
         return proposal_sale, client, freelancer, resolution
 
 
+class ApplicationSale(MerchantTransaction):
+    project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return str(self.project) 
+
+    def save(self, *args, **kwargs):
+        if self.duration is None:
+            self.duration = self.project.duration
+
+        if self.revision is None:
+            self.revision = 1
+
+        if self.status != self.PENDING and self.start_time is None:
+            self.start_time = timezone.now()
+
+        if self.status != self.PENDING and self.end_time is None:
+            self.end_time = (timezone.now() + timedelta(days = self.duration))
+            
+        super(ApplicationSale, self).save(*args, **kwargs)
+
+
+    def status_value(self):
+        return self.purchase.get_status_display()
+
+    @classmethod
+    def application_refund(cls, pk:int):
+        with db_transaction.atomic():
+            application = cls.objects.select_for_update().get(pk=pk)
+            client = ClientAccount.objects.select_for_update().get(user=application.purchase.client)
+            freelancer = FreelancerAccount.objects.select_for_update().get(user=application.team.created_by)
+            
+            try:
+                resolution = ProjectResolution.objects.select_for_update().get(application=application)            
+            except:
+                raise Exception(_("Sorry! could not raise refund. It could be that Team is yet to start work"))
+            
+            if application.is_refunded != False:
+                raise Exception(_("This transaction cannot be refunded twice"))
+
+            # if application.purchase.status != Purchase.SUCCESS:
+            #     raise Exception(_("You cannot issue refund for a failed transaction"))
+
+            if resolution.status == ProjectResolution.COMPLETED:
+                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
+
+            resolution.status = ProjectResolution.CANCELLED
+            resolution.save()
+
+            application.is_refunded = True
+            application.save()
+            
+            freelancer.pending_balance -= int(application.total_sales_price)
+            freelancer.save(update_fields=['pending_balance'])
+            
+            client.available_balance += int(application.total_sales_price)
+            client.save(update_fields=['available_balance'])
+
+        return application, client, freelancer, resolution
+
+
 class ContractSale(MerchantTransaction):
     contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)
 
@@ -691,22 +764,22 @@ class ContractSale(MerchantTransaction):
         return str(self.contract)
 
     def earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
+        return f'{self.merchant.merchant.country.currency} {self.earning_fee_charged}'
 
     def total_earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.total_earning_fee_charged}'
+        return f'{self.merchant.merchant.country.currency} {self.total_earning_fee_charged}'
 
     def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.discount_offered}'
+        return f'{self.merchant.merchant.country.currency} {self.discount_offered}'
 
     def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.Total_discount_offered}'
+        return f'{self.merchant.merchant.country.currency} {self.Total_discount_offered}'
 
     def earnings(self):
-        return f'{get_base_currency_symbol()} {self.earning}'
+        return f'{self.merchant.merchant.country.currency} {self.earning}'
 
     def earnings(self):
-        return f'{get_base_currency_symbol()} {self.total_earning}'
+        return f'{self.merchant.merchant.country.currency} {self.total_earning}'
 
     def status_value(self):
         return self.purchase.get_status_display()
@@ -758,22 +831,22 @@ class ExtContract(MerchantTransaction):
         return str(self.contract)
 
     def earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
+        return f'{self.merchant.merchant.country.currency} {self.earning_fee_charged}'
 
     def total_earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.total_earning_fee_charged}'
+        return f'{self.merchant.merchant.country.currency} {self.total_earning_fee_charged}'
 
     def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.discount_offered}'
+        return f'{self.merchant.merchant.country.currency} {self.discount_offered}'
 
     def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.Total_discount_offered}'
+        return f'{self.merchant.merchant.country.currency} {self.Total_discount_offered}'
 
     def earnings(self):
-        return f'{get_base_currency_symbol()} {self.earning}'
+        return f'{self.merchant.merchant.country.currency} {self.earning}'
 
     def earnings(self):
-        return f'{get_base_currency_symbol()} {self.total_earning}'
+        return f'{self.merchant.merchant.country.currency} {self.total_earning}'
 
     def status_value(self):
         return self.purchase.get_status_display()
@@ -813,63 +886,6 @@ class ExtContract(MerchantTransaction):
             client.save(update_fields=['available_balance'])
 
         return contract_sale, client, freelancer, resolution
-
-
-class ApplicationSale(MerchantTransaction):
-    project = models.ForeignKey("projects.Project", verbose_name=_("Project Applied"), related_name="applicantprojectapplied", on_delete=models.CASCADE)
-
-    class Meta:
-        ordering = ("-created_at",)
-
-    def __str__(self):
-        return str(self.project) 
-
-    def total_earning_fee(self):
-        return f'{get_base_currency_symbol()} {self.earning_fee_charged}'
-
-    def total_discount(self):
-        return f'{get_base_currency_symbol()} {self.discount_offered}'
-
-    def total_earning(self):
-        return f'{get_base_currency_symbol()} {self.earning}'
-
-    def status_value(self):
-        return self.purchase.get_status_display()
-
-    @classmethod
-    def application_refund(cls, pk:int):
-        with db_transaction.atomic():
-            application = cls.objects.select_for_update().get(pk=pk)
-            client = ClientAccount.objects.select_for_update().get(user=application.purchase.client)
-            freelancer = FreelancerAccount.objects.select_for_update().get(user=application.team.created_by)
-            
-            try:
-                resolution = ProjectResolution.objects.select_for_update().get(application=application)            
-            except:
-                raise Exception(_("Sorry! could not raise refund. It could be that Team is yet to start work"))
-            
-            if application.is_refunded != False:
-                raise Exception(_("This transaction cannot be refunded twice"))
-
-            # if application.purchase.status != Purchase.SUCCESS:
-            #     raise Exception(_("You cannot issue refund for a failed transaction"))
-
-            if resolution.status == ProjectResolution.COMPLETED:
-                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
-
-            resolution.status = ProjectResolution.CANCELLED
-            resolution.save()
-
-            application.is_refunded = True
-            application.save()
-            
-            freelancer.pending_balance -= int(application.total_sales_price)
-            freelancer.save(update_fields=['pending_balance'])
-            
-            client.available_balance += int(application.total_sales_price)
-            client.save(update_fields=['available_balance'])
-
-        return application, client, freelancer, resolution
 
 
 class SubscriptionMaster(MerchantMaster):

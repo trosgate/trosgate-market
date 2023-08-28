@@ -18,7 +18,7 @@
         </div>
         <div class="wt-viewjobholder">
             <ul>
-                <li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i> {{base_currency}} {{proposal.salary}}</span></li>
+                <li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i> {{website.merchant.country.currency}} {{proposal.salary}}</span></li>
 				<li><span><i class="far fa-folder"></i>{{proposal.get_service_level_display}}</span></li>
                 <li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}} - {% endif %} &nbsp;&nbsp; {{proposal.created_by.country.name}}</span></li>
                 <li><span><i class="far fa-folder wt-viewjobfolder"></i>Revision: {{proposal.get_revision_display}}</span></li>

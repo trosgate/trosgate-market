@@ -18,7 +18,7 @@
                 {% comment %} {% url 'proposals:purchase_product' product.proposal.slug product.pk %} {% endcomment %}
                 hx-include="input[name='merchant']" 
                 hx-target="#products-list">
-                Buy @ {{base_currency}} {{product.price}}
+                Buy @ {{website.merchant.country.currency}} {{product.price}}
             </button>
             {% endif %}
         </td>

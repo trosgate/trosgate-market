@@ -26,13 +26,6 @@ class CustomAuthBackend(BaseBackend):
         return None
 
 
-    # def get_user(self, user_id):
-    #     try:
-    #         return UserModel.objects.get(pk=user_id)
-    #     except UserModel.DoesNotExist:
-    #         return None
-
-
     def user_type_redirect(self, request, user):
         session = request.session
         current_site = get_current_site(request)

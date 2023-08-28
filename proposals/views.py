@@ -620,7 +620,7 @@ def proposal_preview(request, short_name, proposal_slug):
         "profile_view": profile_view,
 
     }
-    if request.merchant.merchant.proposal_detail == False:
+    if request.merchant.proposal_detail == False:
         return render(request, 'proposals/proposal_detail.html', context)
     else:
         return render(request, 'proposals/proposal_detail2.html', context)
@@ -708,7 +708,7 @@ def add_product_attachment(request, proposal_id):
             product.proposal = proposal
             product.team=team
             product.created_by=request.user
-            product.merchant=request.merchant.merchant
+            product.merchant=request.merchant
             product.save()
 
             if proposal.digital == False:
@@ -767,9 +767,9 @@ def product_download(request, proposal_slug, product_id):
     
 
 def proposal_detail(request, short_name, proposal_slug):
-    proposal = get_object_or_404(Proposal, slug=proposal_slug, created_by__short_name=short_name, status = Proposal.ACTIVE)
+    proposal = get_object_or_404(Proposal, created_by__short_name=short_name, slug=proposal_slug, status = Proposal.ACTIVE)
     profile_view = get_object_or_404(Freelancer, user=proposal.created_by)   
-    other_proposals = Proposal.active.exclude(pk=proposal.id)[:4]    
+    other_proposals = Proposal.objects.exclude(pk=proposal.id)[:4]    
     team_members = proposal.team.members.all()
 
     # proposal_review_msg = ProposalReview.objects.filter(
@@ -828,7 +828,7 @@ def proposal_detail(request, short_name, proposal_slug):
         "sesion_proposal":sesion_proposal,
         "all_viewed_proposals":all_viewed_proposals,
     }
-    if request.merchant.merchant.proposal_detail == False:
+    if request.merchant.proposal_detail == False:
         return render(request, 'proposals/proposal_detail.html', context)
     else:
         return render(request, 'proposals/proposal_detail2.html', context)

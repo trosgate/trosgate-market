@@ -5,6 +5,7 @@ upstream trosgate_app_server {
 server {
     listen 80;
     listen [::]:80;
+    // server_name _;  # This acts as a wildcard, matching any host
     server_name trosgate.com *.trosgate.com;
     return 301 https://$host$request_uri;
 }
@@ -42,3 +43,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
+
+
+

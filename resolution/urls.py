@@ -12,7 +12,7 @@ urlpatterns = [
     # path('applicant_start_work/',views.applicant_start_work, name='applicant_start_work'),
     # path('applicant_review/',views.applicant_review, name='applicant_review'),
 
-    path('<int:product_id>/<slug:product_slug>/',views.proposal_manager, name='proposal_resolution'),
+    path('<int:product_id>/<slug:product_slug>',views.proposal_manager, name='proposal_resolution'),
     path('proposal_start_work/',views.proposal_start_work, name='proposal_start_work'),
     path('proposal_review/',views.proposal_review, name='proposal_review'),
     

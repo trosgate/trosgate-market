@@ -1,0 +1,230 @@
+[
+{
+    "model": "teams.teamchat",
+    "pk": 1,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "This is the Information desk for the Team where members can pass information to the team\n",
+        "sent_on": "2023-06-12T18:56:37.643Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 2,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-06-12T18:56:48.921Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 3,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "This is the Information desk for the Team where members can pass information to the team This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-06-12T18:56:54.227Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 4,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-06-12T18:57:00.774Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 5,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "hellow\n",
+        "sent_on": "2023-06-27T19:02:26.785Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 6,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "great here",
+        "sent_on": "2023-06-27T19:02:43.164Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 7,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "hello",
+        "sent_on": "2023-06-27T19:38:29.277Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 8,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-06-27T19:40:20.418Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 9,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "asdsada zcxzcxzcxzc",
+        "sent_on": "2023-06-27T19:43:53.776Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 10,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "asdsa ddddddddd  ascsdasdsad",
+        "sent_on": "2023-06-27T19:44:07.240Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 11,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "asdasdsdads",
+        "sent_on": "2023-06-27T19:44:17.341Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 12,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "where members can pass information to the team",
+        "sent_on": "2023-06-27T19:47:11.348Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 13,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "Information desk for the Team where members can pass information to th",
+        "sent_on": "2023-06-27T19:52:09.023Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 14,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "Information desk for the Team where members can pass information to th Information desk for the Team where members can pass information to th Information desk for the Team where members can pass information to th",
+        "sent_on": "2023-06-27T19:52:17.491Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 15,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "sasdasdsd",
+        "sent_on": "2023-06-27T19:55:04.108Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 16,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "asssssssssssssssssss",
+        "sent_on": "2023-06-27T20:03:03.816Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 17,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "sssssssssadsacdzcc",
+        "sent_on": "2023-06-27T20:04:13.546Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 18,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "sdsadsad",
+        "sent_on": "2023-06-27T20:04:20.348Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 19,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "sscxxcxzcxzxzc",
+        "sent_on": "2023-06-27T20:05:09.864Z",
+        "is_sent": true
+    }
+}
+]

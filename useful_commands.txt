@@ -5,19 +5,85 @@ psql 'postgresql://isaacagbedam:NmDRfgF9AZ7e@ep-twilight-recipe-039780.eu-centra
 python manage.py dumpdata --exclude=auth --exclude=contenttypes --indent 4 > backups.json.gz
 
 
-//this will dumpdata
-python manage.py dumpdata account.Country --indent 4 > countries.json
-python manage.py dumpdata account.State --indent 4> states.json
+#ACCOUNT MODEL
+
+python manage.py dumpdata account.Country --indent 4 > all_countries.json
+python manage.py dumpdata account.State --indent 4 > all_states.json
 python manage.py dumpdata account.City --indent 4 > cities.json
 
-# Dump all data for the Country model into a single file
-python manage.py dumpdata account.Country --indent 4 > all_countries.json
+python manage.py dumpdata account.Customer --indent 4 > db_admin_auth.json
+python manage.py dumpdata account.Package --indent 4 > fixures/db_admin_package.json
+python manage.py dumpdata account.Merchant --indent 4 > fixures/db_merchant.json
 
-# Dump all data for the State model into a single file
-python manage.py dumpdata account.State --indent 4 > all_states.json
+#FREELANCER MODEL
 
-# Dump all data for the City model into a single file
-python manage.py dumpdata account.City --indent 4 > all_cities.json
+python manage.py dumpdata freelancer --indent 4 > freelancer_app.json
+
+python manage.py dumpdata freelancer.Freelancer --indent 4 > fixures/db_freelancer.json
+python manage.py dumpdata freelancer.FreelancerAccount --indent 4 > fixures/db_freelancer_account.json
+python manage.py dumpdata freelancer.FreelancerAction --indent 4 > fixures/db_freelancer_action.json
+
+#CLIENT MODEL
+
+python manage.py dumpdata client.Client --indent 4 > fixures/db_client.json
+python manage.py dumpdata client.ClientAccount --indent 4 > fixures/db_client_account.json
+python manage.py dumpdata client.ClientAction --indent 4 > fixures/db_client_action.json
+
+
+#TEAM MODEL
+python manage.py dumpdata teams --indent 4 > team_app.json
+
+python manage.py dumpdata teams.Team --indent 4 > fixures/db_teams.json
+python manage.py dumpdata teams.Invitation --indent 4 > fixures/db_invitation.json
+python manage.py dumpdata teams.Package --indent 4 > fixures/db_team_packages.json
+python manage.py dumpdata teams.TeamChat --indent 4 > fixures/db_team_chat.json
+python manage.py dumpdata teams.AssignMember --indent 4 > fixures/db_team_assign_member.json
+python manage.py dumpdata teams.Tracking --indent 4 > fixures/db_team_tracking.json
+
+
+#PAYMENT MODEL
+python manage.py dumpdata payments --indent 4 > payments_app.json
+
+python manage.py dumpdata payments.PaymentGateway --indent 4 > fixures/db_payment_gateways.json
+python manage.py dumpdata payments.MerchantAPIs --indent 4 > fixures/db_merchant_api.json
+python manage.py dumpdata payments.PaymentAccount --indent 4 > fixures/db_payment_acount.json
+python manage.py dumpdata payments.PaymentRequest --indent 4 > fixures/db_payment_request.json
+python manage.py dumpdata payments.AdminCredit --indent 4 > fixures/db_admin_credit.json
+
+
+#PROPOSAL MODEL
+python manage.py dumpdata proposals --indent 4 > proposals_app.json
+
+python manage.py dumpdata proposals.Proposal --indent 4 > fixures/db_proposals.json
+python manage.py dumpdata proposals.ProposalProduct --indent 4 > fixures/db_proposal_product.json
+python manage.py dumpdata proposals.ProposalChat --indent 4 > fixures/db_proposal_chat.json
+python manage.py dumpdata projects.Project --indent 4 > fixures/db_projects.json
+
+#PROJECT MODEL
+python manage.py dumpdata projects --indent 4 > projects_app.json
+
+python manage.py dumpdata projects.Project --indent 4 > fixures/db_projects.json
+
+#TRANSACTION MODEL
+python manage.py dumpdata transactions --indent 4 > transactions_app.json
+
+python manage.py dumpdata transactions.Purchase --indent 4 > fixures/db_purchase.json
+python manage.py dumpdata transactions.ProposalSale --indent 4 > fixures/db_proposalsale.json
+python manage.py dumpdata transactions.ContractSale --indent 4 > fixures/db_contractsale.json
+python manage.py dumpdata transactions.ExtContract --indent 4 > fixures/db_extcontractsale.json
+python manage.py dumpdata transactions.ApplicationSale --indent 4 > fixures/db_applicationsale.json
+
+#PLUGIN MODEL
+python manage.py dumpdata future --indent 4 > plugins.json
+
+python manage.py dumpdata future.FutureRelease --indent 4 > fixures/db_future_release.json
+python manage.py dumpdata future.PluginFeature --indent 4 > fixures/db_plugin_feature.json
+python manage.py dumpdata future.Plugin --indent 4 > fixures/db_plugins.json
+
+#SETTINGS MODEL
+
+python manage.py dumpdata general_settings --exclude general_settings.Currency --indent 4 > fixures/db_global_settings.json
+python manage.py dumpdata general_settings.Currency --indent 4 > fixures/db_plugins.json
 
 
 

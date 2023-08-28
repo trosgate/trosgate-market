@@ -1,11 +1,13 @@
 from django.core.exceptions import ValidationError
-from .models import Team, Invitation, TeamChat, AssignMember
+from .models import Team, TeamMember, TeamChat, AssignMember
 from django import forms
 from django.forms import Textarea
 from proposals.models import Proposal
 from account.models import Customer
 from freelancer.models import Freelancer
 from django.utils.translation import gettext_lazy as _
+
+
 
 
 class TeamCreationForm(forms.ModelForm):
@@ -29,6 +31,37 @@ class TeamModifyForm(forms.ModelForm):
 
         self.fields['notice'].widget.attrs.update(
             {'class': 'form-control col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center'})
+
+
+class TeamMemberForm(forms.ModelForm):
+    class Meta:
+        model = TeamMember
+        fields = ['earning_ratio', 'status', 'member', 'team']
+        required = ['earning_ratio', 'status', 'member', 'team']
+
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['status'].widget.attrs['style'] = 'height: 40px; margin:0 auto;'
+        self.fields['earning_ratio'].widget.attrs['style'] = 'height: 40px; margin:0 auto;'
+        
+        self.fields['status'].widget.attrs.update(
+            {'class': 'form-control customs-select',})
+        self.fields['earning_ratio'].widget.attrs.update(
+            {'class': 'form-control',})
+        
+        for field in self.Meta.required:
+            self.fields[field].required = True
+
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        earning_ratio = cleaned_data.get('earning_ratio')
+
+        if earning_ratio is None:
+            raise forms.ValidationError("Earning ratio cannot be empty.")
+            
+        return cleaned_data
 
 
 class TeamChatForm(forms.ModelForm):

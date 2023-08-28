@@ -14,6 +14,9 @@ from account.models import Customer
 from general_settings.fund_control import get_min_balance, get_max_receiver_balance, get_min_transfer, get_max_transfer, get_min_withdrawal, get_max_withdrawal
 from django.utils.text import slugify
 from merchants.models import MerchantMaster
+from django.core.exceptions import ValidationError
+from django.db.models  import F, Sum
+
 
 
 def code_generator():
@@ -37,7 +40,7 @@ class Package(models.Model):
 
     #
     #Initial Plan Configuration
-    type = models.CharField(_("Package Type"), choices=STATUS, default=BASIC, unique=True, max_length=10)  
+    type = models.CharField(_("Package Type"), choices=STATUS, default=BASIC, unique=True, max_length=20)  
     max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
     monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
     monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
@@ -54,7 +57,7 @@ class Package(models.Model):
         return str(self.get_type_display())
 
 
-# team should have ability to add proposal extras
+
 class Team(MerchantMaster):
     #
     # Team status
@@ -76,7 +79,7 @@ class Team(MerchantMaster):
     title = models.CharField(_("Title"), max_length=100, unique=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
     package = models.ForeignKey(Package, verbose_name=_("Team Plan"), related_name="teampackage", on_delete=models.CASCADE)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name="team_member")
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name='team_member', through="TeamMember")
     notice = models.TextField(_("Purpose/Mission"), max_length=2000)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
@@ -118,21 +121,74 @@ class Team(MerchantMaster):
     def get_team_preview_url(self):
         return reverse('teams:preview_inactive_team', args=[self.id])
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+
     @classmethod
-    def add_new_team(cls, title, created_by, package, notice=None):
+    def create_team_with_member(cls, title, created_by, package, merchant, notice='Default team'):
         with db_transaction.atomic():
             team = cls.objects.create(
-                title=title,
-                created_by=created_by,
+                title=title, 
+                created_by=created_by, 
                 package=package,
-                notice=notice
+                notice=notice, 
+                merchant=merchant
             )
-            team.members.add(team.created_by)
+            team.slug = slugify(created_by.short_name)
+            team.save()
+
+            TeamMember.create(
+                team=team,
+                member=team.created_by,
+                earning_ratio=100
+            )
+
+            Invitation.founder_invitation(
+                team=team, 
+                type=Invitation.INTERNAL, 
+                status=Invitation.ACCEPTED
+            )
+            
         return team
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)            
-        super(Team, self).save(*args, **kwargs)
+
+    def split_earnings(self):
+        active_relationships = self.team.teammemberrelationship_set.filter(is_active=True)
+        total_ratio = sum(relationship.earning_ratio for relationship in active_relationships)
+        earnings = {}
+
+        non_zero_relationships = [relationship for relationship in active_relationships if relationship.earning_ratio > 0]
+        non_zero_total_ratio = sum(relationship.earning_ratio for relationship in non_zero_relationships)
+
+        for relationship in non_zero_relationships:
+            ratio = relationship.earning_ratio
+            earning = self.transaction_amount * (ratio / non_zero_total_ratio)
+            earnings[relationship.member] = earning
+
+        if total_ratio > non_zero_total_ratio:
+            # Calculate remaining amount for the team founder
+            remaining_amount = self.transaction_amount - sum(earnings.values())
+            team_founder = self.team.team_founder
+            team_founder.account_balance += remaining_amount
+            team_founder.save()
+
+        return earnings
+
+
+class TeamMember(models.Model):
+    team = models.ForeignKey(Team, verbose_name=_("Team"), on_delete=models.CASCADE)
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Member"), blank=True, on_delete=models.CASCADE)
+    earning_ratio = models.PositiveIntegerField(_("Earning Ratio"), default=0)
+    status = models.BooleanField(_("Active for Pay"), choices=((False, 'Cannot be Paid'), (True, 'Eligible for Pay')), default=True)
+
+    @classmethod
+    def create(cls, team, member, earning_ratio):
+        return cls.objects.create(team=team, member=member, earning_ratio=earning_ratio)
+
+    def __str__(self):
+        return self.team.title
 
 
 # this is for External User Invitations
@@ -154,7 +210,7 @@ class Invitation(MerchantMaster):
         (ACCEPTED, _('Accepted'))
     )
     team = models.ForeignKey(Team, verbose_name=_("Team"), related_name='invitations', on_delete=models.CASCADE)
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.PROTECT) #CASCADE
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Sender"), related_name="sender", blank=True, on_delete=models.CASCADE)
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Receiver"), related_name="receiver", blank=True, null=True, on_delete=models.SET_NULL)
     email = models.EmailField(_("Email"), max_length=100, blank=True)
     code = models.CharField(_("Code"), max_length=10, blank=True)
@@ -164,7 +220,9 @@ class Invitation(MerchantMaster):
 
     def save(self, *args, **kwargs):
         if self.code == "":
-            self.code = create_random_code()          
+            self.code = create_random_code()
+        if self.merchant is None:
+            self.merchant = self.team.merchant          
         super(Invitation, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -172,32 +230,16 @@ class Invitation(MerchantMaster):
 
 
     @classmethod
-    def new_team_and_invitation(cls, current_team, created_by, title, package, type, status, notice=None):
-        with db_transaction.atomic():
-
-            if notice is None:
-                notice= f'team founded by {created_by}'    
-
-            if not (current_team.created_by == created_by):
-                raise InvitationException(_("You must be in your founded team to create new Teams"))
-
-            new_team = Team.add_new_team(
-                title=title, 
-                created_by=created_by, 
-                package=package,
-                notice=notice
-            )
-            new_team.status = 'active'
-            new_team.save()
-
-            internal_invite = cls.objects.create(
-                team=new_team, 
-                type=type, 
-                sender=new_team.created_by, 
-                email=new_team.created_by.email, 
-                status=status
-            )
-        return new_team, internal_invite
+    def founder_invitation(cls, team, type, status):
+        internal_invite = cls.objects.create(
+            team=team, 
+            type=type, 
+            sender=team.created_by, 
+            email=team.created_by.email, 
+            status=status,
+            merchant = team.merchant
+        )
+        return internal_invite
 
 
     @classmethod
@@ -226,7 +268,13 @@ class Invitation(MerchantMaster):
 
         if team.created_by == receiver:
             raise InvitationException(_("You cannot invite youself"))
-
+        
+        if Customer.objects.filter(user_type=Customer.CLIENT, email=email).exists():
+            raise InvitationException(_("Owner is already a client and can't be invited"))
+        
+        if Customer.objects.filter(is_staff=True, email=email).exists():
+            raise InvitationException(_("This user can't be invited"))
+        
         if cls.objects.filter(team=team, receiver=receiver).exists():
             raise InvitationException(_("User already invited"))  
 
@@ -239,7 +287,7 @@ class Invitation(MerchantMaster):
         if receiver in team.members.all():
             raise InvitationException(_("User already a member"))
 
-        if not (team.package.max_member_per_team < team.members.all().count()):
+        if not (team.package.max_member_per_team > team.invitations.count()):
             raise InvitationException(_("Maximum invitation exceeded"))
         
         internal_invite = cls.objects.create(
@@ -247,7 +295,8 @@ class Invitation(MerchantMaster):
             sender=sender, 
             type=type, 
             receiver=receiver, 
-            email=email
+            email=email,
+            merchant=team.merchant
         )
         return internal_invite
 
@@ -276,24 +325,30 @@ class Invitation(MerchantMaster):
             raise InvitationException(_("User of this email already invited"))
 
         if Customer.objects.filter(user_type=Customer.CLIENT, email=email).exists():
-            raise InvitationException(_("Email owner is already a client and can't be invited"))
+            raise InvitationException(_("Owner is already a client and can't be invited"))
         
-        if Customer.objects.filter(user_type=Customer.ADMIN, email=email).exists():
-            raise InvitationException(_("This Email user is reserved and can't be invited"))
+        if Customer.objects.filter(is_staff=True, email=email).exists():
+            raise InvitationException(_("This user can't be invited"))
 
         if not (team.package_status == 'active'):
-            raise InvitationException(_("Please upgrade your team to invite others"))
+            raise InvitationException(_("Please upgrade team to invite"))
 
-        if not (team.package.type == 'Team'):
+        if not (team.package.type == 'team'):
             raise InvitationException(_("Please subscribe to invite others"))
 
         if team.created_by != sender:
-            raise InvitationException(_("This action requires upgraded team founder"))
+            raise InvitationException(_("This action requires upgrade"))
           
-        if not (team.package.max_member_per_team < team.members.all().count()):
+        if not (team.package.max_member_per_team > team.invitations.count()):
             raise InvitationException(_("Maximum invitation exceeded"))
 
-        external_invite = cls.objects.create(team=team, sender=sender, email=email, type=type)
+        external_invite = cls.objects.create(
+            team=team, 
+            sender=sender, 
+            email=email, 
+            type=type,
+            merchant=team.merchant
+        )
         return external_invite
 
 

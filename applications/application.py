@@ -137,7 +137,7 @@ class ApplicationAddon():
         return saving_in_discount
 
     def get_total_price_after_discount_and_fee(self):
-        subtotal = sum((application["budget"]) for application in self.applicant_box.values())
+        subtotal = self.get_total_price_before_fee_and_discount()
         processing_fee = 0
 
         if settings.APPLICATION_GATEWAY_SESSION_ID in self.session and subtotal > 0:

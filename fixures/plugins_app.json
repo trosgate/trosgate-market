@@ -1,0 +1,157 @@
+[
+{
+    "model": "future.futurerelease",
+    "pk": 1,
+    "fields": {
+        "preview": "Your future in your hands to control",
+        "alert": "Some of these features require additional settings. Be guided by the comments",
+        "more_team_per_user": true,
+        "ext_contract": true,
+        "deposit": true,
+        "transfer": true,
+        "sms_authenticator": false
+    }
+},
+{
+    "model": "future.pluginfeature",
+    "pk": 1,
+    "fields": {
+        "title": "Cheaper cost of Staffing",
+        "preview": "Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eiuste modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem\r\n\r\nSed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui",
+        "promo_image": "promo/plugin1.jpg",
+        "feature1": "Payment is made Monthly or per arrangement",
+        "feature2": "Payment in USD dollars",
+        "feature3": "very cheap with great value",
+        "feature4": "Availability of support staff",
+        "feature5": "Sometimes offer discount",
+        "feature6": null,
+        "ordering": 0
+    }
+},
+{
+    "model": "future.pluginfeature",
+    "pk": 2,
+    "fields": {
+        "title": "Sell final products of proposal",
+        "preview": "Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eiuste modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem\r\n\r\nSed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui",
+        "promo_image": "promo/plugin2.jpg",
+        "feature1": "Can attach digital products based on proposal",
+        "feature2": "Allow for multiple product sales",
+        "feature3": "Ability to give away free products",
+        "feature4": "Pay and download instantly",
+        "feature5": null,
+        "feature6": null,
+        "ordering": 0
+    }
+},
+{
+    "model": "future.pluginfeature",
+    "pk": 3,
+    "fields": {
+        "title": "Instant Download",
+        "preview": "Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eiuste modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem\r\n\r\nSed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui",
+        "promo_image": "promo/plugin2_ZsnoJAg.jpg",
+        "feature1": "Pdf download available",
+        "feature2": "PSD download available",
+        "feature3": "jpeg download available",
+        "feature4": "png download available",
+        "feature5": null,
+        "feature6": null,
+        "ordering": 0
+    }
+},
+{
+    "model": "future.pluginfeature",
+    "pk": 4,
+    "fields": {
+        "title": "Money back quaranteed",
+        "preview": "Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eiuste modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem\r\n\r\nSed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed qui",
+        "promo_image": "promo/plugin1_H0kJjNZ.jpg",
+        "feature1": "Money back guaranteed",
+        "feature2": "Refundable within 7 days",
+        "feature3": "Original amount refundaable",
+        "feature4": null,
+        "feature5": null,
+        "feature6": null,
+        "ordering": 0
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 1,
+    "fields": {
+        "name": "Customer Support Agent",
+        "slug": "customer-support-agent",
+        "price": 80,
+        "preview": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your \r\n\r\nhands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in yovvv",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to controlYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control",
+        "mode": true,
+        "status": true,
+        "created_at": "2023-07-16T14:52:44.293Z",
+        "ordering": 0,
+        "feature": [
+            1,
+            4
+        ]
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 2,
+    "fields": {
+        "name": "Sell Digital Product",
+        "slug": "sell-digital-product",
+        "price": 70,
+        "preview": "DD our future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your \r\n\r\nhands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in yovvv",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to controlYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control",
+        "mode": false,
+        "status": true,
+        "created_at": "2023-07-16T15:10:12.570Z",
+        "ordering": 1,
+        "feature": [
+            1,
+            2,
+            3,
+            4
+        ]
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 3,
+    "fields": {
+        "name": "Multiple Teams",
+        "slug": "multiple-teams",
+        "price": 120,
+        "preview": "your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in",
+        "mode": false,
+        "status": true,
+        "created_at": "2023-07-16T21:59:28.091Z",
+        "ordering": 0,
+        "feature": [
+            1,
+            2,
+            4
+        ]
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 4,
+    "fields": {
+        "name": "Testing plugin",
+        "slug": "testing-plugin",
+        "price": 10,
+        "preview": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in",
+        "mode": false,
+        "status": true,
+        "created_at": "2023-07-16T22:00:37.137Z",
+        "ordering": 0,
+        "feature": [
+            4
+        ]
+    }
+}
+]

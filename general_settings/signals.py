@@ -1,6 +1,16 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from . models import Currency, WebsiteSetting
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+
+
+
+@receiver(post_save, sender=Site)
+def invalidate_allowed_domains_cache(sender, instance, **kwargs):
+    # Invalidate the cached list of allowed domains
+    print('Invalidate the cached list of allowed domains')
+    cache.delete('allowed_domains_cache')
 
 
 @receiver(post_save, sender=Currency)

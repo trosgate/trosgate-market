@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Package, Team, Invitation, TeamChat, AssignMember, Tracking
+from .models import Package, TeamMember, Team, Invitation, TeamChat, AssignMember, Tracking
 
 
 
@@ -61,12 +61,26 @@ class PackageAdmin(admin.ModelAdmin):
         return actions
 
 
+# @admin.register(TeamMember)
+class TeamMemberAdmin(admin.TabularInline):
+    model=TeamMember
+    list_display = ['member', 'team', 'earning_ratio', 'status',]
+    readonly_fields = ['member', 'team', 'earning_ratio', 'status',]
+    list_editable = ['earning_ratio', 'status',]
+    extra = 0
+
+    fieldsets = (
+        ('Comment Thread', {'fields': ('member', 'earning_ratio', 'status',)}),
+    )
+
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ['title', 'merchant', 'package', 'team_balance', 'status',]
     list_display_links = ['title', 'merchant']
     search_fields = ['title']
     list_filter =  ['merchant']
+    inlines = [TeamMemberAdmin]
     readonly_fields = [
         'title', 'merchant', 'slug', 'team_balance','created_by','members', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',

@@ -1,5 +1,7 @@
 from .models import Category, WebsiteSetting, AutoLogoutSystem
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
+
 
 
 def categories(request):
@@ -10,13 +12,16 @@ def categories(request):
 
 
 def website(request):
-    site = Site.objects.get_current()
-    merchant = request.merchant
-    parent = request.parent_site
-    if merchant is not None and site == merchant:
-        return {'website': request.site.merchant}
-    if parent is not None and site == parent:
-        return {'website': request.site.websitesetting}
+    current_site = get_current_site(request)
+    website_obj = None
+
+    if hasattr(current_site, 'websitesetting'):
+        website_obj = request.parent_site.websitesetting
+        
+    elif hasattr(current_site, 'merchant'):
+        website_obj = request.merchant
+        
+    return {'website': website_obj}
 
 
 def autoLogoutSystem(request):

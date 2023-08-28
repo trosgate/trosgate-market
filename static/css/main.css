@@ -5105,6 +5105,16 @@ body.wt-login .wt-userlogedin{display: block;}
 	margin:10px 0px;
 	border-radius:20px;
   }
+
+  
+  .proposal-action .product-btn-state {
+	width: 100%;
+	text-align: center;
+	background: blue;
+	box-shadow: none;
+	margin:10px 0px;
+	border-radius: 20px;
+  }
   .proposal-action .addon-btn {
 	width: 50%;
 	text-align: center;
@@ -5154,3 +5164,50 @@ body.wt-login .wt-userlogedin{display: block;}
 	/* margin:10px 0px; */
 	border-radius:20px;
   }
+
+  .custom-checkout-left{
+	background-color:rgb(7, 5, 49); 
+	color:#fff; 
+	height:100vh; 
+	text-align: center;
+	position: relative;
+	padding:10%;
+}
+
+.custom-checkout-right{
+	background-color:#fff; 
+	color:#000; 
+	height:100vh; 
+	text-align: center;
+	position: relative;
+	padding:0% 5% 0% 5%;
+
+} 
+@media (max-width: 767.98px) {
+	.checkout-to-show {
+		display: block !important;
+	}        
+	.flex-checkout-page {
+		height: 100vh; /* Set the row height to 100% of the viewport height */
+	}
+
+	.custom-checkout-right{
+		background-color: #fff !important; /* Set the background color to white */
+		color: #000; /* Set the text color to black */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		position: absolute;
+		width: 100%;
+
+	}
+	.custom-checkout-left{
+		display:none;
+	}
+	.custom-checkout-right .reposition-top{
+		width: 100%;
+		padding:5%;
+		transform: translateY(-20%) !important;
+	}
+}

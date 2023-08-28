@@ -46,7 +46,6 @@ from teams.models import Team
 
 
 
-
 @login_required
 def proposal_manager(request, product_id, product_slug):
     product = get_object_or_404(ProposalSale, pk=product_id, proposal__slug=product_slug)
@@ -54,8 +53,7 @@ def proposal_manager(request, product_id, product_slug):
         return HttpResponseBadRequest()
     cancellation_form = ProposalCancellationForm(request.POST or None)
     task = ProposalJob.objects.filter(product=product).first()
-    print('Task ::', task)
-    print('product ::', product)
+   
     context = {
         "product": product,
         "task": task,
@@ -69,15 +67,12 @@ def proposal_manager(request, product_id, product_slug):
     return render(request, "resolution/proposal_job.html", context)
 
 
-
 @login_required
 @user_is_freelancer
 def proposal_start_work(request):
-    pk = int(request.GET.get('product'))
-    product = get_object_or_404(
-        ProposalSale, pk=pk, 
-        team__created_by=request.user, 
-        purchase__status = Purchase.SUCCESS
+    product_id = int(request.POST.get('product'))
+    product = get_object_or_404(ProposalSale, pk=product_id, 
+        team__created_by=request.user, purchase__status = Purchase.SUCCESS
     )
 
     task, product_ = ProposalSale.start_task(product.id)

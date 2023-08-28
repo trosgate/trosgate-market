@@ -47,7 +47,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(WebsiteSetting)
 class WebsiteSettingAdmin(admin.ModelAdmin):
-    list_display = ['get_sitename', 'get_sitedomain', 'tagline', 'site_logo_tag', ]
+    list_display = ['get_sitename', 'is_parent_site', 'get_sitedomain', 'site_logo_tag', ]
+    list_editable = ['is_parent_site']
     list_display_links = ['get_sitename', 'get_sitedomain']
     readonly_fields = ['site_logo_tag','site','promo_image_tag', ]
     list_per_page = sys.maxsize

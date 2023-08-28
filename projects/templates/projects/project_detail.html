@@ -50,7 +50,7 @@
 									{% if project.status == 'active' %}
 									<div class="row justify-content-md-center">
 										<div class="wt-sectionhead wt-textcenter">
-											<div id="duration-timer" style="color: green; font-weight: bold; display: none;">{{ project.duration|date:"M d, Y H:m:s"}} </div>
+											<div id="duration-timer" style="color: green; font-weight: bold; display: none;">{{ project.duration_time|date:"M d, Y H:m:s"}} </div>
 											<div class="alert alert-info" role="alert">
 												<strong>Expires In: </strong><span id="duration-countdown-timer" style="color: green; font-weight: bold;"></span>
 											</div>
@@ -61,7 +61,7 @@
 										<h2>{{projectdetail.title}}</h2>
 										
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{base_currency}} {{projectdetail.salary}}</span></li>
+											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{website.merchant.country.currency}} {{projectdetail.salary}}</span></li>
 											<li><span>{% if not projectdetail.created_by.country.flag %}{{projectdetail.created_by.country.country_code}} - {% endif %}{% if projectdetail.created_by.country.flag %}<img src="{{projectdetail.created_by.country.flag.url}}" alt="img description">{% endif %} {{projectdetail.created_by.country.name}}</span></li>
 											{% if project.status == 'active' %}
 											<li><span><i class="far fa-star" style="color:gold;"></i> Rating: {{project.rating}}</span></li>

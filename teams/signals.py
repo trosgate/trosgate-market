@@ -9,4 +9,3 @@ def clear_team_cache(sender, instance, created, **kwargs):
     cache_key = f'team_queryset_{instance.id}'
     cache.delete(cache_key)
 
-

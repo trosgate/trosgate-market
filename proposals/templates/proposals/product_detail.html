@@ -53,7 +53,7 @@
 							<div class="d-flex justify-content-between mb-3" style="font-weight:bold; font-size:18px; width:100%; color:green;">
 								{% if request.user.freelancer%}
 								<span>Default Premium Price </span>
-								<span class="text-primary pt-1"> @ {{base_currency}}{{proposal.salary}}</span>
+								<span class="text-primary pt-1"> @ {{website.merchant.country.currency}}{{proposal.salary}}</span>
 								{% else %}
 								<span>Download Product Below</span>
 								{% endif %}

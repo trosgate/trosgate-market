@@ -47,11 +47,5 @@ def update_assign_proposal_task(sender, instance, created, **kwargs):
         AssignMember.objects.filter(proposal=instance).update(is_assigned=True)
 
 
-# @receiver(post_save, sender=Proposal)
-# def persist_progress_of_proposal(sender, instance, created, **kwargs):
-#     Proposal.objects.filter(pk=instance.pk, progress__lte=99).update(status=Proposal.REVIEW, published=False)
-
-
-
 
 

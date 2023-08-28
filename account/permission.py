@@ -31,7 +31,7 @@ def user_is_merchant(function):
 
     def wrap(request, *args, **kwargs):    
 
-        if request.user.user_type == Customer.MERCHANT and request.user in request.merchant.members.all():
+        if request.user.is_merchant or request.user in request.merchant.members.all():
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied

@@ -97,26 +97,29 @@ class PurchaseAndSaleCreator:
 
 
     def _create_application_sales(self, purchase, hiringbox, grand_total_before_expense, discount_value):
-        for applicant in hiringbox:
-            ApplicationSale.objects.create(
-                team=applicant["application"].team,
-                purchase=purchase,
-                project=applicant["application"].project,
-                sales_price=int(applicant["budget"]),
-                staff_hired=int(1),
-                earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
-                total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
-                total_earnings=int(get_earning_calculator(
-                    (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
-                    get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))             
-            )
+        try:
+            for applicant in hiringbox:
+                ApplicationSale.objects.create(
+                    team=applicant["application"].team,
+                    purchase=purchase,
+                    project=applicant["application"].project,
+                    sales_price=int(applicant["budget"]),
+                    staff_hired=int(1),
+                    earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                    total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                    earning=int(get_earning_calculator(
+                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
+                    total_earning=int(get_earning_calculator(
+                        (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))             
+                )
+        except Exception as e:
+            print('%s' % (str(e)))
 
 
 

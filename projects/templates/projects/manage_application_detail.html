@@ -25,7 +25,7 @@
 													<li><span>{% if project.created_by.country.flag %}<img src="{{project.created_by.country.flag.url}}" alt="img description"> {% else %}{{project.created_by.country.country_code}} - {% endif %} {{project.created_by.country.name|truncatechars:30}}</span></li>
 													<li><span class="wt-dashboraddoller">Salary: <i class="fa fa-dollar-sign"></i>{{project.salary}}</span></li>
 													<li><span class="wt-clicksavefolder"><i class="fa fa-industry"></i>Type: {{project.get_specification_display}}</span></li>
-													<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{project.get_dura_converter_display}}</span></li>															
+													<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> Duration: {{project.get_duration_display}}</span></li>															
 												</ul>
 											</div>
 											<div class="wt-description">

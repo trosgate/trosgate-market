@@ -6,67 +6,48 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.sites.models import Site
 from account.models import Merchant
 import uuid
+from django.contrib.sites.managers import CurrentSiteManager
 
 
-
+    
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
-        site = Site.objects.get_current()
-        curr_merchant = Merchant.objects.filter(site=site).exists()
-        # print(curr_merchant
-        # print(self.merchant_id)
-        if not curr_merchant:
-            return super().get_queryset()
+        current_site = Site.objects.get_current()
+        qs = super().get_queryset()
+        if current_site.pk == 1:
+            queryset = qs
         else:
-            return super().get_queryset().filter(merchant__site=site.id)
-
-    # def get_queryset(self):
-    #     site = Site.objects.get_current()
-    #     curr_merchant = Merchant.objects.filter(site=site).first()
-    #     print('site.merchant ::', site)
-    #     print('curr_merchant ::', curr_merchant)
-
-    #     if curr_merchant:
-    #         return super().get_queryset().filter(merchant=site.id) # Merchant case
-    #     else:
-    #         return super().get_queryset().filter(merchant__site=site.id) # Merchant User case
-    
-
-class UnscopedManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset()
+            queryset = qs.filter(merchant__site=current_site)
+        return queryset
+        
 
 
 class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
-    
     objects = MerchantMasterManager()
-    objectsall = UnscopedManager()
     
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
-        site = Site.objects.get_current()
-        merchant = Merchant.objects.filter(site=site).first()
+        current_site = Site.objects.get_current()
         if not self.merchant_id:
-            self.merchant_id = merchant.id
+            self.merchant=Merchant.objects.filter(site=current_site).first()
         super().save(*args, **kwargs)
 
 
 class MerchantProduct(MerchantMaster):
-    # Proposal Duration Converter
-    ONE_DAY = "one_day"
-    TWO_DAYS = "two_days"
-    THREE_DAYS = "three_days"
-    FOUR_DAYS = "four_days"
-    FIVE_DAYS = "five_days"
-    SIX_DAYS = "six_days"
-    ONE_WEEK = "one_week"
-    TWO_WEEK = "two_weeks"
-    THREE_WEEK = "three_weeks"
-    ONE_MONTH = "one_month"
-    DURATION_CONVERTER = (
+    ONE_DAY = 1
+    TWO_DAYS = 2
+    THREE_DAYS = 3
+    FOUR_DAYS = 4
+    FIVE_DAYS = 5
+    SIX_DAYS = 6
+    ONE_WEEK = 7
+    TWO_WEEK = 14
+    THREE_WEEK = 21
+    ONE_MONTH = 30
+    PACKAGE_DURATION = (
         (ONE_DAY, _("01 Day")),
         (TWO_DAYS, _("02 Days")),
         (THREE_DAYS, _("03 Days")),
@@ -79,6 +60,22 @@ class MerchantProduct(MerchantMaster):
         (ONE_MONTH, _("01 Month")),
     )
 
+    ONE_TIME = 1
+    TWO_TIMES = 2
+    THREE_TIMES = 3
+    FOUR_TIMES = 4
+    FIVE_TIMES = 5
+    SIX_TIMES = 6
+    SEVEN_TIMES = 7
+    REVISION_CHOICES = (
+        (ONE_TIME, _("1 Time")),
+        (TWO_TIMES, _("2 Times")),
+        (THREE_TIMES, _("3 Times")),
+        (FOUR_TIMES, _("4 Times")),
+        (FIVE_TIMES, _("5 Times")),
+        (SIX_TIMES, _("6 Times")),
+        (SEVEN_TIMES, _("7 Times")),
+    )
     # Service Level
     BASIC = 'basic'
     STANDARD = 'standard'
@@ -110,7 +107,6 @@ class MerchantProduct(MerchantMaster):
     sample_link = models.URLField(_("Sample Website"), max_length=2083, help_text=_("the link must be a verified url"), null=True, blank=True)
     status = models.CharField(_("Status"), max_length=20, choices=STATUS, default=ACTIVE)
     description = models.TextField(verbose_name=_("Description"), max_length=3500, error_messages={"name": {"max_length": _("Description field is required")}},)
-    dura_converter = models.CharField(_("Deadline"), max_length=100, choices=DURATION_CONVERTER, default = ONE_DAY)    
     service_level = models.CharField(_("Service Level"), max_length=20, choices=SERVICE_LEVEL, default=BASIC, error_messages={"name": {"max_length": _("Service Level field is required")}},)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), on_delete=models.CASCADE)
     reference = models.CharField(unique=True, null=True, blank=True, max_length=100)
@@ -118,10 +114,12 @@ class MerchantProduct(MerchantMaster):
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
     salary = models.IntegerField(_("Price"), error_messages={"amount": {"max_length": _("Set the salary for this proposal")}},)       
+    revision = models.PositiveIntegerField(_("Revision"), choices=REVISION_CHOICES, default=ONE_TIME)    
+    duration = models.PositiveIntegerField(_("Duration"), choices=PACKAGE_DURATION, default=THREE_DAYS)
+    duration_time = models.DateTimeField(_("Duration Time"), null=True, blank=True, help_text=_("deadline for expiration of project"))
 
     class Meta:
         abstract = True
-
 
 
 

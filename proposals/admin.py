@@ -11,10 +11,10 @@ class ProposalAdmin(admin.ModelAdmin):
     list_editable = [ 'status','published']
     search_fields = ['team__title', 'title', 'category__name']
     readonly_fields = [
-        'created_by','image_tag', 'sample_link', 'skill','description',
+        'image_tag', 'sample_link', 'skill','description', #'created_by',
         'team', 'category','reference', 'published', 'faq_three', 'faq_three_description',
         'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'identifier', 
-        'service_level', 'revision', 'dura_converter', 'thumbnail','merchant'
+        'service_level', 'revision', 'duration_time', 'thumbnail','merchant'
     ]
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
@@ -29,7 +29,7 @@ class ProposalAdmin(admin.ModelAdmin):
         ('Classification', {'fields': ('category','reference', 'published',)}),
         ('Description', {'fields': ('description', 'sample_link', 'skill',)}),
         ('FAQs', {'fields': ('faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'faq_three', 'faq_three_description',)}),
-        ('Attributes', {'fields': ('service_level', 'revision', 'dura_converter', 'thumbnail',)}),   
+        ('Attributes', {'fields': ('service_level', 'revision', 'duration_time', 'thumbnail',)}),   
     )
     
     def mark_bulk_to_public(self, request, queryset):
@@ -52,9 +52,20 @@ class ProposalAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProposalProduct)
-class ProposalAdmin(admin.ModelAdmin):
-    list_display = ['product_type', 'status', 'created_at']
+class ProposalProductAdmin(admin.ModelAdmin):
+    list_display = ['proposal', 'product_type', 'product_price', 'status', 'created_at']
     readonly_fields = ['created_at']
+    readonly_fields = (
+        'merchant', 'license', 'team', 'proposal', 'product_type', 'created_by',
+        'status', 'attachment', 'created_at', 'modified_at', 'price', 'product_price'
+    )
+    search_fields = ['proposal__title', 'status', 'team__title']
+    fieldsets = (
+        ('Digital Product Description', {'fields': (
+            'merchant', 'license', 'team', 'proposal', 'product_type', 'created_by',
+            'status', 'attachment', 'created_at', 'modified_at', 'product_price'
+        )}),
+    )
 
 
 class ProposalSupportInline(admin.StackedInline):

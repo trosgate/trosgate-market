@@ -6,10 +6,10 @@ import requests
 from django.db import models, transaction as db_transaction
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Team, Invitation, TeamChat, AssignMember, Tracking
+from .models import Team, TeamMember, Invitation, TeamChat, AssignMember, Tracking
 from teams.models import Package
 from django.contrib.auth.decorators import login_required
-from .forms import TeamModifyForm, AssignForm, TeamGalleryForm
+from .forms import TeamModifyForm, TeamMemberForm, AssignForm, TeamGalleryForm
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -42,7 +42,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from control_settings.utilities import subscription_switch
 from .tasks import email_all_users
+from django.forms import modelformset_factory
+from django import forms
+from django.core.exceptions import ValidationError
 # from django_celery_beat.models import PeriodicTask, CrontabSchedule
+
 
 def send_email_to_all_users(request):
     email_all_users.delay()
@@ -172,8 +176,6 @@ def remove_invitee(request):
     invited = get_object_or_404(Invitation, pk=invitee_id, team=team, status='invited')
     if team.created_by == request.user:
         invited.delete()
-        # messages.error(request, 'Elevation required to remove this user!')
-
     invited = Invitation.objects.filter(team=team, status=Invitation.INVITED)
 
     context = {
@@ -183,21 +185,63 @@ def remove_invitee(request):
     return render(request, 'teams/components/team_invitees.html', context)
 
 
-# Inviting a user that already
+@login_required
+@user_is_freelancer
+def change_shareholding(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, created_by = request.user)
+    members =  team.teammember_set.all()
+    TeamMemberFormSet = modelformset_factory(TeamMember, form=TeamMemberForm, extra=0)
+
+    custom_message = ''
+    formset_total_ratio = 0
+    if request.method == 'POST':
+        formset = TeamMemberFormSet(request.POST, queryset=members)
+        if formset.is_valid():
+            formset_total_ratio = sum(form.cleaned_data.get('earning_ratio', 0) for form in formset)
+            if formset_total_ratio < 100:
+                raise ValidationError("Earning ratio cannot be less than 100%.")
+            if formset_total_ratio > 100:
+                raise ValidationError("Earning ratio cannot be more than 100%.")
+            formset.save()
+
+            context = {
+                'team':team,
+                'members':members,
+                'custom_message':custom_message,
+            }
+            return render(request, 'teams/components/team_earning.html', context)
+    
+        else:
+            for form_errors in formset.errors:
+                if '__all__' in form_errors:
+                    custom_message = form_errors['__all__'][0]
+
+    else:
+        formset = TeamMemberFormSet(queryset=members)
+
+    context = {
+        "teammemberform": 'teammemberform',
+        'team':team,
+        'formset':formset,
+        'custom_message':custom_message
+    }
+    return render(request, 'teams/components/team_earning.html', context)
+
+
 @login_required
 @user_is_freelancer
 def invitation(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, created_by=request.user)
     invited = team.invitations.filter(status=Invitation.INVITED)
-    accepted = team.invitations.filter(status=Invitation.ACCEPTED)
+    members = team.teammember_set.all()
     code = Invitation.objects.values('code')[0]
     max_team_members = PackageController(team).max_member_per_team()
 
     context = {
-        "teams": team,
+        "team": team,
         "code": code,
         'invited': invited,
-        'accepted': accepted,
+        'members': members,
         'max_team_members': max_team_members,
     }
     return render(request, 'teams/invitation_detail.html', context)
@@ -222,8 +266,8 @@ def internal_invitation(request):
                 receiver=receiver, 
                 email=receiver.email
             )
-            send_invitation_email(new_invite.email, new_invite.code, new_invite.team)
             result = 'The user was invited successfully'
+            # send_invitation_email(new_invite.email, new_invite.code, new_invite.team)
         except InvitationException as e: 
             errors = str(e)
 
@@ -233,8 +277,8 @@ def internal_invitation(request):
 @login_required
 @user_is_freelancer
 def external_invitation(request):
-    email = str(request.POST.get('emailer'))
     team = Team.objects.get(pk=request.user.freelancer.active_team_id, created_by=request.user)
+    email = str(request.POST.get('emailer'))
 
     if email:
         try:
@@ -273,15 +317,13 @@ def accept_team_invitation(request):
         code = str(request.POST.get('code'))
 
         if code:
-            invitations = Invitation.objects.filter(code=code, email=request.user.email, status="invited")
+            invitation = Invitation.objects.filter(code=code, email=request.user.email, status="invited").last()
 
-            if invitations:
-                invitation = invitations.first()
+            if invitation:
                 invitation.status = Invitation.ACCEPTED
                 invitation.save()
 
                 team = invitation.team
-                print(team.title)
                 team.members.add(request.user)
                 team.save()
 
@@ -292,7 +334,8 @@ def accept_team_invitation(request):
                 messages.info(
                     request, f'Hi "{request.user.short_name}", you are now member of {team.title}')
 
-                send_invitation_accepted_mail(team, invitation)
+                #lets make sure acceptance is committed
+                # send_invitation_accepted_mail(team, invitation)
 
                 return redirect('account:dashboard')
             else:

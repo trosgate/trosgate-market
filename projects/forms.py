@@ -16,18 +16,18 @@ class ProjectCreationForm(forms.ModelForm):
         model = Project
         fields = [
             'title', 'preview', 'category', 'service_level', 
-            'completion_time', 'dura_converter', 'skill', 
+            'completion_time', 'duration', 'skill', 
             'description', 'rating', 'salary', 'sample_link',
         ]
         required = [
             'title', 'preview', 'category', 'service_level', 
-            'completion_time', 'dura_converter', 'rating', 'salary'
+            'completion_time', 'duration', 'rating', 'salary'
         ]
         description = ['description']
         skill = ['skill']
 
         custom_select_class = [
-            'category', 'service_level', 'dura_converter', 'rating',
+            'category', 'service_level', 'duration', 'rating',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -67,8 +67,8 @@ class ProjectCreationForm(forms.ModelForm):
 class ProjectReopenForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['dura_converter', 'rating']
-        required = ['dura_converter', 'rating']
+        fields = ['duration', 'rating']
+        required = ['duration', 'rating']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

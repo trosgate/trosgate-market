@@ -6,13 +6,15 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
-from uuid import uuid4
 from contract.models import InternalContract
 from django.urls import reverse
 from django.utils.text import slugify
 from merchants.models import MerchantProduct, MerchantMaster
 from django.core.files.storage import FileSystemStorage
 import uuid
+from datetime import timedelta
+from django.utils import timezone
+
 
 
 PROTECTED_FILES_ROOT = settings.PROTECTED_MEDIA_ROOT
@@ -26,11 +28,6 @@ def product_storage(instance, filename):
     return f"product/{instance.team.title}/attachments/{filename}"
 
 
-class ActiveProposals(models.Manager):
-    def active_proposal(self):
-        return super(ActiveProposals, self).get_queryset().filter(status=Proposal.ACTIVE)
-
-
 class Proposal(MerchantProduct):
     BASIC = 'basic'
     STANDARD = 'standard'
@@ -41,6 +38,22 @@ class Proposal(MerchantProduct):
         (PREMIUM, _("Premium")),
     )
 
+    ONE_TIME = 1
+    TWO_TIMES = 2
+    THREE_TIMES = 3
+    FOUR_TIMES = 4
+    FIVE_TIMES = 5
+    SIX_TIMES = 6
+    SEVEN_TIMES = 7
+    PRODUCT_CHOICES = (
+        (ONE_TIME, _("1 Time")),
+        (TWO_TIMES, _("2 Times")),
+        (THREE_TIMES, _("3 Times")),
+        (FOUR_TIMES, _("4 Times")),
+        (FIVE_TIMES, _("5 Times")),
+        (SIX_TIMES, _("6 Times")),
+        (SEVEN_TIMES, _("7 Times")),
+    )
     ONE_DAY = 1
     TWO_DAYS = 2
     THREE_DAYS = 3
@@ -62,27 +75,7 @@ class Proposal(MerchantProduct):
         (TWO_WEEK, _("02 Weeks")),
         (THREE_WEEK, _("03 Weeks")),
         (ONE_MONTH, _("01 Month")),
-    )
-
-    ONE_TIME = 1
-    TWO_TIMES = 2
-    THREE_TIMES = 3
-    FOUR_TIMES = 4
-    FIVE_TIMES = 5
-    SIX_TIMES = 6
-    SEVEN_TIMES = 7
-    PRODUCT_CHOICES = (
-        (ONE_TIME, _("1 Time")),
-        (TWO_TIMES, _("2 Times")),
-        (THREE_TIMES, _("3 Times")),
-        (FOUR_TIMES, _("4 Times")),
-        (FIVE_TIMES, _("5 Times")),
-        (SIX_TIMES, _("6 Times")),
-        (SEVEN_TIMES, _("7 Times")),
-    )
-
-    revision = models.PositiveIntegerField(_("Revision"), choices=PRODUCT_CHOICES)    
-    duration = models.PositiveIntegerField(_("Duration"), choices=PACKAGE_DURATION)    
+    )    
     thumbnail = models.ImageField(_("Thumbnail"), help_text=_("image must be any of these 'JPEG','JPG','PNG','PSD', and dimension 820x312"), upload_to=proposal_images_path, validators=[FileExtensionValidator(allowed_extensions=['JPG', 'JPEG', 'PNG', 'PSD'])])
     team = models.ForeignKey('teams.Team', verbose_name=_("Team"), related_name="proposalteam", on_delete=models.CASCADE, max_length=250)
 
@@ -112,8 +105,6 @@ class Proposal(MerchantProduct):
     pricing1_duration = models.PositiveIntegerField(_("Duration Tier1"), choices=PACKAGE_DURATION, default=THREE_DAYS)       
     pricing2_duration = models.PositiveIntegerField(_("Duration Tier2"), choices=PACKAGE_DURATION, default=FIVE_DAYS)
     pricing3_duration = models.PositiveIntegerField(_("Duration Tier3"), choices=PACKAGE_DURATION, default=ONE_WEEK)       
-    
-    active = ActiveProposals()
 
     class Meta:
         ordering = ('-created_at',)
@@ -125,7 +116,7 @@ class Proposal(MerchantProduct):
         if self.pricing:
             return f'{self.title} - (Amount={self.salary}, Duration={self.get_pricing2_duration_display()})'
         else:
-            return f'{self.title} - (Amount={self.salary}, Duration={self.get_dura_converter_display()})'
+            return f'{self.title} - (Amount={self.salary}, Duration={self.get_duration_display()})'
 
     def image_tag(self):
         return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.thumbnail))
@@ -136,20 +127,43 @@ class Proposal(MerchantProduct):
     def proposal_absolute_url(self):
         return reverse('proposals:proposal_preview', kwargs={'short_name': self.created_by.short_name, 'proposal_slug':self.slug})
     
+    def proposal_detail_absolute_url(self):
+        return reverse('proposals:proposal_detail', kwargs={'short_name': self.created_by.short_name, 'proposal_slug':self.slug})
+    
     def tracking_time(self):
         return sum(tracker.minutes for tracker in self.trackings.all())
 
     def save(self, *args, **kwargs):
-        if self.reference is None:
-            try:
-                self.reference = 'P' + str(uuid4()).split('-')[4]
-            except:
-                self.reference = 'P' + str(uuid4()).split('-')[4]
-            self.slug=(slugify(self.title))
+        if self.duration_time is None:
+            self.duration_time = (timezone.now() + timedelta(days = self.duration))
+
+        if not self.reference:
+            self.reference = self.generate_unique_reference()
+
+        self.slug=(slugify(self.title))
         
         if self.pricing == True:
             self.salary = self.salary_tier2
+
         super(Proposal, self).save(*args, **kwargs)
+
+
+    def generate_unique_reference(self):
+        max_attempts = 1000
+        attempts = 0
+
+        while attempts < max_attempts:
+            # Generate a random UUID and convert it to a human-readable string
+            # We set max_attempt to prevent function from going into potential infinite loop
+            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
+
+            # Check if the generated reference is unique
+            if not Proposal.objects.filter(reference=reference).exists():
+                return reference
+
+            attempts += 1
+
+        raise ValueError("Failed to create transaction")
 
 
     @property
@@ -203,6 +217,9 @@ class ProposalProduct(MerchantMaster):
         if self.product_type == False:
             self.price = 0
         super(ProposalProduct, self).save(*args, **kwargs)
+
+    def product_price(self):
+        return f'{self.merchant.merchant.country.currency} {self.price}'
 
 
 class ProposalSupport(Proposal):

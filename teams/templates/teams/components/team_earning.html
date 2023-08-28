@@ -1,0 +1,69 @@
+{% if teammemberform == 'teammemberform' %}  
+<form method='POST'>
+    {% csrf_token %}
+    {{ formset.management_form }}
+
+    <table>
+        <thead>
+            <tr>
+                <th class='col-md-4 text-left'>Member</th>
+                <th>Earning Ratio</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+                <tr>
+                    {{ form.id }}
+                    {{ form.team.as_hidden }}
+                    {{ form.member.as_hidden }}
+                    <td class='col-md-4 text-left'>{{ form.instance.member }}</td>
+                    <td class='col-md-4 text-left'>{{ form.earning_ratio }}</td>
+                    <td class='col-md-4 text-left'>{{ form.status }}</td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    <div class='text-center'>
+        <span style="color:red;" role="alert">{{custom_message}}</span><br>
+        <span style="color:blue;" role="alert">If total sharing ratio is less/more than 100% we will ignore your changes</span>
+    </div>
+    <div class='text-center'>
+        <button class="btn btn-success btn-sm" type="submit"
+            hx-post="{% url 'teams:change_shareholding' %}" 
+            hx-target="#earning-ratio">
+            Save Changes
+        </button>
+        
+    </div>
+</form>
+
+{% else %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Member</th>
+            <th>% Share of Sales </th>
+            <th>Eligible to Earn</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for member in members %}
+        <tr>
+        <td>{{forloop.counter}} </td>
+        <td class="text-left">{{member.member.get_full_name}}</td>
+        <td>{{member.earning_ratio|floatformat:2}}%</td>
+        <td><span class="badge badge-{% if member.status == True %}success{% else %}danger{% endif %} badge-sm">{{member.get_status_display}}</span></td>
+    </tr> 
+    {% endfor %}					
+        </tbody>
+    </table>
+    {% if not members %}
+    <p><strong>No Accepted Member to show yet.</strong></p>
+    {% endif %}
+										
+{% endif %}											

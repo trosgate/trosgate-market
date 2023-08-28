@@ -1,0 +1,621 @@
+[
+{
+    "model": "teams.package",
+    "pk": 1,
+    "fields": {
+        "type": "team",
+        "max_proposals_allowable_per_team": 15,
+        "monthly_projects_applicable_per_team": 15,
+        "monthly_offer_contracts_per_team": 15,
+        "max_member_per_team": 3,
+        "price": 20,
+        "ordering": 2
+    }
+},
+{
+    "model": "teams.package",
+    "pk": 2,
+    "fields": {
+        "type": "basic",
+        "max_proposals_allowable_per_team": 5,
+        "monthly_projects_applicable_per_team": 5,
+        "monthly_offer_contracts_per_team": 5,
+        "max_member_per_team": 1,
+        "price": 0,
+        "ordering": 1
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 1,
+    "fields": {
+        "merchant": 1,
+        "title": "gladialancer Team",
+        "created_by": 3,
+        "package": 1,
+        "notice": "This is the team for gladialancer",
+        "created_at": "2023-05-14T18:26:16.816Z",
+        "updated_at": "2023-05-16T18:19:57.506Z",
+        "status": "active",
+        "package_status": "active",
+        "package_expiry": null,
+        "slug": "gladialancer-team",
+        "team_balance": 96,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            3
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 2,
+    "fields": {
+        "merchant": 2,
+        "title": "legendoo Team",
+        "created_by": 5,
+        "package": 1,
+        "notice": "This is the team for legendoo",
+        "created_at": "2023-05-15T22:18:46.880Z",
+        "updated_at": "2023-05-16T18:20:05.935Z",
+        "status": "active",
+        "package_status": "active",
+        "package_expiry": null,
+        "slug": "legendoo-team",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            5
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 3,
+    "fields": {
+        "merchant": 2,
+        "title": "legendfreelancer",
+        "created_by": 9,
+        "package": 1,
+        "notice": "This is the team for legendfreelancer@a.com",
+        "created_at": "2023-06-07T13:44:20.637Z",
+        "updated_at": "2023-06-07T22:08:10.892Z",
+        "status": "active",
+        "package_status": "default",
+        "package_expiry": null,
+        "slug": "legendfreelancer",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            9
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 4,
+    "fields": {
+        "merchant": 1,
+        "title": "Sirkatey Team",
+        "created_by": 10,
+        "package": 2,
+        "notice": "Richy bill this is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board\n\nThis is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board",
+        "created_at": "2023-06-07T22:04:55.569Z",
+        "updated_at": "2023-08-06T17:26:45.684Z",
+        "status": "active",
+        "package_status": "active",
+        "package_expiry": null,
+        "slug": "sirkatey-team",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": "https://trosgate.com",
+        "members": [
+            10,
+            3
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 6,
+    "fields": {
+        "merchant": 1,
+        "title": "The Buffalos",
+        "created_by": 10,
+        "package": 2,
+        "notice": "The Bufallos team",
+        "created_at": "2023-07-22T10:31:57.786Z",
+        "updated_at": "2023-07-22T10:31:57.795Z",
+        "status": "active",
+        "package_status": "default",
+        "package_expiry": null,
+        "slug": "the-buffalos",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            10
+        ]
+    }
+},
+{
+    "model": "teams.invitation",
+    "pk": 1,
+    "fields": {
+        "merchant": 1,
+        "team": 1,
+        "sender": 3,
+        "receiver": null,
+        "email": "sirkatey@gmail.com",
+        "code": "tLmHvb",
+        "status": "invited",
+        "type": "internal",
+        "sent_on": "2023-05-14T18:26:16.912Z"
+    }
+},
+{
+    "model": "teams.invitation",
+    "pk": 2,
+    "fields": {
+        "merchant": 2,
+        "team": 2,
+        "sender": 5,
+        "receiver": null,
+        "email": "legendlancer@a.com",
+        "code": "PFnh45",
+        "status": "invited",
+        "type": "internal",
+        "sent_on": "2023-05-15T22:18:47.149Z"
+    }
+},
+{
+    "model": "teams.invitation",
+    "pk": 3,
+    "fields": {
+        "merchant": 2,
+        "team": 3,
+        "sender": 9,
+        "receiver": null,
+        "email": "legendfreelancer@a.com",
+        "code": "uoTPp8",
+        "status": "invited",
+        "type": "internal",
+        "sent_on": "2023-06-07T13:44:20.949Z"
+    }
+},
+{
+    "model": "teams.invitation",
+    "pk": 7,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "receiver": null,
+        "email": "gladialancer@gmail.com",
+        "code": "znssk2",
+        "status": "accepted",
+        "type": "external",
+        "sent_on": "2023-06-12T18:48:44.902Z"
+    }
+},
+{
+    "model": "teams.invitation",
+    "pk": 11,
+    "fields": {
+        "merchant": 1,
+        "team": 6,
+        "sender": 10,
+        "receiver": null,
+        "email": "sirkatey@gmail.com",
+        "code": "oLmy13",
+        "status": "accepted",
+        "type": "internal",
+        "sent_on": "2023-07-22T10:31:57.807Z"
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 1,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "This is the Information desk for the Team where members can pass information to the team\n",
+        "sent_on": "2023-06-12T18:56:37.643Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 2,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-06-12T18:56:48.921Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 3,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "This is the Information desk for the Team where members can pass information to the team This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-06-12T18:56:54.227Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 4,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-06-12T18:57:00.774Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 5,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "hellow\n",
+        "sent_on": "2023-06-27T19:02:26.785Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 6,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "great here",
+        "sent_on": "2023-06-27T19:02:43.164Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 7,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "hello",
+        "sent_on": "2023-06-27T19:38:29.277Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 8,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-06-27T19:40:20.418Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 9,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "asdsada zcxzcxzcxzc",
+        "sent_on": "2023-06-27T19:43:53.776Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 10,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "asdsa ddddddddd  ascsdasdsad",
+        "sent_on": "2023-06-27T19:44:07.240Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 11,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "asdasdsdads",
+        "sent_on": "2023-06-27T19:44:17.341Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 12,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "where members can pass information to the team",
+        "sent_on": "2023-06-27T19:47:11.348Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 13,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "Information desk for the Team where members can pass information to th",
+        "sent_on": "2023-06-27T19:52:09.023Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 14,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "Information desk for the Team where members can pass information to th Information desk for the Team where members can pass information to th Information desk for the Team where members can pass information to th",
+        "sent_on": "2023-06-27T19:52:17.491Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 15,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "sasdasdsd",
+        "sent_on": "2023-06-27T19:55:04.108Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 16,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "asssssssssssssssssss",
+        "sent_on": "2023-06-27T20:03:03.816Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 17,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "sssssssssadsacdzcc",
+        "sent_on": "2023-06-27T20:04:13.546Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 18,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 3,
+        "content": "sdsadsad",
+        "sent_on": "2023-06-27T20:04:20.348Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.teamchat",
+    "pk": 19,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "sender": 10,
+        "content": "sscxxcxzcxzxzc",
+        "sent_on": "2023-06-27T20:05:09.864Z",
+        "is_sent": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 1,
+    "fields": {
+        "merchant": 1,
+        "team": 1,
+        "proposal": 1,
+        "status": "todo",
+        "assignor": 3,
+        "assignee": 3,
+        "created_at": "2023-05-14T18:31:12.123Z",
+        "modified": "2023-05-14T18:31:12.123Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 2,
+    "fields": {
+        "merchant": 1,
+        "team": 1,
+        "proposal": 2,
+        "status": "todo",
+        "assignor": 3,
+        "assignee": 3,
+        "created_at": "2023-05-14T18:32:37.181Z",
+        "modified": "2023-05-14T18:32:37.181Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 3,
+    "fields": {
+        "merchant": 1,
+        "team": 2,
+        "proposal": 3,
+        "status": "todo",
+        "assignor": 5,
+        "assignee": 5,
+        "created_at": "2023-05-15T22:21:39.705Z",
+        "modified": "2023-05-15T22:21:39.705Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 4,
+    "fields": {
+        "merchant": 1,
+        "team": 2,
+        "proposal": 4,
+        "status": "todo",
+        "assignor": 5,
+        "assignee": 5,
+        "created_at": "2023-06-07T13:56:46.871Z",
+        "modified": "2023-06-07T13:56:46.893Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 5,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "proposal": 5,
+        "status": "todo",
+        "assignor": 10,
+        "assignee": 3,
+        "created_at": "2023-06-12T19:40:23.320Z",
+        "modified": "2023-06-12T19:40:23.358Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 6,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "proposal": 7,
+        "status": "todo",
+        "assignor": 10,
+        "assignee": 10,
+        "created_at": "2023-07-12T17:47:34.511Z",
+        "modified": "2023-07-12T17:47:34.666Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 7,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "proposal": 8,
+        "status": "todo",
+        "assignor": 10,
+        "assignee": 10,
+        "created_at": "2023-07-12T18:36:35.582Z",
+        "modified": "2023-07-12T18:36:35.582Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 8,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "proposal": 10,
+        "status": "todo",
+        "assignor": 10,
+        "assignee": 10,
+        "created_at": "2023-07-12T19:32:51.620Z",
+        "modified": "2023-07-12T19:32:51.620Z",
+        "duty": null,
+        "is_assigned": true
+    }
+},
+{
+    "model": "teams.assignmember",
+    "pk": 9,
+    "fields": {
+        "merchant": 1,
+        "team": 4,
+        "proposal": 11,
+        "status": "todo",
+        "assignor": 10,
+        "assignee": 10,
+        "created_at": "2023-07-12T20:24:58.318Z",
+        "modified": "2023-07-12T20:24:58.334Z",
+        "duty": null,
+        "is_assigned": true
+    }
+}
+]

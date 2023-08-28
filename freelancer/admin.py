@@ -13,8 +13,9 @@ MAX_OBJECTS = 0
 @admin.register(Freelancer)
 class FreelancerAdmin(admin.ModelAdmin):
     model = Freelancer
-    list_display = ['merchant', 'image_tag', 'user', 'tagline']
-    list_display_links = ('image_tag', 'user',)    
+    list_display = ['merchant', 'image_tag', 'user', 'created']
+    list_display_links = ('image_tag', 'user',)
+    list_editable = ['created']   
     readonly_fields = [
         'gender', 'merchant', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',
         'brand_name', 'tagline','description', 'skill', 'business_size', 'department',
@@ -23,7 +24,7 @@ class FreelancerAdmin(admin.ModelAdmin):
         'project_title', 'project_url', 'image_one','project_title_two', 'project_url_two', 'image_two',
         'project_title_three','project_url_three', 'image_three','keyskill_one', 'key_skill_one_score', 
         'keyskill_two','key_skill_two_score','keyskill_three','key_skill_three_score', 
-        'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score'
+        'keyskill_four','key_skill_four_score','keyskill_five','key_skill_five_score',
     ]
     search_fields = ('user__short_name','gender','tagline',)
     fieldsets = (

@@ -1,110 +1,145 @@
 [
-    {
-        "model": "teams.team",
-        "pk": 1,
-        "fields": {
-            "title": "testing",
-            "notice": "This is the basic team",
-            "created_at": "2022-11-03T19:26:24.412Z",
-            "updated_at": "2022-11-03T19:50:51.566Z",
-            "created_by": 2,
-            "status": "inactive",
-            "package": 1,
-            "package_status": "default",
-            "package_expiry": null,
-            "slug": "testing",
-            "team_balance": 0,
-            "stripe_customer_id": null,
-            "stripe_subscription_id": null,
-            "paypal_customer_id": null,
-            "paypal_subscription_id": null,
-            "razorpay_payment_id": null,
-            "razorpay_subscription_id": null,
-            "razorpay_payment_url": null,
-            "members": [
-                2
-            ]
-        }
-    },
-    {
-        "model": "teams.team",
-        "pk": 2,
-        "fields": {
-            "title": "katman",
-            "notice": "This is the basic team",
-            "created_at": "2022-11-03T19:40:09.139Z",
-            "updated_at": "2022-11-03T19:50:36.918Z",
-            "created_by": 3,
-            "status": "inactive",
-            "package": 1,
-            "package_status": "default",
-            "package_expiry": null,
-            "slug": "katman",
-            "team_balance": 0,
-            "stripe_customer_id": null,
-            "stripe_subscription_id": null,
-            "paypal_customer_id": null,
-            "paypal_subscription_id": null,
-            "razorpay_payment_id": null,
-            "razorpay_subscription_id": null,
-            "razorpay_payment_url": null,
-            "members": [
-                3
-            ]
-        }
-    },
-    {
-        "model": "teams.team",
-        "pk": 4,
-        "fields": {
-            "title": "sirksdfatey",
-            "notice": "This is the basic team",
-            "created_at": "2022-11-03T19:51:08.351Z",
-            "updated_at": "2022-11-03T19:54:43.753Z",
-            "created_by": 5,
-            "status": "inactive",
-            "package": 1,
-            "package_status": "default",
-            "package_expiry": null,
-            "slug": "sirksdfatey",
-            "team_balance": 0,
-            "stripe_customer_id": null,
-            "stripe_subscription_id": null,
-            "paypal_customer_id": null,
-            "paypal_subscription_id": null,
-            "razorpay_payment_id": null,
-            "razorpay_subscription_id": null,
-            "razorpay_payment_url": null,
-            "members": [
-                5
-            ]
-        }
-    },
-    {
-        "model": "teams.team",
-        "pk": 5,
-        "fields": {
-            "title": "sirkatey",
-            "notice": "This is the basic team",
-            "created_at": "2022-11-03T19:55:52.724Z",
-            "updated_at": "2022-11-03T19:55:52.728Z",
-            "created_by": 6,
-            "status": "active",
-            "package": 1,
-            "package_status": "default",
-            "package_expiry": null,
-            "slug": "sirkatey",
-            "team_balance": 0,
-            "stripe_customer_id": null,
-            "stripe_subscription_id": null,
-            "paypal_customer_id": null,
-            "paypal_subscription_id": null,
-            "razorpay_payment_id": null,
-            "razorpay_subscription_id": null,
-            "razorpay_payment_url": null,
-            "members": [
-                6
-            ]
-        }
+{
+    "model": "teams.team",
+    "pk": 1,
+    "fields": {
+        "merchant": 1,
+        "title": "gladialancer Team",
+        "created_by": 3,
+        "package": 1,
+        "notice": "This is the team for gladialancer",
+        "created_at": "2023-05-14T18:26:16.816Z",
+        "updated_at": "2023-05-16T18:19:57.506Z",
+        "status": "active",
+        "package_status": "active",
+        "package_expiry": null,
+        "slug": "gladialancer-team",
+        "team_balance": 96,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            3
+        ]
     }
+},
+{
+    "model": "teams.team",
+    "pk": 2,
+    "fields": {
+        "merchant": 2,
+        "title": "legendoo Team",
+        "created_by": 5,
+        "package": 1,
+        "notice": "This is the team for legendoo",
+        "created_at": "2023-05-15T22:18:46.880Z",
+        "updated_at": "2023-05-16T18:20:05.935Z",
+        "status": "active",
+        "package_status": "active",
+        "package_expiry": null,
+        "slug": "legendoo-team",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            5
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 3,
+    "fields": {
+        "merchant": 2,
+        "title": "legendfreelancer",
+        "created_by": 9,
+        "package": 1,
+        "notice": "This is the team for legendfreelancer@a.com",
+        "created_at": "2023-06-07T13:44:20.637Z",
+        "updated_at": "2023-06-07T22:08:10.892Z",
+        "status": "active",
+        "package_status": "default",
+        "package_expiry": null,
+        "slug": "legendfreelancer",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+        "members": [
+            9
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 4,
+    "fields": {
+        "merchant": 1,
+        "title": "Sirkatey Team",
+        "created_by": 10,
+        "package": 2,
+        "notice": "Richy bill this is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board\n\nThis is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board This is the team notice board",
+        "created_at": "2023-06-07T22:04:55.569Z",
+        "updated_at": "2023-08-06T17:26:45.684Z",
+        "status": "active",
+        "package_status": "active",
+        "package_expiry": null,
+        "slug": "sirkatey-team",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": "https://trosgate.com",
+        "members": [
+            10,
+            3
+        ]
+    }
+},
+{
+    "model": "teams.team",
+    "pk": 6,
+    "fields": {
+        "merchant": 1,
+        "title": "The Buffalos",
+        "created_by": 10,
+        "package": 2,
+        "notice": "The Bufallos team",
+        "created_at": "2023-07-22T10:31:57.786Z",
+        "updated_at": "2023-07-22T10:31:57.795Z",
+        "status": "active",
+        "package_status": "default",
+        "package_expiry": null,
+        "slug": "the-buffalos",
+        "team_balance": 0,
+        "stripe_customer_id": null,
+        "stripe_subscription_id": null,
+        "paypal_customer_id": null,
+        "paypal_subscription_id": null,
+        "razorpay_payment_id": null,
+        "razorpay_subscription_id": null,
+        "razorpay_payment_url": null,
+        "gallery_link": null,
+    }
+}
 ]

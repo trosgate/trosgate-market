@@ -148,15 +148,15 @@ def freelancer_profile(request, short_name):
     review_rate = user_review_rate(team) 
     projects_in_queue = total_projects_in_queue(team) 
 
-    max_team_members = ''
-    my_team = ''
+    max_team_members = False
+    my_team = None
     if request.user.user_type == Customer.FREELANCER:
         try:
             my_team = Team.objects.get(pk=request.user.freelancer.active_team_id)
         except Exception as e:
             return None
         max_team_members = PackageController(my_team).max_member_per_team()
-    
+
     context = {
         'freelancer': freelancer,
         'team': team,

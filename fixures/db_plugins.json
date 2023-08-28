@@ -1,0 +1,80 @@
+[
+{
+    "model": "future.plugin",
+    "pk": 1,
+    "fields": {
+        "name": "Customer Support Agent",
+        "slug": "customer-support-agent",
+        "price": 80,
+        "preview": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your \r\n\r\nhands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in yovvv",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to controlYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control",
+        "mode": true,
+        "status": true,
+        "created_at": "2023-07-16T14:52:44.293Z",
+        "ordering": 0,
+        "feature": [
+            1,
+            4
+        ]
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 2,
+    "fields": {
+        "name": "Sell Digital Product",
+        "slug": "sell-digital-product",
+        "price": 70,
+        "preview": "DD our future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your \r\n\r\nhands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in yovvv",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to controlYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control",
+        "mode": false,
+        "status": true,
+        "created_at": "2023-07-16T15:10:12.570Z",
+        "ordering": 1,
+        "feature": [
+            1,
+            2,
+            3,
+            4
+        ]
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 3,
+    "fields": {
+        "name": "Multiple Teams",
+        "slug": "multiple-teams",
+        "price": 120,
+        "preview": "your hands to control Your future in your hands to control\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in",
+        "mode": false,
+        "status": true,
+        "created_at": "2023-07-16T21:59:28.091Z",
+        "ordering": 0,
+        "feature": [
+            1,
+            2,
+            4
+        ]
+    }
+},
+{
+    "model": "future.plugin",
+    "pk": 4,
+    "fields": {
+        "name": "Testing plugin",
+        "slug": "testing-plugin",
+        "price": 10,
+        "preview": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in",
+        "description": "Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control\r\n\r\nYour future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in your hands to control Your future in",
+        "mode": false,
+        "status": true,
+        "created_at": "2023-07-16T22:00:37.137Z",
+        "ordering": 0,
+        "feature": [
+            4
+        ]
+    }
+}
+]

@@ -1,4 +1,4 @@
-from teams.models import Team
+from teams.models import Team, Package
 from projects.models import Project
 from dateutil.relativedelta import relativedelta
 from proposals.models import Proposal
@@ -9,8 +9,10 @@ from applications.models import Application
 from contract.models import InternalContract
 
 
+
 def one_month():
     return (timezone.now() + relativedelta(months = 1))
+
 
 class PackageController():
     """
@@ -20,13 +22,17 @@ class PackageController():
         self.team = team
 
     def max_member_per_team(self):
-        max_member_in_a_team = self.team.package.max_member_per_team > self.team.members.count()
-        return max_member_in_a_team
+        max_member_invite = self.team.package.max_member_per_team > self.team.invitations.count()
+        if (self.team.package.type == Package.TEAM and max_member_invite):
+            return True
+        return False
   
+
     def max_proposals_allowable_per_team(self):
         team_proposal_limit = self.team.package.max_proposals_allowable_per_team  
         team_proposals_count = Proposal.objects.filter(team=self.team).count()
         return team_proposal_limit > team_proposals_count
+
 
     def monthly_projects_applicable_per_team(self):
         team_project_limit = self.team.package.monthly_projects_applicable_per_team
@@ -36,6 +42,7 @@ class PackageController():
         ).count()          
 
         return team_project_limit > monthly_applications_count
+
 
     def monthly_offer_contracts(self):
         team_contracts_limit = self.team.package.monthly_offer_contracts_per_team

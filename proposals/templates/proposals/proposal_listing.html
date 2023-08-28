@@ -171,23 +171,23 @@
 													<div class="wt-checkboxholder">
 														<span class="wt-checkbox">
 															<input id="less_than_50_dollar" class="proposal-checked" type="checkbox" data-filter="less_than_50_dollar" name="less_than_50_dollar" value="less_than_50_dollar">
-															<label for="less_than_50_dollar">{{base_currency}} 50 and Below</label>
+															<label for="less_than_50_dollar">{{website.merchant.country.currency}} 50 and Below</label>
 														</span>
 														<span class="wt-checkbox">
 															<input id="fify_dollar_to_100_dollar" class="proposal-checked" type="checkbox" data-filter="fify_dollar_to_100_dollar" name="fify_dollar_to_100_dollar" value="fify_dollar_to_100_dollar">
-															<label for="fify_dollar_to_100_dollar">{{base_currency}} 50 - {{base_currency}} 100 </label>
+															<label for="fify_dollar_to_100_dollar">{{website.merchant.country.currency}} 50 - {{website.merchant.country.currency}} 100 </label>
 														</span>
 														<span class="wt-checkbox">
 															<input id="hundred_dollar_to_350_dollar" class="proposal-checked" type="checkbox" data-filter="hundred_dollar_to_350_dollar" name="hundred_dollar_to_350_dollar" value="hundred_dollar_to_350_dollar">
-															<label for="hundred_dollar_to_350_dollar">{{base_currency}} 100 - {{base_currency}} 350</label>
+															<label for="hundred_dollar_to_350_dollar">{{website.merchant.country.currency}} 100 - {{website.merchant.country.currency}} 350</label>
 														</span>
 														<span class="wt-checkbox">
 															<input id="three_fifty_dollar_to_500_dollar" class="proposal-checked" type="checkbox" data-filter="three_fifty_dollar_to_500_dollar" name="three_fifty_dollar_to_500_dollar" value="three_fifty_dollar_to_500_dollar">
-															<label for="three_fifty_dollar_to_500_dollar">{{base_currency}} 350 - {{base_currency}} 500</label>
+															<label for="three_fifty_dollar_to_500_dollar">{{website.merchant.country.currency}} 350 - {{website.merchant.country.currency}} 500</label>
 														</span>
 														<span class="wt-checkbox">
 															<input id="above_500_dollar" class="proposal-checked" type="checkbox" data-filter="above_500_dollar" name="above_500_dollar" value="above_500_dollar">
-															<label for="above_500_dollar">{{base_currency}} 500 and Above</label>
+															<label for="above_500_dollar">{{website.merchant.country.currency}} 500 and Above</label>
 														</span>
 													</div>
 												</fieldset>
@@ -260,7 +260,7 @@
 											</div>
 											<div class="wt-viewjobholder">
 												<ul>
-													<li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i> {{base_currency}} {{proposal.salary}}</span></li>
+													<li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i> {{website.merchant.country.currency}} {{proposal.salary}}</span></li>
 													<li><span><i class="far fa-folder"></i>{{proposal.get_service_level_display}}</span></li>
 													<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}} - {% endif %} &nbsp;&nbsp; {{proposal.created_by.country.name}}</span></li>
 													<li><span><i class="far fa-folder wt-viewjobfolder"></i>Revision: {{proposal.get_revision_display}}</span></li>

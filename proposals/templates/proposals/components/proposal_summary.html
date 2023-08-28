@@ -77,7 +77,7 @@
                                         <td>{% if oneclick_contract_review_avg.contract_rating_count == 0 %} 0{% else %}{{oneclick_contract_review_avg.contract_average_rating}}{% endif %}/5</td>
                                     </tr> 
                                     <tr>
-                                        <td>Feedback {{base_currency_symbol}}{{contract_delta_amount}}</td>
+                                        <td>Feedback {{website.merchant.country.currency}}{{contract_delta_amount}}</td>
                                         <td>{{proposal_review_avg.proposal_rating_count}}</td>
                                         <td>{{contract_review_avg.contract_rating_count}}</td>
                                         <td>{{oneclick_proposal_review_avg.proposal_rating_count}}</td>

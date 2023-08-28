@@ -28,10 +28,8 @@ urlpatterns = [
     path('stripe_payment_order/', views.stripe_payment_order, name='stripe_payment_order'),
     path('paypal/api/', views.paypal_payment_order, name='paypal_payment_order'),
     path('paypal/callback/', views.paypal_callback, name='paypal_callback'),
-    path('success/true/', views.payment_success, name='hiring_payment_success'),
     path('paystack_payment_intent/', views.paystack_payment_intent, name='paystack_payment_intent'),
     path('paystack_callback/', views.paystack_callback, name='paystack_callback'),
     path('razorpay_application_intent/', views.razorpay_application_intent,name='razorpay_application_intent'),
     path('razorpay_callback/', views.razorpay_callback,name='razorpay_callback'),    
-    path('congrats/', views.payment_success, name='payment_success'),    
 ]

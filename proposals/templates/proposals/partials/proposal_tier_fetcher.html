@@ -6,7 +6,7 @@
             <span >Proposal Attributes</span>
         </div>
         <div class="d-flex justify-content-between mb-3">
-            <span>Price</span><span id="salaryT0" class="text-primary pt-1"> {{base_currency}} {{proposal.salary}}</span>
+            <span>Price</span><span id="salaryT0" class="text-primary pt-1"> {{website.merchant.country.currency}} {{proposal.salary}}</span>
         </div>
         <div class="d-flex justify-content-between mb-3">
             <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
@@ -66,7 +66,7 @@
         
         <p>{{proposal.tier1_preview}}</p>
         <div class="d-flex justify-content-between mb-3">
-            <span>Price</span><i id="salaryT1" class="text-primary pt-1">{{base_currency}} {% if salary_tier1_price %}{{salary_tier1_price}}{% else %}{{proposal.salary_tier1}}{% endif %}</i>
+            <span>Price</span><i id="salaryT1" class="text-primary pt-1">{{website.merchant.country.currency}} {% if salary_tier1_price %}{{salary_tier1_price}}{% else %}{{proposal.salary_tier1}}{% endif %}</i>
         </div>
         <div class="d-flex justify-content-between mb-3">
             <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_tier1_display}}</i>
@@ -111,7 +111,7 @@
     <div class="tab-pane fade p-3 pt-0" id="standard" role="tabpanel" aria-labelledby="standard-tab">
         <p>{{proposal.tier2_preview}}</p>
         <div class="d-flex justify-content-between mb-3">
-            <span>Price</span><i id="salaryT2" class="text-primary pt-1"> {{base_currency}} {% if salary_tier2_price %}{{salary_tier2_price}}{% else %}{{proposal.salary_tier2}}{% endif %}</i>
+            <span>Price</span><i id="salaryT2" class="text-primary pt-1"> {{website.merchant.country.currency}} {% if salary_tier2_price %}{{salary_tier2_price}}{% else %}{{proposal.salary_tier2}}{% endif %}</i>
         </div>
         <div class="d-flex justify-content-between mb-3">
             <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_tier2_display}}</i>
@@ -156,7 +156,7 @@
     <div class="tab-pane fade p-3 pt-0" id="premium" role="tabpanel" aria-labelledby="premium-tab">
         <p>{{proposal.tier3_preview}}</p>
         <div class="d-flex justify-content-between mb-3">
-            <span>Price</span><span id="salaryT3" class="text-primary pt-1">{{base_currency}} {% if salary_tier3_price %}{{salary_tier3_price}}{% else %}{{proposal.salary_tier3}}{% endif %}</span>
+            <span>Price</span><span id="salaryT3" class="text-primary pt-1">{{website.merchant.country.currency}} {% if salary_tier3_price %}{{salary_tier3_price}}{% else %}{{proposal.salary_tier3}}{% endif %}</span>
         </div>
         <div class="d-flex justify-content-between mb-3">
             <span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_tier3_display}}</i>

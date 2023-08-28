@@ -27,6 +27,7 @@ class StripeClientConfig:
 
     def default_currency(self):
         currency = self.site.merchant.merchant.merchant.country.currency.lower()
+        print('currency :::', currency)
         return currency if currency else 'usd'
 
     def stripe_public_key(self):

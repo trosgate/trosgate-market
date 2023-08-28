@@ -1,0 +1,1134 @@
+[
+{
+    "model": "proposals.proposal",
+    "pk": 1,
+    "fields": {
+        "merchant": 2,
+        "identifier": "87a4b940-29df-48c6-90f2-f65b90ee370c",
+        "title": "I am an expert in graphics for your logos as test",
+        "category": 2,
+        "slug": "i-am-an-expert-in-graphics-for-your-logos-as-test",
+        "preview": "I am an expert in graphics for your logos as testI am an expert in graphics for your logos as test",
+        "sample_link": "https://www.trosgate.com",
+        "status": "active",
+        "description": "I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test\n\nI am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test\n\nI am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test\n\nI am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test",
+        "service_level": "basic",
+        "created_by": 5,
+        "reference": "Peff09c3cf868",
+        "published": true,
+        "created_at": "2023-05-14T18:31:12.078Z",
+        "updated_at": "2023-07-06T12:56:49.526Z",
+        "salary": 100,
+        "revision": 1,
+        "duration": 5,
+        "thumbnail": "proposal/gladialancer Team/hd-wallpaper-ge5a5df732_1280.jpg",
+        "team": 1,
+        "faq_one": "We will make thing work ?",
+        "faq_one_description": "I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test\n\nI am an expert in graphics for your logos as test I am",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test I am an expert in graphics for your logos as test",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": false,
+        "pricing": true,
+        "pricing_tier": "salary_tier1",
+        "salary_tier1": 80,
+        "salary_tier2": 140,
+        "salary_tier3": 320,
+        "tier1_preview": "dfffdsfdsfd",
+        "tier2_preview": "sdfdsfdsfds2",
+        "tier3_preview": "sdfdfdsfdfd3",
+        "revision_tier1": 1,
+        "revision_tier2": 3,
+        "revision_tier3": 7,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            1,
+            12,
+            13
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 2,
+    "fields": {
+        "merchant": 2,
+        "identifier": "e6dab903-bb1e-45cd-bbd1-4891fb983727",
+        "title": "I am expert in content writing and publishing on Amazon and Fiverr",
+        "category": 3,
+        "slug": "i-am-expert-in-content-writing-and-publishing-on-amazon-and-fiverr",
+        "preview": "I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr",
+        "sample_link": "https://www.google.com",
+        "status": "active",
+        "description": "I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr\\n\\nI am expert in content writing and publishing on Amazon\n\nI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr\n\nI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr",
+        "service_level": "standard",
+        "created_by": 5,
+        "reference": "P3a6aa35c61e1",
+        "published": true,
+        "created_at": "2023-05-14T18:32:37.140Z",
+        "updated_at": "2023-07-04T14:55:51.699Z",
+        "salary": 120,
+        "revision": 1,
+        "duration": 14,
+        "thumbnail": "proposal/gladialancer Team/pexels-life-of-pix-7974.jpg",
+        "team": 1,
+        "faq_one": "We will make thing work ?",
+        "faq_one_description": "I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr\n\nI am expert in content writing and publishing on Amazon",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": false,
+        "pricing": false,
+        "pricing_tier": "salary_tier1",
+        "salary_tier1": 0,
+        "salary_tier2": 0,
+        "salary_tier3": 0,
+        "tier1_preview": "dfffdsfdsfd",
+        "tier2_preview": "sdfdsfdsfds2",
+        "tier3_preview": "sdfdfdsfdfd3",
+        "revision_tier1": 1,
+        "revision_tier2": 1,
+        "revision_tier3": 1,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            8,
+            1,
+            9
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 3,
+    "fields": {
+        "merchant": 2,
+        "identifier": "d5dc669f-9345-410a-8329-8242ae00d0da",
+        "title": "I will create a stunning brochure design for your startup",
+        "category": 4,
+        "slug": "i-will-create-a-stunning-brochure-design-for-your-startup",
+        "preview": "I will create a stunning brochure design for your startup I will create a stunning brochure design for your startup",
+        "sample_link": "https://www.google.com",
+        "status": "active",
+        "description": "I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract. I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract. I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract. I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract. I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.",
+        "service_level": "premium",
+        "created_by": 5,
+        "reference": "P40505efea5c2",
+        "published": true,
+        "created_at": "2023-05-15T22:21:39.658Z",
+        "updated_at": "2023-05-15T23:04:32.189Z",
+        "salary": 180,
+        "revision": 1,
+        "duration": 5,
+        "thumbnail": "proposal/legendoo Team/desk-g540460163_1920.jpg",
+        "team": 2,
+        "faq_one": "I will create a stunning brochure1",
+        "faq_one_description": "I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.",
+        "faq_two": "I will create a stunning brochure ..",
+        "faq_two_description": "I will create a stunning brochure design for your startup We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": false,
+        "pricing": true,
+        "pricing_tier": "salary_tier1",
+        "salary_tier1": 0,
+        "salary_tier2": 0,
+        "salary_tier3": 0,
+        "tier1_preview": "dfffdsfdsfd",
+        "tier2_preview": "sdfdsfdsfds2",
+        "tier3_preview": "sdfdfdsfdfd3",
+        "revision_tier1": 1,
+        "revision_tier2": 1,
+        "revision_tier3": 1,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            8,
+            1,
+            9
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 4,
+    "fields": {
+        "merchant": 2,
+        "identifier": "c152526e-e3c5-483d-ab0f-f36acfbc2512",
+        "title": "Web design and django backend",
+        "category": 5,
+        "slug": "web-design-and-django-backend",
+        "preview": "I will make skulpture design for your exhibition I will make skulpture design for your exhibition",
+        "sample_link": "https://www.example.com",
+        "status": "active",
+        "description": "Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5\n\nWeb design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5\n\nWeb design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5",
+        "service_level": "premium",
+        "created_by": 5,
+        "reference": "Pc5840ea23105",
+        "published": true,
+        "created_at": "2023-06-07T13:56:46.830Z",
+        "updated_at": "2023-07-12T21:51:22.189Z",
+        "salary": 80,
+        "revision": 1,
+        "duration": 7,
+        "thumbnail": "proposal/legendoo Team/bokeh_sample.png",
+        "team": 2,
+        "faq_one": "Fawq one about fee",
+        "faq_one_description": "Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "Web design, python developer, html5 Web design, python developer, html5 Web design, python developer, html5",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": false,
+        "pricing": false,
+        "pricing_tier": "salary_tier1",
+        "salary_tier1": 0,
+        "salary_tier2": 0,
+        "salary_tier3": 0,
+        "tier1_preview": null,
+        "tier2_preview": null,
+        "tier3_preview": null,
+        "revision_tier1": 1,
+        "revision_tier2": 1,
+        "revision_tier3": 1,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            1,
+            11,
+            4
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 5,
+    "fields": {
+        "merchant": 2,
+        "identifier": "2d0bff06-b389-42f9-a11c-2bb3050e534e",
+        "title": "Python developers for saas websites",
+        "category": 7,
+        "slug": "python-developers-for-saas-websites",
+        "preview": "I will create a stunning brochure design for your startupI will create a stunning brochure design for your startup",
+        "sample_link": "https://www.google.com",
+        "status": "active",
+        "description": "We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.\n\nWe will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.\n\nWe will show proposals belonging to your currently active Team when clients offer you contract.We will show proposals belonging to your currently active Team when clients offer you contract.We will show proposals belonging to your currently active Team when clients offer you contract.",
+        "service_level": "standard",
+        "created_by": 5,
+        "reference": "P044314523782",
+        "published": false,
+        "created_at": "2023-06-12T19:40:23.304Z",
+        "updated_at": "2023-07-05T21:40:25.561Z",
+        "salary": 70,
+        "revision": 1,
+        "duration": 3,
+        "thumbnail": "proposal/Sirkatey Team/coffee-g1b25bc50a_1920.jpg",
+        "team": 1,
+        "faq_one": "I will create a stunning brochure1",
+        "faq_one_description": "We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.",
+        "faq_two": "I will create a stunning brochure ..",
+        "faq_two_description": "We will show proposals belonging to your currently active Team when clients offer you contract. We will show proposals belonging to your currently active Team when clients offer you contract.",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": false,
+        "pricing": true,
+        "pricing_tier": "salary_tier1",
+        "salary_tier1": 150,
+        "salary_tier2": 250,
+        "salary_tier3": 450,
+        "tier1_preview": "dfffdsfdsfd",
+        "tier2_preview": "sdfdsfdsfds2",
+        "tier3_preview": "sdfdfdsfdfd3",
+        "revision_tier1": 1,
+        "revision_tier2": 3,
+        "revision_tier3": 7,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            1,
+            10,
+            5
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 7,
+    "fields": {
+        "merchant": 2,
+        "identifier": "b58095e2-3b07-4a1a-9f31-20107ae6eedd",
+        "title": "Python Developers For Saas Websites2",
+        "category": 8,
+        "slug": "python-developers-for-saas-websites2",
+        "preview": "Python Developers For Saas Websites Python Developers For Saas Websites",
+        "sample_link": "https://www.trosgate.com",
+        "status": "active",
+        "description": "Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas WebsitesPython Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites",
+        "service_level": "standard",
+        "created_by": 5,
+        "reference": "P282abd2aed4a",
+        "published": false,
+        "created_at": "2023-07-12T17:47:34.449Z",
+        "updated_at": "2023-07-12T21:47:38.708Z",
+        "salary": 40,
+        "revision": 1,
+        "duration": 5,
+        "thumbnail": "proposal/Sirkatey Team/desk-g540460163_1920_LQuRBd1.jpg",
+        "team": 1,
+        "faq_one": "Fawq one about fee",
+        "faq_one_description": "Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Py",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites Python Developers For Saas Websites\n\nPython Developers For Saas Websites Py",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": false,
+        "pricing": true,
+        "pricing_tier": "basic",
+        "salary_tier1": 40,
+        "salary_tier2": 100,
+        "salary_tier3": 189,
+        "tier1_preview": null,
+        "tier2_preview": null,
+        "tier3_preview": null,
+        "revision_tier1": 1,
+        "revision_tier2": 3,
+        "revision_tier3": 5,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            8,
+            1,
+            12
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 8,
+    "fields": {
+        "merchant": 2,
+        "identifier": "ef1758d3-bc10-4df0-9c5c-a5c5707a83c1",
+        "title": "Web design and django backend1",
+        "category": 7,
+        "slug": "web-design-and-django-backend1",
+        "preview": "I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research",
+        "sample_link": "https://www.google.com",
+        "status": "active",
+        "description": "I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research\n\nI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research\n\nI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research\n\nI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business researchI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research\n\nI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research\n\nI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research\n\nI will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research",
+        "service_level": "standard",
+        "created_by": 5,
+        "reference": "P94e0ed53fb68",
+        "published": false,
+        "created_at": "2023-07-12T18:36:35.567Z",
+        "updated_at": "2023-07-25T00:21:42.255Z",
+        "salary": 300,
+        "revision": 1,
+        "duration": 3,
+        "thumbnail": "proposal/Sirkatey Team/car-ga4d6ec178_1920_O0IcR6a.jpg",
+        "team": 1,
+        "faq_one": "Fawq one about fee",
+        "faq_one_description": "I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in busines",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in business research I will guide you in busines",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": true,
+        "pricing": true,
+        "pricing_tier": "basic",
+        "salary_tier1": 250,
+        "salary_tier2": 300,
+        "salary_tier3": 500,
+        "tier1_preview": "ewrewrew",
+        "tier2_preview": "ewrewrere",
+        "tier3_preview": "wererew",
+        "revision_tier1": 2,
+        "revision_tier2": 3,
+        "revision_tier3": 7,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            1,
+            12
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 10,
+    "fields": {
+        "merchant": 2,
+        "identifier": "8cde2488-10a5-4f07-8707-e5c708781063",
+        "title": "Python Developers For Saas Websites4",
+        "category": 1,
+        "slug": "python-developers-for-saas-websites4",
+        "preview": "I am expert in content writing and publishing on Amazon and Fiverr I am expert in content writing and publishing on Amazon and FiverrI am expert in content writing and publishing on Amazon and Fiverr",
+        "sample_link": "https://www.google.com",
+        "status": "active",
+        "description": "Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2",
+        "service_level": "standard",
+        "created_by": 5,
+        "reference": "Pb66b368dca2c",
+        "published": false,
+        "created_at": "2023-07-12T19:32:51.605Z",
+        "updated_at": "2023-08-06T22:01:44.299Z",
+        "salary": 98,
+        "revision": 2,
+        "duration": 5,
+        "thumbnail": "proposal/Sirkatey Team/bokeh_sample_ShnjCI5.png",
+        "team": 1,
+        "faq_one": "We will make thing work 24?",
+        "faq_one_description": "Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": true,
+        "pricing": false,
+        "pricing_tier": "basic",
+        "salary_tier1": 0,
+        "salary_tier2": 0,
+        "salary_tier3": 0,
+        "tier1_preview": null,
+        "tier2_preview": null,
+        "tier3_preview": null,
+        "revision_tier1": 1,
+        "revision_tier2": 3,
+        "revision_tier3": 7,
+        "pricing1_duration": 3,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            8,
+            1
+        ]
+    }
+},
+{
+    "model": "proposals.proposal",
+    "pk": 11,
+    "fields": {
+        "merchant": 2,
+        "identifier": "a0a3c0f1-105f-463d-bbcb-7153058a292d",
+        "title": "Python Developers For Saas Websites3",
+        "category": 2,
+        "slug": "python-developers-for-saas-websites3",
+        "preview": "I will make skulpture design for your exhibition I will make skulpture design for your exhibition",
+        "sample_link": "https://www.google.com",
+        "status": "active",
+        "description": "Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2\n\nPython Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2",
+        "service_level": "basic",
+        "created_by": 5,
+        "reference": "P19ee7f289276",
+        "published": false,
+        "created_at": "2023-07-12T20:24:58.302Z",
+        "updated_at": "2023-07-24T23:29:17.876Z",
+        "salary": 101,
+        "revision": 1,
+        "duration": 6,
+        "thumbnail": "proposal/Sirkatey Team/hd-wallpaper-ge5a5df732_1280_vhXzKIy.jpg",
+        "team": 1,
+        "faq_one": "We will make thing work ?",
+        "faq_one_description": "Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websit",
+        "faq_two": "I am an expert in graphics as test?",
+        "faq_two_description": "Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websites2 Python Developers For Saas Websit",
+        "faq_three": null,
+        "faq_three_description": null,
+        "digital": true,
+        "pricing": true,
+        "pricing_tier": "basic",
+        "salary_tier1": 73,
+        "salary_tier2": 101,
+        "salary_tier3": 235,
+        "tier1_preview": "This is Basic Package11",
+        "tier2_preview": "This is Standard Package2",
+        "tier3_preview": "This is Premium Package3",
+        "revision_tier1": 2,
+        "revision_tier2": 4,
+        "revision_tier3": 6,
+        "pricing1_duration": 2,
+        "pricing2_duration": 5,
+        "pricing3_duration": 7,
+        "skill": [
+            8,
+            1,
+            12
+        ]
+    }
+},
+{
+    "model": "proposals.proposalproduct",
+    "pk": 112,
+    "fields": {
+        "merchant": 2,
+        "license": "49e3c374-8f5f-48f1-877f-40c0ca8f5917",
+        "team": 1,
+        "proposal": 10,
+        "created_by": 5,
+        "product_type": false,
+        "status": true,
+        "attachment": "product/Sirkatey Team/attachments/bokeh_plotdddd_RCCF5pm.png",
+        "created_at": "2023-08-06T22:01:44.283Z",
+        "modified_at": "2023-08-06T22:01:44.283Z",
+        "price": 0
+    }
+},
+{
+    "model": "proposals.proposalproduct",
+    "pk": 115,
+    "fields": {
+        "merchant": 2,
+        "license": "71ec3a39-2e21-406f-b1b0-bc6a609f5c99",
+        "team": 1,
+        "proposal": 10,
+        "created_by": 5,
+        "product_type": true,
+        "status": true,
+        "attachment": "product/Sirkatey Team/attachments/bokeh_plotdddd_08wMYTv.png",
+        "created_at": "2023-08-06T22:04:15.797Z",
+        "modified_at": "2023-08-06T22:04:15.797Z",
+        "price": 95
+    }
+},
+{
+    "model": "proposals.proposalproduct",
+    "pk": 116,
+    "fields": {
+        "merchant": 2,
+        "license": "205d8160-0cf6-496d-9b56-eeabcf5f5526",
+        "team": 1,
+        "proposal": 11,
+        "created_by": 5,
+        "product_type": false,
+        "status": true,
+        "attachment": "product/Sirkatey Team/attachments/bokeh_plotdddd_6UdL8hs.png",
+        "created_at": "2023-08-06T22:11:22.218Z",
+        "modified_at": "2023-08-06T23:04:12.005Z",
+        "price": 0
+    }
+},
+{
+    "model": "proposals.proposalproduct",
+    "pk": 117,
+    "fields": {
+        "merchant": 2,
+        "license": "9e4c9ea7-43ed-4b8c-91c5-0f8c64486f41",
+        "team": 1,
+        "proposal": 11,
+        "created_by": 5,
+        "product_type": true,
+        "status": true,
+        "attachment": "product/Sirkatey Team/attachments/bokeh_plotxx_JtGiTA8.png",
+        "created_at": "2023-08-06T22:11:22.511Z",
+        "modified_at": "2023-08-06T22:11:22.511Z",
+        "price": 101
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 1,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:53:35.274Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 2,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:53:39.918Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 3,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:54:21.112Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 4,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:54:27.486Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 5,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:55:33.797Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 6,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "This is the Information desk for the Team where members can pass information to the tea This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:55:39.507Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 7,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "This is the Information desk for the Team where members can pass information to the tea This is the Information desk for the Team where members can pass information to the tea",
+        "sent_on": "2023-05-29T02:56:07.055Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 8,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "wrwr retretre wfgetr43tr",
+        "sent_on": "2023-06-04T18:28:52.447Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 9,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "oeoewt reitretoret",
+        "sent_on": "2023-06-04T18:37:12.270Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 10,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "disgfoer iwereowe",
+        "sent_on": "2023-06-04T18:37:26.390Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 11,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "zxxkkccx dkfdkssssss",
+        "sent_on": "2023-06-04T19:29:29.697Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 12,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "i am doing good",
+        "sent_on": "2023-06-04T19:33:19.781Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 13,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "I am good again",
+        "sent_on": "2023-06-04T19:38:36.861Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 14,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "I am good again I am good again",
+        "sent_on": "2023-06-04T19:39:57.989Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 15,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "sdfds fdgeasac",
+        "sent_on": "2023-06-04T19:42:15.336Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 16,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "give it a try",
+        "sent_on": "2023-06-04T19:46:03.933Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 17,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "give it a try1",
+        "sent_on": "2023-06-04T19:47:44.078Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 18,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "give it a try give it a try",
+        "sent_on": "2023-06-04T19:52:42.123Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 19,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "give it a try give it a try give it a try give it a try",
+        "sent_on": "2023-06-04T19:54:55.230Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 20,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "give it a try give it a tryqqq",
+        "sent_on": "2023-06-04T19:55:18.222Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 21,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "give it a try give it a tryqqq",
+        "sent_on": "2023-06-04T19:55:27.878Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 22,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "give it a try give it a tryqqq give it a try give it a tryqqq",
+        "sent_on": "2023-06-04T19:55:56.400Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 23,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "give it a try give it a tryqqq",
+        "sent_on": "2023-06-04T19:56:13.076Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 24,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "give it a try give it a tryqqq dsdsdsds",
+        "sent_on": "2023-06-04T19:57:18.707Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 25,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "give it a try give it a tryqqq dsdsdsds5",
+        "sent_on": "2023-06-04T19:59:33.301Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 26,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 6,
+        "content": "saddsfd",
+        "sent_on": "2023-06-04T22:34:10.345Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 27,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "give a try now",
+        "sent_on": "2023-06-04T22:46:41.330Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 28,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "kateygh",
+        "sent_on": "2023-06-04T22:48:05.176Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 29,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "kateygh",
+        "sent_on": "2023-06-04T22:48:16.014Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 30,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 2,
+        "sender": 12,
+        "content": "kateygh",
+        "sent_on": "2023-06-04T22:48:49.713Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 31,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "kateygh kateygh",
+        "sent_on": "2023-06-04T22:49:49.664Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 32,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "kateygh5",
+        "sent_on": "2023-06-04T22:50:12.367Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 33,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "kateygh6",
+        "sent_on": "2023-06-04T22:51:46.741Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 34,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "kateygh5",
+        "sent_on": "2023-06-04T22:52:04.493Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 35,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "I am going to do",
+        "sent_on": "2023-06-04T22:53:18.301Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 36,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "stay put",
+        "sent_on": "2023-06-04T23:22:12.011Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 37,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "stay put",
+        "sent_on": "2023-06-04T23:22:18.323Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 38,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "GET IT",
+        "sent_on": "2023-06-04T23:25:02.182Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 39,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "GET IT GET IT",
+        "sent_on": "2023-06-04T23:25:20.186Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 40,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "c8",
+        "sent_on": "2023-06-04T23:26:05.255Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 41,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "GET IT",
+        "sent_on": "2023-06-04T23:26:15.554Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 42,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 6,
+        "content": "GET IT GET IT",
+        "sent_on": "2023-06-04T23:26:30.586Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 43,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 1,
+        "sender": 12,
+        "content": "uooplp kopo[oi",
+        "sent_on": "2023-06-06T22:17:50.744Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 44,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 5,
+        "sender": 6,
+        "content": "iuyfyttx jdgf\n",
+        "sent_on": "2023-07-05T10:37:34.385Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 45,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 11,
+        "sender": 6,
+        "content": "sads sfd d cxv cxvcxvcxvx",
+        "sent_on": "2023-07-15T17:15:21.018Z",
+        "is_read": false
+    }
+},
+{
+    "model": "proposals.proposalchat",
+    "pk": 46,
+    "fields": {
+        "merchant": 2,
+        "team": 1,
+        "proposal": 11,
+        "sender": 6,
+        "content": "This is the Information desk for the Team where members can pass information to the team",
+        "sent_on": "2023-07-15T17:15:35.656Z",
+        "is_read": false
+    }
+}
+]

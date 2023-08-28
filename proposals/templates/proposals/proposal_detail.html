@@ -45,7 +45,7 @@
 									<div class="wt-proposalhead">
 										<h2>{{proposal.title}}</h2>
 										<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
-											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{base_currency}} {{proposal.salary}}</span></li>
+											<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{website.merchant.country.currency}} {{proposal.salary}}</span></li>
 											<li><span><i class="fa fa-arrow-up" style="color:red;"></i> Sales: {{overal_proposal_sales_count}}</span></li>
 											<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
 											<li><span><i class="far fa-clock" style="color:blue;"></i> Duration: {{proposal.get_duration_display }}</span></li>

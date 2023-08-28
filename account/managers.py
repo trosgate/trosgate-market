@@ -10,6 +10,7 @@ from notification.mailer import new_user_registration
 from django.db import transaction as db_transaction
 
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password, first_name, last_name, **extra_fields):
         if not email:
@@ -26,11 +27,11 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
 
-        try:
-            db_transaction.on_commit(lambda: new_user_registration(user.pk))
-        except Exception as e:
-            error = str(e)
-            print(f"{error}")
+        # try:
+        #     db_transaction.on_commit(lambda: new_user_registration(user.pk))
+        # except Exception as e:
+        #     error = str(e)
+        #     print(f"{error}")
         return user
 
 
@@ -74,6 +75,9 @@ class UserManager(BaseUserManager):
         
         # Create merchant with the received information
         merchantapp = apps.get_model('account', 'Merchant') # This avoids circular import
+        paymentapp = apps.get_model('payments', 'PaymentGateway') # This avoids circular import
+        
+        gateway = paymentapp.objects.get_or_create(name='balance')[0]
         
         domain = business_name.lower().replace(' ','-')
         curr_site = Site.objects.create(domain=f"{domain}.{site.domain}", name=f'{business_name}')
@@ -82,9 +86,10 @@ class UserManager(BaseUserManager):
             business_name=business_name, 
             site=curr_site, 
             package=package,
-            default_domain=f"{domain}.{site.domain}"
+            domain=f"{domain}.{site.domain}"
             )
         merchant.members.add(customer)
+        merchant.gateways.add(gateway)
 
         customer.active_merchant_id = merchant.pk
         customer.save()
@@ -124,7 +129,6 @@ class UserManager(BaseUserManager):
         paymentapp = apps.get_model('payments', 'PaymentAccount')
         teamsapp = apps.get_model('teams', 'Team') 
         packageapp = apps.get_model('teams', 'Package') 
-        invitationapp = apps.get_model('teams', 'Invitation') 
         
         clientapp = apps.get_model('client', 'Client')
         clientaccountapp = apps.get_model('client', 'ClientAccount')
@@ -149,34 +153,27 @@ class UserManager(BaseUserManager):
             user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)
             user.active_merchant_id = merchant.pk
             user.save()
+
             freelanceraccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
             paymentapp.objects.get_or_create(merchant=merchant, user=user)[0]
-            package = packageapp.objects.get_or_create(type='Basic')[0]
+            package = packageapp.objects.get_or_create(type='basic')[0]
 
             title = f'{user.short_name} Team'
-            team = teamsapp.objects.get_or_create(
+            team = teamsapp.create_team_with_member(
                 title=title,
                 notice=f"This is the team for {user.short_name}", 
                 merchant=merchant,
                 created_by = user,
                 package=package,
-                slug = slugify(user.short_name)
-            )[0]
-            team.save()
-            team.members.add(user)
-            
+            )
+         
             freelancer = freelancerapp.objects.get_or_create(
                 merchant=merchant, user=user, active_team_id=team.id
             )[0]
             freelancer.active_team_id = team.id
             freelancer.save()
 
-            invitation = invitationapp.objects.get_or_create(
-                merchant=merchant, team=team, sender=user, 
-                email=user.email, type=invitationapp.INTERNAL,
-            )[0]
-        
-            return user, team, freelancer, invitation
+            return user, team, freelancer
         
 
         if merchant and extra_fields.setdefault('user_type') == 'client':
@@ -191,3 +188,6 @@ class UserManager(BaseUserManager):
             return user, client, client_acct
     
 
+    # def get_queryset(self):
+    #     site = Site.objects.get_current()
+    #     return super().get_queryset().filter(site=site)

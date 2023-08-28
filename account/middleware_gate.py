@@ -1,7 +1,7 @@
 # middleware.py
 import re
 from django.conf import settings
-from account.models import Merchant
+from account.models import Merchant, Customer
 from django.http import  HttpResponseRedirect
 from django.urls import reverse
 
@@ -20,22 +20,18 @@ class MerchantGateMiddleware:
         ]
 
     def __call__(self, request):
-        
-        if request.user.is_authenticated and request.user.is_merchant:
-
-            # This attribute was set by upper lever middleware
-            if request.merchant is None:
-                request.merchant = Merchant.objects.filter(pk=request.user.active_merchant_id).first()
-            
+        if request.user.is_authenticated and request.user.user_type != Customer.ADMIN:
+            request.merchant = Merchant.objects.get(pk=request.user.active_merchant_id)
             gate_url = reverse("merchants:subscription")
-            if (
-                request.merchant.type in Merchant.ACTIVE_TYPES
-                or request.path_info == gate_url # MEANING THEY ARE WHERE THEY SHOULD BE CHECKING OUT
-                or self.is_granted_passage(request.path_info)
-            ):
-                return self.get_response(request)
+            if request.merchant and request.user.is_merchant:
+                if (
+                    request.merchant.type in Merchant.ACTIVE_TYPES
+                    or request.path_info == gate_url
+                    or self.is_granted_passage(request.path_info)
+                ):
+                    return self.get_response(request)
 
-            return HttpResponseRedirect(gate_url)
+                return HttpResponseRedirect(gate_url)
         return self.get_response(request)
 
     def is_granted_passage(self, path):

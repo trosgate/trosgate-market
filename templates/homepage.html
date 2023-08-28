@@ -12,7 +12,7 @@
         <!-- Slide 1 -->
         <div class="carousel-item active" style="background-image: url({% static 'images/slide/slide-1.jpg' %})">
           <div class="container">
-            <h2>Welcome to <span>{{website.site.name}}</span></h2>
+            <h2>Welcome to <span>{{website.name}}</span></h2>
             <p>This is great est quam dolor ad a aliquid qui aliquid. Sequi ea ut et est quaerat sequi nihil ut aliquam. Occaecati alias dolorem mollitia ut. Similique ea voluptatem. Esse doloremque accusamus repellendus deleniti vel.</p>
             <a href="#about" class="btn-get-started scrollto">Read More</a>
           </div>
@@ -289,7 +289,7 @@
 								
 								<div class="p-5 pt-0">
 									<h1 class="display-5 mb-3"> 
-										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{website.merchant.country.currency}}</small>{{package.price}}<small
 											class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
 									</h1>
 									
@@ -335,7 +335,7 @@
 								</div>
 								<div class="p-5 pt-0">
 									<h1 class="display-5 mb-3">
-										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{website.merchant.country.currency}}</small>{{package.price}}<small
 											class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
 									</h1>
 									<div class="d-flex justify-content-between mb-3">
@@ -379,7 +379,7 @@
 								</div>
 								<div class="p-5 pt-0">
 									<h1 class="display-5 mb-3">
-										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+										<small class="align-top" style="font-size: 22px; line-height: 45px;">{{website.merchant.country.currency}}</small>{{package.price}}<small
 											class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
 									</h1>
 									<div class="d-flex justify-content-between mb-3">

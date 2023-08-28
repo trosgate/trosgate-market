@@ -1,0 +1,15 @@
+[
+{
+    "model": "future.futurerelease",
+    "pk": 1,
+    "fields": {
+        "preview": "Your future in your hands to control",
+        "alert": "Some of these features require additional settings. Be guided by the comments",
+        "more_team_per_user": true,
+        "ext_contract": true,
+        "deposit": true,
+        "transfer": true,
+        "sms_authenticator": false
+    }
+}
+]
