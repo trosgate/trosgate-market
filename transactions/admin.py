@@ -102,13 +102,13 @@ class PurchaseAdmin(admin.ModelAdmin):
     list_display = ['client', 'payment_method','salary_paid', 'client_fee', 'created_at', 'status']
     list_filter = ['category', 'status']
     readonly_fields = [
-        'client', 'category', 'status','salary_paid', 'created_at',
+        'client', 'category', 'status','salary_paid', 'created_at','merchant',
         'paypal_order_key', 'paypal_transaction_id', 'stripe_order_key', 
         'paystack_transaction_id','flutterwave_transaction_id','reference',
         'razorpay_order_key', 'razorpay_payment_id', 'razorpay_signature'
         ]  
     fieldsets = (
-        ('Transaction Details', {'fields': ('client', 'category', 'status','reference', 'salary_paid','created_at',)}),
+        ('Transaction Details', {'fields': ('merchant','client', 'category', 'status','reference', 'salary_paid','created_at',)}),
         ('PayPal Payment Mode (If PayPal was used)', {'fields': ('paypal_transaction_id',)}),
         ('Stripe Payment Mode (If Stripe was used)', {'fields': ('stripe_order_key',)}),
         ('Paystack Payment Mode (If Paystack was used)', {'fields': ('paystack_transaction_id',)}),
@@ -151,10 +151,10 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
         'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value',
         'is_refunded','total_earning_fee_charged', 'start_time', 'end_time', 'status',
-        'revision','duration',
+        'revision','duration','merchant',
     ]
     fieldsets = (
-        ('Classification', {'fields': ('team', 'purchase','project',)}),
+        ('Classification', {'fields': ('merchant','team', 'purchase','project',)}),
         ('Revenue', {'fields': (
             'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
             'discount_offered','is_refunded',
@@ -244,10 +244,10 @@ class ProposalSaleAdmin(admin.ModelAdmin):
     readonly_fields = [
         'team', 'purchase','proposal', 'sales_price', 'total_sales_price', 'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value','is_refunded','total_earning_fee_charged', 'start_time', 'end_time', 'status',
-        'package_name','revision','duration','reference'
+        'package_name','revision','duration','reference','merchant',
     ]
     fieldsets = (
-        ('Classification', {'fields': ('team', 'purchase','proposal', 'reference')}),
+        ('Classification', {'fields': ('merchant','team', 'purchase','proposal', 'reference')}),
         ('Revenue', {'fields': (
             'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
             'discount_offered','is_refunded',

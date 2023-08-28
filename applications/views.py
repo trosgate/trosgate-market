@@ -515,6 +515,7 @@ def razorpay_application_intent(request):
     payment_data = calculate_payment_data(applicant_box)
     purchase = None
     base_currency = get_base_currency(request)
+
     razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
     if razorpay_order_key:
         try:
@@ -548,7 +549,7 @@ def razorpay_application_intent(request):
 def razorpay_callback(request):
     applicant_box = ApplicationAddon(request)      
     razorpay_client = RazorpayClientConfig().razorpay
-  
+ 
     razorpay_order_key = request.POST.get('orderid')
     razorpay_payment_id = request.POST.get('paymentid')
     razorpay_signature = request.POST.get('signature')
@@ -558,6 +559,7 @@ def razorpay_callback(request):
         'razorpay_payment_id': razorpay_payment_id,
         'razorpay_signature': razorpay_signature
     }
+
     signature = razorpay_client.utility.verify_payment_signature(data)
 
     if signature == True:

@@ -23,11 +23,10 @@ class PackageController():
 
     def max_member_per_team(self):
         max_member_invite = self.team.package.max_member_per_team > self.team.invitations.count()
-        if (self.team.package.type == Package.TEAM and max_member_invite):
+        if (self.team.package.type == Package.TEAM and self.team.package_status == Team.ACTIVE and max_member_invite):
             return True
         return False
   
-
     def max_proposals_allowable_per_team(self):
         team_proposal_limit = self.team.package.max_proposals_allowable_per_team  
         team_proposals_count = Proposal.objects.filter(team=self.team).count()

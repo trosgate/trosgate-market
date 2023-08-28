@@ -29,7 +29,7 @@ paypal.Buttons({
         //     });
         //     console.log('PayPal', actions.id)    
         //     console.log('PayPalD', actions.orderID) 
-        return fetch("/transaction/paypal/api/", {
+        return fetch("/application/paypal/api/", {
             method: 'GET',
             credentials: 'same-origin',
             headers: {
@@ -47,7 +47,7 @@ paypal.Buttons({
     },
     onApprove: function(data, actions) {
         // This function will be called when the payment is approved
-        return fetch("/transaction/paypal/callback/", {
+        return fetch("/application/paypal/callback/", {
             method: 'POST',
             credentials: 'same-origin',
             headers: {

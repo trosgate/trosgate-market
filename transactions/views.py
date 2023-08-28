@@ -23,7 +23,7 @@ from payments.razorpay import RazorpayClientConfig
 from payments.flutterwave import FlutterwaveClientConfig
 from payments.paystack import PaystackClientConfig
 from .utilities import get_base_currency, calculate_payment_data, PurchaseAndSaleCreator
-
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from .models import (
     ApplicationSale, 
@@ -214,6 +214,7 @@ def payment_fee_structure(request):
 
 
 @login_required
+@never_cache
 def final_checkout(request):
     hiringbox = HiringBox(request)
     payment_data = calculate_payment_data(hiringbox)
@@ -279,6 +280,7 @@ def final_checkout(request):
 
 @login_required
 @user_is_client
+@never_cache
 def paystack_payment_intent(request):
     hiringbox = HiringBox(request)
     payment_data = calculate_payment_data(hiringbox)
@@ -306,6 +308,7 @@ def paystack_payment_intent(request):
 
 
 @csrf_exempt
+@never_cache
 def paystack_callback(request):
     hiringbox = HiringBox(request)      
     payment_reference = request.POST.get('payment_reference')
@@ -332,6 +335,7 @@ def paystack_callback(request):
 
 @login_required
 @user_is_client
+@never_cache
 def flutter_payment_intent(request):
     hiringbox = HiringBox(request)
     payment_data = calculate_payment_data(hiringbox)
@@ -362,6 +366,7 @@ def flutter_payment_intent(request):
 
     
 @login_required
+@never_cache
 @require_http_methods(['GET'])
 def flutter_success(request):
     hiringbox = HiringBox(request)
@@ -391,6 +396,7 @@ def flutter_success(request):
 
 
 @login_required
+@never_cache
 @require_http_methods(['POST'])
 def stripe_payment_intent(request):
     hiringbox = HiringBox(request)
@@ -422,6 +428,7 @@ def stripe_payment_intent(request):
 
 
 @login_required
+@never_cache
 @require_http_methods(['POST'])
 def stripe_payment_order(request):
     hiringbox = HiringBox(request)
@@ -434,6 +441,7 @@ def stripe_payment_order(request):
     
 
 @login_required
+@never_cache
 @require_http_methods(['GET'])
 def paypal_payment_order(request):
     hiringbox = HiringBox(request)
@@ -466,6 +474,7 @@ def paypal_payment_order(request):
 
 
 @csrf_exempt
+@never_cache
 @require_http_methods(['POST'])
 def paypal_callback(request):
     hiringbox = HiringBox(request)
@@ -484,6 +493,7 @@ def paypal_callback(request):
     
 
 @login_required
+@never_cache
 @user_is_client
 def razorpay_application_intent(request):
 
@@ -522,6 +532,7 @@ def razorpay_application_intent(request):
 
 
 @login_required
+@never_cache
 @user_is_client
 def razorpay_callback(request):
     hiringbox = HiringBox(request)      
@@ -536,6 +547,7 @@ def razorpay_callback(request):
         'razorpay_payment_id': razorpay_payment_id,
         'razorpay_signature': razorpay_signature
     }
+    print('purchase data ::', data)
     signature = razorpay_client.utility.verify_payment_signature(data)
 
     if signature == True:

@@ -5,7 +5,6 @@ from .models import Package, TeamMember, Team, Invitation, TeamChat, AssignMembe
 
 MAX_OBJECTS = 2
 
-
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):  
     list_display = ['type','price', 'ordering']
@@ -61,7 +60,6 @@ class PackageAdmin(admin.ModelAdmin):
         return actions
 
 
-# @admin.register(TeamMember)
 class TeamMemberAdmin(admin.TabularInline):
     model=TeamMember
     list_display = ['member', 'team', 'earning_ratio', 'status',]
@@ -74,13 +72,25 @@ class TeamMemberAdmin(admin.TabularInline):
     )
 
 
+class InvitationAdmin(admin.TabularInline):
+    model=Invitation
+    list_display = ['email','sender','receiver', 'code', 'sent_on', 'status']
+    readonly_fields = ['email','sender','receiver', 'code', 'sent_on', 'status']
+    extra = 0
+    can_delete = False
+
+    fieldsets = (
+        ('Invite', {'fields': ('email','sender','receiver', 'code', 'sent_on', 'status')}),
+    )
+
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ['title', 'merchant', 'package', 'team_balance', 'status',]
     list_display_links = ['title', 'merchant']
     search_fields = ['title']
     list_filter =  ['merchant']
-    inlines = [TeamMemberAdmin]
+    inlines = [InvitationAdmin, TeamMemberAdmin]
     readonly_fields = [
         'title', 'merchant', 'slug', 'team_balance','created_by','members', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',
@@ -124,43 +134,6 @@ class TeamAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
         
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
-@admin.register(Invitation)
-class InvitationAdmin(admin.ModelAdmin):
-    list_display = ['email','merchant', 'team', 'code', 'sent_on', 'status']
-    list_display_links = ['email', 'merchant', 'team']
-    search_fields = ['code','email']
-    list_filter = ['status']
-    readonly_fields = ['merchant', 'email','team', 'sender','receiver', 'type','code', 'sent_on']
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        is_superuser = request.user.is_superuser
-        disabled_fields = set() 
-
-        if not is_superuser: 
-            disabled_fields |= {
-                'status'
-            }
-
-        for field in disabled_fields:
-            if field in form.base_fields:
-                form.base_fields[field].disabled = True
-        
-        return form
-
-    def has_add_permission(self, request):
-        return False
-
     def get_actions(self, request):
         actions = super().get_actions(request)
         if 'delete_selected' in actions:

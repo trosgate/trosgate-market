@@ -11,9 +11,9 @@ class RazorpayClientConfig:
 
     def __init__(self):
         self.name = 'razorpay'
-        self.currency = self.currency = get_base_currency_code() if get_base_currency_code() else 'INR'
         self.mysite = Site.objects.get_current()
         self.site = self.mysite.merchant
+        self.currency = self.default_currency() #razorpay accept currency in uppercase
 
         self.razorpay_key_id = self.razorpay_key_id()
         self.razorpay_key_secret = self.razorpay_key_secret()
@@ -25,6 +25,10 @@ class RazorpayClientConfig:
         merchant = MerchantAPIs.objects.filter(merchant=self.site, razorpay_active=True).first()
         return merchant
 
+    def default_currency(self):
+        currency = self.site.merchant.country.currency
+        print('currency :cc::', currency)
+        return currency if currency else 'USD'
 
     def razorpay_key_id(self):
         gateway = self.get_payment_gateway()

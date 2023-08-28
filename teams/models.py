@@ -153,6 +153,34 @@ class Team(MerchantMaster):
             
         return team
 
+    @property
+    def max_member_per_team(self):
+        # Checks that the team qualifies to invite new members
+        max_member_invite = self.package.max_member_per_team > self.invitations.count()
+        return self.package.type == Package.TEAM and self.package_status == Team.ACTIVE and max_member_invite
+
+    @property
+    def show_max_member_message(self):
+        # Messages to show when team.max_member_per_team() is false
+        max_member_invite = self.package.max_member_per_team > self.invitations.count()
+        if self.package.type == Package.BASIC or self.package_status == Team.DEFAULT:
+            message = "Upgrade team to invite"
+        if self.package.type == Package.TEAM and self.package_status == Team.ACTIVE and not max_member_invite:
+            message = "Maximum invite reached for this team"
+        if self.package.type == Package.TEAM and self.package_status != Team.ACTIVE:
+            message = "Renew subscription for this team"
+        return message
+
+    @property
+    def max_proposals_allowable_per_team(self):
+        return self.package.max_proposals_allowable_per_team > self.proposalteam.count()
+
+    @property
+    def show_max_proposal_message(self):
+        # Messages to show when team.max_proposals_allowable_per_team() is false   
+        checker = self.max_proposals_allowable_per_team
+        return "Limit reached for active team's package" if not checker else ''
+ 
 
     def split_earnings(self):
         active_relationships = self.team.teammemberrelationship_set.filter(is_active=True)

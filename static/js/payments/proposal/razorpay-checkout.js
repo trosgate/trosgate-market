@@ -26,6 +26,7 @@
         image: "",
         order_id: data.razorpay_order_key, // Received from the backend
         handler: function(response) {
+          razorpayButton.disabled = false;
           // Handle the response after payment completion
           const formData = new FormData();
           formData.append('orderid', response.razorpay_order_id);
@@ -37,7 +38,6 @@
             body: formData,
             credentials: 'same-origin',
             headers: {
-              'Content-Type': 'application/json',
               'X-CSRFToken': CSRF_TOKEN
             }
           })

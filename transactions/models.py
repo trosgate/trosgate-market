@@ -265,13 +265,9 @@ class Purchase(PurchaseMaster):
                     FreelancerAccount.credit_pending_balance(
                         user=item.team.created_by, 
                         paid_amount=item.total_sales_price,
-                        purchase_model = Purchase.PROPOSAL, 
+                        purchase_model = Purchase.PROJECT, 
                         purchase=item.project
                     )
-                    project = item.project
-                    # applications = Application.objects.filter(project=project)) change the statuses
-                    print(project)
-                    # print(applications)
 
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
@@ -316,7 +312,12 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase, purchase__status='success'):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROJECT, 
+                        purchase=item.project
+                    )
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
@@ -362,7 +363,12 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROJECT, 
+                        purchase=item.project
+                    )
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
@@ -408,7 +414,12 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROJECT, 
+                        purchase=item.project
+                    )
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
@@ -455,7 +466,12 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.PROJECT:
                 for item in ApplicationSale.objects.filter(purchase=purchase):
-                    FreelancerAccount.credit_pending_balance(user=item.team.created_by, paid_amount=item.total_sales_price, purchase=item.project)
+                    FreelancerAccount.credit_pending_balance(
+                        user=item.team.created_by, 
+                        paid_amount=item.total_sales_price,
+                        purchase_model = Purchase.PROJECT, 
+                        purchase=item.project
+                    )
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
