@@ -31,7 +31,6 @@ from general_settings.discount import get_discount_calculator, get_earning_calcu
 from general_settings.fees_and_charges import get_contract_fee_calculator,get_external_contract_gross_earning, get_external_contract_fee_calculator
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
-from teams.controller import PackageController
 from django.views.decorators.cache import cache_control
 from general_settings.utilities import get_protocol_only
 from django.views.decorators.http import require_http_methods
@@ -45,8 +44,8 @@ from django.db.models import Q
 def create_internal_contract(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id, status=Team.ACTIVE)
-    monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
-     
+    monthly_contracts_limiter = team.monthly_contract_slot
+    
     if request.method == 'POST':
         intcontractform = InternalContractForm(team, request.POST)
 
@@ -93,11 +92,8 @@ def internal_contract_detail(request, contract_id, contract_slug):
     elif request.user.user_type == Customer.CLIENT:
         contract = get_object_or_404(InternalContract, pk=contract_id, slug=contract_slug, created_by=request.user)
 
-    base_currency = get_base_currency_symbol()
-
     context = {
         "contract": contract,
-        "base_currency": base_currency,
     }
     return render(request, 'contract/internal_contract_detail.html', context)
 
@@ -108,17 +104,35 @@ def accept_or_reject_contract(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
     contract_id = int(request.POST.get('contractid'))
     contract = get_object_or_404(InternalContract, team=team, id=contract_id)
-    
+
     if request.POST.get('action') == 'accept':
-        InternalContract.capture(contract.id, contract.ACCEPTED)
-        response = JsonResponse({'status': 'accepted'})
-        return response
+        contract = InternalContract.capture(contract.id, contract.ACCEPTED)
 
     elif request.POST.get('action') == 'reject':
-        InternalContract.capture(contract.id, contract.REJECTED)
-        response = JsonResponse({'status': 'rejected'})
-        return response
+        contract = InternalContract.capture(contract.id, contract.REJECTED)
 
+    else:
+        messages.error(request, 'No option selected')
+    context = {
+        "contract": contract,
+    }
+    return render(request, 'contract/components/accept_or_reject.html', context)
+
+
+@login_required
+@user_is_client
+def refresh_contract(request):
+    contract_id = int(request.GET.get('refresh'))
+    contract = InternalContract.objects.filter(id=contract_id).first()
+    message = 'No action taken by Team'
+    if contract is not None and contract.reaction != 'awaiting':
+        message = 'Action taken by Team'
+
+    messages.info(request, f'{message}')
+    context = {
+        "contract": contract,
+    }
+    return render(request, 'contract/components/accept_or_reject.html', context)
 
 @login_required
 @user_is_client
@@ -710,6 +724,7 @@ def delete_contractor(request, contractor_id):
     return render(request, 'contract/components/partial_contractor.html',context)
 
 # <...........................................................External Contract Section..........................................................>
+
 @login_required
 @user_is_freelancer
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

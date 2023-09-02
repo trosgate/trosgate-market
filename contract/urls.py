@@ -37,6 +37,7 @@ urlpatterns = [
     
     path('congrats/', views.contract_success, name='contract_success'),
 
+    path('refresh_contract/', views.refresh_contract, name='refresh_contract'),
     path('offer/<slug:short_name>/', views.create_internal_contract, name='create_internal_contract'),
     path('detail/<int:contract_id>/<slug:contract_slug>/', views.internal_contract_detail, name='internal_contract_detail'),
     path('intern/<int:contract_id>/<slug:contract_slug>/fees-structure/', views.internal_contract_fee_structure, name='internal_contract_fee_structure'),

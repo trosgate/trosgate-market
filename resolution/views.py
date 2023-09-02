@@ -53,7 +53,7 @@ def proposal_manager(request, product_id, product_slug):
         return HttpResponseBadRequest()
     cancellation_form = ProposalCancellationForm(request.POST or None)
     task = ProposalJob.objects.filter(product=product).first()
-   
+
     context = {
         "product": product,
         "task": task,

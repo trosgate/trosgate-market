@@ -68,7 +68,7 @@ class TeamMemberAdmin(admin.TabularInline):
     extra = 0
 
     fieldsets = (
-        ('Comment Thread', {'fields': ('member', 'earning_ratio', 'status',)}),
+        (None, {'fields': ('member', 'earning_ratio', 'status',)}),
     )
 
 
@@ -100,7 +100,7 @@ class TeamAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Introduction', {'fields': ('title', 'merchant', 'slug',  'status', 'team_balance',)}),
-        ('Package and Background', {'fields': ('package', 'package_status', 'created_by','members','notice',)}),
+        ('Package and Background', {'fields': ('package', 'package_status', 'created_by','notice',)}),
         ('Subscription Type - Stripe', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
         ('Subscription Type - Razorpay', {'fields': ('razorpay_payment_id','razorpay_subscription_id','razorpay_payment_url',)}),
         ('Subscription Type - PayPal', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),

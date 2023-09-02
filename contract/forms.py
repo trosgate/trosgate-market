@@ -34,7 +34,7 @@ class InternalContractForm(forms.ModelForm):
 
     def __init__(self, team, *args, **kwargs):
         super(InternalContractForm, self).__init__(*args, **kwargs)        
-        self.fields['proposal'].queryset = Proposal.active.filter(team=team)
+        self.fields['proposal'].queryset = Proposal.objects.filter(team=team, status=Proposal.ACTIVE)
        
         # 'Basic Info'
         self.fields['proposal'].widget.attrs.update(
@@ -192,11 +192,8 @@ class ExternalContractForm(forms.ModelForm):
 class ContractorForm(forms.ModelForm):
     class Meta:
         model = Contractor
-        fields = ['name', 'email',] 
-        required = [
-         # Required details 
-            'name', 'email',              
-        ]  
+        fields = ['name', 'email'] 
+        required = ['name', 'email']  
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

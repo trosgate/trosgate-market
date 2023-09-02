@@ -16,7 +16,9 @@ from django.utils.text import slugify
 from merchants.models import MerchantMaster
 from django.core.exceptions import ValidationError
 from django.db.models  import F, Sum
-
+from datetime import timedelta
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 
 
 def code_generator():
@@ -153,6 +155,7 @@ class Team(MerchantMaster):
             
         return team
 
+
     @property
     def max_member_per_team(self):
         # Checks that the team qualifies to invite new members
@@ -180,29 +183,76 @@ class Team(MerchantMaster):
         # Messages to show when team.max_proposals_allowable_per_team() is false   
         checker = self.max_proposals_allowable_per_team
         return "Limit reached for active team's package" if not checker else ''
- 
 
-    def split_earnings(self):
-        active_relationships = self.team.teammemberrelationship_set.filter(is_active=True)
+    @property
+    def monthly_contract_slot(self):
+        team_contracts_limit = self.package.monthly_offer_contracts_per_team
+        monthly_team_contracts_count = self.internalcontractteam.filter(
+            date_created__gt=timezone.now() - relativedelta(months=1)
+        ).prefetch_related('team').count()
+        print('monthly_team_contracts_count :gdgdgdg:', monthly_team_contracts_count)     
+        return team_contracts_limit > monthly_team_contracts_count
+
+    @property
+    def show_monthly_contract_message(self):
+        # Messages to show when team.monthly_contract_slot() is false   
+        checker = self.monthly_contract_slot
+        return "does not have open slot for contracts" if not checker else ''
+
+    @property
+    def monthly_projects_slot(self):
+        team_project_limit = self.team.package.monthly_projects_applicable_per_team
+
+        applications = self.application_set.filter(
+            created_at__gt=timezone.now() - relativedelta(months=1)
+        ).prefetch_related('team')
+
+        monthly_applications_count = len(applications)
+
+        return team_project_limit > monthly_applications_count
+
+
+    @classmethod
+    @db_transaction.atomic
+    def split_earnings(cls):
+        team = cls.team  # Store the team instance to avoid repeated attribute access
+        
+        active_relationships = team.teammember_set.filter(is_active=True).select_related('member')
+        
+        if active_relationships.count() == 0:
+            raise ValueError("No active team members to split earnings.")
+        
         total_ratio = sum(relationship.earning_ratio for relationship in active_relationships)
         earnings = {}
 
         non_zero_relationships = [relationship for relationship in active_relationships if relationship.earning_ratio > 0]
         non_zero_total_ratio = sum(relationship.earning_ratio for relationship in non_zero_relationships)
 
+        if non_zero_total_ratio == 0:
+            raise ValueError("No active team members with non-zero earning ratio.")
+
         for relationship in non_zero_relationships:
             ratio = relationship.earning_ratio
-            earning = self.transaction_amount * (ratio / non_zero_total_ratio)
+            earning = cls.transaction_amount * (ratio / non_zero_total_ratio)
             earnings[relationship.member] = earning
 
-        if total_ratio > non_zero_total_ratio:
-            # Calculate remaining amount for the team founder
-            remaining_amount = self.transaction_amount - sum(earnings.values())
-            team_founder = self.team.team_founder
-            team_founder.account_balance += remaining_amount
+        if active_relationships.count() == 1:
+            # Credit founder's account if there's only one active team member
+            team_founder = team.team_founder
+            team_founder.account_balance += cls.transaction_amount
             team_founder.save()
+        else:
+            remaining_amount = cls.transaction_amount - sum(earnings.values())
+            if remaining_amount > 0:
+                raise ValueError("Remaining amount cannot be distributed.")
+            
+            for member, earning in earnings.items():
+                member.account_balance += earning
+                member.save()
 
         return earnings
+
+
 
 
 class TeamMember(models.Model):

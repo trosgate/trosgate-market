@@ -39,7 +39,7 @@
 												
 												<span>{% if good_review_rate > 0 %}{{good_review_rate}} Good Review{{good_review_rate|pluralize}} <a class="javascript:void(0);">(3 Stars & Above)</a> <br>{% endif %} Member since {{freelancer.user.date_joined|date:"M d, Y"}}<br><a href="#">@{{freelancer.user.short_name}}</a></span>
 												{% if active_team.created_by == request.user %}
-												{% if max_team_members %}
+												{% if active_team.max_member_per_team %}
 												<div id="invitation-message"></div>
 												<div class="form-group wt-btnarea">
 													<button id="userInvitation" class="btn btn-danger btn-sm"><i class="fa fa-handshake-o" aria-hidden="true"> Invite to Team</i></button>
@@ -81,23 +81,20 @@
 												<h3 data-from="0" data-to="{{verified_sale}}" data-speed="8000" data-refresh-interval="100">{{verified_sale}}</h3>
 												<h4>Total <br>Sales</h4>
 											</div>
+											{% if request.user.clients %}
 											<div class="wt-description">
-												{% if request.user.clients %}
-												{% if monthly_contracts_limiter %}
-												
-												{% if team.package.type == 'Team' %}
-												{% if proposal_count %}
-												<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
-												{% endif %}
-												{% endif %}
+												{% if team.monthly_contract_slot %}
+													{% if proposal_count %}
+													<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
+													{% endif %}
 
 												{% else %}
-												<p style='color:green'>* Hi {{request.user.short_name|capfirst}}, {{freelancer.user.short_name|capfirst}} does not have open slot for contracts at the moment.</p>
-												<a href="{% url 'freelancer:freelancer_listing' %}" class="wt-btn">Try others</a>
+													<p style='color:green'>* Hi {{request.user.short_name|capfirst}}, {{freelancer.user.short_name|capfirst}} {{team.show_monthly_contract_message}}.</p>
+													<a href="{% url 'freelancer:freelancer_listing' %}" class="wt-btn">Try others</a>
 												{% endif %}
 												
-												{% endif %}
 											</div>
+											{% endif %}
 										</div>
 									</div>
 								</div>

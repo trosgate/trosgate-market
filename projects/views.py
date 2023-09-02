@@ -90,7 +90,7 @@ def project_single(request, project_slug):
 @login_required
 @user_is_client
 def reopen_project(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug, duration__lt=timezone.now(), status=Project.ACTIVE, created_by=request.user)
+    project = get_object_or_404(Project, slug=project_slug, duration_time__lt=timezone.now(), status=Project.ACTIVE, created_by=request.user)
     #reopen_count=0, 
 
     if request.method == 'POST':

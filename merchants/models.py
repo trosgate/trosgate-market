@@ -8,8 +8,7 @@ from account.models import Merchant
 import uuid
 from django.contrib.sites.managers import CurrentSiteManager
 
-
-    
+ 
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
         current_site = Site.objects.get_current()
@@ -20,7 +19,6 @@ class MerchantMasterManager(models.Manager):
             queryset = qs.filter(merchant__site=current_site)
         return queryset
         
-
 
 class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)

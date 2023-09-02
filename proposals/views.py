@@ -26,7 +26,6 @@ from django.views.decorators.cache import cache_control #prevent back button on 
 from account.models import Country, Merchant
 from django.template.loader import render_to_string
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
-from teams.controller import PackageController
 from account.models import Customer
 from client.models import Client
 from resolution.reviews import (
@@ -838,7 +837,7 @@ def proposal_detail(request, short_name, proposal_slug):
 def proposal_chat_messages(request, proposal_slug):
     proposal=None
     if request.user.user_type == Customer.FREELANCER:    
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user])
         proposal = get_object_or_404(Proposal, slug=proposal_slug, team=team)
 
     elif request.user.user_type == Customer.CLIENT:

@@ -6,7 +6,7 @@ from general_settings.fees_and_charges import (
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from account.models import Merchant
-
+from django.db import models, transaction as db_transaction
 
 
 def get_base_currency(request):
@@ -14,8 +14,9 @@ def get_base_currency(request):
     base_currency = merchant.merchant.country.currency.upper()
 
     if not base_currency:
-        base_currency = request.merchant.merchant.merchant.country.currency.upper()
+        base_currency = request.merchant.merchant.country.currency.upper()
     return base_currency
+
 
 def calculate_payment_data(hiringbox):
     discount_value = hiringbox.get_discount_value()
@@ -34,17 +35,18 @@ def calculate_payment_data(hiringbox):
 
 
 class PurchaseAndSaleCreator:
+    @db_transaction.atomic()
     def create_purchase_and_sales(self, client, gateway_type, total_gateway_fee, grand_total, category, hiringbox, grand_total_before_expense, discount_value, stripe_order_key='', paypal_order_key='', razorpay_order_key=''):
-        try:
-            purchase = self._create_purchase(client, gateway_type, total_gateway_fee, grand_total, category, stripe_order_key, paypal_order_key,razorpay_order_key)
 
-            if purchase.category == Purchase.PROPOSAL:
-                self._create_proposal_sales(purchase, hiringbox, grand_total_before_expense, discount_value)
-                return purchase
-            
-            if purchase.category == Purchase.PROJECT:
-                self._create_application_sales(purchase, hiringbox, grand_total_before_expense, discount_value)
-                return purchase
+        purchase = self._create_purchase(client, gateway_type, total_gateway_fee, grand_total, category, stripe_order_key, paypal_order_key,razorpay_order_key)
+
+        if purchase.category == Purchase.PROPOSAL:
+            self._create_proposal_sales(purchase, hiringbox, grand_total_before_expense, discount_value)
+            return purchase
+        
+        if purchase.category == Purchase.PROJECT:
+            self._create_application_sales(purchase, hiringbox, grand_total_before_expense, discount_value)
+            return purchase
             
             # if purchase.category == Purchase.CONTRACT:
             #     self._create_contract_sales(purchase, hiringbox, grand_total_before_expense, discount_value)
@@ -53,9 +55,6 @@ class PurchaseAndSaleCreator:
             # if purchase.category == Purchase.EX_CONTRACT:
             #     self._create_ext_contract_sales(purchase, hiringbox, grand_total_before_expense, discount_value)
             #     return purchase
-            
-        except Exception as e:
-            print('%s' % (str(e)))
 
 
     def _create_purchase(self, client, gateway_type, total_gateway_fee, grand_total, category, stripe_order_key='', paypal_order_key='', razorpay_order_key=''):

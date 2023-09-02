@@ -15,10 +15,10 @@ class FreelancerAdmin(admin.ModelAdmin):
     model = Freelancer
     list_display = ['merchant', 'image_tag', 'user', 'created']
     list_display_links = ('image_tag', 'user',)
-    list_editable = ['created']   
+    list_editable = ['created']
     readonly_fields = [
         'gender', 'merchant', 'address','image_tag', 'profile_photo', 'banner_tag', 'banner_photo',
-        'brand_name', 'tagline','description', 'skill', 'business_size', 'department',
+        'brand_name', 'skill', 'business_size', 'department',
         'company_name','job_position', 'start_date', 'end_date', 'job_description',
         'company_name_two','job_position_two', 'start_date_two', 'end_date_two','job_description_two',
         'project_title', 'project_url', 'image_one','project_title_two', 'project_url_two', 'image_two',

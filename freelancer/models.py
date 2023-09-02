@@ -92,12 +92,24 @@ class Freelancer(MerchantMaster):
         return f'{self.user.first_name} {self.user.last_name}'
 
     def save(self, *args, **kwargs):
+
+        if self.tagline is None or self.tagline == "":
+            self.tagline = self.get_tagline()
+        if self.description is None or self.description == "":
+            self.description = self.get_description()
+
         super(Freelancer, self).save(*args, **kwargs)
         new_profile_photo = Image.open(self.profile_photo.path)
-        if new_profile_photo.height > 300 or new_profile_photo.width > 300:
-            output_size = (300, 300)
+        if new_profile_photo.height > 250 or new_profile_photo.width > 250:
+            output_size = (250, 250)
             new_profile_photo.thumbnail(output_size)
             new_profile_photo.save(self.profile_photo.path)
+
+    def get_tagline(self):
+        return f"I am {self.user.get_short_name()} with specialty in ..." 
+    
+    def get_description(self):
+        return "I am highly motivated freelancer with experience with five(5) years of working experience in ....." 
 
     def clean(self):
         if self.start_date > self.end_date:
@@ -129,7 +141,6 @@ class Freelancer(MerchantMaster):
                 {'key_skill_five_score': _('Skill #5 and Score #5 are required together')})
 
         return super().clean()
-
 
     def freelancer_profile_absolute_url(self):
         return reverse('freelancer:freelancer_profile', args=([(self.user.short_name)]))

@@ -230,16 +230,22 @@
                                 </div>  
                             </form>
                             {% else %}
-                            <div class="wt-btnarea text-center alert alert-warning col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"></i> 
-                                    {% if request.user.freelancer %} 
-                                    Sorry! we could not fetch the information you are looking for. <a href="{% url 'marketing:support' %}"> Check resources</a>
-                                    {% elif request.user.clients %} 
-                                    Sorry! we could not fetch the information you are looking for. <a href="{% url 'freelancer:freelancer_listing' %}"> Check other freelancers</a>
+                            <div class="text-center col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <span style="color: green; font-weight: bold;"><i class="fa fa-exclamation-triangle"> Error Occured!</i> 
+                                    {% if request.user.freelancer %}
+                                    <div class="wt-updatall">
+                                        <span>Sorry! we could not fetch the information.</span>
+                                        <a href="{% url 'marketing:support' %}"> Check resources</a>
+                                    </div>
+                                    {% elif request.user.clients %}
+                                    <div class="wt-updatall">
+                                        <span>Sorry! we could not fetch the information.</span>
+                                        <a class="wt-btn" href="{% url 'freelancer:freelancer_listing' %}"> Check other freelancers</a>
+                                    </div>
                                     {% endif %}
                                 </span>
                             </div>	
-                        {% endif %}
+                            {% endif %}
 						</div>
 					</div>
 				</div>

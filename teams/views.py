@@ -27,7 +27,6 @@ from applications.models import Application
 from account.models import Customer
 from datetime import datetime
 from django.utils import timezone
-from .controller import PackageController
 # from django.views.decorators.http import require_http_methods
 from freelancer.models import Freelancer
 from payments.paypal import PayPalClientConfig
@@ -235,14 +234,12 @@ def invitation(request):
     invited = team.invitations.filter(status=Invitation.INVITED)
     members = team.teammember_set.all()
     code = Invitation.objects.values('code')[0]
-    max_team_members = PackageController(team).max_member_per_team()
 
     context = {
         "team": team,
         "code": code,
         'invited': invited,
         'members': members,
-        'max_team_members': max_team_members,
     }
     return render(request, 'teams/invitation_detail.html', context)
 

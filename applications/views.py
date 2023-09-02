@@ -45,7 +45,6 @@ from general_settings.discount import get_discount_calculator, get_earning_calcu
 from general_settings.fees_and_charges import get_application_fee_calculator
 from django.db import transaction as db_transaction
 from freelancer.models import FreelancerAccount
-from teams.controller import PackageController
 from notification.mailer import application_notification
 from general_settings.utilities import get_protocol_only
 from analytics.analytic import user_review_rate
@@ -58,7 +57,8 @@ from transactions.utilities import get_base_currency, calculate_payment_data #, 
 def apply_for_project(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
-    can_apply_for_project = PackageController(team).monthly_projects_applicable_per_team()
+    can_apply_for_project = team.monthly_projects_slot
+    print('can_apply_for_project ::', can_apply_for_project)
     applied = Application.objects.filter(team=team, project=project)
     base_currency = get_base_currency(request)
 
@@ -307,8 +307,8 @@ def paystack_payment_intent(request):
     purchase = None
     base_currency = get_base_currency(request)
     try:
-        creator = PurchaseAndSaleCreator()
-        purchase = creator.create_purchase_and_sales(
+        purchase = PurchaseAndSaleCreator()
+        purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROJECT,
@@ -361,8 +361,8 @@ def flutter_payment_intent(request):
 
     base_currency = get_base_currency(request)
     try:
-        creator = PurchaseAndSaleCreator()
-        purchase = creator.create_purchase_and_sales(
+        purchase = PurchaseAndSaleCreator()
+        purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROJECT,
@@ -422,12 +422,11 @@ def stripe_payment_intent(request):
     card_token = request.POST.get('card_token')
     stripe_client = StripeClientConfig()
     payment_id, client_secret = stripe_client.create_payment_intent(grand_total,card_token) 
-    print('payment_id ::', payment_id)
-    print('client_secret ::', client_secret)
+
     purchase = None
     try:
-        creator = PurchaseAndSaleCreator()
-        purchase = creator.create_purchase_and_sales(
+        purchase = PurchaseAndSaleCreator()
+        purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROJECT,
@@ -438,7 +437,6 @@ def stripe_payment_intent(request):
             'client_secret': client_secret,
             'payment_intent': payment_id,
         }
-        print('purchase ID ::', purchase.id)
         return JsonResponse(response_data)
     except Exception as e:
         print('%s' % (str(e)))
@@ -462,13 +460,12 @@ def paypal_payment_order(request):
     applicant_box = ApplicationAddon(request)
     grand_total = applicant_box.get_total_price_after_discount_and_fee()
     payment_data = calculate_payment_data(applicant_box)
-    purchase = None
 
     paypal_order_key = PayPalClientConfig().create_order(grand_total)
     if paypal_order_key:
         try:
-            creator = PurchaseAndSaleCreator()
-            purchase = creator.create_purchase_and_sales(
+            purchase = PurchaseAndSaleCreator()
+            purchase.create_purchase_and_sales(
                 client=request.user,
                 **payment_data,
                 category=Purchase.PROJECT,
@@ -478,7 +475,6 @@ def paypal_payment_order(request):
             response_data = {
                 'paypal_order_key': paypal_order_key,
             }
-            print('purchase ID ::', purchase.id)
             return JsonResponse(response_data)
         except Exception as e:
             print('purchase ID ::', str(e))

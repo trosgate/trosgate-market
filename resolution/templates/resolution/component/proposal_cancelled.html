@@ -2,7 +2,16 @@
     <div class="col-md-12">
         <div class="a" style="display:flex; justify-content:space-between; margin-bottom:10px;">
             <div class='col-md-4'>
-                <span><strong>Type:</strong> {{product.get_cancel_type_display}}</span>
+                <span><strong>Chat Client:</strong> 
+                    <a class="badge badge-danger" href="{% url 'proposals:proposal_chat_messages' product.proposal.slug %}" class="btn btn-outline-danger btn-sm">
+                        {% if request.user.freelancer %} 
+                        Message Client
+                        {% else %}
+                        Message Team
+                        {% endif %}
+                    </a>
+                </span>
+                
             </div>
             <div class='col-md-4'>
                 <span><strong>Status:</strong> {{product.get_cancel_status_display}}</span>

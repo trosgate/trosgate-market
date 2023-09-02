@@ -49,9 +49,8 @@
                                         
                                         <div class="form-group col-md-6">
                                             <span><i class="fa fa-group"> Client Name: {{contract.created_by.get_full_name}}</i></span><br><br>
-                                            <span><i class="fa fa-arrow-up">  Contract Status: </i><i style='color:blue'>{{contract.get_reaction_display}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Duration: {{contract.get_contract_duration_display}}</i></span><br><br>
-                                            <span><i class="far fa-calendar"> Reference: {{contract.reference}}</i></span><br><br>
+                                            <span><i class="fa fa-bookmark"> Reference: {{contract.reference}}</i></span><br><br>
                                             <span><i class="far fa-calendar"> Time Created: {{contract.date_created}}</i></span><br><br>
                                         </div>
                                           
@@ -67,8 +66,8 @@
                                             <th scope="col">#</th>
                                             <th scope="col">Line Services</th>
                                             <th scope="col">Quantity</th>
-                                            <th scope="col">Price({{base_currency}})</th>
-                                            <th scope="col">Total({{base_currency}})</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Total</th>
                                         </tr>
                                     </thead>
                                     
@@ -78,8 +77,8 @@
                                             <th scope="row">1</th>
                                             <td>{{ contract.line_one}}(main)</td>
                                             <td>{{ contract.line_one_quantity}}</td>
-                                            <td>{{ contract.line_one_unit_price}}</td>
-                                            <td>{{ contract.line_one_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_one_unit_price}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_one_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_two %}
@@ -88,7 +87,7 @@
                                             <td>{{ contract.line_two}}</td>
                                             <td>{{ contract.line_two_quantity}}</td>
                                             <td>{{ contract.line_two_unit_price}}</td>
-                                            <td>{{ contract.line_two_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_three %}
@@ -97,7 +96,7 @@
                                             <td>{{ contract.line_three}}</td>
                                             <td>{{ contract.line_three_quantity}}</td>
                                             <td>{{ contract.line_three_quantity}}</td>
-                                            <td>{{ contract.line_two_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_four %}
@@ -106,7 +105,7 @@
                                             <td>{{ contract.line_four}}</td>
                                             <td>{{ contract.line_four_quantity}}</td>
                                             <td>{{ contract.line_four_unit_price}}</td>
-                                            <td>{{ contract.line_four_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_four_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_five %}
@@ -115,12 +114,12 @@
                                             <td>{{ contract.line_five}}</td>
                                             <td>{{ contract.line_five_quantity}}</td>
                                             <td>{{ contract.line_five_unit_price}}</td>
-                                            <td>{{ contract.line_five_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_five_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         <tr>
-                                            <td colspan="4"><strong>Grand Total ({{base_currency}})</strong></td>
-                                            <td><strong>{{ contract.grand_total}}</strong></td>
+                                            <td colspan="4"><strong>Grand Total</strong></td>
+                                            <td><strong>{{website.merchant.country.currency}} {{ contract.grand_total}}</strong></td>
                                         </tr>                                                
                                     </tbody>
                                 </table>
@@ -138,148 +137,18 @@
                                 {% endif %}
                             </div>
                             </div>
-                            {% if request.user == contract.team.created_by %}
-                            {% if contract.reaction == 'awaiting' %}
-                                <div class="container">
-                                    <div class="row justify-content-md-center">
-                                        <div class="text-center">
-                                            <button type="button" id="accept-contract" data-index="{{contract.id}}" class="btn btn-outline-success accept-contract"><i class="fa fa-check"> Accept</i></button>
-                                            <button type="button" id="reject-contract" data-index="{{contract.id}}" class="btn btn-outline-danger reject-contract"><i class="fa fa-ban"> Reject</i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}	
-                            {% endif %}	
-                            {% if request.user == contract.created_by %}
-                            {% if contract.reaction == 'accepted' %}
-                            
+
+                            <div id='accept-reject'>
+                            {% include 'contract/components/accept_or_reject.html' %}
                             </div>
-                                </div>
-                                    </div>
-                                    <div class="wt-updatall">
-                                        <i class="ti-announcement"></i>
-                                        <span>Redeem Contract with 1-Click Checkout (1CC)</span>
-                                        <button class="wt-btn" data-toggle="modal" data-target="#oneClickContractCheckout">1 Click Pay</button>
-                                    </div>
-                                    <div class="wt-updatall">
-                                        <i class="ti-announcement"></i>
-                                        <span>Redeem Contract and pay direct</span>
-                                        <a href="{% url 'contract:internal_contract_fee_structure' contract.id contract.slug %}" class="wt-btn">Direct Pay</a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% elif contract.reaction == 'awaiting' %}
-                                <div class="row justify-content-md-center">
-                                    <div class="col-xs-12">
-                                        <div class="alert alert-info" role="alert">
-                                        <span style="color: green; font-weight: bold;"> We will display the button if contract is accepted</span>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            {% endif %}
                         </div>  
                     </div>
                 </div>
             </div>
         </div>
                 
-        </main>
-        {% include 'client/partials/one_click_contract_modal.html' %}
+    </main>
 
 {% endblock %}
 
-{% block scripts %}
-
-<script>
-    $(document).on('click', '.accept-contract', function (e) {
-      e.preventDefault();
-      $.ajax({
-        type: 'POST',
-        url: '{% url "contract:accept_or_reject_contract" %}',
-        data: {
-            contractid: $(this).data('index'),
-            csrfmiddlewaretoken: "{{csrf_token}}",
-            action: 'accept'
-        },
-        beforeSend:function(){
-            $("#accept-contract").attr("disabled", true);
-            $("#reject-contract").attr("disabled", true);
-        },
-        success: function (json) {
-            if(json.status == 'accepted'){
-                alert('Thank you for acceptance. We shall inform the client to proceed with payment')
-                window.location.href = ""
-            }
-        },
-        error: function (xhr, errmsg, err) {
-            $("#accept-contract").attr("disabled", false);
-        }
-      });
-    })
-  </script>
-  <script>
-    $(document).on('click', '.reject-contract', function (e) {
-      e.preventDefault();
-      $.ajax({
-        type: 'POST',
-        url: '{% url "contract:accept_or_reject_contract" %}',
-        data: {
-            contractid: $(this).data('index'),
-            csrfmiddlewaretoken: "{{csrf_token}}",
-            action: 'reject'
-        },
-        beforeSend:function(){
-            $("#accept-contract").attr("disabled", true);
-            $("#reject-contract").attr("disabled", true);
-        },
-        success: function (json) {
-            if(json.status == 'rejected'){
-                alert('We are sorry you had a bad offer. Other doors will open soon')
-                window.location.href = ""
-            }
-        },
-        error: function (xhr, errmsg, err) {
-            $("#reject-contract").attr("disabled", false);
-        }
-      });
-    })
-  </script>
-
-<script>
-	$(document).on('click', '#oneClickCheckout', function (e) {
-	  e.preventDefault();
-
-	  let displayMessage = document.getElementById('oneClick-message');
-	  let displayError = document.getElementById("oneClick-error")
-	  $.ajax({
-		type: 'POST',
-		url: '{% url "client:one_click_contract_checkout" %}',
-		data: {
-			contractId:'{{contract.id}}',
-			csrfmiddlewaretoken: "{{csrf_token}}",
-			action: 'oneclick-pay'
-		},
-		beforeSend:function(){
-			$("#oneClickCheckout").attr("disabled", true);
-		},
-		success: function (json) {
-			if(json.errors != ''){
-				displayError.innerHTML = json.errors;
-				$("#oneClickCheckout").attr("disabled", false);
-				return false
-			}
-			else{
-				displayError.innerHTML = '';
-				displayMessage.innerHTML = json.message;
-				$("#oneClickCheckout").attr("disabled", true);
-			}
-		},
-		error: function (xhr, errmsg, err) {
-			$("#oneClickCheckout").attr("disabled", false);
-		}
-	  });
-	})
-  </script>
-
-  {% endblock scripts %}
 

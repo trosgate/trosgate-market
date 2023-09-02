@@ -68,9 +68,10 @@ class ContractAdmin(admin.ModelAdmin):
 class InternalContractAdmin(admin.ModelAdmin):
     list_display = ['team','reference', 'get_proposal_title', 'grand_total', 'reaction']
     list_display_links = ['team','reference']
+    list_editable = ['reaction']
     search_fields = ['team__title', 'proposal__title']
     readonly_fields = [
-        'team', 'created_by', 'reference', 'proposal', 'contract_duration','reaction','slug',
+        'team', 'created_by', 'reference', 'proposal', 'contract_duration','slug',
         'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',
         'line_two','line_two_quantity', 'line_two_unit_price', 'line_two_total_price',
         'line_three','line_three_quantity', 'line_three_unit_price', 'line_three_total_price',

@@ -383,7 +383,7 @@ def add_paystack_api(request):
 def add_flutterwave_api(request):
     merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
     flutterwaveform = FlutterwaveMerchantForm(request.POST or None, instance=request.merchant)
-    
+    print(request.POST)
     if flutterwaveform.is_valid():
         flutterwaveform.save()
 

@@ -85,7 +85,7 @@ class FlutterwaveMerchantForm(forms.ModelForm):
             # Stripe
             'flutterwave_public_key', 'flutterwave_secret_key', 
             'flutterwave_subscription_price_id', 'flutterwave_active',  
-        ]
+        ] #19805
         
     def __init__(self, *args, **kwargs):
         super(FlutterwaveMerchantForm, self).__init__(*args, **kwargs)

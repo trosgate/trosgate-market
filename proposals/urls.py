@@ -33,7 +33,7 @@ urlpatterns = [
     path('attribute/<int:proposal_id>/<slug:proposal_slug>', views.modify_proposal_step_four, name='modify_proposal_step_four'),
 
     # Proposal chats   
-    path('<slug:proposal_slug>/chat', views.proposal_chat_messages, name='proposal_chat_messages'),
+    path('c/<slug:proposal_slug>/chat', views.proposal_chat_messages, name='proposal_chat_messages'),
     path('products/<str:proposal_ref>/', views.create_product_view, name='create_product_view'),
     path('attachment/<int:proposal_id>/', views.add_product_attachment, name='add_product_attachment'),
     path('download/<slug:proposal_slug>/<int:product_id>/', views.product_download, name='product_download'),

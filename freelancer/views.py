@@ -28,7 +28,6 @@ from .utilities import (
     one_month, two_months, three_months, four_months, five_months, six_months,
     one_year, two_years, three_years, four_years, five_years    
 )
-from teams.controller import PackageController
 from django.core.paginator import Paginator
 from analytics.analytic import (
     ongoing_founder_projects, completed_founder_projects,
@@ -60,12 +59,12 @@ def freelancer_listing(request):
 
 def freelancer_search(request):
     freelancer_list = Freelancer.objects.filter(created=True)
-    base_currency = get_base_currency_symbol()
+    base_currency = request.merchant.merchant.country.currency
     #Country
     country = request.GET.getlist('country[]')
     # Skills
     skill = request.GET.getlist('skill[]')
-    # # Upgraded Teams
+    # Upgraded Teams
     upgraded_founder = request.GET.get('upgradedfreelancer[]', '')
     basic_founder = request.GET.get('basicfreelancer[]', '')
     # User Joined Date
@@ -140,29 +139,19 @@ def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id)
     proposal_count = Proposal.objects.filter(team=team, status=Proposal.ACTIVE).count() > 0
-    monthly_contracts_limiter = PackageController(team).monthly_offer_contracts()
+    monthly_contract_slot = team.monthly_contract_slot
     ongoing_projects = ongoing_founder_projects(team)
     completed_projects = completed_founder_projects(team)
     cancelled_projects = cancelled_founder_projects(team)
     verified_sale = total_verified_sale(team)
-    review_rate = user_review_rate(team) 
+    review_rate = user_review_rate(team)
     projects_in_queue = total_projects_in_queue(team) 
-
-    max_team_members = False
-    my_team = None
-    if request.user.user_type == Customer.FREELANCER:
-        try:
-            my_team = Team.objects.get(pk=request.user.freelancer.active_team_id)
-        except Exception as e:
-            return None
-        max_team_members = PackageController(my_team).max_member_per_team()
 
     context = {
         'freelancer': freelancer,
         'team': team,
+        'monthly_contract_slot': monthly_contract_slot,
         'proposal_count': proposal_count,
-        'monthly_contracts_limiter': monthly_contracts_limiter,
-        'max_team_members': max_team_members,
         'ongoing_projects': ongoing_projects,
         'completed_projects': completed_projects,
         'cancelled_projects': cancelled_projects,

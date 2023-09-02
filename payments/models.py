@@ -15,16 +15,14 @@ from django.contrib.sites.models import Site
 
 
 
-class MerchantAPIsManager(models.Manager):
-    def get_queryset(self, merchant=None):
-        site = Site.objects.get_current()
-        curr_merchant = Merchant.objects.filter(site=site).exists()
-        # print(curr_merchant)
-        # print(self.merchant_id)
-        if not curr_merchant:
-            return super().get_queryset().filter(merchant=merchant)
-        else:
-            return super().get_queryset().filter(merchant__site=site.id)
+# class MerchantAPIsManager(models.Manager):
+#     def get_queryset(self, merchant=None):
+#         site = Site.objects.get_current()
+#         curr_merchant = Merchant.objects.filter(site=site).exists()
+#         if not curr_merchant:
+#             return super().get_queryset().filter(merchant=merchant)
+#         else:
+#             return super().get_queryset().filter(merchant__site=site.id)
  
 
 class PaymentAPI(models.Model): # This model stores apis for parent site

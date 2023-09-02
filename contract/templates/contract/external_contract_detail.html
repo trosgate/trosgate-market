@@ -70,8 +70,8 @@
                                             <th scope="col">#</th>
                                             <th scope="col">Line Services</th>
                                             <th scope="col">Quantity</th>
-                                            <th scope="col">Price({{base_currency}})</th>
-                                            <th scope="col">Total({{base_currency}})</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Total</th>
                                         </tr>
                                     </thead>
                                     
@@ -82,7 +82,7 @@
                                             <td>{{ contract.line_one}}(main)</td>
                                             <td>{{ contract.line_one_quantity}}</td>
                                             <td>{{ contract.line_one_unit_price}}</td>
-                                            <td>{{ contract.line_one_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_one_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_two %}
@@ -91,7 +91,7 @@
                                             <td>{{ contract.line_two}}</td>
                                             <td>{{ contract.line_two_quantity}}</td>
                                             <td>{{ contract.line_two_unit_price}}</td>
-                                            <td>{{ contract.line_two_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_three %}
@@ -100,7 +100,7 @@
                                             <td>{{ contract.line_three}}</td>
                                             <td>{{ contract.line_three_quantity}}</td>
                                             <td>{{ contract.line_three_quantity}}</td>
-                                            <td>{{ contract.line_two_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_four %}
@@ -109,7 +109,7 @@
                                             <td>{{ contract.line_four}}</td>
                                             <td>{{ contract.line_four_quantity}}</td>
                                             <td>{{ contract.line_four_unit_price}}</td>
-                                            <td>{{ contract.line_four_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_four_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         {% if contract.line_five %}
@@ -118,12 +118,12 @@
                                             <td>{{ contract.line_five}}</td>
                                             <td>{{ contract.line_five_quantity}}</td>
                                             <td>{{ contract.line_five_unit_price}}</td>
-                                            <td>{{ contract.line_five_total_price }}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_five_total_price }}</td>
                                         </tr>
                                         {% endif %}
                                         <tr>
-                                            <td colspan="4"><strong>Grand Total ({{base_currency}})</strong></td>
-                                            <td><strong>{{ contract.grand_total}}</strong></td>
+                                            <td colspan="4"><strong>Grand Total</strong></td>
+                                            <td><strong>{{website.merchant.country.currency}} {{ contract.grand_total}}</strong></td>
                                         </tr>                                                
                                     </tbody>
                                 </table>

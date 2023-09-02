@@ -27,8 +27,7 @@ class RazorpayClientConfig:
 
     def default_currency(self):
         currency = self.site.merchant.country.currency
-        print('currency :cc::', currency)
-        return currency if currency else 'USD'
+        return currency if currency else 'INR'
 
     def razorpay_key_id(self):
         gateway = self.get_payment_gateway()

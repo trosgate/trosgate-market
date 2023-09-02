@@ -138,7 +138,7 @@ class InternalContract(models.Model):
                 raise ContractException('Contract must be in awaiting state to accept or reject')
             
             contract.reaction = reaction
-            contract.save(update_fields=['reaction'])
+            contract.save()
 
             if contract.reaction == 'accepted':
                 db_transaction.on_commit(lambda: send_contract_accepted_email(contract))
