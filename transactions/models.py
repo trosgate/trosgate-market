@@ -20,6 +20,13 @@ from datetime import timedelta
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 import uuid
+from general_settings.fees_and_charges import (
+    get_proposal_fee_calculator,
+    get_application_fee_calculator
+)
+from general_settings.discount import get_discount_calculator, get_earning_calculator
+from account.models import Merchant
+
 
 
 class PurchaseMaster(MerchantMaster):
@@ -91,6 +98,77 @@ class Purchase(PurchaseMaster):
             attempts += 1
 
         raise ValueError("Failed to create transaction")
+
+
+    @classmethod
+    def create_purchase_and_sales(cls, client, gateway_type, total_gateway_fee, grand_total, category, hiringbox, grand_total_before_expense, discount_value, stripe_order_key='', paypal_order_key='', razorpay_order_key=''):
+        with db_transaction.atomic():
+            purchase = cls.objects.create(
+                client=client,
+                payment_method=gateway_type,
+                client_fee=total_gateway_fee,
+                category=category,
+                salary_paid=grand_total,
+                status=Purchase.FAILED,
+                stripe_order_key=stripe_order_key,
+                paypal_order_key=paypal_order_key,
+                razorpay_order_key=razorpay_order_key
+            )
+
+            if purchase.category == Purchase.PROPOSAL:
+                for proposal in hiringbox:
+                    ProposalSale.objects.create(
+                        package_name = proposal['package_name'],
+                        team=proposal["proposal"].team, 
+                        purchase=purchase,
+                        proposal=proposal["proposal"], 
+                        sales_price=int(proposal["salary"]), 
+                        staff_hired=proposal["member_qty"],
+                        earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),                   
+                        total_earning_fee_charged=round(get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),                   
+                        discount_offered=get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value),
+                        total_discount_offered=((get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+                        disc_sales_price=int(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)),
+                        total_sales_price=int((proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)) * proposal["member_qty"]),
+                        earning=int(get_earning_calculator(
+                            (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                            get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))), 
+                        total_earning=int(get_earning_calculator(
+                            (proposal["salary"] - (get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value))),
+                            get_proposal_fee_calculator(proposal["salary"] - get_discount_calculator(proposal["salary"], grand_total_before_expense, discount_value)))* proposal["member_qty"]) 
+                    )
+                return purchase
+            
+            if purchase.category == Purchase.PROJECT:
+                for applicant in hiringbox:
+                    ApplicationSale.objects.create(
+                        team=applicant["application"].team,
+                        purchase=purchase,
+                        project=applicant["application"].project,
+                        sales_price=int(applicant["budget"]),
+                        staff_hired=int(1),
+                        earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        total_earning_fee_charged=int(get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                        total_discount_offered=int(get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                        disc_sales_price=int(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)),
+                        total_sales_price=int((applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                        earning=int(get_earning_calculator(
+                            (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                            get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value)))), 
+                        total_earning=int(get_earning_calculator(
+                            (applicant["budget"] - (get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))),
+                            get_application_fee_calculator(applicant["budget"] - get_discount_calculator(applicant["budget"], grand_total_before_expense, discount_value))))             
+                    )
+                return purchase
+                
+                # if purchase.category == Purchase.CONTRACT:
+
+                #     return purchase
+                
+                # if purchase.category == Purchase.EX_CONTRACT:
+
+                #     return purchase
 
 
     @classmethod
@@ -727,8 +805,27 @@ class ApplicationSale(MerchantTransaction):
 
         if self.status != self.PENDING and self.end_time is None:
             self.end_time = (timezone.now() + timedelta(days = self.duration))
-            
+
+        if not self.reference:
+            self.reference = self.generate_unique_reference()            
         super(ApplicationSale, self).save(*args, **kwargs)
+
+
+    def generate_unique_reference(self):
+        max_attempts = 2000
+        attempts = 0
+
+        while attempts < max_attempts:
+            # Generate a random UUID and convert it to a human-readable string
+            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
+
+            # Check if the generated reference is unique
+            if not ApplicationSale.objects.filter(reference=reference).exists():
+                return reference
+
+            attempts += 1
+
+        raise ValueError("Failed to create transaction")
 
 
     def status_value(self):
