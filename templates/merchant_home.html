@@ -166,60 +166,48 @@
 				{% endif %} 
 			</section>
 
-			{% comment %} <div id="wt-chatpopup" class="wt-chatpopup">
-            
-				<div id="guest-user" hx-on="htmx:afterSettle: document.getElementById('wt-getsupport').click();">
-					{% include 'notification/partials/helpdesk.html' %}
-				</div>
-					
-				<div id="wt-getsupport" class="wt-themeimgborder">
-					<img src="{% static 'images/messages/img-12.jpg' %}" alt="image description">
-				</div>
-			</div> {% endcomment %}
-
 	</main>	
 
 	{% include 'dashboard/main_footer.html' %}
-	{% block scripts %}
-	
-	{% comment %} <script src="{% static 'js/chatroom.js' %}"></script> {% endcomment %}
-	
-	<script src="{% static 'js/typed-2.0.js' %}"></script>
-	<script>
-		let typed = new Typed(".autoTyper", {
-			strings: [{% for typer in pypist %}"{{typer}}",{% endfor %}],
-			typeSpeed: 100,
-			backSpeed: 100,
-			loop: true
-		})
-		
-	</script>
 
-	<script>
-        //Script to add proposal quantity in session             
-        $(document).on('change', '#id_search_type', function (e) {
-        e.preventDefault();
-		mysearchval = $('#id_search_type option:selected').val()
-		//console.log(mysearchval)
-        $.ajax({
-            type: 'POST',
-            url: '{% url "account:searchtype" %}',
-            data: {
-                searchVal: $('#id_search_type option:selected').val(),
-                csrfmiddlewaretoken: "{{csrf_token}}",
-                action: 'searching-type'
-            },
-            success: function (json) {
-                if (mysearchval === 'freelancer'){
-					window.location.href = "{% url 'freelancer:freelancer_listing' %}"
-				}
-				else if (mysearchval === 'proposal'){
-					window.location.href = "{% url 'proposals:proposal_list' %}"
-				}
-            },
-            error: function (xhr, errmsg, err) {}
-        });
-        })
-    </script>
-{% endblock scripts %}
 {% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static 'js/typed-2.0.js' %}"></script>
+<script>
+	let typed = new Typed(".autoTyper", {
+		strings: [{% for typer in pypist %}"{{typer}}",{% endfor %}],
+		typeSpeed: 100,
+		backSpeed: 100,
+		loop: true
+	})
+</script>
+
+<script>
+	//Script to add proposal quantity in session             
+	$(document).on('change', '#id_search_type', function (e) {
+	e.preventDefault();
+	mysearchval = $('#id_search_type option:selected').val()
+	//console.log(mysearchval)
+	$.ajax({
+		type: 'POST',
+		url: '{% url "account:searchtype" %}',
+		data: {
+			searchVal: $('#id_search_type option:selected').val(),
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'searching-type'
+		},
+		success: function (json) {
+			if (mysearchval === 'freelancer'){
+				window.location.href = "{% url 'freelancer:freelancer_listing' %}"
+			}
+			else if (mysearchval === 'proposal'){
+				window.location.href = "{% url 'proposals:proposal_list' %}"
+			}
+		},
+		error: function (xhr, errmsg, err) {}
+	});
+	})
+</script>
+{% endblock scripts %}

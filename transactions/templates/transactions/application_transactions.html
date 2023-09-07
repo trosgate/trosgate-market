@@ -2,159 +2,86 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
-{% include 'dashboard/main_sidebar.html' %}
 
-<!--Main Start-->
-	<main id="wt-main" class="wt-main wt-haslayout">
-
-		<!--Company listing starts-->
-		<div class="wt-proposalholder" style="padding: 5px;">
-			<div class="container">
-				<div class="row justify-content-md-center">
-					<div class="col-12">
-						<div class="wt-sectionhead wt-textcenter">
-							<div class="alert alert-info" role="alert">
-								<h4 style="color: green; font-weight: bold; margin:0;">Application Transactions</h4>
-							</div>
+	<!--Main Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+						<div class="wt-title"><h2>Transactions</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Proposal</li>
+							</ol>
 						</div>
 					</div>
 				</div>
 			</div>
-			{% if request.user.freelancer %}
-			<div class="table-responsive">
-				<table class="table table-striped table-sm">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Client</th>
-							<th>Date</th>
-							<th>Method</th>
-							<th>Amount</th>
-							{% if active_team.created_by == request.user %}
-							<th>Manager</th>
-							{% endif %}
-						</tr>
-					</thead>
-					
-					<tbody>
-						{% for application in applications %}
-						<tr>
-							<td>{{forloop.counter}}</td>
-							<td>{{application.team|capfirst}}</td>
-							<td>{{application.created_at}}</td>
-							<td>{{application.purchase.payment_method|capfirst}}</td>
-							<td>{{application.totalsales}} = ({{application.disc_sales_price}} px @ {{application.staff_hired}} staff)</td>      
-							{% comment %} {% url 'resolution:application_resolution' application.id application.project.slug %} {% endcomment %}
-							<td><a href="">
-								<button type="button" class="btn btn-outline-{% if application.status == 'pending' %}danger {% else %}info {% endif %} btn-sm"><i class="fa fa-window-restore"></i> {{application.get_status_display}}</button>
-								</a>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				{% if not applications %}
-				<div class="alert alert-info text-center" role="alert">
-					<span style="color: blue; font-weight: bold;"> Hmmm! No proposal sold Yet. Keep hope alive</span>
-				</div>
-				{% endif %}
-			</div>
-			{% endif %}
-
-			{% if request.user.clients %}
-			<div class="table-responsive">
-				<table class="table table-striped table-sm">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Team</th>
-							<th>Date</th>
-							<th>Method</th>
-							<th>Amount</th>
-							<th>Status</th>
-						</tr>
-					</thead>
-					
-					<tbody>
-						{% for application in applications %}
-						<tr>
-							<td>{{forloop.counter}}</td>
-							<td>{{application.team|capfirst}}</td>
-							<td>{{application.created_at}}</td>
-							<td>{{application.purchase.payment_method|capfirst}}</td>
-							<td>{{application.totalsales}} = ({{application.disc_sales_price}} px @ {{application.staff_hired}} staff)</td>      
-							{% comment %} {% url 'resolution:application_resolution' application.id application.project.slug %} {% endcomment %}
-							<td><a href="">
-								<button type="button" class="btn btn-outline-{% if application.status == 'pending' %}danger {% else %}info {% endif %} btn-sm"><i class="fa fa-window-restore"></i> {{application.get_status_display}}</button>
-								</a>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-					{% if not applications %}
-					<div class="alert alert-info text-center" role="alert">
-						<span style="color: blue; font-weight: bold;"> Hmmm! No applications made Yet. Keep hope alive</span>
-					</div>
-					{% endif %}
-				</div>  
-			{% endif %}
-			{% if request.user.is_merchant %}
-			<div class="table-responsive">
-				<table class="table">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Team</th>
-							<th>Purchase Date</th>
-							<th>Method</th>
-							<th>Amount</th>
-							<th>Status</th>
-						</tr>
-					</thead>
-					
-					<tbody>
-						{% for application in applications %}
-						<tr>
-							<td>{{forloop.counter}}</td>
-							{% comment %} {% url 'resolution:application_resolution' application.id application.project.slug %} {% endcomment %}
-							<td><a href="">{{application.team|capfirst}}</a></td>
-							<td>{{application.created_at}}</td>
-							<td>{{application.purchase.payment_method|capfirst}} | <span class='text-primary'>{{proposal.purchase.get_status_display}}</span></td>
-							<td>{{application.totalsales}}</td>
-							<td>
-								<button class="btn btn-outline-{% if application.status == 'pending' %}danger{% else %}primary{% endif %} btn-sm" disabled>
-									{% if application.status == 'ongoing' %}
-									<i class="fas fa-spinner fa-spin"></i>
-									{% elif application.status == 'disputed' %}
-									<i class="fa fa-warning"></i>
-									{% elif application.status == 'cancelled' %}
-									<i class="fa fa-warning"></i>
-									{% endif %}
-									{{application.get_status_display}}
-								</button>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-					{% if not applications %}
-					<div class="alert alert-info text-center" role="alert">
-						<span style="color: blue; font-weight: bold;"> Hmmm! No applications made Yet. Keep hope alive</span>
-					</div>
-					{% endif %}
-				</div>  
-			{% endif %}
 		</div>
-		
-		<div class="wt-proposalholder mt-6">
+	</div>
+
+	<div class="background"  style="background-color:#fff;">
+		<section class="container" style="background-color:#fff;">
+			<div class="row justify-content-md-center">				
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+					<div class="table-responsive">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Transaction ID</th>
+									<th>Date</th>
+									<th>Method</th>
+									<th>Amount</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								{% for application in applications %}
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<td>
+										{% comment %} {% url 'resolution:proposal_resolution' proposal.id proposal.proposal.slug %} {% endcomment %}
+										<a href="">
+											{{application.reference}}
+										</a>
+									</td>
+									<td>{{application.created_at}}</td>
+									<td>{{application.purchase.payment_method|capfirst}}</td>
+									<td>{{application.totalsales}} = ({{application.disc_sales_price}} px @ {{proposal.staff_hired}} staff)</td> 
+									<td>
+										<button class="btn btn-{% if application.status == 'pending' %}danger{% else %}primary{% endif %} btn-sm" disabled>
+											{% if application.status == 'ongoing' %}
+											<i class="fas fa-spinner fa-spin"></i>
+											{% elif application.status == 'disputed' %}
+											<i class="fa fa-warning"></i>
+											{% elif application.status == 'cancelled' %}
+											<i class="fa fa-warning"></i>
+											{% endif %}
+											{{application.get_status_display}}
+										</button>
+									</td>
+									
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+						{% if not applications %}
+						<div class="alert alert-info text-center" role="alert">
+							<span style="color: blue; font-weight: bold;"> Hmmm! No application sold Yet...</span>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
 			<div class="row justify-content-md-center">
 				<div class="wt-sectionhead wt-textcenter">
-					<span>Copyright @ {{website.site_name}}</span>
+					<span>Copyright @ {{website.site.name}}</span>
 				</div>
 			</div>
-		</div>
-	</main>
-
+		</section>						
+	</div>
 	{% endblock %}
 

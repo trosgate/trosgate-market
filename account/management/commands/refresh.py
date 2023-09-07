@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from account.models import Country, Package, Customer
-from transactions.models import ProposalSale
+from transactions.models import Purchase, ProposalSale
 
 
 class Command(BaseCommand):
@@ -12,6 +12,7 @@ class Command(BaseCommand):
         # call_command("migrate")
 
         # call_command("loaddata", "fixures/transactions_app.json")
-        for proposal in ProposalSale.objects.all():
-            proposal.save()
+        Purchase.objects.all().delete()
+        # for proposal in ProposalSale.objects.all():
+        #     proposal.save()
         print('This command is done')

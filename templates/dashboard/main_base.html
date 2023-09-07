@@ -3,6 +3,7 @@
 <html lang="en">
     {% include 'dashboard/main_header.html' %}
     <body class="wt-login" hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
+        
     {% include 'dashboard/main_navbar.html' %}
 
     {% if request.user.is_authenticated %}

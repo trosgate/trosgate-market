@@ -22,7 +22,7 @@ from payments.stripe import StripeClientConfig
 from payments.razorpay import RazorpayClientConfig
 from payments.flutterwave import FlutterwaveClientConfig
 from payments.paystack import PaystackClientConfig
-from .utilities import get_base_currency, calculate_payment_data, PurchaseAndSaleCreator
+from .utilities import get_base_currency, calculate_payment_data
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from .models import (
@@ -287,8 +287,7 @@ def paystack_payment_intent(request):
     purchase = None
     base_currency = get_base_currency(request)
     try:
-        creator = PurchaseAndSaleCreator()
-        purchase = creator.create_purchase_and_sales(
+        purchase = Purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROPOSAL,
@@ -343,8 +342,7 @@ def flutter_payment_intent(request):
 
     base_currency = get_base_currency(request)
     try:
-        creator = PurchaseAndSaleCreator()
-        purchase = creator.create_purchase_and_sales(
+        purchase = Purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROPOSAL,
@@ -408,8 +406,7 @@ def stripe_payment_intent(request):
     payment_id, client_secret = stripe_client.create_payment_intent(grand_total,card_token) 
     purchase = None
     try:
-        creator = PurchaseAndSaleCreator()
-        purchase = creator.create_purchase_and_sales(
+        purchase = Purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROPOSAL,
@@ -452,8 +449,7 @@ def paypal_payment_order(request):
     paypal_order_key = PayPalClientConfig().create_order(grand_total)
     if paypal_order_key:
         try:
-            creator = PurchaseAndSaleCreator()
-            purchase = creator.create_purchase_and_sales(
+            purchase = Purchase.create_purchase_and_sales(
                 client=request.user,
                 **payment_data,
                 category=Purchase.PROPOSAL,
@@ -506,8 +502,7 @@ def razorpay_application_intent(request):
     razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
     if razorpay_order_key:
         try:
-            creator = PurchaseAndSaleCreator()
-            purchase = creator.create_purchase_and_sales(
+            purchase = Purchase.create_purchase_and_sales(
                 client=request.user,
                 **payment_data,
                 category=Purchase.PROPOSAL,
@@ -565,7 +560,6 @@ def razorpay_callback(request):
                 
 @login_required
 def proposal_transaction(request):
-    proposals = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
         proposals = ProposalSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
@@ -576,6 +570,8 @@ def proposal_transaction(request):
     elif request.user.user_type == Customer.MERCHANT:
         proposals = ProposalSale.objects.filter(merchant=request.merchant)
 
+    else:
+        proposals = None
     context = {
         'proposals': proposals,
     }

@@ -32,23 +32,12 @@ from payments.stripe import StripeClientConfig
 from payments.razorpay import RazorpayClientConfig
 from payments.flutterwave import FlutterwaveClientConfig
 from payments.paystack import PaystackClientConfig
-from transactions.utilities import (
-    get_base_currency, 
-    calculate_payment_data, 
-    PurchaseAndSaleCreator
-)
+from transactions.utilities import get_base_currency, calculate_payment_data
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_control
-from django.contrib.sites.shortcuts import get_current_site
-from general_settings.discount import get_discount_calculator, get_earning_calculator
-from general_settings.fees_and_charges import get_application_fee_calculator
-from django.db import transaction as db_transaction
-from freelancer.models import FreelancerAccount
 from notification.mailer import application_notification
-from general_settings.utilities import get_protocol_only
-from analytics.analytic import user_review_rate
-from transactions.utilities import get_base_currency, calculate_payment_data #, PurchaseAndSaleCreator
+
 
 
 @login_required
@@ -307,8 +296,7 @@ def paystack_payment_intent(request):
     purchase = None
     base_currency = get_base_currency(request)
     try:
-        purchase = PurchaseAndSaleCreator()
-        purchase.create_purchase_and_sales(
+        purchase = Purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROJECT,
@@ -361,8 +349,7 @@ def flutter_payment_intent(request):
 
     base_currency = get_base_currency(request)
     try:
-        purchase = PurchaseAndSaleCreator()
-        purchase.create_purchase_and_sales(
+        purchase = Purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROJECT,
@@ -425,8 +412,7 @@ def stripe_payment_intent(request):
 
     purchase = None
     try:
-        purchase = PurchaseAndSaleCreator()
-        purchase.create_purchase_and_sales(
+        purchase = Purchase.create_purchase_and_sales(
             client=request.user,
             **payment_data,
             category=Purchase.PROJECT,
@@ -435,7 +421,7 @@ def stripe_payment_intent(request):
         )
         response_data = {
             'client_secret': client_secret,
-            'payment_intent': payment_id,
+            'payment_intent': purchase.stripe_order_key,
         }
         return JsonResponse(response_data)
     except Exception as e:
@@ -464,8 +450,7 @@ def paypal_payment_order(request):
     paypal_order_key = PayPalClientConfig().create_order(grand_total)
     if paypal_order_key:
         try:
-            purchase = PurchaseAndSaleCreator()
-            purchase.create_purchase_and_sales(
+            purchase = Purchase.create_purchase_and_sales(
                 client=request.user,
                 **payment_data,
                 category=Purchase.PROJECT,
@@ -473,7 +458,7 @@ def paypal_payment_order(request):
                 hiringbox=applicant_box,
             )
             response_data = {
-                'paypal_order_key': paypal_order_key,
+                'paypal_order_key': purchase.paypal_order_key,
             }
             return JsonResponse(response_data)
         except Exception as e:
@@ -515,8 +500,7 @@ def razorpay_application_intent(request):
     razorpay_order_key = RazorpayClientConfig().create_order(grand_total)
     if razorpay_order_key:
         try:
-            creator = PurchaseAndSaleCreator()
-            purchase = creator.create_purchase_and_sales(
+            purchase = Purchase.create_purchase_and_sales(
                 client=request.user,
                 **payment_data,
                 category=Purchase.PROJECT,
@@ -525,10 +509,9 @@ def razorpay_application_intent(request):
             )
 
             response_data = {
-                'razorpay_order_key': razorpay_order_key,
+                'razorpay_order_key': purchase.razorpay_order_key,
                 'currency': base_currency,
                 'amount': purchase.salary_paid,
-                'razorpay_order_key': purchase.razorpay_order_key,
             }
             print('purchase ID ::', purchase.id)
             return JsonResponse(response_data)

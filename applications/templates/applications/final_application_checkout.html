@@ -80,15 +80,13 @@
     {{ request.user.email|json_script:"checkout_user_email"}}
     {{ website.site_logo_tag|json_script:"checkout_logo"}}
     {{ website.site_name|json_script:"checkout_site"}}
-    {% endblock content %}
 
-    {% block scripts %}
-        <script>
-            const CSRF_TOKEN = '{{ csrf_token }}';
-            const USER = document.getElementById('checkout_user');
-            const USER_EMAIL = document.getElementById('checkout_user_email');
-            const SITE_NAME = document.getElementById('checkout_site');
-        </script>
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token }}';
+        const USER = document.getElementById('checkout_user');
+        const USER_EMAIL = document.getElementById('checkout_user_email');
+        const SITE_NAME = document.getElementById('checkout_site');
+    </script>
 
     {% if gateway_type == "paypal" %}
     <script 
@@ -130,5 +128,4 @@
     <script src="{% static 'js/payments/application/razorpay-checkout.js' %}"></script>
     {% endif %}
     
-    {% endblock scripts %}
-  
+    {% endblock content %}  

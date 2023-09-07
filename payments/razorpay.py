@@ -45,12 +45,13 @@ class RazorpayClientConfig:
 
     def create_order(self, amount):
         try:
-            # notes = {'Total Price': 'The total amount may change with discount'}
             data = {
                 'amount': int(amount * self.currency_notation),
                 'currency': self.currency,
-                # notes:notes,
-                # receipt: reference
+                'notes': {
+                    'Freelancer': f'Hire of freelancer on {self.site}',
+                    'Total Price': 'The total amount may change with discount'
+                },
             }
             order = self.razorpay.order.create(data=data)
             return order['id']

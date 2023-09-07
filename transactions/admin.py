@@ -151,10 +151,10 @@ class ApplicationSaleAdmin(admin.ModelAdmin):
         'total_earning', 'earning_fee_charged','discount_offered',
         'staff_hired','earning','created_at','updated_at','status_value',
         'is_refunded','total_earning_fee_charged', 'start_time', 'end_time', 'status',
-        'revision','duration','merchant',
+        'revision','duration','merchant','reference'
     ]
     fieldsets = (
-        ('Classification', {'fields': ('merchant','team', 'purchase','project',)}),
+        ('Classification', {'fields': ('merchant','team', 'purchase','project','reference')}),
         ('Revenue', {'fields': (
             'total_sales_price', 'earning_fee_charged','total_earning_fee_charged', 
             'discount_offered','is_refunded',
