@@ -1,27 +1,26 @@
 [
-    {
-        "model": "account.customer",
-        "pk": 1,
-        "fields": {
-            "password": "pbkdf2_sha256$390000$WyVnuh2vLzYUicuKDPZKij$lNZr6BxW8+RqrqTOdBcDzTLP9wYawY1DFq5U5f5jiDI=",
-            "email": "isaacagbedam@gmail.com",
-            "short_name": "Kateyson",
-            "first_name": "Isaac",
-            "last_name": "Admin",
-            "phone": null,
-            "country": 6,
-            "is_active": true,
-            "is_staff": true,
-            "is_superuser": true,
-            "is_assistant": false,
-            "user_type": "admin",
-            "site": 1,
-            "active_merchant_id": 0,
-            "date_joined": "2023-05-14T18:19:21.993Z",
-            "last_login": "2023-08-11T18:09:39.052Z",
-            "groups": [],
-            "user_permissions": []
-        }
+{
+    "model": "account.customer",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$WyVnuh2vLzYUicuKDPZKij$lNZr6BxW8+RqrqTOdBcDzTLP9wYawY1DFq5U5f5jiDI=",
+        "email": "isaacagbedam@gmail.com",
+        "short_name": "Kateyson",
+        "first_name": "Isaac",
+        "last_name": "Admin",
+        "phone": null,
+        "country": 6,
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true,
+        "is_assistant": false,
+        "user_type": "admin",
+        "site": 1,
+        "active_merchant_id": 0,
+        "date_joined": "2023-05-14T18:19:21.993Z",
+        "last_login": "2023-09-14T19:00:46.934Z",
+        "groups": [],
+        "user_permissions": []
     }
-    
+}
 ]

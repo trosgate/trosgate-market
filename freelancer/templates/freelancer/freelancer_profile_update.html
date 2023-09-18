@@ -79,10 +79,10 @@
 														<div class="wt-uploadingbox">
 															<div class="wt-designimg">
 																<input id="demoz" type="radio" name="profile_photo" value="profile_photo" checked="">
-																{% if request.user.freelancer.profile_photo %}
-																<label for="demoz"><img src="{{request.user.freelancer.profile_photo.url}}" alt="img description"><i class="fa fa-check"></i></label>
-																{% else %}
-																<label for="demoz"><img src="{% static 'images/user-login.png' %}" alt="img description"><i class="fa fa-check"></i></label>
+																{% if freelancer.profile_photo %}
+																<label for="demoz">
+																	<img src="{{freelancer.get_profile_photo}}" alt="img description"><i class="fa fa-check"></i>
+																</label>
 																{% endif %}
 															</div>
 															<div class="wt-uploadingbar wt-uploading">

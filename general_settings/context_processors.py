@@ -16,7 +16,7 @@ def website(request):
     website_obj = None
 
     if hasattr(current_site, 'websitesetting'):
-        website_obj = request.parent_site.websitesetting
+        website_obj = request.parent_site #.websitesetting
         
     elif hasattr(current_site, 'merchant'):
         website_obj = request.merchant

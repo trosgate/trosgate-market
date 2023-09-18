@@ -1,0 +1,152 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+{% include "account/partials/feebanner.html" %}
+        
+    <div class="wt-proposalholder">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="wt-tabscontenttitle proposal-total-btn">
+                        <h5>Bucket preview</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" style="border:none;">
+                            <thead class="addon-header">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team</th>
+                                    <th>Contract Offered</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                                
+                            <tbody data-index="{{contract.id}}" class="proposal-item">
+                                <tr>
+                                    <td>1</td> 
+                                    <td>{{contract.team|capfirst}}</td>
+                                    <td>{% firstof contract.proposal.title contract.line_one %}</td>
+                                    <td><button class="btn btn-primary btn-sm" type="button" disabled> {{base_currency}} {{contract.grand_total}}</a></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="container">
+            <div class="wt-tabscontenttitle">
+                <h5>Product pricing</h5>
+            </div>
+            <div id="payment-method" class="row">
+                {% include 'contract/components/pricing_option_with_fees.html' %}
+            </div>
+            {% comment %} <br>
+            <br>
+            <br>
+            <br>
+            <br> {% endcomment %}
+            <div class="row justify-content-md-center">
+                <div class="wt-sectionhead wt-textcenter">
+                    <span>Copyright @ {{website.site.name|capfirst}}</span>
+                </div>
+            </div>
+            <br>
+            <br>
+        </div> 
+        </div> 
+        
+    </div> 
+    </div>
+
+	{% include 'client/partials/one_click_proposal_modal.html' %}
+
+    {% endblock content %}
+    {% block scripts %}
+    
+    <script>
+        //Script to delete proposal in session
+        $(document).on('click', '.remove-box', function (e) {
+            e.preventDefault();
+            var applicId = $(this).data('index');
+            $.ajax({
+            type: 'POST',
+            url: '{% url "applications:remove_application" %}',
+            data: {
+                applicationid: $(this).data('index'),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post'
+            },
+            success: function (json) {
+                $('.proposal-item[data-index="' + applicId + '"]').remove();
+                document.getElementById("totalFreelancer").innerHTML = json.freelancers;
+                document.getElementById("totalDiscount").innerHTML = `Up to ${json.discount}%`;
+                document.getElementById("grandTotal").innerHTML = `${json.base_currency} ${json.grandtotal}`
+                document.getElementById("grandTotal2").innerHTML = `${json.base_currency} ${json.grandtotal}`
+            },
+            error: function (xhr, errmsg, err) {}
+            });
+        })
+    </script>
+    
+    <script>
+        //Script to add proposal quantity in session             
+        $(document).on('click', '#convert-currency', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url "general_settings:converter" %}',
+            data: {
+                currencyid: $('#id_currency option:selected').val(),
+                targetamount: '{{hiring_box.get_total_price_after_discount_and_fee}}',
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'currency'
+            },
+            success: function (json) {
+                document.getElementById('feedback-converter').innerHTML = json.message
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+        })
+    </script>
+    <script>
+        $(document).on('click', '#oneClickCheckout', function (e) {
+          e.preventDefault();
+    
+          let displayMessage = document.getElementById('oneClick-message');
+          let displayError = document.getElementById("oneClick-error")
+          $.ajax({
+            type: 'POST',
+            url: '{% url "client:one_click_proposal_checkout" %}',
+            data: {
+                proposalId:'{{proposal.id}}',
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'oneclick-pay'
+            },
+            beforeSend:function(){
+                $("#oneClickCheckout").attr("disabled", true);
+            },
+            success: function (json) {
+                if(json.errors != ''){
+                    displayError.innerHTML = json.errors;
+                    $("#oneClickCheckout").attr("disabled", false);
+                    return false
+                }
+                else{
+                    displayMessage.innerHTML = '';
+                    displayMessage.innerHTML = json.message;
+                    window.location.href = "{% url 'transactions:proposal_transaction' %}"
+                    $("#oneClickCheckout").attr("disabled", false);
+                }
+            },
+            error: function (xhr, errmsg, err) {
+                $("#oneClickCheckout").attr("disabled", false);
+            }
+          });
+        })
+      </script>
+
+{% endblock scripts %}
+

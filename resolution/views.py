@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from contract.models import InternalContract
 from projects.models import Project
 from applications.models import Application
 from proposals.models import Proposal

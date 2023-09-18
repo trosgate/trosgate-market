@@ -16,7 +16,7 @@ from teams.models import Team
 from projects.models import Project
 from applications.models import Application
 from transactions.models import  Purchase
-from contract.models import InternalContract, Contract
+from contract.models import Contract
 from django.utils import timezone
 
 def ongoing_founder_projects(team):
@@ -124,15 +124,15 @@ def total_proposal_review_rate():
     return 0
 
 def total_internal_contracts():
-    return InternalContract.objects.all().count()
+    # return InternalContract.objects.all().count()
+    return Contract.objects.all().count()
 
 def total_external_contracts():
     return Contract.objects.all().count()
 
 def total_contracts_hired():
-    int_contracts = InternalContract.objects.filter(reaction='paid').count()
     ext_contracts = Contract.objects.filter(reaction='paid').count()
-    return int_contracts + ext_contracts
+    return ext_contracts
 
 
 

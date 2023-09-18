@@ -1,9 +1,9 @@
-from django.utils.deprecation import MiddlewareMixin
 from django.contrib.sites.models import Site
 from django.http import HttpResponseNotFound
 from django.conf import settings
 from django.core.cache import cache
 from general_settings.models import WebsiteSetting
+from threadlocals.threadlocals import set_thread_variable
 
 
 
@@ -52,17 +52,18 @@ class DynamicHostMiddleware:
 
         settings.SITE_ID = site.pk
         request.site = site
+        # Set the request and current site in thread-local storage
+        set_thread_variable('current_site', request.site)
 
         request.parent_site = None
         request.merchant = None
 
-        parent_site = WebsiteSetting.objects.filter(site=request.site).first()
-        if parent_site:
-            request.parent_site = request.site
+        if WebsiteSetting.objects.filter(site=request.site).first():
+            request.parent_site = request.site.websitesetting
         else:
             request.merchant = request.site.merchant
-        
-        response = self.get_response(request) 
+
+        response = self.get_response(request)
         return response
 
     def load_allowed_hosts(self):

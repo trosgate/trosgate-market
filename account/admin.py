@@ -351,7 +351,7 @@ class TwoFactorAuthAdmin(admin.ModelAdmin):
 
 @admin.register(Merchant)
 class MerchantAdmin(admin.ModelAdmin):   
-    list_display = ['business_name', 'domain', 'merchant', 'type', 'package', 'created_at']
+    list_display = ['business_name', 'domain', 'merchant', 'type', 'packages', 'created_at']
     radio_fields = {
         'type': admin.HORIZONTAL,
         'category_type': admin.HORIZONTAL,
@@ -361,7 +361,7 @@ class MerchantAdmin(admin.ModelAdmin):
     readonly_fields = [
         'business_name', 'domain', 
         'get_merchant', 'get_site', 'site_logo_tag', 'image_tag', 'banner_tag',
-        'merchant', 'package', 'members', 'created_at', 'modified', 'promo_image_tag',
+        'merchant', 'packages', 'members', 'created_at', 'modified', 'promo_image_tag',
         # 'business_name', 'gender', 'tagline', 'description', 'address', 'announcement',
         # 'gateways','banner_image',,'profile_photo'  
     ]
@@ -389,6 +389,15 @@ class MerchantAdmin(admin.ModelAdmin):
         ('Category Content', {'fields': ('category_title','category_subtitle',)}),
         ('Proposal Content', {'fields': ('proposal_title','proposal_subtitle',)}),
         ('Project Content', {'fields': ('project_title','project_subtitle',)}),
+
+        ('Level One Checkout Discount', {'fields': (
+            'level_one_name', 'level_one_rate', 'level_one_start_amount', 'level_one_delta_amount',)}),
+        ('Level Two Checkout Discount', {'fields': (
+            'level_two_name', 'level_two_rate', 'level_two_start_amount', 'level_two_delta_amount',)}),
+        ('Level Three Checkout Discount', {'fields': (
+            'level_three_name', 'level_three_rate', 'level_three_start_amount', 'level_three_delta_amount',)}),
+        ('Level Four Checkout Discount', {
+         'fields': ('level_four_name', 'level_four_rate', 'level_four_start_amount',)}),
 
         ('Promotion Content', {'fields': (
             'promo_type', 'promo_title','promo_subtitle','promo_description',

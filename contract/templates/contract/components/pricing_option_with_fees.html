@@ -1,0 +1,74 @@
+<div class="col-md-8">
+    <div class="table-responsive">
+        <table class="table" style="border:none;">
+            <thead class="addon-header">
+                <tr>
+                <th>Action</th>
+                    <th>Name</th>
+                    <th>Fee</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for gateway in payment_gateways %}
+                <tr>
+                    <td>
+                        <form>
+                        <input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"
+                            hx-post="{% url 'contract:pricing_option_with_fees' contract.id contract.slug %}"
+                            hx-target="#payment-method">
+                        </input>
+                        </form>
+                    </td>
+                    <td class="text-left">{{gateway.get_name_display}}
+                        {% if gateway_type|lower == gateway.name %} 
+                        <i class="fa fa-check" style="color:green;"></i>
+                        {% else %}
+                        <i class="fa fa-close" style="color:red;"></i>
+                        {% endif %}
+                    </td>
+                    <td> {{base_currency}} {{gateway.processing_fee}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="d-flex justify-content-between mb-3">
+        <span>Initial Price</span><span id="grandTotal2" class="text-primary pt-1">{{base_currency}} {% firstof subtotal contract.grand_total %}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Mode </span><span id="totalFreelancer" class="text-primary pt-1"> {{contract.get_contract_type_display}}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Discount (Up to) </span><span id="totalDiscount" class="text-primary pt-1"> {{base_currency}} {{ discount }}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3"> 
+        <span>Processing Fee</span><span id="totalFees" class="text-primary pt-1">{{base_currency}} {{selected_fee }}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Final Price</span><span id="grandTotal2" class="text-primary pt-1">{{base_currency}} {% firstof grand_total contract.grand_total %}</span>
+    </div>
+    <div class="proposal-action">
+        <button class="btn btn-info btn-block proposal-btn-state"  data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Buy with Balance <i class="fa fa-info badge badge-success" hx-on="click: alert('this is the total messages')"></i></button>
+    </div>
+    <div class="proposal-action">
+        {% if grand_total > 0 %}
+        {% if gateway_type %}
+        <a href="{% url 'applications:final_application_checkout' %}" 
+            class="btn btn-primary btn-block product-btn-state"
+            style="border-radius:20px;">
+            <i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>
+        {% else %}
+        <button class="btn btn-primary btn-block product-btn-state" disabled>
+            Select Pricing to pay
+        </button>
+        {% endif %}
+        {% else %}
+        <button class="btn btn-primary btn-block product-btn-state" disabled>
+            No product in Box
+        </button>
+        {% endif %}
+    </div>
+</div>

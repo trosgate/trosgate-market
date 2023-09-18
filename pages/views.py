@@ -52,7 +52,7 @@ from analytics.analytic import (
     total_contracts_hired
 )
 
-from contract.models import InternalContract, Contract
+from contract.models import Contract
 from .forms import InvestorForm
 
 def aboutus(request):

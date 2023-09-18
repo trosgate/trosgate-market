@@ -13,12 +13,12 @@ class ProposalAdmin(admin.ModelAdmin):
     readonly_fields = [
         'image_tag', 'sample_link', 'skill','description', #'created_by',
         'team', 'category','reference', 'published', 'faq_three', 'faq_three_description',
-        'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 'identifier', 
+        'faq_one','faq_one_description', 'faq_two', 'faq_two_description', 
         'service_level', 'revision', 'duration_time', 'thumbnail','merchant'
     ]
     actions = ['mark_bulk_to_public', 'mark_bulk_to_private']
     fieldsets = (
-        ('Basic Info', {'fields': ('created_by','merchant','team', 'identifier','salary',)}),
+        ('Basic Info', {'fields': ('created_by','merchant','team', 'salary',)}),
         ('Service Product pricing', {'fields': (
             'tier1_preview', 'tier2_preview', 'tier3_preview',
             'pricing', 'pricing1_duration','pricing2_duration', 'pricing3_duration',

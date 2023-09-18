@@ -59,135 +59,144 @@ class UserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email=email, password=password, first_name=first_name, last_name=last_name, **extra_fields)
 
-
     def create_merchant(self, email, password, first_name, last_name, business_name, country, package, **extra_fields):
-        if not package:
-            raise ValueError(_('Unknown package selected')) 
-        
-        site = Site.objects.get_current()
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_active', False)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('site', site)
-        extra_fields.setdefault('user_type', 'merchant')
+    
+        with db_transaction.atomic():
+            if not package:
+                raise ValueError(_('Unknown package selected')) 
+            
+            site = Site.objects.get_current()
+            extra_fields.setdefault('is_staff', False)
+            extra_fields.setdefault('is_active', False)
+            extra_fields.setdefault('is_superuser', False)
+            extra_fields.setdefault('site', site)
+            extra_fields.setdefault('user_type', 'merchant')
 
-        customer = self.create_user(email, password, first_name=first_name, last_name=last_name, country=country, **extra_fields)
-        
-        # Create merchant with the received information
-        merchantapp = apps.get_model('account', 'Merchant') # This avoids circular import
-        paymentapp = apps.get_model('payments', 'PaymentGateway') # This avoids circular import
-        
-        gateway = paymentapp.objects.get_or_create(name='balance')[0]
-        
-        domain = business_name.lower().replace(' ','-')
-        curr_site = Site.objects.create(domain=f"{domain}.{site.domain}", name=f'{business_name}')
-        merchant = merchantapp.objects.create(
-            merchant=customer, 
-            business_name=business_name, 
-            site=curr_site, 
-            package=package,
-            domain=f"{domain}.{site.domain}"
+            customer = self.create_user(email, password, first_name=first_name, last_name=last_name, country=country, **extra_fields)
+            
+            # Create merchant with the received information
+            merchantapp = apps.get_model('account', 'Merchant') # This avoids circular import
+            paymentapp = apps.get_model('payments', 'PaymentGateway') # This avoids circular import
+            gateway = paymentapp.objects.get_or_create(name='balance')[0]
+            
+            domain = business_name.lower().replace(' ','-')
+            curr_site = Site.objects.create(domain=f"{domain}.{site.domain}", name=f'{business_name}')
+            merchant = merchantapp.objects.create(
+                merchant=customer, 
+                business_name=business_name, 
+                site=curr_site, 
+                packages=package,
+                domain=f"{domain}.{site.domain}"
+                )
+            merchant.members.add(customer)
+            merchant.gateways.add(gateway)
+
+            customer.active_merchant_id = merchant.pk
+            customer.save()
+
+            teampackage = apps.get_model('teams', 'Package') 
+            plans = ['basic', 'team']
+            for plan in plans:
+                teampackage.objects.create(merchant=merchant, type=plan)
+                
+            teampackage.objects.filter(merchant=merchant,type='team').update(
+                max_proposals_allowable_per_team = merchant.packages.max_proposals_allowable_per_team,
+                monthly_projects_applicable_per_team = merchant.packages.monthly_projects_applicable_per_team,
+                monthly_offer_contracts_per_team = merchant.packages.monthly_offer_contracts_per_team,
+                max_member_per_team = merchant.packages.max_member_per_team,
             )
-        merchant.members.add(customer)
-        merchant.gateways.add(gateway)
-
-        customer.active_merchant_id = merchant.pk
-        customer.save()
-
-        return customer, merchant
+        return customer
     
 
     def create_merchant_staff(self, email, password, first_name, last_name, merchant, **extra_fields):
         # Create merchant with the received information
-        merchantapp = apps.get_model('account', 'Merchant')
-        curr_site = Site.objects.get_current()
-        merchant = merchantapp.objects.filter(site=curr_site, merchant=merchant).first()
+        with db_transaction.atomic():
+            merchantapp = apps.get_model('account', 'Merchant')
+            curr_site = Site.objects.get_current()
+            merchant = merchantapp.objects.filter(site=curr_site, merchant=merchant).first()
 
-        if not merchant:
-            raise ValueError(_('Something went wrong. Please try again'))
-        
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_active', False)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('site', curr_site)
-        extra_fields.setdefault('user_type', 'merchant')   
-         
-        customer = self.create_user(email, password, first_name=first_name, last_name=last_name, **extra_fields)
-        customer.active_merchant_id = merchant.pk
-        customer.save()
-        
-        merchant.members.add(customer)
+            if not merchant:
+                raise ValueError(_('Something went wrong. Please try again'))
+            
+            extra_fields.setdefault('is_staff', False)
+            extra_fields.setdefault('is_active', False)
+            extra_fields.setdefault('is_superuser', False)
+            extra_fields.setdefault('site', curr_site)
+            extra_fields.setdefault('user_type', 'merchant')   
+            
+            customer = self.create_user(email, password, first_name=first_name, last_name=last_name, **extra_fields)
+            customer.active_merchant_id = merchant.pk
+            customer.save()
+            
+            merchant.members.add(customer)
 
-        return customer, merchant
+        return customer
     
 
     def create_merchant_user(self, email, password, short_name, first_name, last_name, country, **extra_fields):
         # Create merchant with the received information
-        merchantapp = apps.get_model('account', 'Merchant')
-        freelancerapp = apps.get_model('freelancer', 'Freelancer')
-        freelanceraccountapp = apps.get_model('freelancer', 'FreelancerAccount')
-        paymentapp = apps.get_model('payments', 'PaymentAccount')
-        teamsapp = apps.get_model('teams', 'Team') 
-        packageapp = apps.get_model('teams', 'Package') 
-        
-        clientapp = apps.get_model('client', 'Client')
-        clientaccountapp = apps.get_model('client', 'ClientAccount')
-
-        curr_site = Site.objects.get_current()
-        merchant = get_object_or_404(merchantapp, site=curr_site)
-
-        if not merchant:
-            raise ValueError(_('Something went wrong. Please try again'))
-        
-        if not first_name:
-            raise ValueError(_('Something went wrong. Please try again'))
-        
-        extra_fields.setdefault('site', curr_site)
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_active', False)
-        extra_fields.setdefault('is_superuser', False)   
-         
-        if merchant and extra_fields.setdefault('user_type') == 'freelancer':
-            extra_fields.setdefault('user_type', 'freelancer')
+        with db_transaction.atomic():
+            merchantapp = apps.get_model('account', 'Merchant')
+            freelancerapp = apps.get_model('freelancer', 'Freelancer')
+            freelanceraccountapp = apps.get_model('freelancer', 'FreelancerAccount')
+            paymentapp = apps.get_model('payments', 'PaymentAccount')
+            teamsapp = apps.get_model('teams', 'Team') 
             
-            user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)
-            user.active_merchant_id = merchant.pk
-            user.save()
+            clientapp = apps.get_model('client', 'Client')
+            packageapp = apps.get_model('teams', 'Package') 
+            clientaccountapp = apps.get_model('client', 'ClientAccount')
 
-            freelanceraccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
-            paymentapp.objects.get_or_create(merchant=merchant, user=user)[0]
-            package = packageapp.objects.get_or_create(type='basic')[0]
+            curr_site = Site.objects.get_current()
+            merchant = get_object_or_404(merchantapp, site=curr_site)
 
-            title = f'{user.short_name} Team'
-            team = teamsapp.create_team_with_member(
-                title=title,
-                notice=f"This is the team for {user.short_name}", 
-                merchant=merchant,
-                created_by = user,
-                package=package,
-            )
-         
-            freelancer = freelancerapp.objects.get_or_create(
-                merchant=merchant, user=user, active_team_id=team.id
-            )[0]
-            freelancer.active_team_id = team.id
-            freelancer.save()
+            if not merchant:
+                raise ValueError(_('Something went wrong. Please try again'))
+            
+            if not first_name:
+                raise ValueError(_('Something went wrong. Please try again'))
+            
+            extra_fields.setdefault('site', curr_site)
+            extra_fields.setdefault('is_staff', False)
+            extra_fields.setdefault('is_active', False)
+            extra_fields.setdefault('is_superuser', False)   
+            
+            if merchant and extra_fields.setdefault('user_type') == 'freelancer':
+                extra_fields.setdefault('user_type', 'freelancer')
+                
+                user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)
+                user.active_merchant_id = merchant.pk
+                user.save()
 
-            return user, team, freelancer
+                freelanceraccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
+                paymentapp.objects.get_or_create(merchant=merchant, user=user)[0]
+                package = packageapp.objects.get_or_create(type='basic')[0]
+
+                title = f'{user.short_name} Team'
+                team = teamsapp.create_team_with_member(
+                    title=title,
+                    notice=f"This is the team for {user.short_name}", 
+                    merchant=merchant,
+                    created_by = user,
+                    package=package,
+                )
+            
+                freelancer = freelancerapp.objects.get_or_create(
+                    merchant=merchant, 
+                    user=user, active_team_id=team.id
+                )[0]
+                freelancer.active_team_id = team.id
+                freelancer.save()
+
+                return user
+
+            if merchant and extra_fields.setdefault('user_type') == 'client':
+                extra_fields.setdefault('user_type', 'client')
+                user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)            
+                user.active_merchant_id = merchant.pk
+                user.save()
+                            
+                clientapp.objects.get_or_create(merchant=merchant, user=user)[0]
+                clientaccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
+
+                return user
         
-
-        if merchant and extra_fields.setdefault('user_type') == 'client':
-            extra_fields.setdefault('user_type', 'client')
-            user = self.create_user(email, password, short_name=short_name, first_name=first_name, last_name=last_name, country=country, **extra_fields)            
-            user.active_merchant_id = merchant.pk
-            user.save()
-                        
-            client = clientapp.objects.get_or_create(merchant=merchant, user=user)[0]
-            client_acct = clientaccountapp.objects.get_or_create(merchant=merchant, user=user)[0]
-
-            return user, client, client_acct
-    
-
-    # def get_queryset(self):
-    #     site = Site.objects.get_current()
-    #     return super().get_queryset().filter(site=site)

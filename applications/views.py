@@ -47,7 +47,6 @@ def apply_for_project(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, status=Project.ACTIVE)
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, members__in=[request.user])
     can_apply_for_project = team.monthly_projects_slot
-    print('can_apply_for_project ::', can_apply_for_project)
     applied = Application.objects.filter(team=team, project=project)
     base_currency = get_base_currency(request)
 

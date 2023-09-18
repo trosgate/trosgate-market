@@ -20,7 +20,7 @@ from projects.models import Project
 from notification.mailer import new_user_registration, two_factor_auth_mailer
 from future.utilities import get_sms_feature, get_more_team_per_user_feature
 from quiz.models import Quizes
-from contract . models import InternalContract
+from contract . models import Contract
 from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -364,7 +364,7 @@ def user_dashboard(request):
 
     if request.user.is_freelancer:
         user_active_team = Team.objects.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE).first()
-        contracts = InternalContract.objects.filter(team=user_active_team, reaction=InternalContract.AWAITING)[:10]
+        contracts = Contract.objects.filter(team=user_active_team, reaction=Contract.AWAITING)[:10]
         proposals = Proposal.objects.filter(team=user_active_team)
         freelancer_profile = Freelancer.objects.filter(created=True, user__id=request.user.id).first()
         open_projects = Project.objects.filter(status=Project.ACTIVE, duration_time__gte=timezone.now())[:10]
@@ -420,9 +420,8 @@ def user_dashboard(request):
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration_time__gte=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration_time__lt=timezone.now())
-        contracts = InternalContract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
+        contracts = Contract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
         base_currency = get_base_currency_symbol()
-        print(request.user)
         context = {
             'open_projects': open_projects,
             'closed_projects': closed_projects,

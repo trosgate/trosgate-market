@@ -1,0 +1,13 @@
+python manage.py dumpdata account.Customer --indent 4 > fixures/db_admin_auth.json
+python manage.py dumpdata general_settings --indent 4 > fixures/db_global_settings.json
+python manage.py dumpdata account.Package --indent 4 > fixures/db_admin_package.json
+python manage.py dumpdata payments --indent 4 > fixures/db_payments.json
+python manage.py dumpdata account.Merchant --indent 4 > fixures/db_merchant.json
+python manage.py dumpdata freelancer --indent 4 > fixures/db_freelancer.json
+python manage.py dumpdata client --indent 4 > fixures/db_client.json
+python manage.py dumpdata teams --indent 4 > fixures/db_teams.json
+python manage.py dumpdata proposals --indent 4 > fixures/db_proposals.json
+python manage.py dumpdata projects --indent 4 > fixures/db_projects.json
+python manage.py dumpdata transactions --indent 4 > fixures/db_transactions.json
+python manage.py dumpdata future --indent 4 > fixures/plugins.json
+

@@ -22,6 +22,7 @@ from payments.models import PaymentRequest, AdminCredit
 # from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email, lock_fund_email
 from PIL import Image
+import io
 from merchants.models import MerchantMaster
 from notification.tasks import send_pending_balance_email
 
@@ -37,15 +38,15 @@ class Freelancer(MerchantMaster):
     )
     # freelancer details
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("User"), related_name="freelancer", on_delete=models.CASCADE)
-    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='freelancemerchant', on_delete=models.PROTECT)    
-    gender = models.CharField(_("Gender"), max_length=10, choices=GENDER)
-    tagline = models.CharField(_("Tagline"), max_length=100, blank=True)
+    merchant = models.ForeignKey('account.Merchant', verbose_name=_('Merchant'), related_name='freelancemerchant', on_delete=models.CASCADE)    
+    gender = models.CharField(_("Gender"), max_length=10, choices=GENDER, blank=True, null=True)
+    tagline = models.CharField(_("Tagline"), max_length=100, blank=True, null=True)
     description = models.TextField(_("Description"), max_length=2000, blank=True, error_messages={"name": {"max_length": _("Ensure a maximum character of 2000 for description field")}},)
     brand_name = models.CharField(_("Brand Name"), max_length=60, null=True, blank=True)
     profile_photo = models.ImageField(_("Profile Photo"), upload_to='freelancer/', default='freelancer/user-login.png')
     banner_photo = models.ImageField(_("Banner Photo"),  upload_to='freelancer/', default='freelancer/banner.png')
-    department = models.ForeignKey('general_settings.Department', verbose_name=_("Department"),  null=True, blank=True, on_delete=models.RESTRICT)
-    business_size = models.ForeignKey('general_settings.Size', verbose_name=_("Business Size"), related_name="freelancers", null=True, blank=True, on_delete=models.RESTRICT)
+    department = models.ForeignKey('general_settings.Department', verbose_name=_("Department"),  null=True, blank=True, on_delete=models.PROTECT)
+    business_size = models.ForeignKey('general_settings.Size', verbose_name=_("Business Size"), related_name="freelancers", null=True, blank=True, on_delete=models.PROTECT)
     address = models.CharField(_("Residence Address"), max_length=100, null=True, blank=True)
     # Skill and Specialty
     skill = models.ManyToManyField('general_settings.Skill', verbose_name=_("General skill"), related_name="freelancerskill")
@@ -99,11 +100,28 @@ class Freelancer(MerchantMaster):
             self.description = self.get_description()
 
         super(Freelancer, self).save(*args, **kwargs)
-        new_profile_photo = Image.open(self.profile_photo.path)
-        if new_profile_photo.height > 250 or new_profile_photo.width > 250:
-            output_size = (250, 250)
-            new_profile_photo.thumbnail(output_size)
-            new_profile_photo.save(self.profile_photo.path)
+
+        # if self.profile_photo:
+        #     image = Image.open(self.profile_photo.path)
+        #     desired_width = 400  # Set your desired width
+        #     desired_height = 300  # Set your desired height
+
+        #     # Get the current dimensions of the image
+        #     current_width, current_height = image.size
+
+        #     # Check if the image dimensions are smaller than the desired size
+        #     if current_width < desired_width or current_height < desired_height:
+        #         # If the image is smaller, you may want to handle this differently
+        #         # For example, you can raise an exception or save it as is.
+        #         # Here, we'll save it without cropping or resizing.
+        #         return
+
+        #     # Perform cropping and resizing
+        #     cropped_image = image.crop((0, 0, desired_width, desired_height))
+        #     cropped_image = cropped_image.resize((desired_width, desired_height), Image.ANTIALIAS)
+        #     cropped_image.save(self.profile_photo.path)
+
+
 
     def get_tagline(self):
         return f"I am {self.user.get_short_name()} with specialty in ..." 
@@ -148,12 +166,20 @@ class Freelancer(MerchantMaster):
     def modify_freelancer_absolute_url(self):
         return reverse('freelancer:update_freelancer_profile', args=([(self.user.short_name)]))
 
-    # image display in Admin
+    # image display on site
+    @property
+    def get_profile_photo(self):
+        if self.profile_photo:
+            return self.profile_photo.url
+        else:
+            return f'/media/freelancer/user-login.png'
+        
+    # image display on Admin panel
     def image_tag(self):
         if self.profile_photo:
-            return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.profile_photo))
+            return mark_safe('<img src="/media/freelancer/%s" width="50" height="50" />' % (self.profile_photo))
         else:
-            return f'/static/images/user-login.png'
+            return f'/media/freelancer/user-login.png'
 
     image_tag.short_description = 'profile_photo'
 

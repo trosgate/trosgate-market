@@ -30,7 +30,7 @@ def code_generator():
     return code
 
 
-class Package(models.Model):
+class Package(MerchantMaster):
     #
     # Team statuses
     BASIC = 'basic'
@@ -42,11 +42,11 @@ class Package(models.Model):
 
     #
     #Initial Plan Configuration
-    type = models.CharField(_("Package Type"), choices=STATUS, default=BASIC, unique=True, max_length=20)  
+    type = models.CharField(_("Package Type"), choices=STATUS, max_length=20)  
     max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=10, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
-    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=0, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
-    max_member_per_team = models.PositiveIntegerField(_("Max Member per Team"), default=0, help_text=_("New feature Coming Soon: Here, freelancer team can send followup/ reminder mail per external contract to client. Daily sending will have min of 1 amd max is 3 mails"), validators=[MinValueValidator(0), MaxValueValidator(3)])
+    monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=5, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
+    monthly_offer_contracts_per_team = models.PositiveIntegerField(_("Monthly Offer Contracts"), default=5, help_text=_("Clients can view team member's profile and send offer Contracts up to 100 monthly"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    max_member_per_team = models.PositiveIntegerField(_("Max Member per Team"), default=1, help_text=_("A freelancer can invite upt this number inclusive"), validators=[MinValueValidator(0), MaxValueValidator(4)])
     price = models.PositiveIntegerField(_("Price"), default=0)
     ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
  
@@ -54,10 +54,17 @@ class Package(models.Model):
         ordering = ('ordering',)
         verbose_name = _("Upsell Package")
         verbose_name_plural = _("Upsell Packages")
+        unique_together = ['type', 'merchant']
 
     def __str__(self):
         return str(self.get_type_display())
 
+    def save(self, *args, **kwargs):
+        if self.type == Package.TEAM:
+            self.price = (self.merchant.packages.price * 0.6)
+        else:
+            self.price = 0
+        super(Package, self).save(*args, **kwargs)
 
 
 class Team(MerchantMaster):
@@ -80,7 +87,7 @@ class Team(MerchantMaster):
 
     title = models.CharField(_("Title"), max_length=100, unique=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Team Founder"), related_name="teammanager", on_delete=models.CASCADE)
-    package = models.ForeignKey(Package, verbose_name=_("Team Plan"), related_name="teampackage", on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, verbose_name=_("Team Plan"), related_name="teams", on_delete=models.CASCADE)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Team Members"), related_name='team_member', through="TeamMember")
     notice = models.TextField(_("Purpose/Mission"), max_length=2000)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
@@ -187,7 +194,7 @@ class Team(MerchantMaster):
     @property
     def monthly_contract_slot(self):
         team_contracts_limit = self.package.monthly_offer_contracts_per_team
-        monthly_team_contracts_count = self.internalcontractteam.filter(
+        monthly_team_contracts_count = self.contracts.filter(
             date_created__gt=timezone.now() - relativedelta(months=1)
         ).prefetch_related('team').count()
         print('monthly_team_contracts_count :gdgdgdg:', monthly_team_contracts_count)     
@@ -251,8 +258,6 @@ class Team(MerchantMaster):
                 member.save()
 
         return earnings
-
-
 
 
 class TeamMember(models.Model):

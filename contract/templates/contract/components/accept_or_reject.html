@@ -9,13 +9,13 @@
     </div>
     {% endfor %}
 {% endif %}  
- 
-{% if request.user == contract.team.created_by %}
-{% if contract.reaction == 'awaiting' %}
+
+
+    {% if contract.reaction == 'awaiting' %}
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="text-center">
-                
+              {% if contract.contract_type == 'internal' and request.user.freelancer %}  
                 <form>{% csrf_token %}
                     <input type="hidden" name="contractid" id="contractid" value="{{contract.id}}">
                     <div class="text-center" style="display:flex; justify-content:flex-end;">
@@ -33,54 +33,65 @@
                         </button>
                     </div>
                 </form>
+                {% endif %}
+                {% if contract.contract_type == 'external' and request.user.clients %}
+                <form>{% csrf_token %}
+                    <input type="hidden" name="contractid" id="contractid" value="{{contract.id}}">
+                    <div class="text-center" style="display:flex; justify-content:flex-end;">
+                        <select class="form-control customs-select" name="action" id="acceptreject" style=" border-radius:20px; margin:3px; background-color:black; border:none; color:white;">
+                            <option value=""> ---Select Option---</option>
+                            <option value="accept"> Accept Contract</option>
+                            <option value="reject"> Reject Contract</option>
+                        </select>
+                        <button type="submit" class="btn btn-success"
+                            hx-post="{% url 'contract:accept_or_reject_contract' %}"
+                            hx-target="#accept-reject",
+                            hx-confirm="Are you sure you want to proceed? You may not be able to change"
+                            style="margin:3px; background-color:green; border:none; color:white; border-radius:20px;">
+                            Accept or Reject
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row justify-content-md-center">
+            <div class="col-xs-12">
+                <div class="text-center">
+                <span style="color: blue; font-weight: bold;"> 
+                    if contract is accepted, we shall notify you OR enquire below<br><br>
+                    <input type="hidden" name="refresh" id="contract" value="{{contract.id}}">
+                    <span id='refresh_contract' class="text-center btn btn-info btn-sm"
+                        hx-get="{% url 'contract:refresh_contract' %}"
+                        hx-include="input[name='refresh']"
+                        hx-target="#accept-reject"
+                        style="cursor:pointer;">
+                        Enquire Status
+                    </span>
+                </span>
             </div>
         </div>
     </div>
-{% endif %}
-{% endif %}
 
-{% if contract.reaction == 'accepted' %}
-<div class="col-md-12 justify-content-md-center">
-    <div class="text-center">
-        <span style="color: green; font-weight: bold;"> 
-            Contract Accepted by Team
-        </span>
+    {% elif contract.reaction == 'accepted' %}
+    <div class="col-md-12 justify-content-md-center">
+        <div class="text-center">
+            <span style="color: green; font-weight: bold;"> 
+                Contract Accepted, awaiting payment
+            </span>
+        </div>
+        {% if request.user.clients %}
+        <div class="text-center">
+            <a href="{% url 'contract:pricing_option_with_fees' contract.id contract.slug %}" class="wt-btn">Review product</a>
+        </div>
+        {% endif %}
     </div>
-</div>
-{% elif contract.reaction == 'rejected' %}
-<div class="col-md-12 justify-content-md-center">
-    <div class="text-center">
-        <span style="color: red; font-weight: bold;"> 
-            Contract rejected by Team. {% if request.user.clients %}Better luck ahead{% endif %}
-        </span>
-    </div>
-</div>
-{% endif %}	
-
-{% if request.user == contract.created_by %}
-{% if contract.reaction == 'accepted' %}<br>
-<div class="col-md-12 justify-content-md-center">
-    <div class="text-center">
-        <a href="{% url 'contract:internal_contract_fee_structure' contract.id contract.slug %}" class="wt-btn">Review product</a>
-    </div>
-</div>
-
-{% elif contract.reaction == 'awaiting' %}
-    <div class="row justify-content-md-center">
-        <div class="col-xs-12">
-            <div class="text-center">
-            <span style="color: blue; font-weight: bold;"> 
-                We will display the button if contract is accepted<br>
-                <input type="hidden" name="refresh" id="contract" value="{{contract.id}}">
-                <span id='refresh_contract' class="text-center btn btn-info btn-sm"
-                    hx-get="{% url 'contract:refresh_contract' %}"
-                    hx-include="input[name='refresh']"
-                    hx-target="#accept-reject"
-                    style="cursor:pointer;">
-                    Enquire Status
-                </span>
+    {% elif contract.reaction == 'rejected' %}
+    <div class="col-md-12 justify-content-md-center">
+        <div class="text-center">
+            <span style="color: red; font-weight: bold;"> 
+                Contract rejected. {% if request.user.clients %}Better days ahead{% endif %}
             </span>
         </div>
     </div>
-{% endif %}
-{% endif %}
+    {% endif %}	

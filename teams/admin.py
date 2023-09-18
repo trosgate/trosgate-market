@@ -7,20 +7,24 @@ MAX_OBJECTS = 2
 
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):  
-    list_display = ['type','price', 'ordering']
-    list_display_links = ['type','price']
+    list_display = ['merchant', 'max_member_per_team','price', 'ordering']
+    list_display_links = ['merchant','max_member_per_team']
     list_editable = ['ordering']
     # readonly_fields = ['type']
-    radio_fields = {'type': admin.HORIZONTAL}    
 
     fieldsets = (
-        ('Merchant Package', {'fields': ('type', 'price', 'ordering',)}),
+        ('Merchant Package', {'fields': ('merchant', 'type', 'price', 'ordering',)}),
         ('Merchant Upsell', {'fields': (
             'max_member_per_team', 'max_proposals_allowable_per_team',   
             'monthly_offer_contracts_per_team', 'monthly_projects_applicable_per_team', 
         )}),
 
     )
+
+    def get_queryset(self, request):
+        qs = super(PackageAdmin, self).get_queryset(request)
+        return qs.filter(type='team')
+        
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         is_superuser = request.user.is_superuser
@@ -92,7 +96,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter =  ['merchant']
     inlines = [InvitationAdmin, TeamMemberAdmin]
     readonly_fields = [
-        'title', 'merchant', 'slug', 'team_balance','created_by','members', 'package_expiry',
+        'title', 'package', 'merchant', 'slug', 'team_balance','created_by','members', 'package_expiry',
         'stripe_customer_id','stripe_subscription_id',
         'paypal_customer_id', 'paypal_subscription_id',
         'razorpay_payment_id','razorpay_payment_url','razorpay_subscription_id',  

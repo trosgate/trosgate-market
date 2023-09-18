@@ -1,4 +1,4 @@
-from .models import InternalContract
+from .models import Contract
 from django.conf import settings
 from payments.models import PaymentGateway
 from general_settings.models import DiscountSystem
@@ -8,7 +8,7 @@ from general_settings.discount import (
     get_level_two_start_amount, get_level_two_delta_amount, get_level_three_start_amount, 
     get_level_three_delta_amount, get_level_four_start_amount
 )
-
+import math
 
 class BaseContract():
     """
@@ -23,7 +23,7 @@ class BaseContract():
 
     def capture(self, contract):
         contract_id = str(contract.id)
-        chosen_contract = InternalContract.objects.get(pk=contract_id)
+        chosen_contract = Contract.objects.filter(pk=contract_id).first()
         return chosen_contract
 
     def get_total_price_before_fee_and_discount(self, contract):
@@ -40,6 +40,7 @@ class BaseContract():
             newprocessing_fee = self.get_gateway().processing_fee
         return newprocessing_fee
 
+
     def get_discount_value(self, contract):
         discount = 0
         subtotal = self.get_total_price_before_fee_and_discount(contract)
@@ -49,15 +50,14 @@ class BaseContract():
 
         elif (get_level_two_start_amount() <= subtotal <= get_level_two_delta_amount()):
             discount = ((subtotal * get_level_two_rate())/100)
-
         elif (get_level_three_start_amount() <= subtotal <= get_level_three_delta_amount()):
             discount = ((subtotal * get_level_three_rate())/100)
 
         elif subtotal > get_level_four_start_amount():
             discount = ((subtotal * get_level_four_rate())/100)
 
-        total_discount = round(discount)
-        return total_discount
+        return round(discount)
+
 
     def get_start_discount_value(self):
         return get_level_two_start_amount()

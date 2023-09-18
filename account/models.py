@@ -223,10 +223,10 @@ class Package(models.Model):
     verbose_type = models.CharField(_("Branded Name"), unique=True, blank=True, null=True, help_text=_("Customize name for the package. If empty, the default names will be displayed"), max_length=50)
     can_change_domain = models.BooleanField(_("Domain Change"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Merchant with this package can change domain"),)
     ssl_activation = models.BooleanField(_("SSL Installation"), choices=((False, 'No'), (True, 'Yes')), default=True, help_text=_("Domains on site will be provided with ssl. We recommend actiovation for all domains"),)
+    multiple_freelancer_teams = models.BooleanField(_("Multiple teams per Freelancer"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Enables each freelancer can create multiple teams"),)
     max_num_of_staff = models.PositiveIntegerField(_("Number of Staff"), default=1, help_text=_("Numner of staffs that merchant can invite"), validators=[MinValueValidator(1), MaxValueValidator(5)])
     can_upsell_teams = models.BooleanField(_("Upselling Subscription"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Merchant with this package can sell subscription to their freelancers who want to upgrade"),)
     max_users_sitewide = models.PositiveIntegerField(_("Max number of users"), default=100, help_text=_("Total users including merchant and staffs"), validators=[MinValueValidator(100), MaxValueValidator(1000000)])
-    multiple_freelancer_teams = models.BooleanField(_("Multiple teams per Freelancer"), choices=((False, 'No'), (True, 'Yes')), default=False, help_text=_("Each freelancer can create multiple teams"),)
     price = models.PositiveIntegerField(_("Package Price"), default=0, help_text=_("Decide your reasonable price with max limit of 1000"), validators=[MinValueValidator(0), MaxValueValidator(1000)])
     is_default = models.BooleanField(_("Make Default"), choices=((False, 'No'), (True, 'Yes')), help_text=_("Only 1 package should have a default set to 'Yes'"), default=False)
     ordering = models.PositiveIntegerField(_("Display"), default=1, help_text=_("This determines how each package will appear to user eg, 1 means first position"), validators=[MinValueValidator(1), MaxValueValidator(3)])
@@ -242,6 +242,10 @@ class Package(models.Model):
 
     class Meta:
         ordering = ['ordering']
+
+    def save(self, *args, **kwargs):
+        self.upsell_price = (self.price * 0.6)
+        super(Package, self).save(*args, **kwargs)
 
 
 class Merchant(SettingsMaster):
@@ -278,10 +282,10 @@ class Merchant(SettingsMaster):
     merchant = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant', on_delete=models.CASCADE)
     business_name = models.CharField(_("Business Name"), max_length=255)
     domain = models.CharField(_("Default Domain"), max_length=255)
-    package = models.ForeignKey("account.Package", 
+    packages = models.ForeignKey("account.Package", 
         verbose_name=_("Package"), 
-        related_name="packages",
-        on_delete=models.PROTECT
+        related_name="package",
+        on_delete=models.CASCADE
     )
     package_expiry = models.DateTimeField(_("Package Expiry Date"), blank=True, null=True)
     gateways = models.ManyToManyField("payments.PaymentGateway", 
@@ -301,7 +305,41 @@ class Merchant(SettingsMaster):
     project_subtitle = models.CharField(_("Div Five Project Subitle"), max_length=100, default="Apply and get Hired", null=True, blank=True)
     category_title = models.CharField(_("Div Two Category Title"), max_length=100, default="Explore Categories", null=True, blank=True)
     category_subtitle = models.CharField(_("Div Two Category Subitle"), max_length=100, default="Professional by categories", null=True, blank=True)
-            
+
+    #Discount
+    level_one_name = models.CharField(
+        _("Level One(L1)"), max_length=30, default="Level One Discount System",)
+    level_one_rate = models.PositiveIntegerField(_("L1 Rate"), default=0, help_text=_(
+        "Starting Rate for L1 Discount with minimum default of 0 %"), validators=[MinValueValidator(0), MaxValueValidator(0)])
+    level_one_start_amount = models.PositiveIntegerField(_("L1 Amount Start"), default=10, help_text=_(
+        "Minimum checkout amount with default of zero(0) currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+    level_one_delta_amount = models.PositiveIntegerField(_("L1 Amount Delta"), default=299, help_text=_(
+        "checkout amount delta with default of 199 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+
+    level_two_name = models.CharField(
+        _("Level Two(L2)"), max_length=30, default="Level Two Discount System",)
+    level_two_rate = models.PositiveIntegerField(_("L2 Rate"), default=3, help_text=_(
+        "Second level Rate for L2 Discount with minimum default of 3%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    level_two_start_amount = models.PositiveIntegerField(_("L2 Amount Start"), default=300, help_text=_(
+        "Minimum checkout amount with default of 300 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+    level_two_delta_amount = models.PositiveIntegerField(_("L2 Amount Delta"), default=499, help_text=_(
+        "checkout amount delta with default of 499 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+
+    level_three_name = models.CharField(
+        _("Level Three(L3)"), max_length=30, default="Level Three Discount System",)
+    level_three_rate = models.PositiveIntegerField(_("L3 Rate"), default=5, help_text=_(
+        "Medium Rate for L3 Discount with minimum default of 5%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    level_three_start_amount = models.PositiveIntegerField(_("L3 Amount Start"), default=500, help_text=_(
+        "Minimum checkout amount with default of 500 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+    level_three_delta_amount = models.PositiveIntegerField(_("L3 Amount Delta"), default=999, help_text=_(
+        "checkout amount delta with default of 999 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
+
+    level_four_name = models.CharField(
+        _("Level Four(L4)"), max_length=30, default="Level Four Discount System",)
+    level_four_rate = models.PositiveIntegerField(_("L4 Rate"), default=7, help_text=_(
+        "Highest Rate for L4 Discount with minimum default of 7%"), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    level_four_start_amount = models.PositiveIntegerField(_("L4 Amount Start"), default=1000, help_text=_(
+        "Minimum checkout Amount with default of 1000 currency points"), validators=[MinValueValidator(10), MaxValueValidator(50000)])
 
     def __str__(self):
         return str(self.business_name)
@@ -314,6 +352,7 @@ class Merchant(SettingsMaster):
     def save(self, *args, **kwargs):
         self.domain = self.site.domain
         self.business_name = self.site.name
+        
         super(Merchant, self).save(*args, **kwargs)
 
     def image_tag(self):
@@ -327,6 +366,64 @@ class Merchant(SettingsMaster):
         """Calculate the account's trial end date."""
         return self.merchant.date_joined + datetime.timedelta(days=constant.TRIAL_DAYS)
     
+    def level_one_discount(self):
+        return f'{self.level_one_rate}%'
+
+    def level_two_discount(self):
+        return f'{self.level_two_rate}%'
+
+    def level_three_discount(self):
+        return f'{self.level_three_rate}%'
+
+    def level_four_discount(self):
+        return f'{self.level_four_rate}%'
+
+    def clean(self):
+        # Start amount against delta validation
+        if self.level_one_start_amount >= self.level_one_delta_amount:
+            raise ValidationError(
+                {'level_one_start_amount': _('L1 Amount Start cannot be bigger than L1 Amount Delta')})
+        
+        if self.level_two_start_amount >= self.level_two_delta_amount:
+            raise ValidationError(
+                {'level_two_start_amount': _('L2 Amount Start cannot be bigger than L2 Amount Delta')})
+        
+        if self.level_three_start_amount >= self.level_three_delta_amount:
+            raise ValidationError(
+                {'level_three_start_amount': _('L3 Amount Start cannot be bigger than L3 Amount Delta')})
+        
+        if self.level_four_start_amount < self.level_three_start_amount or self.level_four_start_amount < self.level_two_start_amount or self.level_four_start_amount < self.level_one_start_amount:
+            raise ValidationError(
+                {'level_four_start_amount': _('L4 Amount Start must be the biggest of all levels start amount')})
+        
+        # Rate against other rates validation
+        if self.level_one_rate > self.level_two_rate or self.level_one_rate > self.level_three_rate or self.level_one_rate > self.level_four_rate:
+            raise ValidationError(
+                {'level_one_rate': _('L1 Rate must be the smallest of all 4 level rates')})
+        
+        if self.level_two_rate > self.level_three_rate or self.level_two_rate > self.level_four_rate:
+            raise ValidationError(
+                {'level_two_rate': _('L2 Rate must be the second lowest rate after L1 level rate')})
+        
+        if self.level_three_rate > self.level_four_rate:
+            raise ValidationError(
+                {'level_three_rate': _('L3 Rate must be the third lowest rate after L1 and L2 rate')})
+        
+        # Start amount vrs delta validation
+        if self.level_one_delta_amount >= self.level_two_start_amount:
+            raise ValidationError(
+                {'level_one_delta_amount': _('L1 Amount delta cannot be bigger or equal to L2 Amount Start')})
+                        
+        if self.level_two_delta_amount >= self.level_three_start_amount:
+            raise ValidationError(
+                {'level_two_delta_amount': _('L2 Amount delta cannot be bigger or equal to L3 Amount Start')})
+        
+        if self.level_three_delta_amount >= self.level_four_start_amount:
+            raise ValidationError(
+                {'level_three_delta_amount': _('L3 Amount delta cannot be bigger or equal to L4 Amount Start')})
+                        
+        return super().clean()
+
 
 class TwoFactorAuth(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='twofactorauth', on_delete=models.CASCADE)

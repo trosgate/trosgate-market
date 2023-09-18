@@ -3,12 +3,19 @@ from django.dispatch import receiver
 from . models import Customer, TwoFactorAuth, Merchant
 from django.core.cache import cache
 from django.core.cache import caches
+from teams.models import Package
 
 
 @receiver(post_save, sender=Customer)
 def generate_TwoFactorAuth_code(sender, instance, created, **kwargs):
     if created:
         TwoFactorAuth.objects.create(user=instance)
+
+# @receiver(post_save, sender=Merchant)
+# def create_upsell_plans(sender, instance, created, **kwargs):
+#     if created:
+#         plans = ['basic', 'team']
+#         TwoFactorAuth.objects.create(user=instance)
         
 
 @receiver(post_save, sender=Merchant)

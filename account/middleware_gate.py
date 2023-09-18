@@ -4,6 +4,8 @@ from django.conf import settings
 from account.models import Merchant, Customer
 from django.http import  HttpResponseRedirect
 from django.urls import reverse
+from threadlocals.threadlocals import set_thread_variable
+
 
 
 class MerchantGateMiddleware:
@@ -22,7 +24,9 @@ class MerchantGateMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated and request.user.user_type != Customer.ADMIN:
             request.merchant = Merchant.objects.get(pk=request.user.active_merchant_id)
+
             gate_url = reverse("merchants:subscription")
+
             if request.merchant and request.user.is_merchant:
                 if (
                     request.merchant.type in Merchant.ACTIVE_TYPES

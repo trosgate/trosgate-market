@@ -35,11 +35,10 @@ from .models import (
 from .hiringbox import HiringBox
 from general_settings.fees_and_charges import get_proposal_fee_calculator
 # from general_settings.currency import get_base_currency_symbol, get_base_currency_code
-from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.decorators.http import require_http_methods
-from contract.models import InternalContract
+from contract.models import Contract
 from django.utils import timezone
 from datetime import timedelta
 from teams.utilities import get_expiration

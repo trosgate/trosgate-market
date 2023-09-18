@@ -77,17 +77,13 @@
 								<span>Fund Deposits</span>
 							</a>
 						</li>
-						<li class="menu-item-has-children">
-							<a href="javascript:void(0);">
+								
+						<li>
+							<a href="{% url 'contract:contract_list' %}">
 								<i class="ti-package"></i>
 								<span>My Contracts</span>
 							</a>
-							<ul class="sub-menu">
-								<li><hr><a href="{% url 'contract:internal_contract_list' %}">Internal Contracts</a></li>
-								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
-							</ul>
-						</li>		
-						
+						</li>
 						<li>
 							<a href="{% url 'transactions:pricing_option_with_fees' %}">
 								<i class="ti-heart"></i>
@@ -177,6 +173,12 @@
 								<li><hr><a href="{% url 'analytics:time_tracker' %}">Performance</a></li>
 							</ul>
 							{% endif %}
+						</li>
+						<li>
+							<a href="{% url 'contract:contract_list' %}">
+								<i class="ti-package"></i>
+								<span>My Contracts</span>
+							</a>
 						</li>												
 						<li class="menu-item-has-children">
 							<a href="javascript:void(0);">
@@ -198,22 +200,10 @@
 								<span>Applications</span>
 							</a>
 						</li>
+													
+						
 						{% endif %}
-						<li class="menu-item-has-children">
-							<a href="javascript:void(0);">
-								<i class="ti-package"></i>
-								<span>My Contracts</span>
-							</a>
-							{% if active_team.status == 'active' %}
-							<ul class="sub-menu">
-								<li><hr><a href="{% url 'contract:contract_client' %}">Contractors</a></li>
-								<li><hr><a href="{% url 'contract:internal_contract_list' %}">Internal Contracts</a></li>
-								<li><hr><a href="{% url 'contract:external_contract_list' %}">External Contracts</a></li>
-							</ul>
-							{% endif %}
-						</li>							
 							
-						{% comment %} {% endif %}	 {% endcomment %}
 						{% endif %}	
 						{% if request.user.clents %}
 						<li class="wt-notificationicon menu-item-has-children">

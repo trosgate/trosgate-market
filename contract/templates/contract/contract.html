@@ -1,0 +1,146 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+	<!--Main Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+						<div class="wt-title"><h2>Create Contract</h2></div>
+						<span><a href="{% url 'account:dashboard' %}" class="text-primary">Back to Dashboard</a></span><br>
+							{% if request.user.freelancer %}	
+							<ol class="wt-breadcrumb">
+                                <li class="wt-active text-white">1. Add Client</li>
+                                <li class="wt-active text-white">2. Connect contract</li>
+							</ol>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="background"  style="background-color:#fff;">
+		{% if request.user.freelancer %}
+		<div class="text-center">
+			{% if active_team.status == 'active' %}
+            <button class="btn btn-primary mt-4"  style="background-color:blue; color:white;"
+				hx-get="{% url 'contract:add_contractor' %}"
+				hx-target="#contractor">
+				Add New Client
+			</button>
+			{% else %}
+            <button class="btn btn-primary mt-4"  style="background-color:blue; color:white;" disabled>
+				Add New Client
+			</button>
+			{% endif %}
+        </div>
+		{% endif %}
+		<section class="container" style="background-color:#fff;">
+			<div class="row justify-content-md-center">
+				{% if active_team %}
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+					<div class="wt-tabscontenttitle">
+						<div class="alert alert-info">
+							<span style="color: green; font-weight: bold;"> 
+								Every new client you bring is an asset to us. When they purchase your contract, it will be at zero(0) fee
+							</span>
+						</div>
+					</div>	
+                    <div class="table-responsive" id="contractor">
+                        {% include "contract/components/contract.html" %}
+                    </div> 
+				</div>
+				{% endif %}
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+					<br>
+					<div class="wt-tabscontenttitle">
+						<div class="alert alert-info" role="alert">
+							<span style="color: green; font-weight: bold;"> 
+								Manage all your contracts in one place
+							</span>
+						</div>
+					</div>	
+					<div class="table-responsive">
+						<table class="table">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Contract #</th>
+								<th>Created By</th>
+								<th>Main Service</th>
+								<th>Created On</th>
+								<th>Completion</th>
+								<th>Budget({{base_currency}})</th>
+								<th>Status</th>
+								<th>Actions</th>
+								
+							</tr>
+						</thead>
+						<tbody>
+
+							{% for contract in contracts %}
+							<tr>
+							<td>{{forloop.counter}} </td>
+							<td>{{contract.reference}}</td>
+							<td>{{contract.created_by.get_short_name}}</td>
+							<td class="text-left">{{contract.line_one}}</td>
+							<td>{{contract.date_created|date:"M-d-Y"}}</td>
+							<td>{{contract.get_contract_duration_display}}</td>
+							<td>{{contract.grand_total}}</td>
+							<td {% if contract.reaction == 'awaiting' %} style='color:purple' 
+								{% elif contract.reaction == 'accepted' %} style='color:blue'
+								{% elif contract.reaction == 'rejected' %} style='color:red'
+								{% elif contract.reaction == 'paid' %} style='color:green'
+								{% endif %}>
+								{{contract.get_reaction_display}}
+							</td>
+
+							{% if active_team.created_by == request.user %}
+							<td>
+								{% if active_team.status == 'active' %}
+								<a href="{% url 'contract:contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+								{% else %}
+								<button class="btn btn-success btn-sm"  style="background-color:blue; color:white;" disabled>
+									preview
+								</button>
+								{% endif %}
+							</td> 
+							{% else %}
+							<td>
+								<a href="{% url 'contract:contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+							</td>
+								{% endif %}
+							{% endfor %}					
+							</tbody>
+						</table>
+						{% if not contracts %}
+						<hr>
+						<p class='text-center'><strong>No contract to show at the moment</strong></p>
+						{% endif %}											
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site.name}}</span>
+				</div>
+			</div>
+	</div>
+	{% endblock %}
+
+
+	<script>
+		$(document).on("click", "#newclient", function(){
+			$("#id_name").val('');
+			$("#id_email").val('');
+		})
+	</script>
+
+
+

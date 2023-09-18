@@ -2,26 +2,33 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.sites.models import Site
 from account.models import Merchant
 import uuid
-from django.contrib.sites.managers import CurrentSiteManager
+from threadlocals.threadlocals import get_thread_variable
 
- 
+
+
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
-        current_site = Site.objects.get_current()
+        current_site = get_thread_variable('current_site')
         qs = super().get_queryset()
-        if current_site.pk == 1:
+        if current_site and current_site.pk == 1:
             queryset = qs
-        else:
+        elif current_site:
             queryset = qs.filter(merchant__site=current_site)
+        else:
+            queryset = qs.none()
         return queryset
-        
+
+
+# class MerchantMasterManager(models.Manager):
+#     def get_queryset(self):
+#         return super().get_queryset()
+
 
 class MerchantMaster(models.Model):
-    merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.PROTECT)
+    merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.CASCADE)
     objects = MerchantMasterManager()
     
     class Meta:
@@ -30,7 +37,7 @@ class MerchantMaster(models.Model):
     def save(self, *args, **kwargs):
         current_site = Site.objects.get_current()
         if not self.merchant_id:
-            self.merchant=Merchant.objects.filter(site=current_site).first()
+            self.merchant = Merchant.objects.filter(site=current_site).first()
         super().save(*args, **kwargs)
 
 
@@ -96,7 +103,7 @@ class MerchantProduct(MerchantMaster):
         (ARCHIVE, _("Archived")),
     )
     id = models.AutoField(primary_key=True),
-    identifier = models.URLField(editable=False, unique=True, default=uuid.uuid4, verbose_name='Identifier')    
+    identifier = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)    
     title = models.CharField(_("Title"), max_length=255, help_text=_("title field is Required"), unique=True)
     category = models.ForeignKey('general_settings.Category', verbose_name=_("Category"), on_delete=models.RESTRICT, max_length=250)
     slug = models.SlugField(_("Slug"), max_length=255)

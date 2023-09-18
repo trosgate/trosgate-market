@@ -1,9 +1,10 @@
-from .models import Contractor, Contract, InternalContract
+from .models import Contractor, Contract
 from teams.models import Team
 from django.utils.translation import gettext_lazy as _
 from django import forms
 from proposals.models import Proposal
 from account.models import Customer
+
 
 # a class to output datepicker on template
 class DateInput(forms.DateInput):
@@ -11,10 +12,10 @@ class DateInput(forms.DateInput):
 
 
 class InternalContractForm(forms.ModelForm):
-    proposal = forms.ModelChoiceField(queryset=InternalContract.objects.all(), empty_label='Select Proposal')
+    proposal = forms.ModelChoiceField(queryset=Contract.objects.filter(contract_type='internal'), empty_label='Select Proposal')
 
     class Meta:
-        model = InternalContract
+        model = Contract
         fields = [
             'proposal','contract_duration', 'line_one','line_one_quantity', 'line_one_unit_price', 'line_one_total_price',
             'line_two','line_two_quantity', 'line_two_unit_price', 'line_two_total_price',

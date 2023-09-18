@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
-from contract.models import InternalContract
+from contract.models import Contract
 from django.urls import reverse
 from django.utils.text import slugify
 from merchants.models import MerchantProduct, MerchantMaster
@@ -174,7 +174,7 @@ class Proposal(MerchantProduct):
     @property
     def preview_contract_sales_count(self):
         new_contract = 0
-        contracts = InternalContract.objects.filter(proposal__id=self.id)
+        contracts = Contract.objects.filter(proposal__isnull=False, proposal__id=self.id)
         for contract in contracts:
             new_contract = contract.contracthired.filter(purchase__status='success').count()
         return new_contract
@@ -187,7 +187,7 @@ class Proposal(MerchantProduct):
 
 class ProposalProduct(MerchantMaster):
     id = models.AutoField(primary_key=True),
-    license = models.URLField(editable=False, unique=True, default=uuid.uuid4, verbose_name='Product License')    
+    license = models.UUIDField(editable=False, unique=True, default=uuid.uuid4, verbose_name='Product License')    
     team = models.ForeignKey('teams.Team', verbose_name=_("Product Team"), on_delete=models.CASCADE)
     proposal = models.ForeignKey(Proposal, verbose_name=_("Proposal"), on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Author"), on_delete=models.CASCADE)

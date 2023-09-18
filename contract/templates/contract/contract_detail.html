@@ -1,0 +1,154 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% block content %}
+
+            <!--Inner Home Banner Start-->
+            <div class="wt-haslayout wt-innerbannerholder">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                            <div class="wt-innerbannercontent">
+                            <div class="wt-title"><h2>Contract Page</h2></div>
+                                <ol class="wt-breadcrumb">
+                                    <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                                    <li><a href="{% url 'contract:contract_list' %}">Contract</a></li>
+                                    <li class="wt-active">Detail</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Inner Home End-->
+        <main class="wt-haslayout wt-innerbgcolor">
+			<div class="wt-haslayout wt-main-section">
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 push-lg-2 float-center">
+                        <div class="wt-dashboardbox">
+                            <div class="wt-dashboardboxtitle">
+                                <div class="text-center">
+                                    <ul class="wt-postarticlemeta">
+                                        {{website.site_logo_tag}}
+                                    </ul><br>
+                                    
+                                </div>
+                            </div>
+                            <div class="wt-dashboardboxcontent">
+                                <div class="text-center">
+                                    <h5>{% firstof contract.proposal.title contract.line_one %}</h5>
+                                </div>
+                         
+                                <div class="wt-jobdescription wt-tabsinfo">
+                                    <div class="wt-tabscontenttitle">
+                                        <h2>Contract Terms</h2>
+                                    </div>	
+                                    <div class="form-row">
+                                        
+                                        <div class="form-group col-md-6">
+                                            <span><i class="fa fa-group"> Client Name: {{contract.created_by.get_full_name}}</i></span><br><br>
+                                            <span><i class="far fa-calendar"> Job Type: {{contract.get_contract_type_display}}</i></span><br><br>
+                                            <span><i class="far fa-calendar"> Duration: {{contract.get_contract_duration_display}}</i></span><br><br>
+                                            <span><i class="fa fa-bookmark"> Reference: {{contract.reference}}</i></span><br><br>
+                                            <span><i class="far fa-calendar"> Time Created: {{contract.date_created}}</i></span><br><br>
+                                        </div>
+                                          
+                                    </div>
+                                </div>
+                            <div class="wt-jobdetails wt-tabsinfo">
+                                <div class="wt-tabscontenttitle">
+                                    <h2>Services</h2>
+                                </div> 
+                                <div class="table-responsive">
+								<table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Line Services</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Total</th>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <tbody>
+                                        {% if contract.line_one %}
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td class="text-left">{{ contract.line_one}}(main)</td>
+                                            <td>{{ contract.line_one_quantity}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_one_unit_price}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_one_total_price }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if contract.line_two %}
+                                        <tr>
+                                            <th scope="row">2</th>
+                                            <td class="text-left">{{ contract.line_two}}</td>
+                                            <td>{{ contract.line_two_quantity}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_unit_price}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_total_price }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if contract.line_three %}
+                                        <tr>
+                                            <th scope="row">3</th>
+                                            <td class="text-left">{{ contract.line_three}}</td>
+                                            <td>{{ contract.line_three_quantity}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_three_quantity}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_two_total_price }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if contract.line_four %}
+                                        <tr>
+                                            <th scope="row">4</th>
+                                            <td class="text-left">{{ contract.line_four}}</td>
+                                            <td>{{ contract.line_four_quantity}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_four_unit_price}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_four_total_price }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if contract.line_five %}
+                                        <tr>
+                                            <th scope="row">5</th>
+                                            <td class="text-left">{{ contract.line_five}}</td>
+                                            <td>{{ contract.line_five_quantity}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_five_unit_price}}</td>
+                                            <td>{{website.merchant.country.currency}} {{ contract.line_five_total_price }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td colspan="4"><strong>Grand Total</strong></td>
+                                            <td><strong>{{website.merchant.country.currency}} {{ contract.grand_total}}</strong></td>
+                                        </tr>                                                
+                                    </tbody>
+                                </table>
+                            </div>
+                                {% if contract.notes %}                                             
+                                <div class="wt-jobdetails wt-tabsinfo">
+                                    <div class="wt-tabscontenttitle">
+                                        <h2>Description</h2>
+                                    </div> 
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <h7>{{ contract.notes|linebreaks }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            </div>
+
+                            <div id='accept-reject'>
+                            {% include 'contract/components/accept_or_reject.html' %}
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+    </main>
+
+{% endblock %}
+
+

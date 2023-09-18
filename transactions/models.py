@@ -8,7 +8,7 @@ from proposals.models import Proposal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from general_settings.currency import get_base_currency_symbol
-from contract.models import InternalContract, Contract
+from contract.models import Contract
 from client.models import ClientAccount
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator, get_external_contract_fee_calculator
 from account.fund_exception import FundException
@@ -256,7 +256,7 @@ class Purchase(PurchaseMaster):
 
             ClientAccount.debit_available_balance(user=sales.client, available_balance=sales.salary_paid)
 
-            selected_contract = InternalContract.objects.select_for_update().get(pk=purchass.contract.id)
+            selected_contract = Contract.objects.select_for_update().get(pk=purchass.contract.id)
             selected_contract.reaction = 'paid'
             selected_contract.save()
             
@@ -349,7 +349,7 @@ class Purchase(PurchaseMaster):
 
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
-                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
@@ -399,7 +399,7 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
@@ -450,7 +450,7 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
@@ -501,7 +501,7 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
@@ -553,7 +553,7 @@ class Purchase(PurchaseMaster):
             
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = InternalContract.objects.select_for_update().get(pk=contract_item.contract.id)
+                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
                 contract.reaction = 'paid'
                 contract.save()
@@ -868,7 +868,7 @@ class ApplicationSale(MerchantTransaction):
 
 
 class ContractSale(MerchantTransaction):
-    contract = models.ForeignKey("contract.InternalContract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)
+    contract = models.ForeignKey("contract.Contract", verbose_name=_("Contract Hired"), related_name="contracthired", on_delete=models.CASCADE)
 
     class Meta:
         ordering = ("-created_at",)

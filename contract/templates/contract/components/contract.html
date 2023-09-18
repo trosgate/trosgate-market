@@ -1,0 +1,84 @@
+
+{% if messages %}
+    <div class="justify-content-md-center" 
+        hx-get="{% url 'account:remove_message' %}" 
+        hx-trigger="load delay:3s">        
+        {% for message in messages %}        
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <span class="wt-jobalerts">
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show text-center">
+                    <span> {{ message}} </span>
+                </div>
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if contractorform %}
+<form method="POST", class="wt-formtheme wt-formpopup"> {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            {{contractorform.name.label}}
+            {{contractorform.name}}
+        </div>
+        <div class="col-md-6">
+            {{contractorform.email.label}}
+            {{contractorform.email}}
+        </div>
+        <div class="text-center wt-btnarea">
+            <button id="newclient" type="submit"
+                class="btn btn-danger mt-4"
+                hx-post="{% url 'contract:add_contractor' %}"
+                hx-target="#contractor"> Add Client 
+            </button>
+        </div>											
+    </div>											
+</form>
+{% else %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Invitee</th>
+            <th>Contractor</th>
+            <th>Email</th>
+            <th>date_created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>    
+    <tbody>
+        {% for contractor in contractors %}
+        <tr>
+            <td>{{forloop.counter}} </td>
+            <td>{{contractor.created_by.get_short_name}}</td>
+            <td>{{contractor.name}}</td>
+            <td>{{contractor.email}}</td>
+            <td>{{contractor.date_created|date:"M-d-Y"}}</td>
+            <td>
+                {% if active_team.status == 'active' %}
+                <a href="{% url 'contract:connect_contract' contractor.pk %}" 
+                    class="btn btn-success btn-sm text-white">
+                    <i class="fa fa-window-restore"> 
+                    {% if contractor.is_connected %} Preview {% else %} Connect {% endif %}</i> 
+                </a>
+                <a class="btn btn-danger btn-sm text-white"
+                    hx-get="{% url 'contract:delete_contractor' contractor.pk %}"
+                    hx-confirm="Removing a client will equally remove it's connected offer or conntract. Are you sure?" 
+                    hx-target="#contractor">
+                <i class="fa fa-trash"> Delete</i></a>
+                {% else %}
+                    <button class="btn btn-success btn-sm"  style="background-color:blue; color:white;" disabled>
+                        Connect
+                    </button>
+                {% endif %}
+            </td> 
+        </tr>
+        {% endfor %}					
+    </tbody>
+</table>
+{% if not contractors %}
+<hr>
+<p class='text-center'><strong>No contractor added but you can change that</strong></p>
+{% endif %}
+{% endif %}

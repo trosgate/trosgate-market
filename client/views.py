@@ -24,7 +24,7 @@ from general_settings.currency import get_base_currency_symbol, get_base_currenc
 from general_settings.fund_control import get_min_depositor_balance, get_max_depositor_balance, get_min_deposit, get_max_deposit
 from django.contrib.sites.shortcuts import get_current_site
 from transactions.models import Purchase
-from contract.models import InternalContract, Contract
+from contract.models import Contract
 from control_settings.utilities import deposit_switch
 import stripe
 import json
@@ -133,7 +133,7 @@ def one_click_interncontract_checkout(request):
     if request.POST.get('action') == 'oneclick-pay':
         contract_id = int(request.POST.get('contractId'))
         
-        contract = get_object_or_404(InternalContract, pk=contract_id, created_by=request.user, reaction=InternalContract.ACCEPTED)
+        contract = get_object_or_404(Contract, pk=contract_id, created_by=request.user, reaction=Contract.ACCEPTED)
        
         if request.user.clientfunduser.available_balance >= contract.grand_total:
             try:

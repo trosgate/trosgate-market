@@ -173,6 +173,7 @@ def update_freelancer(request, short_name):
         if profileform.is_valid():
             freelancer = profileform.save(commit=False)
             freelancer.user = request.user
+            freelancer.merchant = request.merchant
             freelancer.created = True
 
             freelancer.save()
