@@ -26,7 +26,7 @@ from transactions.models import (
     ContractSale,ExtContract, SubscriptionItem
 )
 from location import default_country_state_city
-
+from contract.models import Contract
 
 class Command(BaseCommand):
     help = "this creates fixures for the entire system"
@@ -51,17 +51,16 @@ class Command(BaseCommand):
         #     Site.objects.create(domain=dom, name=nam)
 
         # # # ACCOUNT MODEL
-        # call_command("loaddata", "fixures/db_admin_auth.json")
-        # call_command("loaddata", "fixures/db_admin_package.json")
-        # call_command("loaddata", "fixures/db_global_settings.json")
+        call_command("loaddata", "fixures/db_admin_auth.json")
+        call_command("loaddata", "fixures/db_admin_package.json")
+        call_command("loaddata", "fixures/db_global_settings.json")
         # call_command("loaddata", "fixures/db_plugins.json")
+        call_command("loaddata", "fixures/db_merchant.json")
         call_command("loaddata", "fixures/db_payments.json")
-        # call_command("loaddata", "fixures/db_merchant.json")
-        # call_command("loaddata", "fixures/db_freelancer.json")
-        # call_command("loaddata", "fixures/db_client.json")
-        # call_command("loaddata", "fixures/db_teams.json")
-        # call_command("loaddata", "fixures/db_proposals.json")
-        # call_command("loaddata", "fixures/db_projects.json")
+        call_command("loaddata", "fixures/db_freelancer.json")
+        call_command("loaddata", "fixures/db_client.json")
+        call_command("loaddata", "fixures/db_teams.json")
+        call_command("loaddata", "fixures/db_proposals.json")
+        call_command("loaddata", "fixures/db_projects.json")
 
-          
         print('All done')

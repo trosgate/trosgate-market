@@ -19,12 +19,11 @@ from django.views.decorators.csrf import csrf_exempt
 from transactions.models import Purchase, ContractSale, ExtContract
 from transactions.utilities import get_base_currency, calculate_contract_payment_data
 from paypalcheckoutsdk.orders import OrdersGetRequest
-from general_settings.gateways import (
-    FlutterwaveClientConfig, 
-    RazorpayClientConfig
-)
 from payments.paypal import PayPalClientConfig
 from payments.stripe import StripeClientConfig
+from payments.razorpay import RazorpayClientConfig
+from payments.flutterwave import FlutterwaveClientConfig
+from payments.paystack import PaystackClientConfig
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_external_contract_gross_earning, get_external_contract_fee_calculator
 from general_settings.forms import CurrencyForm
@@ -44,11 +43,14 @@ def contract_list(request):
     contracts = None
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id)
-        contractors = Contractor.objects.filter(team=team)
+        contractors = team.contractors.all()
         contracts = team.contracts.all()
 
     elif request.user.user_type == Customer.CLIENT:
-        contracts = Contract.objects.filter(created_by=request.user)
+        contracts = Contract.objects.filter(
+            Q(created_by=request.user)|
+            Q(client__email__iexact=request.user.email)
+        )
     else:
         contracts = Contract.objects.filter(merchant__merchant=request.user)
 
@@ -64,26 +66,29 @@ def contract_list(request):
 @user_is_freelancer
 def add_contractor(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-    contractors = Contractor.objects.filter(team=team)
-    
+    contractors = team.contractors.all()
+    contractorform = ContractorForm(request.POST or None)
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        try:
-            Contractor.add_client(
-                name=name,email=email,team=team,created_by=request.user
-            )
-            messages.info(request, f'Client added successfully')
-        except Exception as e:
-            messages.error(request, f'{e}!')
+        if contractorform.is_valid():
+            name = contractorform.cleaned_data['name']
+            email = contractorform.cleaned_data['email']
+            try:
+                Contractor.add_client(
+                    name=name,email=email,team=team,created_by=request.user
+                )
+                messages.info(request, f'Client added successfully')
+            except Exception as e:
+                messages.error(request, f'{e}!')
+        else:
+            messages.error(request, f'Invalid name or email!')
         context={
-            'contractors': contractors
+            'contractors': contractors,
+            # 'contractorform': ContractorForm()
         }
         return render(request, 'contract/components/contract.html', context)
     else:
-        contractorform = ContractorForm(request.POST or None)
         context={
-            'contractorform': contractorform,
+            'contractorform': ContractorForm(),
             'contractors': contractors
         }
         return render(request, 'contract/components/contract.html', context)
@@ -137,7 +142,7 @@ def create_external_contract(request, reference):
             contract.save()
 
             messages.info(request, 'The contract was added!')
-            return redirect('contract:contract_client')
+            return redirect('contract:contract_list')
 
     else:
         contractform = ExternalContractForm()
@@ -187,16 +192,16 @@ def create_internal_contract(request, short_name):
 
 
 @login_required
-def contract_detail(request, contract_id, contract_slug):
+def contract_detail(request, identifier, contract_slug):
     if request.user.user_type == Customer.FREELANCER:
         team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
-        contract = get_object_or_404(Contract, team=team, pk=contract_id, slug=contract_slug)
+        contract = get_object_or_404(Contract, team=team, identifier=identifier, slug=contract_slug)
 
     if request.user.user_type == Customer.CLIENT:
-        contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, created_by=request.user)
+        contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, client__email=request.user.email)
     
     if request.user.user_type == Customer.MERCHANT:
-        contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, merchant__merchant=request.user)
+        contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, merchant__merchant=request.user)
 
     context = {
         "contract": contract,
@@ -248,34 +253,12 @@ def refresh_contract(request):
     return render(request, 'contract/components/accept_or_reject.html', context)
 
 
-# @login_required
-# @user_is_client
-# def pricing_option_with_fees(request, contract_id, contract_slug):
-#     base_contract = BaseContract(request)
-#     payment_gateways = request.merchant.gateways.all().exclude(name='balance')
-#     contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, reaction=Contract.ACCEPTED, created_by=request.user)
-#     discount = base_contract.get_discount_value(contract)
-#     multiplier = base_contract.get_discount_multiplier(contract)
-#     start_discount = base_contract.get_start_discount_value()
-#     base_currency = get_base_currency(request)
-#     context = {
-#         "contract": contract,
-#         "payment_gateways": payment_gateways,
-#         "discount": discount,
-#         "multiplier": multiplier,
-#         "start_discount": start_discount,
-#         "base_currency": base_currency,
-#         "payment_method": "Payment Summary",
-#     }
-#     return render(request, 'contract/pricing_option_with_fees.html', context)
-
-
-
 @login_required
-def pricing_option_with_fees(request, contract_id, contract_slug):
+def pricing_option_with_fees(request, identifier, contract_slug):
     base_contract = BaseContract(request)
     payment_gateways = request.merchant.gateways.all().exclude(name='balance')
-    contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, reaction=Contract.ACCEPTED)
+    contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, reaction=Contract.ACCEPTED, client__email=request.user.email)
+    payment_data = calculate_contract_payment_data(base_contract, contract)
     base_currency = get_base_currency(request)
 
     if request.method == 'POST':
@@ -285,6 +268,7 @@ def pricing_option_with_fees(request, contract_id, contract_slug):
         session = request.session
 
         if gateway:
+            
             if "contractgateway" not in session:
                 session["contractgateway"] = {"gateway_id": gateway.id}
                 session.modified = True
@@ -294,7 +278,6 @@ def pricing_option_with_fees(request, contract_id, contract_slug):
         else:
             pass
 
-    payment_data = calculate_contract_payment_data(base_contract, contract)
     context ={
         'contract': contract,
         'selected': 'selected',
@@ -315,62 +298,111 @@ def pricing_option_with_fees(request, contract_id, contract_slug):
 
 @login_required
 @user_is_client
-def final_intcontract_checkout(request, contract_id, contract_slug):
-    chosen_contract = BaseContract(request)
-    contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, reaction=Contract.ACCEPTED, created_by=request.user)
+def final_contract_checkout(request, identifier, contract_slug):
+    base_contract = BaseContract(request)
+    contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, reaction=Contract.ACCEPTED)
+    session = request.session
+    
+    if not (contract.created_by == request.user or contract.client.email == request.user.email):
+        raise HttpResponseNotFound()
 
-    if "contractchosen" not in request.session:
-        messages.error(request, "Bad request. Please select payment option again")
-        return redirect("contract:contract_fee_structure", contract_id=contract.id, contract_slug=contract.slug)
-
-    if "contractgateway" not in request.session:
+    if "contractgateway" not in session:
         messages.error(request, "Please select payment option to proceed")
         return redirect("contract:pricing_option_with_fees", contract_id=contract.id, contract_slug=contract.slug)
 
-    clientsecret = ''
-    context = {}
-    discount = chosen_contract.get_discount_value(contract)
-    multiplier = chosen_contract.get_discount_multiplier(contract)
-    start_discount = chosen_contract.get_start_discount_value()
-    selected_fee = chosen_contract.get_fee_payable()
-    gateway_type = chosen_contract.get_gateway()
-    subtotal = chosen_contract.get_total_price_before_fee_and_discount(contract)
-    grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)
-    
+    base_contract.capture(contract = contract)
+    payment_data = calculate_contract_payment_data(base_contract, contract)
+    gateway_type = str(payment_data['gateway_type']).lower()
+
+    base_currency = get_base_currency(request)
+    paypal_public_key = ''
+    stripeClient = ''
+    razorpay_public_key = ''
+    flutterwave_public_key = ''
+    stripe_public_key = ''
+    paystack_public_key = ''
+
+    # Paypal payment api
+    if gateway_type == 'paypal':
+        paypal_public_key = PayPalClientConfig().paypal_public_key()
 
     # Stripe payment api
-    stripe_public_key = StripeClientConfig().stripe_public_key()
-    # Paypal payment api
-    paypal_public_key = PayPalClientConfig().paypal_public_key()
-    # Futterwave payment api
-    flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key()
-    # Razorpay payment api
-    razorpay_public_key = RazorpayClientConfig().razorpay_public_key_id()
+    elif gateway_type == 'stripe':
+        stripeClient = StripeClientConfig()
+        stripe_public_key = stripeClient.stripe_public_key()
 
-    currency = CurrencyForm()
-    base_currency = get_base_currency(request)
+    # Razorpay payment api
+    elif gateway_type == 'razorpay':
+        razorpay_public_key = RazorpayClientConfig().razorpay_key_id
+
+
+    # Flutterwave payment api
+    elif gateway_type == 'flutterwave':
+        flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key  
+    
+    # Paystack payment api
+    elif gateway_type == 'paystack':
+        paystack_public_key = PaystackClientConfig().paystack_public_key  
+
 
     context = {
-        'contract': contract,
-        'subtotal': subtotal,
-        'grand_total': grand_total,
-        'selected_fee': selected_fee,
+        "discount": payment_data['discount_value'],
+        'subtotal': payment_data['grand_total_before_expense'],
+        'grand_total': payment_data['grand_total'],
+        'selected_fee': payment_data['total_gateway_fee'],
         "gateway_type": gateway_type,
+        "paystack_public_key": paystack_public_key,
         "paypal_public_key": paypal_public_key,
         "stripe_public_key": stripe_public_key,
         "flutterwave_public_key": flutterwave_public_key,
         "razorpay_public_key": razorpay_public_key,
-        "currency": currency,
+        "currency": CurrencyForm(),
         "base_currency": base_currency,
-        "base_currency_symbol": base_currency_symbol,
-        "discount": discount,
-        "multiplier": multiplier,
-        "start_discount": start_discount,
-        "paypal_public_key": paypal_public_key,
-        "clientsecret": clientsecret,        
     }
 
     return render(request, "contract/final_contract_checkout.html", context)
+
+
+@login_required
+@require_http_methods(['POST'])
+def stripe_payment_intent(request):
+    base_contract = BaseContract(request)
+    contract_id = request.session["chosencontract"]["contract_id"]
+    contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED)
+    payment_data = calculate_contract_payment_data(base_contract, contract)
+
+    card_token = request.POST.get('card_token')
+    stripe_client = StripeClientConfig()
+    payment_id, client_secret = stripe_client.create_payment_intent(contract.grand_total, card_token) 
+
+    purchase = None
+    try:
+        purchase = Purchase.create_purchase_and_sales(
+            client=request.user,
+            **payment_data,
+            category=Purchase.CONTRACT,
+            stripe_order_key=payment_id,
+            hiringbox=base_contract,
+        )
+        response_data = {
+            'client_secret': client_secret,
+            'payment_intent': purchase.stripe_order_key,
+        }
+        return JsonResponse(response_data)
+    except Exception as e:
+        print('%s' % (str(e)))
+        return JsonResponse({'status': 'failed'})
+
+
+@login_required
+@require_http_methods(['POST'])
+def stripe_payment_order(request):
+    applicant_box = ApplicationAddon(request)
+    stripe_order_key = request.POST.get('stripe_order_key')
+    Purchase.stripe_order_confirmation(stripe_order_key)
+    applicant_box.clean_box()
+    transaction_url = reverse('transactions:application_transaction')
+    return JsonResponse({'status': 'success', 'transaction_url':transaction_url})
 
 
 @login_required
@@ -489,96 +521,6 @@ def flutter_contract_success(request):
     }
     return render(request, "contract/payment_success.html", context)
 
-
-@login_required
-@user_is_client
-def stripe_contract_intent(request):
-    contract_id = request.session["contractchosen"]["contract_id"]
-    chosen_contract = BaseContract(request)
-    gateway_type = str(chosen_contract.get_gateway())
-    contract = get_object_or_404(Contract, pk=contract_id, reaction=Contract.ACCEPTED, created_by=request.user)
-    
-    discount_value = chosen_contract.get_discount_value(contract)
-    total_gateway_fee = chosen_contract.get_fee_payable()
-    grand_total_before_expense = chosen_contract.get_total_price_before_fee_and_discount(contract)  
-    grand_total = chosen_contract.get_total_price_after_discount_and_fee(contract)  
-    purchase=None
-    
-    stripe_obj = StripeClientConfig()
-    stripe_reference = stripe_obj.stripe_unique_reference()
-    stripe.api_key = stripe_obj.stripe_secret_key()
-    base_currency_code = get_base_currency(request)
-    session = stripe.checkout.Session.create(
-        metadata = {'mode':'payment'},
-        payment_method_types=['card'],
-        line_items = [
-            {
-                'price_data': {
-                    'currency': base_currency_code.lower(),
-                    'product_data': {
-                        'name': 'Hiring of Applicants',
-                    },
-                    'unit_amount': grand_total * 100,
-                },
-                'quantity': 1
-            },
-        ],
-        mode='payment',
-        success_url=f"{get_protocol_only()}{str(get_current_site(request))}/contract/congrats/",
-        cancel_url=f"{get_protocol_only()}{str(get_current_site(request))}/dashboard/"
-    )
-
-    payment_intent = session.payment_intent
-
-    if Purchase.objects.filter(stripe_order_key=payment_intent).exists():
-        pass
-    else:
-        try:        
-            purchase = Purchase.objects.create(
-                client=request.user,
-                full_name=request.user.get_full_name,
-                email=request.user.email,
-                country=str(request.user.country),
-                payment_method=gateway_type,
-                client_fee = int(total_gateway_fee),
-                category = Purchase.CONTRACT,
-                salary_paid=grand_total,
-                unique_reference=stripe_reference,           
-            )           
-            purchase.stripe_order_key=payment_intent
-            purchase.status=Purchase.FAILED
-            purchase.save()
-        except Exception as e:
-            print('%s' % (str(e)))
-
-        try:
-            ContractSale.objects.create(
-                team=contract.team, 
-                purchase=purchase,  
-                contract=contract, 
-                sales_price=contract.grand_total,  
-                staff_hired=int(1),
-                earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-                total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
-                discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
-                disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
-                total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                earning=int(get_earning_calculator(
-                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                    get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
-                total_earning=int(get_earning_calculator(
-                    (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
-                    get_contract_fee_calculator(contract.grand_total- get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
-            
-            )
-        except Exception as e:
-            print('%s' % (str(e)))
-
-        chosen_contract.clean_box()
-        return JsonResponse({'session': session,})
-            
-    return JsonResponse({'Perfect':'All was not successful',})
 
 
 @login_required

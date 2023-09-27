@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.cache import cache
 from general_settings.models import WebsiteSetting
 from threadlocals.threadlocals import set_thread_variable
-
+from account.models import Merchant
 
 
 class DynamicHostMiddleware:
@@ -61,7 +61,8 @@ class DynamicHostMiddleware:
         if WebsiteSetting.objects.filter(site=request.site).first():
             request.parent_site = request.site.websitesetting
         else:
-            request.merchant = request.site.merchant
+            request.merchant = Merchant.objects.filter(site=request.site).first()
+            # request.merchant = request.site.merchant
 
         response = self.get_response(request)
         return response

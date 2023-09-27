@@ -69,7 +69,7 @@
                                             <div class="wt-iconbox">
                                                 {% comment %} <i class="ti-announcement"></i> {% endcomment %}
                                                 <span class="float-left text-center" style="color:green;">Ask questions about this proposal or help others</span>
-                                                <button id="newMessage" hx-post="{% url 'contract:create_contract_chat' contract.id %}" hx-target="#contract-messages" type="submit" class="wt-btnsendmsg">Send</button>
+                                                <button id="newMessage" hx-post="{% url 'contract:create_contract_chat' contract.identifier %}" hx-target="#contract-messages" type="submit" class="wt-btnsendmsg">Send</button>
                                             </div>
                                         </div>
                                     </div>

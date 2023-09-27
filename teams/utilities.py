@@ -3,14 +3,11 @@
 
 #
 # Import from django
-from django.shortcuts import get_object_or_404
 from twisted.internet.protocol import Protocol
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 from account.models import Customer
 from general_settings.backends import get_website_email
-
+import uuid
 #
 # Import from python
 
@@ -54,16 +51,16 @@ def create_random_code(chars=GENERATED_CHARS):
     return "".join([choice(chars) for _ in range(SIZE)])
     
 #
-# # Try to avoid the possible chance of repeated code with function below
-# def create_shortened_url(model_instance):
-#     random_code = create_random_code()
+def generate_unique_reference(model, max_attempts=10):
+    attempts = 0
+    while attempts < max_attempts:
+        # Generate a random UUID and convert it to a human-readable string
+        reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
 
-#     # This line help to avoid error when we make circular imports between models and this file- utilities
-#     model_class = model_instance.__class__
+        # Check if the generated reference is unique for the given model
+        if not model.objects.filter(reference=reference).exists():
+            return reference
 
-#     if model_class.objects.filter(invite_url=random_code).exists():
-#         # Run the function again
-#         return create_shortened_url(model_instance)
+        attempts += 1
 
-#     return random_code
-
+    raise ValueError("Failed to create unique reference")

@@ -45,6 +45,8 @@ from django_htmx.http import HttpResponseClientRedirect
 from contract.models import Contract
 from .backend import CustomAuthBackend
 from .permission import user_is_merchant
+from django.db.models import Q
+
 
 
 @login_required
@@ -364,7 +366,7 @@ def user_dashboard(request):
 
     if request.user.is_freelancer:
         user_active_team = Team.objects.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE).first()
-        contracts = Contract.objects.filter(team=user_active_team, reaction=Contract.AWAITING)[:10]
+        contracts = Contract.objects.filter(team=user_active_team, reaction=Contract.AWAITING)
         proposals = Proposal.objects.filter(team=user_active_team)
         freelancer_profile = Freelancer.objects.filter(created=True, user__id=request.user.id).first()
         open_projects = Project.objects.filter(status=Project.ACTIVE, duration_time__gte=timezone.now())[:10]
@@ -420,7 +422,11 @@ def user_dashboard(request):
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration_time__gte=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration_time__lt=timezone.now())
-        contracts = Contract.objects.filter(created_by=request.user).exclude(reaction='paid')[:10]
+        contracts = Contract.objects.filter(
+            Q(created_by=request.user)|
+            Q(client__email__iexact=request.user.email),
+            reaction = Contract.AWAITING
+        )
         base_currency = get_base_currency_symbol()
         context = {
             'open_projects': open_projects,

@@ -8,34 +8,12 @@ import uuid
 from django.template.defaultfilters import slugify
 from teams.utilities import create_random_code
 from django.template.defaultfilters import truncatechars
-# from proposals.utilities import (
-#     one_day, 
-#     two_days, 
-#     three_days, 
-#     four_days, 
-#     five_days, 
-#     six_days, 
-#     one_week,
-#     two_weeks,
-#     three_weeks,
-#     one_month,
-# )
 from merchants.models import MerchantProduct
 from django.contrib.sites.models import Site
 from datetime import timedelta
 from django.utils import timezone
+from teams.utilities import generate_unique_reference
 
-
-
-# class PublishedProjects(models.Manager):
-#     def publish_project(self):
-#         site = Site.objects.get_current()
-#         return super(PublishedProjects, self).get_queryset().filter(
-#             merchant__site=site.id, 
-#             published=True, 
-#             status='active', 
-#             duration__time__gte=timezone.now()
-#         )
 
 
 class Project(MerchantProduct):
@@ -90,27 +68,9 @@ class Project(MerchantProduct):
             self.duration_time = (timezone.now() + timedelta(days = self.duration))
 
         if not self.reference:
-            self.reference = self.generate_unique_reference()
+            self.reference = generate_unique_reference(Project)
 
         super(Project, self).save(*args, **kwargs)
-
-
-    def generate_unique_reference(self):
-        max_attempts = 1000
-        attempts = 0
-
-        while attempts < max_attempts:
-            # Generate a random UUID and convert it to a human-readable string
-            # We set max_attempt to prevent function from going into potential infinite loop
-            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
-
-            # Check if the generated reference is unique
-            if not Project.objects.filter(reference=reference).exists():
-                return reference
-
-            attempts += 1
-
-        raise ValueError("Failed to create transaction")
 
 
     #a url route for the project detail page

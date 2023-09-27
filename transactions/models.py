@@ -26,7 +26,7 @@ from general_settings.fees_and_charges import (
 )
 from general_settings.discount import get_discount_calculator, get_earning_calculator
 from account.models import Merchant
-
+from teams.utilities import generate_unique_reference
 
 
 class PurchaseMaster(MerchantMaster):
@@ -40,13 +40,11 @@ class PurchaseMaster(MerchantMaster):
     PROPOSAL = 'proposal'
     PROJECT = 'project'
     CONTRACT = 'contract'
-    EX_CONTRACT = 'excontract'
     PURCHASE_CATEGORY = (
         (PROPOSAL, _('Proposal')),
         (PROJECT, _('Project')),
         (CONTRACT, _('Contract')),
-        (EX_CONTRACT, _('Ex-Contract'))
-    ) 
+    )
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     salary_paid = models.PositiveIntegerField(_("Salary Paid"))
     payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
@@ -80,24 +78,8 @@ class Purchase(PurchaseMaster):
 
     def save(self, *args, **kwargs):
         if not self.reference:
-            self.reference = self.generate_unique_reference()
+            self.reference = generate_unique_reference(Purchase)
         super().save(*args, **kwargs)
-
-    def generate_unique_reference(self):
-        max_attempts = 1000
-        attempts = 0
-
-        while attempts < max_attempts:
-            # Generate a random UUID and convert it to a human-readable string
-            reference = str(uuid.uuid4()).replace('-', '')[:12].upper()
-
-            # Check if the generated reference is unique
-            if not Purchase.objects.filter(reference=reference).exists():
-                return reference
-
-            attempts += 1
-
-        raise ValueError("Failed to create transaction")
 
 
     @classmethod
@@ -164,11 +146,6 @@ class Purchase(PurchaseMaster):
                 
                 # if purchase.category == Purchase.CONTRACT:
 
-                #     return purchase
-                
-                # if purchase.category == Purchase.EX_CONTRACT:
-
-                #     return purchase
 
 
     @classmethod
@@ -708,25 +685,8 @@ class ProposalSale(MerchantTransaction):
             self.end_time = (timezone.now() + timedelta(days = self.duration))
 
         if not self.reference:
-            self.reference = self.generate_unique_reference()
+            self.reference = generate_unique_reference(ProposalSale)
         super(ProposalSale, self).save(*args, **kwargs)
-
-
-    def generate_unique_reference(self):
-        max_attempts = 2000
-        attempts = 0
-
-        while attempts < max_attempts:
-            # Generate a random UUID and convert it to a human-readable string
-            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
-
-            # Check if the generated reference is unique
-            if not ProposalSale.objects.filter(reference=reference).exists():
-                return reference
-
-            attempts += 1
-
-        raise ValueError("Failed to create transaction")
 
 
     def __str__(self):
@@ -807,25 +767,8 @@ class ApplicationSale(MerchantTransaction):
             self.end_time = (timezone.now() + timedelta(days = self.duration))
 
         if not self.reference:
-            self.reference = self.generate_unique_reference()            
+            self.reference = generate_unique_reference(ApplicationSale)            
         super(ApplicationSale, self).save(*args, **kwargs)
-
-
-    def generate_unique_reference(self):
-        max_attempts = 2000
-        attempts = 0
-
-        while attempts < max_attempts:
-            # Generate a random UUID and convert it to a human-readable string
-            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
-
-            # Check if the generated reference is unique
-            if not ApplicationSale.objects.filter(reference=reference).exists():
-                return reference
-
-            attempts += 1
-
-        raise ValueError("Failed to create transaction")
 
 
     def status_value(self):

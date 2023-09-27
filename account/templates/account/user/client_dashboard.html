@@ -299,10 +299,10 @@
 									<td>{{contract.grand_total}}</td>
 									<td>{{contract.get_reaction_display}}</td>
 									<td>
-										<a href="{% url 'contract:contract_discord' contract.id contract.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-folder-open"> Chat Team</i></a>
+										<a href="{{contract.get_contract_discord_absolute_url}}" class="btn btn-danger btn-sm"><i class="fa fa-folder-open"> Chat Team</i></a>
 									</td>
 									<td> 
-										<a href="{% url 'contract:contract_detail' contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+										<a href="{{contract.get_contract_detail_absolute_url}}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
 									</td> 
 								</tr>
 								{% endfor %}

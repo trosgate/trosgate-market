@@ -33,6 +33,4 @@ class Command(BaseCommand):
         # new_proposal.save()
 
         ## assign to different user
-        Contractor.objects.all().delete()
-        # proposal.created_by_id = 18
         print('This command is done')

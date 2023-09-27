@@ -81,7 +81,7 @@
                                     </td>
                                     {% if contract.team.created_by == request.user %}
                                     <td>
-										<a href="{% url 'contract:internal_contract_detail'  contract.id contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
+										<a href="{% url 'contract:contract_detail'  contract.identifier contract.slug %}" class="btn btn-success btn-sm"><i class="fa fa-info"> Preview</i></a>
 									</td> 
                                     {% endif %}
                                     </tr>

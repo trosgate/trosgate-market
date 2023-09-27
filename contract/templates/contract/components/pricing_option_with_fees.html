@@ -12,22 +12,25 @@
             <tbody>
                 {% for gateway in payment_gateways %}
                 <tr>
-                    <td>
+                    <td
+                    {% if gateway_type|lower == gateway.name %}
+                        style="background-color:rgb(231, 236, 231); color:#fff"
+                        {% endif %}>
                         <form>
                         <input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"
-                            hx-post="{% url 'contract:pricing_option_with_fees' contract.id contract.slug %}"
+                            hx-post="{% url 'contract:pricing_option_with_fees' contract.identifier contract.slug %}"
                             hx-target="#payment-method">
                         </input>
                         </form>
                     </td>
-                    <td class="text-left">{{gateway.get_name_display}}
-                        {% if gateway_type|lower == gateway.name %} 
-                        <i class="fa fa-check" style="color:green;"></i>
-                        {% else %}
-                        <i class="fa fa-close" style="color:red;"></i>
-                        {% endif %}
+                    <td class="text-left" 
+                    {% if gateway_type|lower == gateway.name %}
+                    style="background-color:rgb(231, 236, 231);"
+                    {% endif %}>{{gateway.get_name_display}}
                     </td>
-                    <td> {{base_currency}} {{gateway.processing_fee}}</td>
+                    <td {% if gateway_type|lower == gateway.name %}
+                    style="background-color:rgb(231, 236, 231);"
+                    {% endif %}> {{base_currency}} {{gateway.processing_fee}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -56,7 +59,7 @@
     <div class="proposal-action">
         {% if grand_total > 0 %}
         {% if gateway_type %}
-        <a href="{% url 'applications:final_application_checkout' %}" 
+        <a href="{% url 'contract:final_contract_checkout' contract.identifier contract.slug %}" 
             class="btn btn-primary btn-block product-btn-state"
             style="border-radius:20px;">
             <i class="fa fa-lock" aria-hidden="true"></i> Review and Pay</a>

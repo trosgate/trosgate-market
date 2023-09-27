@@ -11,6 +11,25 @@ class DateInput(forms.DateInput):
     input_type = 'date'
 
 
+
+class ContractorForm(forms.ModelForm):
+    class Meta:
+        model = Contractor
+        fields = ['name', 'email'] 
+        required = ['name', 'email']  
+
+    def __init__(self, *args, **kwargs):
+        super(ContractorForm, self).__init__(*args, **kwargs)
+
+        self.fields['name'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Enter Full Name'})
+        self.fields['email'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Active Email'})           
+     
+        for field in self.Meta.required:
+            self.fields[field].required = True
+
+
 class InternalContractForm(forms.ModelForm):
     proposal = forms.ModelChoiceField(queryset=Contract.objects.filter(contract_type='internal'), empty_label='Select Proposal')
 
@@ -189,23 +208,6 @@ class ExternalContractForm(forms.ModelForm):
         for field in self.Meta.readonly:
             self.fields[field].widget.attrs["readonly"] = True
 
-
-class ContractorForm(forms.ModelForm):
-    class Meta:
-        model = Contractor
-        fields = ['name', 'email'] 
-        required = ['name', 'email']  
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields['name'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Enter Full Name'})
-        self.fields['email'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Active Email'})           
-     
-        for field in self.Meta.required:
-            self.fields[field].required = True
 
     def clean_email(self):
         email = self.cleaned_data['email']

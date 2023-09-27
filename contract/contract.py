@@ -24,6 +24,13 @@ class BaseContract():
     def capture(self, contract):
         contract_id = str(contract.id)
         chosen_contract = Contract.objects.filter(pk=contract_id).first()
+        
+        if "chosencontract" not in self.session:
+            self.session["chosencontract"] = {"contract_id": contract.id}
+        else:
+            self.session["chosencontract"]["contract_id"] = contract.id
+
+        self.commit()
         return chosen_contract
 
     def get_total_price_before_fee_and_discount(self, contract):

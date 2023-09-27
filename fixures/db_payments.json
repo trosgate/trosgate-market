@@ -1,124 +1,5 @@
 [
 {
-    "model": "payments.paymentgateway",
-    "pk": 1,
-    "fields": {
-        "public_key": null,
-        "secret_key": null,
-        "webhook_key": null,
-        "subscription_price_id": null,
-        "sandbox": true,
-        "name": "balance",
-        "status": true,
-        "processing_fee": 0,
-        "ordering": 1,
-        "subscription": false,
-        "default": true
-    }
-},
-{
-    "model": "payments.paymentgateway",
-    "pk": 2,
-    "fields": {
-        "public_key": "pk_test_51JxEfNF4wH80TkNlzPX02TCj0H8k1L2rviwn961IIyuO9yuXIVjAr3PjrejrS5vDMe2iXLYVHLbTCVk5rDVEEkwl00dV0nWbqW",
-        "secret_key": "sk_test_51JxEfNF4wH80TkNlVeNwGaAJYSaduuxjjeGWRzoemJj833qIn4pKnwwfP2pvemT8oiepPbAr9lBZkkkH9fIhQEtO00JkJOMAHt",
-        "webhook_key": "whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c",
-        "subscription_price_id": "price_1MxbNoF4wH80TkNlnmoi9SXR",
-        "sandbox": true,
-        "name": "paypal",
-        "status": true,
-        "processing_fee": 7,
-        "ordering": 2,
-        "subscription": true,
-        "default": false
-    }
-},
-{
-    "model": "payments.paymentgateway",
-    "pk": 3,
-    "fields": {
-        "public_key": "pk_test_51JxEfNF4wH80TkNlgTuafnWaz7TKrQr34DUqaHwC5BaFOJ2FWsggoVBIeMHUtmRhwLIBuQe75QnZze3mpETo1q8300ZjZ423cP",
-        "secret_key": "sk_test_51JxEfNF4wH80TkNlwb7kYyjvWkJnB3BjBantEbw5akhnOZCSnCb4nqxBW8mjpMvnjJUWvKRq745IMrb5Ri9CbLTw00f7IG6QDi",
-        "webhook_key": "whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c",
-        "subscription_price_id": "price_1MxbNoF4wH80TkNlnmoi9SXR",
-        "sandbox": true,
-        "name": "stripe",
-        "status": true,
-        "processing_fee": 10,
-        "ordering": 3,
-        "subscription": true,
-        "default": false
-    }
-},
-{
-    "model": "payments.paymentgateway",
-    "pk": 4,
-    "fields": {
-        "public_key": null,
-        "secret_key": null,
-        "webhook_key": null,
-        "subscription_price_id": null,
-        "sandbox": true,
-        "name": "flutterwave",
-        "status": true,
-        "processing_fee": 12,
-        "ordering": 4,
-        "subscription": false,
-        "default": false
-    }
-},
-{
-    "model": "payments.paymentgateway",
-    "pk": 5,
-    "fields": {
-        "public_key": null,
-        "secret_key": null,
-        "webhook_key": null,
-        "subscription_price_id": null,
-        "sandbox": true,
-        "name": "razorpay",
-        "status": true,
-        "processing_fee": 15,
-        "ordering": 5,
-        "subscription": false,
-        "default": false
-    }
-},
-{
-    "model": "payments.paymentgateway",
-    "pk": 6,
-    "fields": {
-        "public_key": null,
-        "secret_key": null,
-        "webhook_key": null,
-        "subscription_price_id": null,
-        "sandbox": true,
-        "name": "mtn_momo",
-        "status": true,
-        "processing_fee": 15,
-        "ordering": 6,
-        "subscription": false,
-        "default": false
-    }
-},
-{
-    "model": "payments.paymentgateway",
-    "pk": 7,
-    "fields": {
-        "public_key": null,
-        "secret_key": null,
-        "webhook_key": null,
-        "subscription_price_id": null,
-        "sandbox": true,
-        "name": "paystack",
-        "status": true,
-        "processing_fee": 8,
-        "ordering": 7,
-        "subscription": false,
-        "default": false
-    }
-},
-{
     "model": "payments.merchantapis",
     "pk": 1,
     "fields": {
@@ -221,6 +102,99 @@
         "mtn_subscription_key": "sod;osfidfoispodf",
         "mtn_callback_url": "sod;osfidfoispodf",
         "mtn_active": true
+    }
+},
+{
+    "model": "payments.paymentaccount",
+    "pk": 1,
+    "fields": {
+        "merchant": 13,
+        "user": 19,
+        "primary_account_type": null,
+        "paypal_account": null,
+        "paypal_bearer": null,
+        "paypal_country": null,
+        "stripe_country": null,
+        "stripe_bank": null,
+        "stripe_account": null,
+        "stripe_routing": null,
+        "stripe_swift_iban": null,
+        "stripe_bearer": null,
+        "stripe_extra_info": null,
+        "flutterwave_type": "mobilemoney",
+        "flutterwave_bank": null,
+        "flutterwave_bearer": null,
+        "flutterwave_country": null,
+        "flutterwave_account": null,
+        "flutterwave_swift_iban": null,
+        "flutterwave_extra_info": null,
+        "razorpay_bearer": null,
+        "razorpay_upi": null,
+        "razorpay_country": null,
+        "created_at": "2023-09-16T18:33:17.561Z",
+        "modified_on": "2023-09-16T18:33:17.561Z"
+    }
+},
+{
+    "model": "payments.paymentaccount",
+    "pk": 2,
+    "fields": {
+        "merchant": 13,
+        "user": 20,
+        "primary_account_type": null,
+        "paypal_account": null,
+        "paypal_bearer": null,
+        "paypal_country": null,
+        "stripe_country": null,
+        "stripe_bank": null,
+        "stripe_account": null,
+        "stripe_routing": null,
+        "stripe_swift_iban": null,
+        "stripe_bearer": null,
+        "stripe_extra_info": null,
+        "flutterwave_type": "mobilemoney",
+        "flutterwave_bank": null,
+        "flutterwave_bearer": null,
+        "flutterwave_country": null,
+        "flutterwave_account": null,
+        "flutterwave_swift_iban": null,
+        "flutterwave_extra_info": null,
+        "razorpay_bearer": null,
+        "razorpay_upi": null,
+        "razorpay_country": null,
+        "created_at": "2023-09-16T18:42:58.395Z",
+        "modified_on": "2023-09-16T18:42:58.395Z"
+    }
+},
+{
+    "model": "payments.paymentaccount",
+    "pk": 3,
+    "fields": {
+        "merchant": 13,
+        "user": 21,
+        "primary_account_type": null,
+        "paypal_account": null,
+        "paypal_bearer": null,
+        "paypal_country": null,
+        "stripe_country": null,
+        "stripe_bank": null,
+        "stripe_account": null,
+        "stripe_routing": null,
+        "stripe_swift_iban": null,
+        "stripe_bearer": null,
+        "stripe_extra_info": null,
+        "flutterwave_type": "mobilemoney",
+        "flutterwave_bank": null,
+        "flutterwave_bearer": null,
+        "flutterwave_country": null,
+        "flutterwave_account": null,
+        "flutterwave_swift_iban": null,
+        "flutterwave_extra_info": null,
+        "razorpay_bearer": null,
+        "razorpay_upi": null,
+        "razorpay_country": null,
+        "created_at": "2023-09-16T18:43:49.701Z",
+        "modified_on": "2023-09-16T18:43:49.701Z"
     }
 }
 ]

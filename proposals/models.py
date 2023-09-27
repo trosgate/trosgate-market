@@ -14,7 +14,7 @@ from django.core.files.storage import FileSystemStorage
 import uuid
 from datetime import timedelta
 from django.utils import timezone
-
+from teams.utilities import generate_unique_reference
 
 
 PROTECTED_FILES_ROOT = settings.PROTECTED_MEDIA_ROOT
@@ -138,7 +138,7 @@ class Proposal(MerchantProduct):
             self.duration_time = (timezone.now() + timedelta(days = self.duration))
 
         if not self.reference:
-            self.reference = self.generate_unique_reference()
+            self.reference = generate_unique_reference(Proposal)
 
         self.slug=(slugify(self.title))
         
@@ -146,24 +146,6 @@ class Proposal(MerchantProduct):
             self.salary = self.salary_tier2
 
         super(Proposal, self).save(*args, **kwargs)
-
-
-    def generate_unique_reference(self):
-        max_attempts = 1000
-        attempts = 0
-
-        while attempts < max_attempts:
-            # Generate a random UUID and convert it to a human-readable string
-            # We set max_attempt to prevent function from going into potential infinite loop
-            reference = str(uuid.uuid4()).replace('-', '')[:8].upper()
-
-            # Check if the generated reference is unique
-            if not Proposal.objects.filter(reference=reference).exists():
-                return reference
-
-            attempts += 1
-
-        raise ValueError("Failed to create transaction")
 
 
     @property
