@@ -2,7 +2,7 @@
 const flutterwaveButton = document.getElementById('flutterwaveButton')
 flutterwaveButton.addEventListener('click', function () {
     flutterwaveButton.disabled = true;
-    fetch("/transaction/flutter_payment_intent/", {
+    fetch("/contract/flutter_payment_intent/", {
         method: 'GET',
         credentials: 'same-origin',
         headers: {
@@ -33,7 +33,7 @@ flutterwaveButton.addEventListener('click', function () {
                     logo: "",
                 },                
                 callback: function (response) {
-                    fetch(`/transaction/flutter_success/?tx_ref=${response.tx_ref}&transaction_id=${response.transaction_id}&status=${response.status}`,{
+                    fetch(`/contract/flutter_success/?tx_ref=${response.tx_ref}&transaction_id=${response.transaction_id}&status=${response.status}`,{
                         method: 'GET',
                         credentials: 'same-origin',
                         headers: {

@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_countries',
     'ckeditor',
+    'debug_toolbar',
     # 'corsheaders',
     'rest_framework',
     'django_celery_results',
@@ -85,6 +86,11 @@ INSTALLED_APPS = [
     'channels',
 ]
 
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 
 MIDDLEWARE = [
     'account.middleware_host.DynamicHostMiddleware',
@@ -93,12 +99,13 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",###
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Django htmx begins
-    'django_htmx.middleware.HtmxMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',###
     # Django htmx ends
     'account.middleware_gate.MerchantGateMiddleware',
     'account.middleware_admin.AdminGateMiddleware',

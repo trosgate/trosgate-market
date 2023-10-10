@@ -121,7 +121,7 @@ class Contract(MerchantMaster):
         (ACCEPTED, _('Accepted')),
         (REJECTED, _('Rejected')),
         (PAID, _('Paid')),
-    )   
+    )
 
     id = models.AutoField(primary_key=True),
     identifier = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)    

@@ -6,7 +6,6 @@ from account.fund_exception import (
     GatewayNotConfigured, 
     InvalidData
 )
-from general_settings.currency import get_base_currency_code
 
 
 class StripeClientConfig:
@@ -20,14 +19,13 @@ class StripeClientConfig:
         stripe.api_key = self.stripe_secret_key()
         self.stripe = stripe
 
-
     def get_payment_gateway(self):
         merchant = MerchantAPIs.objects.filter(merchant=self.site, stripe_active=True).first()
         return merchant
 
     def default_currency(self):
         currency = self.site.merchant.merchant.merchant.country.currency.lower()
-        print('currency :::', currency)
+        print('currency :::----', currency)
         return currency if currency else 'usd'
 
     def stripe_public_key(self):
@@ -36,27 +34,23 @@ class StripeClientConfig:
             return gateway.stripe_public_key
         return None
 
-
     def stripe_secret_key(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_secret_key
         return None
     
-
     def stripe_webhook_key(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_webhook_key
         return None
 
-
     def get_gateway_status(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_sandbox
         return False
-    
     
     def create_payment_intent(self, amount, card_token):
         try:

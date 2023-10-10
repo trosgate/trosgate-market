@@ -1,0 +1,66 @@
+{
+    "listeners": {
+        "*:80": {
+            "pass": "routes"
+        },
+        "*:443": {
+            "pass": "routes",
+            "tls": {
+                "certificate": "/etc/letsencrypt/live/$domain/fullchain.pem",
+                "key": "/etc/letsencrypt/live/$domain/privkey.pem"
+            }
+        }
+    },
+
+    "routes": [
+        {
+            "action": {
+                "share": "/webapps/trosgate/trosgate_env/trosgate-marketplace/staticfiles/",
+                "alias": "/static/"
+            },
+            "match": {
+                "uri": "/static/(.*)"
+            }
+        },
+        {
+            "action": {
+                "share": "/webapps/trosgate/trosgate_env/trosgate-marketplace/media/",
+                "alias": "/media/"
+            },
+            "match": {
+                "uri": "/media/(.*)"
+            }
+        },
+        {
+            "action": {
+                "pass": "applications/trosgate"
+            },
+            "match": {
+                "uri": "/"
+            }
+        }
+    ],
+
+    "applications": {
+        "trosgate": {
+            "type": "python",
+            "path": "/webapps/trosgate/trosgate_env/trosgate-marketplace",
+            "module": "wsgi",
+            "processes": {
+                "spare": 0
+            },
+            "user": "katey",
+            "group": "webApps",
+            "environment": {
+                "DJANGO_SETTINGS_MODULE": "trosgate.settings"
+            },
+            "headers": {
+                "X-Scheme": "https",
+                "X-Forwarded-Proto": "https"
+            },
+            "log": {
+                "error": "/webapps/trosgate/trosgate_env/logs/nginx-error.log"
+            }
+        }
+    }
+}

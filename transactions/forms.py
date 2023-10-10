@@ -1,4 +1,4 @@
-from .models import Purchase, ProposalSale, ApplicationSale, ContractSale, ExtContract
+from .models import Purchase, ProposalSale, ApplicationSale, ContractSale
 from django import forms
 from account.fund_exception import FundException
 from django.utils.translation import gettext_lazy as _
@@ -40,17 +40,6 @@ class ApplicationRefundForm(BaseMemoForm):
 class ContractRefundForm(BaseMemoForm):
     def form_action(self, pk):
         return ContractSale.contract_refund(pk=pk)
-
-
-class ExtContractRefundForm(BaseMemoForm):
-    def form_action(self, pk):
-        return ExtContract.contract_refund(pk=pk)
-
-
-class OneClickRefundForm(BaseMemoForm):
-    def form_action(self, pk):
-        return OneClickPurchase.oneclick_refund(pk=pk)
-
 
 
 

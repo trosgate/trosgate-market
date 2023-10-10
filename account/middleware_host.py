@@ -44,25 +44,30 @@ class DynamicHostMiddleware:
             return HttpResponseNotFound()
         
         try:
-            site = Site.objects.get(domain=domain)
+            site = Site.objects.select_related('websitesetting', 'merchant').get(domain=domain)
         except Site.DoesNotExist:
-            site = Site.objects.get(pk=settings.SITE_ID)
+            site = Site.objects.select_related('websitesetting', 'merchant').get(pk=settings.SITE_ID)
         except Site.DoesNotExist:
             return HttpResponseNotFound()
-
+        
         settings.SITE_ID = site.pk
         request.site = site
         # Set the request and current site in thread-local storage
+        
         set_thread_variable('current_site', request.site)
 
         request.parent_site = None
         request.merchant = None
 
-        if WebsiteSetting.objects.filter(site=request.site).first():
-            request.parent_site = request.site.websitesetting
-        else:
-            request.merchant = Merchant.objects.filter(site=request.site).first()
-            # request.merchant = request.site.merchant
+        if hasattr(site, 'websitesetting') and site.websitesetting:
+            request.parent_site = site.websitesetting
+        elif hasattr(site, 'merchant') and site.merchant:
+            request.merchant = site.merchant
+
+        # if WebsiteSetting.objects.filter(site=request.site).first():
+        #     request.parent_site = request.site.websitesetting
+        # else:
+        #     request.merchant = Merchant.objects.filter(site=request.site).first()
 
         response = self.get_response(request)
         return response
@@ -74,5 +79,4 @@ class DynamicHostMiddleware:
             site_domains = [site.domain for site in Site.objects.all()]
             cached_domains = list(set(site_domains) | set(settings.ALLOWED_HOSTS))
             cache.set('allowed_domains_cache', cached_domains, timeout=3600)
-
         settings.ALLOWED_HOSTS = cached_domains

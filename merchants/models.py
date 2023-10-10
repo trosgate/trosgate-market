@@ -13,12 +13,14 @@ class MerchantMasterManager(models.Manager):
     def get_queryset(self):
         current_site = get_thread_variable('current_site')
         qs = super().get_queryset()
+
         if current_site and current_site.pk == 1:
             queryset = qs
         elif current_site:
-            queryset = qs.filter(merchant__site=current_site)
+            queryset = qs.filter(merchant__site=current_site).select_related('merchant')
         else:
             queryset = qs.none()
+
         return queryset
 
 

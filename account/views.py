@@ -34,7 +34,6 @@ from general_settings.models import Mailer
 from general_settings.currency import get_base_currency_symbol
 from .fund_exception import InvitationException
 from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
-from django.db.models import F, Sum, Count, Avg
 from freelancer.models import FreelancerAccount
 from applications.application import ApplicationAddon
 from contract.contract import BaseContract
@@ -45,7 +44,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from contract.models import Contract
 from .backend import CustomAuthBackend
 from .permission import user_is_merchant
-from django.db.models import Q
+from django.db.models import Q, Prefetch, F, Sum, Count, Avg
 
 
 
@@ -360,10 +359,6 @@ def user_dashboard(request):
     proposals=None
     msg = ''
 
-    # print('request.site :', request.site)
-    # print('request.parent :', request.parent_site)
-    # print('request.merchant :', request.merchant)
-
     if request.user.is_freelancer:
         user_active_team = Team.objects.filter(pk=request.user.freelancer.active_team_id, status=Team.ACTIVE).first()
         contracts = Contract.objects.filter(team=user_active_team, reaction=Contract.AWAITING)
@@ -422,11 +417,16 @@ def user_dashboard(request):
         proposals = Proposal.objects.filter(status=Proposal.ACTIVE)
         open_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, duration_time__gte=timezone.now())
         closed_projects = Project.objects.filter(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration_time__lt=timezone.now())
+
+        # open_projects = Project.objects.filter(
+        #     Q(created_by=request.user, status=Project.ACTIVE, duration_time__gte=timezone.now()) |
+        #     Q(created_by=request.user, status=Project.ACTIVE, reopen_count=0, duration_time__lt=timezone.now())
+        # )
+
         contracts = Contract.objects.filter(
             Q(created_by=request.user)|
-            Q(client__email__iexact=request.user.email),
-            reaction = Contract.AWAITING
-        )
+            Q(client__email__iexact=request.user.email)
+        ).exclude(reaction = Contract.PAID)
         base_currency = get_base_currency_symbol()
         context = {
             'open_projects': open_projects,

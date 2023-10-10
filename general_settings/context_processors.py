@@ -15,19 +15,20 @@ def website(request):
     current_site = get_current_site(request)
     website_obj = None
 
-    if hasattr(current_site, 'websitesetting'):
-        website_obj = request.parent_site #.websitesetting
+    if hasattr(current_site, 'websitesetting') and current_site.websitesetting:
+        website_obj = request.parent_site
         
-    elif hasattr(current_site, 'merchant'):
+    elif hasattr(current_site, 'merchant') and current_site.merchant:
         website_obj = request.merchant
         
     return {'website': website_obj}
 
 
 def autoLogoutSystem(request):
-    if AutoLogoutSystem.objects.filter(pk=1).exists():
-        autoLogoutSystem = AutoLogoutSystem.objects.get(pk=1)
-        return {'autoLogoutSystem': autoLogoutSystem}
-    return {'autoLogoutSystem':None}    
+    return {'autoLogoutSystem':AutoLogoutSystem.objects.first()}    
+    # if AutoLogoutSystem.objects.filter(pk=1).exists():
+    #     autoLogoutSystem = AutoLogoutSystem.objects.get(pk=1)
+    #     return {'autoLogoutSystem': autoLogoutSystem}
+    # return {'autoLogoutSystem':None}    
 
    

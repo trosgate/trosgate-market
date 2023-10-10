@@ -1,8 +1,6 @@
 def get_base_currency(request):
     base_currency = request.merchant.merchant.country.currency.upper()
-    if not base_currency:
-        base_currency = 'USD'
-    return base_currency
+    return base_currency if base_currency else 'usd'
 
 
 def calculate_payment_data(hiringbox):

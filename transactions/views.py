@@ -49,6 +49,7 @@ from client.models import ClientAccount
 from django_htmx.http import HttpResponseClientRedirect
 from payments.forms import StripeCardCardForm
 from account.models import Merchant
+from django.db.models import Q
 
 
 
@@ -576,6 +577,14 @@ def proposal_transaction(request):
     }
     return render(request, 'transactions/proposal_transactions.html', context)
 
+# team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)  
+
+# # Use prefetch_related to fetch related proposals
+# team_with_proposals = Team.objects.prefetch_related('proposals').get(pk=team.pk)
+
+# # Now you can access the proposals without additional queries
+# proposals = team_with_proposals.proposals.filter(purchase__status=Purchase.SUCCESS)
+
 
 @login_required
 def application_transaction(request):
@@ -598,17 +607,31 @@ def application_transaction(request):
 @login_required
 def contract_transaction(request):
     base_currency = get_base_currency(request)
-    contracts = None
+
     if request.user.user_type == Customer.FREELANCER:
-        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)   
-        contracts = ContractSale.objects.filter(team=team, purchase__status=Purchase.SUCCESS)
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
+        contracts = ContractSale.objects.filter(
+            team=team, 
+            purchase__status=Purchase.SUCCESS
+        )#.select_related('client', 'proposal')
 
     elif request.user.user_type == Customer.CLIENT:
-        contracts = ContractSale.objects.filter(purchase__client=request.user, purchase__status=Purchase.SUCCESS)
-    
+        contracts = ContractSale.objects.filter(
+            purchase__client=request.user,
+            purchase__status=Purchase.SUCCESS
+        )#.select_related('client', 'proposal')
+
+    elif request.user.user_type == Customer.MERCHANT:
+        contracts = ContractSale.objects.filter(
+            merchant=request.merchant
+        )#.select_related('client', 'proposal')
+
+    else:
+        contracts = None
+
     context = {
         'contracts':contracts,
-        'base_currency': base_currency,        
+        'base_currency': base_currency,       
     }
     return render(request, 'transactions/contract_transactions.html', context)
 

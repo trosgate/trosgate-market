@@ -7,13 +7,12 @@ from freelancer.models import FreelancerAccount
 from proposals.models import Proposal
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from general_settings.currency import get_base_currency_symbol
 from contract.models import Contract
 from client.models import ClientAccount
 from general_settings.fees_and_charges import get_contract_fee_calculator, get_proposal_fee_calculator, get_external_contract_fee_calculator
 from account.fund_exception import FundException
 from teams.models import Team
-from resolution.models import ProposalJob #ProjectResolution, ContractResolution, ExtContractResolution
+from resolution.models import ProposalJob
 from merchants.models import MerchantMaster
 from applications.models import Application
 from datetime import timedelta
@@ -83,7 +82,7 @@ class Purchase(PurchaseMaster):
 
 
     @classmethod
-    def create_purchase_and_sales(cls, client, gateway_type, total_gateway_fee, grand_total, category, hiringbox, grand_total_before_expense, discount_value, stripe_order_key='', paypal_order_key='', razorpay_order_key=''):
+    def create_purchase_and_sales(cls, client, gateway_type, total_gateway_fee, grand_total, category, hiringbox, grand_total_before_expense, discount_value, contract=None, stripe_order_key='', paypal_order_key='', razorpay_order_key=''):
         with db_transaction.atomic():
             purchase = cls.objects.create(
                 client=client,
@@ -144,8 +143,32 @@ class Purchase(PurchaseMaster):
                     )
                 return purchase
                 
-                # if purchase.category == Purchase.CONTRACT:
+            if purchase.category == Purchase.CONTRACT:
 
+                if contract is None:
+                    raise FundException('Error occured. Try again later')
+                
+                ContractSale.objects.create(
+                    team=contract.team, 
+                    purchase=purchase, 
+                    contract=contract, 
+                    sales_price=contract.grand_total, 
+                    staff_hired=int(1),
+                    earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                   
+                    total_earning_fee_charged=int(get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),                 
+                    discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                    total_discount_offered=get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value),
+                    disc_sales_price=int(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)),
+                    total_sales_price=int((contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                    earning=int(get_earning_calculator(
+                        (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                        get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value)))), 
+                    total_earning=int(get_earning_calculator(
+                        (contract.grand_total - (get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))),
+                        get_contract_fee_calculator(contract.grand_total - get_discount_calculator(contract.grand_total, grand_total_before_expense, discount_value))))         
+                
+                )
+            return purchase
 
 
     @classmethod
@@ -243,60 +266,10 @@ class Purchase(PurchaseMaster):
 
 
     @classmethod
-    def one_click_extern_contract(cls, user, contract):
-        with db_transaction.atomic():
-            account = ClientAccount.objects.select_for_update().get(user=user)
-
-            if account.available_balance < contract.grand_total:
-                raise FundException('Insufficient Balance')
-            
-            if contract is None:    
-                raise FundException('Contract error occured. Try again')
-
-            if not contract:
-                raise FundException('Contract not found')
-
-            if contract is None:
-                raise FundException('Contract error')
-                            
-            sales = cls.objects.create(
-                client=account.user,
-                payment_method='balance',
-                category = Purchase.EX_CONTRACT,
-                salary_paid=contract.grand_total,
-                status = cls.SUCCESS,
-            )
-            stan = f'{sales.pk}'.zfill(8)
-            sales.unique_reference = f'1click{sales.client.id}{stan}'
-            sales.status=Purchase.SUCCESS
-            sales.save()
-
-            purchass = ExtContract.objects.create(
-                team = contract.team,
-                contract = contract,
-                purchase=sales,
-                sales_price=int(contract.grand_total),
-                disc_sales_price=int(contract.grand_total),
-                total_sales_price=int(contract.grand_total),
-                earning=int(contract.grand_total),
-                total_earning=int(contract.grand_total)
-            )  
-
-            ClientAccount.debit_available_balance(user=sales.client, available_balance=sales.salary_paid)
-
-            selected_contract = Contract.objects.select_for_update().get(pk=purchass.contract.id)
-            selected_contract.reaction = 'paid'
-            selected_contract.save()
-            
-            FreelancerAccount.credit_pending_balance(user=purchass.team.created_by, paid_amount=purchass.total_earning, purchase=selected_contract)
-
-        return account, purchass, selected_contract
-
-
-    @classmethod
     def stripe_order_confirmation(cls, stripe_order_key):
         with db_transaction.atomic():
             purchase = cls.objects.select_for_update().get(stripe_order_key=stripe_order_key)
+            
             if purchase.status != Purchase.FAILED:
                 raise Exception(_("This purchase already succeeded"))
 
@@ -327,20 +300,18 @@ class Purchase(PurchaseMaster):
             if purchase.category == Purchase.CONTRACT:
                 contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                
+                FreelancerAccount.credit_pending_balance(
+                    user=contract_item.team.created_by, 
+                    paid_amount=contract_item.total_sales_price,
+                    purchase_model = Purchase.CONTRACT, 
+                    purchase=contract.proposal
+                )
                 contract.reaction = 'paid'
                 contract.save()
                 # contract.save(update_fields=['reaction'])
             
-            if purchase.category == Purchase.EX_CONTRACT:
-                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
-                contract.reaction = 'paid'
-                contract.save()
-                # contract.save(update_fields=['reaction'])
-
-        return purchase, contract_item, contract
+        return purchase
 
 
     @classmethod
@@ -382,7 +353,7 @@ class Purchase(PurchaseMaster):
                 contract.save()
                 # contract.save(update_fields=['reaction'])
 
-            if purchase.category == Purchase.EX_CONTRACT:
+            if purchase.category == Purchase.CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
@@ -433,7 +404,7 @@ class Purchase(PurchaseMaster):
                 contract.save()
                 # contract.save(update_fields=['reaction'])
 
-            if purchase.category == Purchase.EX_CONTRACT:
+            if purchase.category == Purchase.CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
@@ -484,7 +455,7 @@ class Purchase(PurchaseMaster):
                 contract.save()
                 # contract.save(update_fields=['reaction'])
 
-            if purchase.category == Purchase.EX_CONTRACT:
+            if purchase.category == Purchase.CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
@@ -536,7 +507,7 @@ class Purchase(PurchaseMaster):
                 contract.save()
                 # contract.save(update_fields=['reaction'])
 
-            if purchase.category == Purchase.EX_CONTRACT:
+            if purchase.category == Purchase.CONTRACT:
                 contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
                 FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
@@ -816,6 +787,23 @@ class ContractSale(MerchantTransaction):
     class Meta:
         ordering = ("-created_at",)
 
+    def save(self, *args, **kwargs):
+        if self.duration is None:
+            self.duration = self.contract.contract_duration
+
+        if self.revision is None:
+            self.revision = 1
+
+        if self.status != self.PENDING and self.start_time is None:
+            self.start_time = timezone.now()
+
+        if self.status != self.PENDING and self.end_time is None:
+            self.end_time = (timezone.now() + timedelta(days = self.duration))
+
+        if not self.reference:
+            self.reference = generate_unique_reference(ContractSale)            
+        super(ContractSale, self).save(*args, **kwargs)
+
     def __str__(self):
         return str(self.contract)
 
@@ -829,7 +817,7 @@ class ContractSale(MerchantTransaction):
         return f'{self.merchant.merchant.country.currency} {self.discount_offered}'
 
     def total_discount(self):
-        return f'{self.merchant.merchant.country.currency} {self.Total_discount_offered}'
+        return f'{self.merchant.merchant.country.currency} {self.total_discount_offered}'
 
     def earnings(self):
         return f'{self.merchant.merchant.country.currency} {self.earning}'
@@ -868,74 +856,6 @@ class ContractSale(MerchantTransaction):
             contract_sale.save()
             
             freelancer.pending_balance -= int(contract_sale.total_earning)
-            freelancer.save(update_fields=['pending_balance'])
-            
-            client.available_balance += int(contract_sale.total_sales_price)
-            client.save(update_fields=['available_balance'])
-
-        return contract_sale, client, freelancer, resolution
-
-
-class ExtContract(MerchantTransaction):
-    # status choices to be added to track the state of order
-    contract = models.ForeignKey("contract.Contract", verbose_name=_("Contract Hired"), related_name="extcontracthired", on_delete=models.CASCADE)
-
-    class Meta:
-        ordering = ("-created_at",)
-
-    def __str__(self):
-        return str(self.contract)
-
-    def earning_fee(self):
-        return f'{self.merchant.merchant.country.currency} {self.earning_fee_charged}'
-
-    def total_earning_fee(self):
-        return f'{self.merchant.merchant.country.currency} {self.total_earning_fee_charged}'
-
-    def total_discount(self):
-        return f'{self.merchant.merchant.country.currency} {self.discount_offered}'
-
-    def total_discount(self):
-        return f'{self.merchant.merchant.country.currency} {self.Total_discount_offered}'
-
-    def earnings(self):
-        return f'{self.merchant.merchant.country.currency} {self.earning}'
-
-    def earnings(self):
-        return f'{self.merchant.merchant.country.currency} {self.total_earning}'
-
-    def status_value(self):
-        return self.purchase.get_status_display()
-
-
-    @classmethod
-    def contract_refund(cls, pk:int):
-        with db_transaction.atomic():
-            contract_sale = cls.objects.select_for_update().get(pk=pk)
-            client = ClientAccount.objects.select_for_update().get(user=contract_sale.purchase.client)
-            freelancer = FreelancerAccount.objects.select_for_update().get(user=contract_sale.team.created_by)
-            
-            try:
-                resolution = ExtContractResolution.objects.select_for_update().get(contract_sale=contract_sale)            
-            except:
-                raise Exception(_("Sorry! refund cannot be raised for this transaction. It could be that Team is yet to start work"))
-            
-            if contract_sale.is_refunded != False:
-                raise Exception(_("This transaction cannot be refunded twice"))
-
-            # if contract_sale.purchase.status != Purchase.SUCCESS:
-            #     raise Exception(_("You cannot issue refund for a failed transaction"))
-
-            if resolution.status == ProjectResolution.COMPLETED:
-                raise Exception(_("This transaction was completed and closed so cannot be refunded"))
-
-            resolution.status = ProjectResolution.CANCELLED
-            resolution.save()
-
-            contract_sale.is_refunded = True
-            contract_sale.save()
-            
-            freelancer.pending_balance -= int(contract_sale.total_sales_price)
             freelancer.save(update_fields=['pending_balance'])
             
             client.available_balance += int(contract_sale.total_sales_price)

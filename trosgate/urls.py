@@ -9,6 +9,7 @@ urlpatterns = [
     # DJANGO REGULAR URLS
     path('admin/', admin.site.urls),
     # path('', include(tf_urls)),
+    path("__debug__/", include("debug_toolbar.urls")),
     path('', include('account.urls', namespace='account')),
     path('', include('notification.urls', namespace='notification')),
     path('merchant/', include('merchants.urls', namespace='merchants')),

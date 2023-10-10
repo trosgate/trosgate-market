@@ -5,7 +5,7 @@
   paystackButton.addEventListener('click', function() {
 
     paystackButton.disabled = true;
-    fetch('/transaction/paystack_payment_intent/', {
+    fetch('/contract/paystack_payment_intent/', {
       method: 'GET',
       credentials: 'same-origin',
       headers: {
@@ -36,7 +36,7 @@
           formData.append('status', response.status);
           formData.append('message', response.message);
 
-          fetch('/transaction/paystack_callback/', {
+          fetch('/contract/paystack_callback/', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin',

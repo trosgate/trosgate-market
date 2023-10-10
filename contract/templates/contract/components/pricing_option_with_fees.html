@@ -18,7 +18,7 @@
                         {% endif %}>
                         <form>
                         <input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"
-                            hx-post="{% url 'contract:pricing_option_with_fees' contract.identifier contract.slug %}"
+                            hx-post="{% url 'contract:pricing_option_with_fees' contract.pk contract.slug %}"
                             hx-target="#payment-method">
                         </input>
                         </form>

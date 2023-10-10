@@ -16,7 +16,7 @@ from client.models import Client
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 from .contract import BaseContract
 from django.views.decorators.csrf import csrf_exempt
-from transactions.models import Purchase, ContractSale, ExtContract
+from transactions.models import Purchase, ContractSale
 from transactions.utilities import get_base_currency, calculate_contract_payment_data
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from payments.paypal import PayPalClientConfig
@@ -25,13 +25,14 @@ from payments.razorpay import RazorpayClientConfig
 from payments.flutterwave import FlutterwaveClientConfig
 from payments.paystack import PaystackClientConfig
 from general_settings.discount import get_discount_calculator, get_earning_calculator
-from general_settings.fees_and_charges import get_contract_fee_calculator, get_external_contract_gross_earning, get_external_contract_fee_calculator
+from general_settings.fees_and_charges import get_contract_fee_calculator
 from general_settings.forms import CurrencyForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.decorators.cache import cache_control
 from general_settings.utilities import get_protocol_only
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
+from django.urls import reverse
 
 
 
@@ -50,9 +51,11 @@ def contract_list(request):
         contracts = Contract.objects.filter(
             Q(created_by=request.user)|
             Q(client__email__iexact=request.user.email)
-        )
+        ).select_related('client', 'proposal')
     else:
-        contracts = Contract.objects.filter(merchant__merchant=request.user)
+        contracts = Contract.objects.filter(
+            merchant__merchant=request.user
+        )
 
     context = {
         'team': team,
@@ -198,8 +201,15 @@ def contract_detail(request, identifier, contract_slug):
         contract = get_object_or_404(Contract, team=team, identifier=identifier, slug=contract_slug)
 
     if request.user.user_type == Customer.CLIENT:
-        contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, client__email=request.user.email)
-    
+        contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug)
+        if contract.contract_type == Contract.INTERNAL:
+            user_is_client = request.user == contract.created_by
+        else:
+            user_is_client = request.user.email == contract.client.email
+        
+        if not user_is_client:
+            return HttpResponseNotFound()
+           
     if request.user.user_type == Customer.MERCHANT:
         contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, merchant__merchant=request.user)
 
@@ -254,10 +264,19 @@ def refresh_contract(request):
 
 
 @login_required
-def pricing_option_with_fees(request, identifier, contract_slug):
+def pricing_option_with_fees(request, contract_id, contract_slug):
     base_contract = BaseContract(request)
     payment_gateways = request.merchant.gateways.all().exclude(name='balance')
-    contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, reaction=Contract.ACCEPTED, client__email=request.user.email)
+    contract = get_object_or_404(Contract, pk=contract_id, slug=contract_slug, reaction=Contract.ACCEPTED)
+    
+    if contract.contract_type == Contract.INTERNAL:
+        user_is_client = request.user == contract.created_by
+    else:
+        user_is_client = request.user.email == contract.client.email
+    
+    if not user_is_client:
+        return HttpResponseNotFound()
+    
     payment_data = calculate_contract_payment_data(base_contract, contract)
     base_currency = get_base_currency(request)
 
@@ -303,8 +322,13 @@ def final_contract_checkout(request, identifier, contract_slug):
     contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, reaction=Contract.ACCEPTED)
     session = request.session
     
-    if not (contract.created_by == request.user or contract.client.email == request.user.email):
-        raise HttpResponseNotFound()
+    if contract.contract_type == Contract.INTERNAL:
+        user_is_authorized = request.user == contract.created_by
+    else:
+        user_is_authorized = request.user.email == contract.client.email
+    
+    if not user_is_authorized:
+        return HttpResponseNotFound()
 
     if "contractgateway" not in session:
         messages.error(request, "Please select payment option to proceed")
@@ -373,7 +397,7 @@ def stripe_payment_intent(request):
 
     card_token = request.POST.get('card_token')
     stripe_client = StripeClientConfig()
-    payment_id, client_secret = stripe_client.create_payment_intent(contract.grand_total, card_token) 
+    payment_id, client_secret = stripe_client.create_payment_intent(contract.grand_total, card_token)
 
     purchase = None
     try:
@@ -383,6 +407,7 @@ def stripe_payment_intent(request):
             category=Purchase.CONTRACT,
             stripe_order_key=payment_id,
             hiringbox=base_contract,
+            contract=contract
         )
         response_data = {
             'client_secret': client_secret,
@@ -397,11 +422,11 @@ def stripe_payment_intent(request):
 @login_required
 @require_http_methods(['POST'])
 def stripe_payment_order(request):
-    applicant_box = ApplicationAddon(request)
+    applicant_box = BaseContract(request)
     stripe_order_key = request.POST.get('stripe_order_key')
     Purchase.stripe_order_confirmation(stripe_order_key)
     applicant_box.clean_box()
-    transaction_url = reverse('transactions:application_transaction')
+    transaction_url = reverse('transactions:contract_transaction')
     return JsonResponse({'status': 'success', 'transaction_url':transaction_url})
 
 
@@ -509,7 +534,10 @@ def flutter_contract_success(request):
     flutterwave_order_key = request.GET.get('transaction_id', '')
     message = ''
     if status == 'successful' and unique_reference != '' and flutterwave_order_key != '':
-        Purchase.flutterwave_order_confirmation(unique_reference=unique_reference, flutterwave_order_key=flutterwave_order_key)
+        Purchase.flutterwave_order_confirmation(
+            unique_reference=unique_reference, 
+            flutterwave_order_key=flutterwave_order_key
+        )
         message = 'Payment succeeded'
     else:
         message = 'Payment failed'
@@ -520,7 +548,6 @@ def flutter_contract_success(request):
         "good": message
     }
     return render(request, "contract/payment_success.html", context)
-
 
 
 @login_required

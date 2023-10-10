@@ -82,7 +82,7 @@
         </div>
         {% if request.user.clients %}
         <div class="text-center">
-            <a href="{% url 'contract:pricing_option_with_fees' contract.identifier contract.slug %}" class="wt-btn">Review product</a>
+            <a href="{% url 'contract:pricing_option_with_fees' contract.id contract.slug %}" class="wt-btn">Review product</a>
         </div>
         {% endif %}
     </div>

@@ -39,7 +39,7 @@ form.addEventListener('submit', function(event) {
     } else {
       let formData = new FormData();
       formData.append('card_token', result.token.id);
-      fetch('/transaction/stripe_payment_intent/', {
+      fetch('/contract/stripe_payment_intent/', {
         method: 'POST',
         body: formData, 
         credentials: 'same-origin',
@@ -62,7 +62,7 @@ form.addEventListener('submit', function(event) {
                 console.log('stripe_order_key ::', result.paymentIntent.id)
                 let formData = new FormData();
                 formData.append('stripe_order_key', result.paymentIntent.id);
-                fetch('/transaction/stripe_payment_order/', {
+                fetch('/contract/stripe_payment_order/', {
                   method: 'POST',
                   body: formData,
                   credentials: 'same-origin',
