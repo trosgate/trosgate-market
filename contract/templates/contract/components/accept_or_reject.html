@@ -8,8 +8,7 @@
         </span>
     </div>
     {% endfor %}
-{% endif %}  
-
+    {% endif %}  
 
     {% if contract.reaction == 'awaiting' %}
     <div class="container">
@@ -82,10 +81,11 @@
         </div>
         {% if request.user.clients %}
         <div class="text-center">
-            <a href="{% url 'contract:pricing_option_with_fees' contract.id contract.slug %}" class="wt-btn">Review product</a>
+            <a href="{% url 'contract:pricing_option_with_fees' contract.identifier %}" class="btn btn-primary">Review Product</a>
         </div>
         {% endif %}
     </div>
+
     {% elif contract.reaction == 'rejected' %}
     <div class="col-md-12 justify-content-md-center">
         <div class="text-center">
@@ -94,4 +94,4 @@
             </span>
         </div>
     </div>
-    {% endif %}	
+    {% endif %}

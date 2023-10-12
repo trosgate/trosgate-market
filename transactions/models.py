@@ -346,21 +346,18 @@ class Purchase(PurchaseMaster):
                     )
             
             if purchase.category == Purchase.CONTRACT:
-                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
-                contract.reaction = 'paid'
-                contract.save()
-                # contract.save(update_fields=['reaction'])
-
-            if purchase.category == Purchase.CONTRACT:
-                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
-                contract.reaction = 'paid'
-                contract.save()
-                # contract.save(update_fields=['reaction'])
                 
+                FreelancerAccount.credit_pending_balance(
+                    user=contract_item.team.created_by, 
+                    paid_amount=contract_item.total_sales_price,
+                    purchase_model = Purchase.CONTRACT, 
+                    purchase=contract.proposal
+                )
+                contract.reaction = 'paid'
+                contract.save()
+                            
         return purchase, contract_item, contract
 
 
@@ -395,24 +392,21 @@ class Purchase(PurchaseMaster):
                         purchase_model = Purchase.PROJECT, 
                         purchase=item.project
                     )
-            
-            if purchase.category == Purchase.CONTRACT:
-                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
-                contract.reaction = 'paid'
-                contract.save()
-                # contract.save(update_fields=['reaction'])
 
             if purchase.category == Purchase.CONTRACT:
-                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
+                
+                FreelancerAccount.credit_pending_balance(
+                    user=contract_item.team.created_by, 
+                    paid_amount=contract_item.total_sales_price,
+                    purchase_model = Purchase.CONTRACT, 
+                    purchase=contract.proposal
+                )
                 contract.reaction = 'paid'
                 contract.save()
-                # contract.save(update_fields=['reaction'])
 
-        return purchase, contract_item, contract
+        return purchase
         
 
     @classmethod
@@ -448,22 +442,19 @@ class Purchase(PurchaseMaster):
                     )
             
             if purchase.category == Purchase.CONTRACT:
-                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                
+                FreelancerAccount.credit_pending_balance(
+                    user=contract_item.team.created_by, 
+                    paid_amount=contract_item.total_sales_price,
+                    purchase_model = Purchase.CONTRACT, 
+                    purchase=contract.proposal
+                )
                 contract.reaction = 'paid'
                 contract.save()
-                # contract.save(update_fields=['reaction'])
 
-            if purchase.category == Purchase.CONTRACT:
-                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
-                contract.reaction = 'paid'
-                contract.save()
-                # contract.save(update_fields=['reaction'])
-
-        return purchase, contract_item, contract
+        return purchase
         
 
     @classmethod
@@ -500,22 +491,19 @@ class Purchase(PurchaseMaster):
                     )
             
             if purchase.category == Purchase.CONTRACT:
-                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase, purchase__status='success')
+                contract_item = ContractSale.objects.select_for_update().get(purchase=purchase)
                 contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.proposal)
+                
+                FreelancerAccount.credit_pending_balance(
+                    user=contract_item.team.created_by, 
+                    paid_amount=contract_item.total_sales_price,
+                    purchase_model = Purchase.CONTRACT, 
+                    purchase=contract.proposal
+                )
                 contract.reaction = 'paid'
                 contract.save()
-                # contract.save(update_fields=['reaction'])
 
-            if purchase.category == Purchase.CONTRACT:
-                contract_item = ExtContract.objects.select_for_update().get(purchase=purchase, purchase__status='success')
-                contract = Contract.objects.select_for_update().get(pk=contract_item.contract.id)
-                FreelancerAccount.credit_pending_balance(user=contract_item.team.created_by, paid_amount=contract_item.total_sales_price, purchase=contract_item.contract.line_one)
-                contract.reaction = 'paid'
-                contract.save()
-                # contract.save(update_fields=['reaction'])
-
-        return purchase, contract_item, contract
+        return purchase
 
 
 class MerchantTransaction(MerchantMaster):

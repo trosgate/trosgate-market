@@ -5,7 +5,7 @@
   razorpayButton.addEventListener('click', function() {
     // Fetch API to create the order and get the transaction ID
     razorpayButton.disabled = true;
-    fetch('/transaction/razorpay_application_intent/', {
+    fetch('/contract/razorpay_contract_intent/', {
       method: 'GET',
       credentials: 'same-origin',
       headers: {
@@ -26,18 +26,18 @@
         image: "",
         order_id: data.razorpay_order_key, // Received from the backend
         handler: function(response) {
+          razorpayButton.disabled = false;
           // Handle the response after payment completion
           const formData = new FormData();
           formData.append('orderid', response.razorpay_order_id);
           formData.append('paymentid', response.razorpay_payment_id);
           formData.append('signature', response.razorpay_signature);
 
-          fetch('/transaction/razorpay_callback/', {
+          fetch('/contract/razorpay_callback/', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin',
             headers: {
-              'Content-Type': 'application/json',
               'X-CSRFToken': CSRF_TOKEN
             }
           })

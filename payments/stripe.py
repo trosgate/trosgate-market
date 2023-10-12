@@ -10,6 +10,8 @@ from account.fund_exception import (
 
 class StripeClientConfig:
     currency_notation = 100
+    
+    #3D secure test card: 4000000000003220
 
     def __init__(self):
         self.name = 'stripe'

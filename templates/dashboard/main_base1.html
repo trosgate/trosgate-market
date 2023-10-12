@@ -4,6 +4,7 @@
 
 {% include 'dashboard/main_header1.html' %}
 <body class="wt-login" hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
+    {% comment %} hx-boost="true" {% endcomment %}
     {% if not 'login' in request.path %}
     {% include 'dashboard/main_navbar1.html' %}
     {% endif %}

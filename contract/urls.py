@@ -12,7 +12,9 @@ urlpatterns = [
     path('connect/<str:reference>', views.create_external_contract, name='connect_contract'),
     path('delete/<str:contractor_id>', views.delete_contractor, name='delete_contractor'),
     path('offer/<slug:short_name>', views.create_internal_contract, name='create_internal_contract'),
-    path('gateway-and-fees/<int:contract_id>/<slug:contract_slug>', views.pricing_option_with_fees, name='pricing_option_with_fees'),
+    path('gateway-and-fees/<str:identifier>', views.pricing_option_with_fees, name='pricing_option_with_fees'),
+    # path('payment-fee-structure/', views.payment_fee_structure,name='payment_fee_structure'),
+    
     path('detail/<str:identifier>/<slug:contract_slug>', views.contract_detail, name='contract_detail'),
     path('final/<str:identifier>/<slug:contract_slug>/checkout', views.final_contract_checkout, name='final_contract_checkout'),
 
@@ -21,24 +23,18 @@ urlpatterns = [
     path('stripe_payment_order/', views.stripe_payment_order, name='stripe_payment_order'),
     # Urls for Flutterwave gateway
     path('flutter_payment_intent/', views.flutter_payment_intent, name='flutter_payment_intent'),
-    path('flutter_success/', views.flutter_contract_success, name='flutter_contract_success'),
+    path('flutter_success/', views.flutter_success, name='flutter_success'),
     # Urls for Paypal gateway
-    path('paypal/checkout/api/', views.paypal_contract_intent, name='paypal_contract_intent'),
-    # path('paystack_payment_intent', views.paystack_payment_intent, name='paystack_payment_intent'),
-    
-    # path('paypal/external/', views.extern_paypal_contract_intent, name='extern_paypal_intent'),
-    # path('extern_stripe_contract_intent/', views.extern_stripe_contract_intent, name='extern_stripe_contract_intent'),
+    path('paypal/api/', views.paypal_payment_order, name='paypal_payment_order'),
+    path('paypal/callback/', views.paypal_callback, name='paypal_callback'),
+    # Urls for Paystack gateway
+    path('paystack_payment_intent/', views.paystack_payment_intent, name='paystack_payment_intent'),
+    path('paystack_callback/', views.paystack_callback, name='paystack_callback'),
     
     # Urls for Razorpay gateway
     path('razorpay_contract_intent/', views.razorpay_contract_intent, name='razorpay_contract_intent'),
-    # path('extern_razorpay_contract_intent/', views.extern_razorpay_contract_intent, name='extern_razorpay_contract_intent'),
-    # path('extern_razorpay/', views.extern_razorpay, name='extern_razorpay'),
-
-    path('razorpay_webhook/', views.razorpay_webhook, name='razorpay_webhook'),
+    path('razorpay_callback/', views.razorpay_callback, name='razorpay_callback'),
     
-    path('congrats/', views.contract_success, name='contract_success'),
-
-        
 ]
 htmx_urlpatterns = [
     path('accept_or_reject_contract', views.accept_or_reject_contract, name='accept_or_reject_contract'),
