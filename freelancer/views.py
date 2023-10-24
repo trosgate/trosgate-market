@@ -23,7 +23,6 @@ from teams.models import Team
 from account.models import Customer
 from proposals.models import Proposal
 from django.template.loader import render_to_string
-from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 from .utilities import (
     one_month, two_months, three_months, four_months, five_months, six_months,
     one_year, two_years, three_years, four_years, five_years    
@@ -34,6 +33,9 @@ from analytics.analytic import (
     cancelled_founder_projects, total_verified_sale,
     user_review_rate, total_projects_in_queue
 )
+from transactions.utilities import get_base_currency
+
+
 
 # this will appear in search results
 def freelancer_listing(request):
@@ -41,8 +43,7 @@ def freelancer_listing(request):
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
     skills = Skill.objects.all().distinct()
-    base_currency = get_base_currency_symbol()
-    base_currency = get_base_currency_symbol()
+    base_currency = get_base_currency(request)
     all_freelancers = freelancer_list.count()
 
     totalcount = f' There are {all_freelancers} Freelancers available for search'
@@ -59,7 +60,7 @@ def freelancer_listing(request):
 
 def freelancer_search(request):
     freelancer_list = Freelancer.objects.filter(created=True)
-    base_currency = request.merchant.merchant.country.currency
+    base_currency = get_base_currency(request)
     #Country
     country = request.GET.getlist('country[]')
     # Skills
@@ -138,20 +139,18 @@ def freelancer_search(request):
 def freelancer_profile(request, short_name):
     freelancer = get_object_or_404(Freelancer, user__short_name=short_name)
     team = get_object_or_404(Team, pk=freelancer.active_team_id)
-    proposal_count = Proposal.objects.filter(team=team, status=Proposal.ACTIVE).count() > 0
     monthly_contract_slot = team.monthly_contract_slot
     ongoing_projects = ongoing_founder_projects(team)
     completed_projects = completed_founder_projects(team)
     cancelled_projects = cancelled_founder_projects(team)
     verified_sale = total_verified_sale(team)
     review_rate = user_review_rate(team)
-    projects_in_queue = total_projects_in_queue(team) 
+    projects_in_queue = total_projects_in_queue(team)
 
     context = {
         'freelancer': freelancer,
         'team': team,
         'monthly_contract_slot': monthly_contract_slot,
-        'proposal_count': proposal_count,
         'ongoing_projects': ongoing_projects,
         'completed_projects': completed_projects,
         'cancelled_projects': cancelled_projects,

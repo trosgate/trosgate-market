@@ -340,40 +340,52 @@
 						<div class="row justify-content-md-center">
 						{% for proposal in proposals %}
 							<div class="col-12 col-sm-12 col-md-12 col-lg-3">
-								<div class="wt-companysdetails" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<div class="wt-companysdetails" style="box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 4px 4px 0 rgba(0, 0, 0, 0.19);">
 									<figure class="wt-companysimg">
 									{% if proposal.thumbnail %}
 										<img src="{{proposal.thumbnail.url}}" style="height:180px;" alt="img description">
+									{% else %}
+										<img src="{% static 'images/thumbnail/thumbnail.jpg' %}" style="height:80px;" alt="img description">
 									{% endif %}
 									</figure>
 									<div class="wt-companysinfo">
-										<figure><img src="{{proposal.created_by.freelancer.profile_photo.url}}" style="height:80px;" alt="img description"></figure>
+										<figure>
+											<img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description">
+										</figure>
 										<div class="wt-title">
-											<a href="javascript:void(0);"><i class="fa fa-check-circle"></i>{% if proposal.created_by.freelancer.brand_name %}{{proposal.created_by.freelancer.brand_name}} {% else %}{{proposal.created_by.get_full_name}}{% endif %}</a>
-											<a href="{% url 'proposals:proposal_detail' proposal.created_by.short_name proposal.slug %}"><p>{{proposal.title|truncatechars:50}}</p></a> 
+											{% comment %} <figure class="float-left">
+												<img src="{{proposal.created_by.freelancer.profile_photo.url}}" alt="img description">
+											</figure> {% endcomment %}
+											<a href="javascript:void(0);"><i class="fa fa-check-circle"> {% firstof proposal.created_by.get_short_name|capfirst proposal.team.title|slice:30 %}</i></a>
+											<a href="{{proposal.proposal_detail_absolute_url}}"><p>{{proposal.title|truncatechars:50}}</p></a>
 										<hr>
-										<ul class="wt-postarticlemeta">
-											<li class="wt-following">
+										<div class="proposal-attribute"  style="display:flex; justify-content:space-between;">
+											<span>
 												<a href="javascript:void(0);">
-													<span><i>{{base_currency}}</i> {{proposal.salary}}</span>
+													<span><i class="fa fa-balance-scale"></i>{{proposal.aggregated_sales_count}}</span>
 												</a>
-											</li>
-											<li class="wt-following">
+											</span>
+											<span>
+												<a href="javascript:void(0);">
+													<span><i>{{website.merchant.country.currency}}</i> {{proposal.salary}}</span>
+												</a>
+											</span>
+											<span>
 												<a href="javascript:void(0);">
 													<span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %} {{proposal.created_by.country.country_code}}{% endif %}</span>
 												</a>
-											</li>
-											<li class="wt-following">
+											</span>
+											<span>
 												<a href="javascript:void(0);">
-													<span><i class="far fa-star"></i>5</span>
+													<span><i class="fa fa-heart"></i></span>
 												</a>
-											</li>
-										</ul>
+											</span>
 										</div>
 									</div>
 								</div>
 							</div>
-							{% endfor %}
+						</div>
+						{% endfor %}
 							{% if not proposals %}
 							<hr>
 							<div class="text-center">

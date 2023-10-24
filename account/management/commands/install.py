@@ -23,7 +23,7 @@ from django.contrib.sites.models import Site
 # New scripts
 from transactions.models import (
     Purchase, ApplicationSale, ProposalSale, 
-    ContractSale,ExtContract, SubscriptionItem
+    ContractSale, SubscriptionItem
 )
 from location import default_country_state_city
 from contract.models import Contract

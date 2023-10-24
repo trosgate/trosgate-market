@@ -34,7 +34,7 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
-
+from .utilities import permit_client, can_accept_or_reject
 
 
 @login_required
@@ -203,14 +203,10 @@ def contract_detail(request, identifier, contract_slug):
 
     if request.user.user_type == Customer.CLIENT:
         contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug)
-        if contract.contract_type == Contract.INTERNAL:
-            user_is_client = request.user == contract.created_by
-        else:
-            user_is_client = request.user.email == contract.client.email
-        
+        user_is_client = permit_client(request, contract)
         if not user_is_client:
             return HttpResponseNotFound()
-           
+            
     if request.user.user_type == Customer.MERCHANT:
         contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, merchant__merchant=request.user)
 
@@ -225,22 +221,18 @@ def accept_or_reject_contract(request):
     contract_id = request.POST.get('contractid')
     contract = get_object_or_404(Contract, id=contract_id)
 
-    if contract.contract_type == Contract.INTERNAL:
-        activator = contract.team.created_by
-    else:
-        activator = contract.client
-    
-    if activator:
-        if request.POST.get('action') == 'accept':
-            contract = Contract.capture(contract.id, contract.ACCEPTED)
+    activator = can_accept_or_reject(contract)
+    if not activator:
+        return HttpResponseNotFound()
+        
+    if request.POST.get('action') == 'accept':
+        contract = Contract.capture(contract.id, contract.ACCEPTED)
 
-        elif request.POST.get('action') == 'reject':
-            contract = Contract.capture(contract.id, contract.REJECTED)
+    elif request.POST.get('action') == 'reject':
+        contract = Contract.capture(contract.id, contract.REJECTED)
 
-        else:
-            messages.error(request, 'No option selected')
     else:
-        raise HttpResponseNotFound()
+        messages.error(request, 'No option selected')
 
     context = {
         "contract": contract,
@@ -270,11 +262,7 @@ def pricing_option_with_fees(request, identifier):
     payment_gateways = request.merchant.gateways.all().exclude(name='balance')
     contract = get_object_or_404(Contract, identifier=identifier, reaction=Contract.ACCEPTED)
     
-    if contract.contract_type == Contract.INTERNAL:
-        user_is_client = request.user == contract.created_by
-    else:
-        user_is_client = request.user.email == contract.client.email
-    
+    user_is_client = permit_client(request, contract)
     if not user_is_client:
         return HttpResponseNotFound()
     
@@ -297,6 +285,8 @@ def pricing_option_with_fees(request, identifier):
                 session.modified = True
         else:
             pass
+        
+        payment_data = calculate_contract_payment_data(base_contract, contract)
 
     context ={
         'contract': contract,
@@ -308,49 +298,12 @@ def pricing_option_with_fees(request, identifier):
         'subtotal': payment_data['grand_total_before_expense'],
         'grand_total': payment_data['grand_total'],
         'selected_fee': payment_data['total_gateway_fee'],
-        "gateway_type": payment_data['gateway_type'],
+        "gateway_type": payment_data['gateway_type'].lower(),
     }
     if request.htmx:
         return render(request, "contract/components/pricing_option_with_fees.html", context)
 
     return render(request, "contract/pricing_option_with_fees.html", context)
-
-
-# @login_required
-# def payment_fee_structure(request):
-#     base_contract = BaseContract(request)
-#     gateways = int(request.POST.get('paymentGateway'))
-#     contract_id = request.POST.get('contract_id')
-#     contract = get_object_or_404(Contract, identifier=contract_id, reaction=Contract.ACCEPTED)
-#     print('Reaction :::', contract)
-#     gateway = PaymentGateway.objects.filter(id=gateways).first()
-
-#     payment_gateways = request.merchant.gateways.all().exclude(name='balance')
-#     payment_data = calculate_contract_payment_data(base_contract, contract)
-#     base_currency = get_base_currency(request)
-
-#     session = request.session
-
-#     if "contractgateway" not in session:
-#         session["contractgateway"] = {"gateway_id": gateway.id}
-#         session.modified = True
-#     else:
-#         session["contractgateway"]["gateway_id"] = gateway.id
-#         session.modified = True
-
-#     context ={
-#         'contract': contract,
-#         'selected': 'selected',
-#         'payment_gateways': payment_gateways,
-#         'base_currency': base_currency,
-#         'payment_method': 'Payment Summary',
-#         "discount": payment_data['discount_value'],
-#         'subtotal': payment_data['grand_total_before_expense'],
-#         'grand_total': payment_data['grand_total'],
-#         'selected_fee': payment_data['total_gateway_fee'],
-#         "gateway_type": payment_data['gateway_type'],
-#     }
-#     return render(request, "contract/components/pricing_option_with_fees.html", context)
 
 
 @login_required
@@ -360,12 +313,8 @@ def final_contract_checkout(request, identifier, contract_slug):
     contract = get_object_or_404(Contract, identifier=identifier, slug=contract_slug, reaction=Contract.ACCEPTED)
     session = request.session
     
-    if contract.contract_type == Contract.INTERNAL:
-        user_is_authorized = request.user == contract.created_by
-    else:
-        user_is_authorized = request.user.email == contract.client.email
-    
-    if not user_is_authorized:
+    user_is_client = permit_client(request, contract)
+    if not user_is_client:
         return HttpResponseNotFound()
 
     if "contractgateway" not in session:
@@ -397,7 +346,6 @@ def final_contract_checkout(request, identifier, contract_slug):
     elif gateway_type == 'razorpay':
         razorpay_public_key = RazorpayClientConfig().razorpay_key_id
 
-
     # Flutterwave payment api
     elif gateway_type == 'flutterwave':
         flutterwave_public_key = FlutterwaveClientConfig().flutterwave_public_key  
@@ -405,7 +353,6 @@ def final_contract_checkout(request, identifier, contract_slug):
     # Paystack payment api
     elif gateway_type == 'paystack':
         paystack_public_key = PaystackClientConfig().paystack_public_key  
-
 
     context = {
         "discount": payment_data['discount_value'],
@@ -421,7 +368,6 @@ def final_contract_checkout(request, identifier, contract_slug):
         "currency": CurrencyForm(),
         "base_currency": base_currency,
     }
-
     return render(request, "contract/final_contract_checkout.html", context)
 
 

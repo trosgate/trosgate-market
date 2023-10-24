@@ -19,7 +19,8 @@
                         <form>
                         <input type="radio" name="paymentGateway" id="{{gateway.id}}" value="{{gateway.id}}"
                             hx-post="{% url 'contract:pricing_option_with_fees' contract.identifier %}"
-                            hx-target="#payment-method">
+                            hx-target="#payment-method"
+                            {% if gateway_type|lower == gateway.name %}checked{% endif %}>
                         </form>
                     </td>
                     <td class="text-left"
@@ -43,9 +44,11 @@
     <div class="d-flex justify-content-between mb-3">
         <span>Mode </span><span id="totalFreelancer" class="text-primary pt-1"> {{contract.get_contract_type_display}}</span>
     </div>
+    {% if discount > 00 %}
     <div class="d-flex justify-content-between mb-3">
         <span>Discount (Up to) </span><span id="totalDiscount" class="text-primary pt-1"> {{base_currency}} {{ discount }}</span>
     </div>
+    {% endif %}
     <div class="d-flex justify-content-between mb-3"> 
         <span>Processing Fee</span><span id="totalFees" class="text-primary pt-1">{{base_currency}} {{selected_fee }}</span>
     </div>

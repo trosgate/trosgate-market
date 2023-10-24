@@ -11,6 +11,11 @@ import json
 
 
 class PayPalClientConfig:
+    
+    TEST_CARD = 4000000000003220
+    TEST_CVC = 234
+    TEST_DATE = 'PUT FUTURE DATE HERE DYNAMICALLY'
+
     def __init__(self):
         self.name = 'paypal'
         self.mysite = Site.objects.get_current()

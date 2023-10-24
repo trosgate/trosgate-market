@@ -21,14 +21,6 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 
 
-def code_generator():
-    generated_code = secrets.token_urlsafe(6)[:6]
-    similar_ref = Invitation.objects.filter(code=generated_code)
-    while not similar_ref:
-        code = generated_code
-        break
-    return code
-
 
 class Package(MerchantMaster):
     #
@@ -162,7 +154,6 @@ class Team(MerchantMaster):
             
         return team
 
-
     @property
     def max_member_per_team(self):
         # Checks that the team qualifies to invite new members
@@ -196,9 +187,14 @@ class Team(MerchantMaster):
         team_contracts_limit = self.package.monthly_offer_contracts_per_team
         monthly_team_contracts_count = self.contracts.filter(
             date_created__gt=timezone.now() - relativedelta(months=1)
-        ).prefetch_related('team').count()
-        print('monthly_team_contracts_count :gdgdgdg:', monthly_team_contracts_count)     
-        return team_contracts_limit > monthly_team_contracts_count
+        ).count()
+        proposal_count = self.proposalteam.filter(status='active').exists()
+
+        avail_slot = proposal_count and team_contracts_limit > monthly_team_contracts_count
+
+        # print('proposal_count ::', proposal_count, 'avail_slot ::', avail_slot)     
+        # print('contracts_limit ::', team_contracts_limit, 'contracts_count ::', monthly_team_contracts_count)     
+        return avail_slot
 
     @property
     def show_monthly_contract_message(self):
@@ -208,13 +204,14 @@ class Team(MerchantMaster):
 
     @property
     def monthly_projects_slot(self):
-        team_project_limit = self.team.package.monthly_projects_applicable_per_team
+        team_project_limit = self.package.monthly_projects_applicable_per_team
 
-        applications = self.application_set.filter(
+        applications = self.applications.filter(
             created_at__gt=timezone.now() - relativedelta(months=1)
         ).prefetch_related('team')
-
+        # print(applications)
         monthly_applications_count = len(applications)
+        # print(monthly_applications_count)
 
         return team_project_limit > monthly_applications_count
 
@@ -274,7 +271,6 @@ class TeamMember(models.Model):
         return self.team.title
 
 
-# this is for External User Invitations
 class Invitation(MerchantMaster):
     # Type
     FOUNDER = 'founder'
@@ -498,3 +494,7 @@ class Tracking(MerchantMaster):
 
     def __str__(self):
         return self.assigned.proposal.title
+
+
+
+

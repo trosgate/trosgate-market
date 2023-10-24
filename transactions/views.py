@@ -174,6 +174,7 @@ def pricing_option_with_fees(request):
 
 
 @login_required
+@never_cache
 def payment_fee_structure(request):
     hiringbox = HiringBox(request)
     gateway_type = int(request.POST.get('paymentGateway'))
@@ -256,7 +257,6 @@ def final_checkout(request):
     elif gateway_type == 'paystack':
         paystack_public_key = PaystackClientConfig().paystack_public_key  
 
-
     context = {
         "discount": payment_data['discount_value'],
         'subtotal': payment_data['grand_total_before_expense'],
@@ -271,13 +271,12 @@ def final_checkout(request):
         "currency": CurrencyForm(),
         "base_currency": base_currency,
     }
-
     return render(request, "transactions/final_proposal_checkout.html", context)
 
 
 @login_required
-@user_is_client
 @never_cache
+@user_is_client
 def paystack_payment_intent(request):
     hiringbox = HiringBox(request)
     payment_data = calculate_payment_data(hiringbox)
@@ -513,7 +512,6 @@ def razorpay_application_intent(request):
                 'amount': purchase.salary_paid,
                 'razorpay_order_key': purchase.razorpay_order_key,
             }
-            print('purchase ID ::', purchase.id)
             return JsonResponse(response_data)
         except Exception as e:
             print('purchase ID ::', str(e))

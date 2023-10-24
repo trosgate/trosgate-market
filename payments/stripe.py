@@ -11,7 +11,9 @@ from account.fund_exception import (
 class StripeClientConfig:
     currency_notation = 100
     
-    #3D secure test card: 4000000000003220
+    TEST_CARD = 4000000000003220
+    TEST_CVC = 234
+    TEST_DATE = 'PUT FUTURE DATE HERE DYNAMICALLY'
 
     def __init__(self):
         self.name = 'stripe'
@@ -26,8 +28,7 @@ class StripeClientConfig:
         return merchant
 
     def default_currency(self):
-        currency = self.site.merchant.merchant.merchant.country.currency.lower()
-        print('currency :::----', currency)
+        currency = self.site.merchant.country.currency.lower()
         return currency if currency else 'usd'
 
     def stripe_public_key(self):

@@ -7,8 +7,8 @@ MAX_OBJECTS = 2
 
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):  
-    list_display = ['merchant', 'max_member_per_team','price', 'ordering']
-    list_display_links = ['merchant','max_member_per_team']
+    list_display = ['merchant', 'type', 'max_member_per_team', 'price', 'ordering']
+    list_display_links = ['merchant', 'max_member_per_team']
     list_editable = ['ordering']
     # readonly_fields = ['type']
 
@@ -96,15 +96,15 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter =  ['merchant']
     inlines = [InvitationAdmin, TeamMemberAdmin]
     readonly_fields = [
-        'title', 'package', 'merchant', 'slug', 'team_balance','created_by','members', 'package_expiry',
-        'stripe_customer_id','stripe_subscription_id',
-        'paypal_customer_id', 'paypal_subscription_id',
-        'razorpay_payment_id','razorpay_payment_url','razorpay_subscription_id',  
+        'title', 'merchant', 'slug', 'team_balance', 'created_by', 'members',
+        'package_expiry', 'stripe_customer_id', 'stripe_subscription_id',
+        'paypal_customer_id', 'paypal_subscription_id',  'package',
+        'razorpay_payment_id', 'razorpay_payment_url', 'razorpay_subscription_id',  
     ]
 
     fieldsets = (
         ('Introduction', {'fields': ('title', 'merchant', 'slug',  'status', 'team_balance',)}),
-        ('Package and Background', {'fields': ('package', 'package_status', 'created_by','notice',)}),
+        ('Package and Background', {'fields': ('package', 'created_by','notice',)}),
         ('Subscription Type - Stripe', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
         ('Subscription Type - Razorpay', {'fields': ('razorpay_payment_id','razorpay_subscription_id','razorpay_payment_url',)}),
         ('Subscription Type - PayPal', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),
@@ -112,7 +112,7 @@ class TeamAdmin(admin.ModelAdmin):
 
     radio_fields = {
         'status': admin.HORIZONTAL,
-        'package_status': admin.HORIZONTAL,
+        # 'package_status': admin.HORIZONTAL,
         'package': admin.HORIZONTAL,
     }
 

@@ -15,7 +15,10 @@ from general_settings.models import ExachangeRateAPI
 class PaystackClientConfig:
     currency_notation = 100
     PAYSTACK_BASE_URL = "https://api.paystack.co"
-
+    
+    TEST_CARD = 4000000000003220
+    TEST_CVC = 234
+    TEST_DATE = 'PUT FUTURE DATE HERE DYNAMICALLY'
 
     def __init__(self):
         self.name = 'paystack'
@@ -32,7 +35,14 @@ class PaystackClientConfig:
             "Content-Type": "application/json",
         }
 
+    def get_payment_gateway(self):
+        merchant = MerchantAPIs.objects.filter(merchant=self.site, paystack_active=True).first()
+        return merchant
 
+    def default_currency(self):
+        currency = self.site.merchant.country.currency.lower()
+        return currency if currency else 'ghs'
+    
     def _make_api_request(self, method, endpoint, data=None):
         url = f"{self.PAYSTACK_BASE_URL}/{endpoint}"
 
@@ -50,7 +60,7 @@ class PaystackClientConfig:
         request = method_map.get(method)
         try:
             response = request(url, headers=headers, json=data)
-            print('Headers ::', response)
+            
             return response.json()
         except requests.RequestException as e:
             # Handle the error here or re-raise the exception if needed

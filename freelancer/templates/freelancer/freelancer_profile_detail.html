@@ -84,15 +84,11 @@
 											{% if request.user.clients %}
 											<div class="wt-description">
 												{% if team.monthly_contract_slot %}
-													{% if proposal_count %}
 													<a href="{% url 'contract:create_internal_contract' freelancer.user.short_name %}" class="wt-btn">Send Contract</a>
-													{% endif %}
-
 												{% else %}
 													<p style='color:green'>* Hi {{request.user.short_name|capfirst}}, {{freelancer.user.short_name|capfirst}} {{team.show_monthly_contract_message}}.</p>
 													<a href="{% url 'freelancer:freelancer_listing' %}" class="wt-btn">Try others</a>
 												{% endif %}
-												
 											</div>
 											{% endif %}
 										</div>

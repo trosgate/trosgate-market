@@ -8,6 +8,7 @@ from django.template.defaultfilters import slugify
 from django.template.defaultfilters import truncatechars
 
 
+
 class Application(models.Model):
     # Project Duration
     ONE_DAY = "01 day"

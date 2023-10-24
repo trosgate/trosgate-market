@@ -8,6 +8,10 @@ from general_settings.currency import get_base_currency_code
 
 class RazorpayClientConfig:
     currency_notation = 100
+    
+    TEST_CARD = 4000000000003220
+    TEST_CVC = 234
+    TEST_DATE = 'PUT FUTURE DATE HERE DYNAMICALLY'
 
     def __init__(self):
         self.name = 'razorpay'

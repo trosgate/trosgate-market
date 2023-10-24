@@ -24,11 +24,6 @@ class MerchantMasterManager(models.Manager):
         return queryset
 
 
-# class MerchantMasterManager(models.Manager):
-#     def get_queryset(self):
-#         return super().get_queryset()
-
-
 class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.CASCADE)
     objects = MerchantMasterManager()
@@ -83,6 +78,7 @@ class MerchantProduct(MerchantMaster):
         (SIX_TIMES, _("6 Times")),
         (SEVEN_TIMES, _("7 Times")),
     )
+    #
     # Service Level
     BASIC = 'basic'
     STANDARD = 'standard'

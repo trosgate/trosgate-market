@@ -31,7 +31,7 @@ from account.forms import (
     MerchantBrandingForm
 )
 from payments.checkout_card import CreditCard
-from payments.gateways.stripe import StripeClientConfig
+from payments.stripe import StripeClientConfig
 from account.forms import DomainForm
 from django.contrib.sites.models import Site
 
@@ -73,7 +73,6 @@ def brand_form(request):
         'brandingform': brandingform,
     }
     return render(request, "merchants/partials/brand.html", context)
-
 
 
 @login_required
@@ -213,7 +212,6 @@ def update_domain(request):
     }
 
     return render(request, "merchants/partials/domain_settings.html", context)
-
 
 
 @login_required
@@ -383,7 +381,7 @@ def add_paystack_api(request):
 def add_flutterwave_api(request):
     merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
     flutterwaveform = FlutterwaveMerchantForm(request.POST or None, instance=request.merchant)
-    print(request.POST)
+    # print(request.POST)
     if flutterwaveform.is_valid():
         flutterwaveform.save()
 
