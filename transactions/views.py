@@ -17,11 +17,11 @@ from account.models import Package
 from proposals.models import Proposal
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from payments.models import PaymentGateway
-from payments.paypal import PayPalClientConfig
-from payments.stripe import StripeClientConfig
-from payments.razorpay import RazorpayClientConfig
-from payments.flutterwave import FlutterwaveClientConfig
-from payments.paystack import PaystackClientConfig
+from payments.checkout.paypal import PayPalClientConfig
+from payments.checkout.stripe import StripeClientConfig
+from payments.checkout.razorpay import RazorpayClientConfig
+from payments.checkout.flutterwave import FlutterwaveClientConfig
+from payments.checkout.paystack import PaystackClientConfig
 from .utilities import get_base_currency, calculate_payment_data
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt

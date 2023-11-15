@@ -52,7 +52,6 @@ class PaymentGateway(PaymentAPI):
     FLUTTERWAVE = 'flutterwave'
     RAZORPAY = 'razorpay'
     PAYSTACK = 'paystack'
-    MTN_MOMO = 'mtn_momo'
     GATEWAY_TYPE = (
         (BALANCE, _('Balance')),
         (STRIPE, _('Stripe')),
@@ -60,7 +59,6 @@ class PaymentGateway(PaymentAPI):
         (FLUTTERWAVE, _('Flutterwave')),
         (RAZORPAY, _('Razorpay')),
         (PAYSTACK, _('Paystack')),
-        (MTN_MOMO, _('MTN Momo')),
     )
     name = models.CharField(
         _("Payment Gateway"), 
@@ -161,13 +159,6 @@ class MerchantAPIs(models.Model):
     razorpay_subscription_price_id = encrypt(models.CharField(_("RAZORPAY SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
     razorpay_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
     
-    # MTN API Credentials
-    mtn_api_user_id = encrypt(models.CharField(_("MTN API_USER ID"), max_length=255, blank=True, null=True))
-    mtn_api_key = encrypt(models.CharField(_("MTN API KEY"), max_length=255, blank=True, null=True))
-    mtn_subscription_key = encrypt(models.CharField(_("MTN SUBSCRIPTION PRICE ID"), max_length=255, blank=True, null=True))
-    mtn_callback_url = encrypt(models.CharField(_("MTN CALLBACK URL"), max_length=255, blank=True, null=True))
-    mtn_active = models.BooleanField(_("Status"), choices=((False, 'No'), (True, 'Yes')), default=False)
-
     # objects = MerchantAPIsManager()
 
     def __str__(self):

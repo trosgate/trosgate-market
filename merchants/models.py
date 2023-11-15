@@ -12,17 +12,21 @@ from threadlocals.threadlocals import get_thread_variable
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
         current_site = get_thread_variable('current_site')
+        print('curr_site', current_site)
+        parent_site = get_thread_variable('parent_site')
+        print('curr_parent_site', parent_site)
+        merchant_id = get_thread_variable('merchant')
+        print('curr_merchant', merchant_id)
         qs = super().get_queryset()
-
-        if current_site and current_site.pk == 1:
-            queryset = qs
-        elif current_site:
-            queryset = qs.filter(merchant__site=current_site).select_related('merchant')
-        else:
-            queryset = qs.none()
-
-        return queryset
-
+        # .filter(
+        #     Q(merchant__site=current_site)|
+        #     Q(merchant_id=merchant_id)
+        # ).distinct()#.select_related('merchant', 'category', 'created_by')
+        return qs if parent_site == 1 else qs.filter(
+                Q(merchant__site=current_site)|
+                Q(merchant_id=merchant_id)
+            ).select_related('merchant')
+        
 
 class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.CASCADE)

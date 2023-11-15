@@ -61,8 +61,10 @@ class DynamicHostMiddleware:
 
         if hasattr(site, 'websitesetting') and site.websitesetting:
             request.parent_site = site.websitesetting
+            set_thread_variable('parent_site', request.parent_site.pk)
         elif hasattr(site, 'merchant') and site.merchant:
             request.merchant = site.merchant
+            set_thread_variable('merchant', request.merchant.pk)
 
         # if WebsiteSetting.objects.filter(site=request.site).first():
         #     request.parent_site = request.site.websitesetting

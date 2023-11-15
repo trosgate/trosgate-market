@@ -13,12 +13,13 @@ from .models import Team
 from account.models import Package
 from .utilities import get_expiration
 from transactions.models import SubscriptionItem
-from general_settings.gateways import RazorpayClientConfig
+from payments.checkout.razorpay import RazorpayClientConfig
 from django.contrib import messages
 from django.utils import timezone
 from general_settings.currency import get_base_currency_symbol, get_base_currency_code
 import time
 from datetime import timedelta
+
 
 
 @login_required

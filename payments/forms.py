@@ -124,31 +124,6 @@ class RazorpayMerchantForm(forms.ModelForm):
             {'class': 'form-control'})
 
 
-class MTNMerchantForm(forms.ModelForm):
-    class Meta:
-        model = MerchantAPIs
-        fields = [
-            # Stripe
-            'mtn_api_user_id', 'mtn_api_key', 
-            'mtn_subscription_key', 'mtn_callback_url', 'sandbox',  
-        ]
-        
-    def __init__(self, *args, **kwargs):
-        super(MTNMerchantForm, self).__init__(*args, **kwargs)
-
-        # Flutterwave
-        self.fields['mtn_api_user_id'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['mtn_api_key'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['mtn_subscription_key'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['mtn_callback_url'].widget.attrs.update(
-            {'class': 'form-control'})
-        self.fields['sandbox'].widget.attrs.update(
-            {'class': 'form-control'})
-
-
 CARD_TYPES = [
     ('', ''),
     ('visa', 'Visa'),

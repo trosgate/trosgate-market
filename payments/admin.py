@@ -28,8 +28,6 @@ class MerchantAPIAdmin(admin.ModelAdmin):
          'fields': ('flutterwave_public_key', 'flutterwave_secret_key','flutterwave_subscription_price_id','flutterwave_active',)}),
         ('Razorpay API', {
          'fields': ('razorpay_public_key_id', 'razorpay_secret_key_id', 'razorpay_subscription_price_id',)}),
-        ('MTN API', {
-         'fields': ('mtn_api_user_id', 'mtn_api_key', 'mtn_subscription_key','mtn_callback_url',)}),
     )
 
     def has_add_permission(self, request):

@@ -26,7 +26,6 @@ htmx_urlpatterns = [
     path('add_paystack_api/', views.add_paystack_api, name='add_paystack_api'),
     path('add_flutterwave_api/', views.add_flutterwave_api, name='add_flutterwave_api'),
     path('add_razorpay_api/', views.add_razorpay_api, name='add_razorpay_api'),
-    path('add_mtn_api/', views.add_mtn_api, name='add_mtn_api'),
     path('stripe_subscription/', views.stripe_subscription, name='stripe_subscription'),
 
     path('theme_form/', views.theme_form, name='theme_form'),

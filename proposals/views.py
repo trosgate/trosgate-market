@@ -50,7 +50,7 @@ from transactions.hiringbox import HiringBox
 
 
 def merchant_proposal(request):
-    proposals = Proposal.objects.filter(merchant__site=request.user.merchant.site.id)
+    proposals = Proposal.objects.select_related('created_by','category','team').filter(merchant_id=request.user.merchant.id)
     
     active_proposals = proposals.filter(status='active').count()
     review_proposals = proposals.filter(status='review').count()
@@ -74,7 +74,7 @@ def proposal_listing(request):
     categorie = Category.objects.filter(visible = True).distinct()
     countries = Country.objects.filter(supported = True).distinct()
     skills = Skill.objects.all().distinct()
-    proposals = Proposal.objects.filter(status='active').distinct()
+    proposals = Proposal.objects.select_related('category','team', 'created_by').filter(status='active').distinct()
     
     base_currency = get_base_currency_symbol()
     all_proposals = proposals.count()
@@ -122,7 +122,9 @@ def proposal_filter(request):
     three_fifty_dollar_to_500_dollar = request.GET.get('three_fifty_dollar_to_500_dollar[]', '')
     above_500_dollar = request.GET.get('above_500_dollar[]', '')
 
-    proposals = Proposal.objects.all()
+    proposals = Proposal.objects.select_related('category','team', 'created_by').filter(
+        merchant=request.merchant
+    )
     all_proposals = proposals.count()
     #Country
     if len(country) > 0:
@@ -560,7 +562,7 @@ def review_proposal(request):
 @user_is_freelancer
 def active_proposal(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, members__in=[request.user], status=Team.ACTIVE)    
-    proposal = team.proposalteam.filter(status = Proposal.ACTIVE)
+    proposal = Proposal.objects.select_related('category','team', 'created_by').filter(team=team, status = Proposal.ACTIVE)
 
     context = {
         'team':team,

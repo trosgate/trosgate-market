@@ -23,7 +23,6 @@ from payments.forms import (
     PaystackMerchantForm,
     FlutterwaveMerchantForm, 
     RazorpayMerchantForm, 
-    MTNMerchantForm,
     CreditCardForm
 )
 from account.forms import (
@@ -31,9 +30,14 @@ from account.forms import (
     MerchantBrandingForm
 )
 from payments.checkout_card import CreditCard
-from payments.stripe import StripeClientConfig
+from payments.checkout.paypal import PayPalClientConfig
+from payments.checkout.stripe import StripeClientConfig
+from payments.checkout.razorpay import RazorpayClientConfig
+from payments.checkout.flutterwave import FlutterwaveClientConfig
+from payments.checkout.paystack import PaystackClientConfig
 from account.forms import DomainForm
 from django.contrib.sites.models import Site
+
 
 
 @login_required
@@ -224,7 +228,6 @@ def payment_settings(request):
     flutterwaveform = FlutterwaveMerchantForm(request.POST or None, instance=merchant_api)
     paystackform = PaystackMerchantForm(request.POST or None, instance=merchant_api)
     razorpayform = RazorpayMerchantForm(request.POST or None, instance=merchant_api)
-    mtnform = MTNMerchantForm(request.POST or None, instance=merchant_api)
     context = {
         'merchant_api': merchant_api,
         'stripeform': stripeform,
@@ -232,7 +235,6 @@ def payment_settings(request):
         'paystackform': paystackform,
         'flutterwaveform': flutterwaveform,
         'razorpayform': razorpayform,
-        'mtnform': mtnform,
         'gateways': gateways,
     }
     return render(request, "merchants/payment_settings.html", context)
@@ -280,12 +282,6 @@ def add_or_remove_gateway(request):
         else:
             merchant.gateways.add(gateway) 
     
-    elif merchant_api and merchant_api.mtn_active == True and gateway and gateway.name == 'mtn_momo':
-        merchant = request.merchant
-        if gateway in merchant.gateways.all():
-            merchant.gateways.remove(gateway)
-        else:
-            merchant.gateways.add(gateway)
     else:
         messages.error(request, f'{gateway.get_name_display()} must be created first!')
     
@@ -322,7 +318,6 @@ def add_stripe_api(request):
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
-        'mtnform' : MTNMerchantForm(instance=merchant_api),
     }
     return render(request, "merchants/partials/create_payment.html", context)
 
@@ -351,7 +346,6 @@ def add_paypal_api(request):
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
-        'mtnform' : MTNMerchantForm(instance=merchant_api),
     }
     return render(request, "merchants/partials/create_payment.html", context)
 
@@ -371,7 +365,6 @@ def add_paystack_api(request):
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
-        'mtnform' : MTNMerchantForm(instance=merchant_api),
     }
     return render(request, "merchants/partials/create_payment.html", context)
 
@@ -400,7 +393,6 @@ def add_flutterwave_api(request):
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'razorpayform' : RazorpayMerchantForm(instance=merchant_api),
-        'mtnform' : MTNMerchantForm(instance=merchant_api),
     }
     return render(request, "merchants/partials/create_payment.html", context)
 
@@ -429,40 +421,8 @@ def add_razorpay_api(request):
         'stripeform' : StripeMerchantForm(instance=merchant_api),
         'paypalform' : PayPalMerchantForm(instance=merchant_api),
         'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),
-        'mtnform' : MTNMerchantForm(instance=merchant_api),
     }
     return render(request, "merchants/partials/create_payment.html", context)
-
-
-@login_required
-@user_is_merchant
-def add_mtn_api(request):
-    mtnform = MTNMerchantForm(request.POST or None, instance=request.merchant)
-    
-    if mtnform.is_valid():
-
-        data = mtnform.cleaned_data
-        
-        merchant_api = MerchantAPIs.objects.get_or_create(merchant=request.merchant)[0]
-        merchant_api.mtn_api_user_id = data['mtn_api_user_id']
-        merchant_api.mtn_api_key = data['mtn_api_key']
-        merchant_api.mtn_subscription_key = data['mtn_subscription_key']
-        merchant_api.mtn_callback_url = data['mtn_callback_url']
-        merchant_api.sandbox = data['sandbox']
-        merchant_api.mtn_active = True
-        merchant_api.save()
-
-    context = {
-        'mtnform': mtnform,
-        'stripeform' : StripeMerchantForm(instance=merchant_api),
-        'paypalform' : PayPalMerchantForm(instance=merchant_api),
-        'flutterwaveform' : FlutterwaveMerchantForm(instance=merchant_api),        
-        'razorpayform' : RazorpayMerchantForm(instance=merchant_api),    
-    }
-    return render(request, "merchants/partials/create_payment.html", context)
-
-
-
 
 
 

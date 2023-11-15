@@ -27,11 +27,11 @@ from payments.models import PaymentGateway
 from general_settings.forms import CurrencyForm
 from django.views.decorators.csrf import csrf_exempt
 from transactions.models import Purchase, ApplicationSale
-from payments.paypal import PayPalClientConfig
-from payments.stripe import StripeClientConfig
-from payments.razorpay import RazorpayClientConfig
-from payments.flutterwave import FlutterwaveClientConfig
-from payments.paystack import PaystackClientConfig
+from payments.checkout.paypal import PayPalClientConfig
+from payments.checkout.stripe import StripeClientConfig
+from payments.checkout.razorpay import RazorpayClientConfig
+from payments.checkout.flutterwave import FlutterwaveClientConfig
+from payments.checkout.paystack import PaystackClientConfig
 from transactions.utilities import get_base_currency, calculate_payment_data
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse

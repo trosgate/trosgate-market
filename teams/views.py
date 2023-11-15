@@ -29,9 +29,11 @@ from datetime import datetime
 from django.utils import timezone
 # from django.views.decorators.http import require_http_methods
 from freelancer.models import Freelancer
-from payments.paypal import PayPalClientConfig
-from payments.stripe import StripeClientConfig
-from general_settings.gateways import FlutterwaveClientConfig, RazorpayClientConfig
+from payments.checkout.paypal import PayPalClientConfig
+from payments.checkout.stripe import StripeClientConfig
+from payments.checkout.razorpay import RazorpayClientConfig
+from payments.checkout.flutterwave import FlutterwaveClientConfig
+from payments.checkout.paystack import PaystackClientConfig
 from paypalcheckoutsdk.orders import OrdersGetRequest
 from transactions.models import Purchase, SubscriptionItem
 from django.conf import settings
