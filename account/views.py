@@ -369,7 +369,7 @@ def user_dashboard(request):
         teams = request.user.team_member.all().exclude(pk=request.user.freelancer.active_team_id)
         belong_to_more_than_one_team = request.user.team_member.filter(status=Team.ACTIVE).count() > 1
 
-        package=TeamPlan.objects.get_or_create(type=TeamPlan.BASIC)[0]
+        package=TeamPlan.objects.get_or_create(merchant=request.merchant,type=TeamPlan.BASIC)[0]
 
         base_currency = get_base_currency_symbol()
 

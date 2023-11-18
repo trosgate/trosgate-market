@@ -1,266 +1,30 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% block content%}
-{% comment %} <link rel="stylesheet" href="{% static 'css/bootstrap-5.min.css'%}"> {% endcomment %}
-
+{% block content %}
+{% include "account/partials/feebanner.html" %}
         
-    <div class="wt-dashboardbox">
-        <div class="wt-proposalsr">
-            <div class="container"><br><br><br>
-                <div class="wt-managejobcontent">
-                    <div class="col-12">
-                        <h3>Subscription Checkout</h3>
-                    </div>
-                    <div class="wt-updatall">
-                        <span>These are multiple options available for subscription</span>
-                    </div>	
-                </div>
-                
-                <div class="container">
-                    <div class="row g-3">
-                        <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
-                            <div class="d-flex bd-highlight ms-0">
-                                <div class="p-2 flex-grow-1 bd-highlight">Package Type:</div>
-                                <div class="p-2 bd-highlight"><span class="fw-bold h5"></span><span
-                                class="fw-bold h5">{% firstof package.verbose_type package.type %}</span></div>
-                            </div>
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">Package Price:</div>
-                                <div class="p-2 bd-highlight"><span class="fw-bold h5">$</span><span
-                                class="fw-bold h5">{{package.price}}</span></div>
-                            </div>
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">Current Team:</div>
-                                <div class="p-2 bd-highlight"><span class="fw-bold h5"></span><span 
-                                    class="fw-bold h5">{{active_team.title}}</span></div>
-                                </div>
-                            </div> 
-                        <div class="col-md-7 col-lg-8">
-                            {% if subscript_switcher.stripe == True %}
-                            <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
-                            <div class="row g-0">
-                                <div class="col-md-2 ps-3 ps-md-4"></div>
-                                <div class="col-md-9 ps-md-1">
-                                    <div class="card-body p-1">
-                                    <h4 class="card-text ps-2 pb-3">Option: Stripe Checkout</h4>
-                                    </div>
-                                </div>
-                                <button onclick='stripeSubscriber(event)' class="btn btn-primary w-100 fw-bold">Pay with Stripe </button>
-                            </div>
-                            </div>
-                            {% endif %}
-                            {% if subscript_switcher.paypal == True %}
-                            <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
-                            <div class="row g-0">
-                                <div class="col-md-2 ps-3 ps-md-4">
-                                </div>
-                                <div class="col-md-9 ps-md-1">
-                                <div class="card-body p-1">
-                                    <h4 class="card-text ps-2 pb-3">Option: PayPal Checkout</h4>
-                                </div>
-                            </div>
-                            <div id="paypal-button-container" class="w-100 fw-bold"></div>
-                            </div>
-                            {% endif %}
-                            {% if subscript_switcher.razorpay == True %}
-                            <div class="card mb-3 border-1 rounded-0 product-item me-md-4">
-                            <div class="row g-0">
-                                <div class="col-md-2 ps-3 ps-md-4"></div>
-                                <div class="col-md-9 ps-md-1">
-                                <div class="card-body p-1">
-                                    <h4 class="card-text ps-2 pb-3">Option: Razorpay Checkout</h4>
-                                </div>
-                            </div>
-                            <button id='razorpaySubscriber' class="btn btn-primary w-100 fw-bold">Pay with Razorpay</button></div>
-                            </div>
-                            {% endif %}
-                        </div>
-                        </div>
-                    </div>
+    <div class="wt-proposalholder">
+        
+        <div class="container">
+            <div id="payment-method" class="row">
+                {% include 'teams/components/purchase_package.html' %}
+            </div>
+            {% comment %} <br>
+            <br>
+            <br>
+            <br>
+            <br> {% endcomment %}
+            <div class="row justify-content-md-center">
+                <div class="wt-sectionhead wt-textcenter">
+                    <span>Copyright @ {{website.site.name|capfirst}}</span>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="wt-proposalholder mt-6">
-        <div class="row justify-content-md-center">
-            <div class="wt-sectionhead wt-textcenter">
-                <span>Copyright @ {{website.site_name}}</span>
-            </div>
-        </div>
+            <br>
+            <br>
+        </div> 
+        </div> 
+        
     </div> 
-          
-{% endblock %}
-{% block scripts %}
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
-<script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            let cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                let cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    let csrftoken = getCookie('csrftoken');
-    
-    function subscribePayPalButton() { 
-        paypal.Buttons({
-            style: {
-                shape: 'rect',
-                color: 'gold',
-                layout: 'vertical',
-                label: 'subscribe'
-            },
-            createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                    plan_id:'{{paypal_subscription_price_id}}'
-                  });
-                },
-                
-            onApprove: function(data, actions) {
-                let url = "{% url 'teams:activate_paypal_subscription' %}"
-                return fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/json',
-                        'X-CSRFToken': '{{csrftoken}}',
-                    },
-                    
-                    body: JSON.stringify({
-                        subscriptionID: data.subscriptionID,
-                        customerID: '{{request.user.freelancer.active_team_id}}'
-                    })
-                    }).then(function (json) {
-                        swal("Perfect!", 'All looked good', "success").then((value) =>{
-                            window.location.href = "/team/packages/"
-                        });              
-                        
-                    })
-                },      
-                }).render('#paypal-button-container');
-            }
-            subscribePayPalButton(); // Renders the PayPal button
-    </script>
+    </div>
 
-
-<script src="https://js.stripe.com/v3/"></script>
-{% comment %} <script src="{% static 'js/payments/stripe-subscription.js' %}"></script> {% endcomment %}
-<script>
-    function stripeSubscriber(event) {
-        event.preventDefault();
-        let data = {
-            'team_id': '{{active_team.id}}', 
-      
-          }
-      
-          let stripe = Stripe('{{stripe_public_key}}');
-      
-          fetch('/team/stripe_subscription_checkout_session/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{csrf_token}}'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-          })
-            .then(function (response) {
-              return response.json()
-            })
-            .then(function (session) {
-              return stripe.redirectToCheckout({ sessionId: session.sessionId.id })
-            })
-            .then(function (result) {
-              return console.log(result.error.message)
-            })
-            .catch(function (error) {
-              return console.log(error)
-            })
-        }
-</script>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-    //Script to add proposal quantity in session             
-    $(document).on('click', '#razorpaySubscriber', function (e) {
-    e.preventDefault();
-    $.ajax({
-        method: 'GET',
-        url: '{% url "teams:razorpay_subscription_checkout_session" %}',
-        success: function (response) {
-            var options = {
-                "key": "{{razorpay_public_key}}",
-                "subscription_id": response.razorpay_subscription_id,
-                "name": response.description,
-                "amount": response.amount,
-                "description": response.description,
-                "image": "{{website.site_Logo.url}}",
-                "handler": function (responseOne){
-                    
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'teams:razorpay_subscription_webhook' %}",
-                        data: {
-                            subscriptionID: responseOne.razorpay_subscription_id,
-                            paymentID: responseOne.razorpay_payment_id,
-                            signature: responseOne.razorpay_signature,
-                            csrfmiddlewaretoken: "{{csrf_token}}",
-                            action: "razorpay-subscription",
-                        },
-                        success: function (responseTwo) {
-                            console.log(responseTwo)
-                            swal("Perfect!", 'All looked good', "success").then((value) =>{
-                                window.location.href = '/transaction/congrats/'
-                            });                        
-                        }
-                    });
-                },
-
-                "prefill": {
-                    "name": "{{request.user.get_full_name}}",
-                    "email": "{{request.user.email}}",
-                    "contact": "{{request.user.phone}}"
-                },
-                "notes": {
-                    "info": response.description
-                },
-                "theme": {
-                    "color": "#3399cc"
-                }
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.open();                
-            },
-            error: function (xhr, errmsg, err) {}
-        });
-    });
-</script>
-
-{% endblock scripts %}
-        
-        
-
-{% comment %} <script src="https://checkout.razorpay.com/v1/checkout.js"></script>      
-<script>         
-   var options = {
-       "key": "{{razorpay_public_key}}",
-       "subscription_id": "sub_JlU2kCShkWoKVq",
-       "name": "My Billing Label",
-       "description": "Auth txn for sub_JlU2kCShkWoKVq",
-       "handler": function (response){
-           alert(response.razorpay_payment_id);
-       }
-   };
-   var rzp1 = new Razorpay(options);
-   document.getElementById('razorpaySubscriber').onclick = function(e){
-       rzp1.open();
-   }
-</script>            {% endcomment %}
-        
+    {% endblock content %}

@@ -1,0 +1,20 @@
+STRIPE : price_1OCo8dF4wH80TkNlZKABK9rG
+
+PAYPAL :
+
+RAZORPAY :
+
+PAYSTACK :
+
+FLUTTERWAVE :
+
+
+
+
+
+
+
+
+
+
+

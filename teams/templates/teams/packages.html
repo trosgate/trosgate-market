@@ -11,67 +11,109 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-left">
                 <div class="wt-dashboardbox">
                     <div class="wt-dashboardboxtitle">
-                        <h2>Packages</h2>
-                        {% if active_team.package_status == 'active' %}
-                        <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Next Payment Due On: <b>{{active_team.package_expiry|date:'M-d-Y'}}</b></span>
-                        {% endif %}
-                        
+                        <h2>Packages ({{active_team.package.get_type_display}})
+
+                            {% if active_team.package_status == 'active' %}
+                            <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Payment Due On: <b>{{request.merchant.trial_end|date:'M-d-Y'}}</b></span>
+                            {% endif %}
+                        </h2>
                     </div>
+                   
                     <div id="packaging" class="wt-dashboardboxcontent wt-packages">
-                        <div class="wt-package wt-packagedetails">
-                            <div class="wt-packagehead">
+                        <div class="row g-0">
+                            {% for package in packages %}
+                            {% if package.type == 'basic' %}
+                            <div class="col-lg-6 wow slideInUp" data-wow-delay="0.6s">
+                                <div class="bg-light rounded">
+                                    <div class="border-bottom py-4 px-5 mb-0">
+                                        <h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+                                    </div>
+                                    
+                                    <div class="p-5 pt-0">
+                                        <h1 class="display-5 mb-3"> 
+                                            <small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+                                                class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+                                        </h1>
+                                        
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Offering:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Multiple Teams</span><i class="fa fa-close text-danger pt-1"></i>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Group Chats</span><i class="fa fa-close text-danger pt-1"></i>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Maximum Membership</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_member_per_team}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Maximum Proposals</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_proposals_allowable_per_team}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Monthly Jobs Applications</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_projects_applicable_per_team}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Monthly Contract Offer</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_offer_contracts_per_team}}</span>
+                                        </div>
+                                        <button class="btn btn-danger py-2 px-4 mt-4" disabled>
+                                            <span>
+                                                {% if active_team.package_status == 'active' %}
+                                                Active
+                                                {% else %}
+                                                Inactive
+                                                {% endif %}
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="wt-packagecontent">
-                                <ul class="wt-packageinfo">
-                                    <li class="wt-packageprices"><span>Price</span></li>
-                                    <li><span>Group Chat</span></li>
-                                    <li><span>Fund Transfer - Within Team</span></li>
-                                    <li><span>Member Per Team</span></li>
-                                    <li><span>Monthly Offer Contracts</span></li>
-                                    <li><span>Max Proposals Per Team</span></li>
-                                    <li><span>Monthly Applications</span></li>
-                                </ul>
+                            {% endif %}
+                            {% if package.type == 'team' %}
+                            <div class="col-lg-6 wow slideInUp" data-wow-delay="0.3s">
+                                <div class="bg-white rounded shadow position-relative" style="z-index: 1;">
+                                    <div class="border-bottom py-4 px-5 mb-0">
+                                        <h4 class="text-primary mb-1">{% firstof package.verbose_type package.get_type_display %}</h4>
+                                    </div>
+                                    <div class="p-5 pt-0">
+                                        <h1 class="display-5 mb-3">
+                                            <small class="align-top" style="font-size: 22px; line-height: 45px;">{{base_currency}}</small>{{package.price}}<small
+                                                class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Month</small>
+                                        </h1>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span style="font-weight:bold;">Offering:</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Multiple Teams</span><i class="fa fa-check text-primary pt-1"></i>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Group Chats</span><i class="fa fa-check text-primary pt-1"></i>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Maximum Membership</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_member_per_team}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Maximum Proposals</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.max_proposals_allowable_per_team}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Monthly Applications</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_projects_applicable_per_team}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Monthly Contract Offer</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_offer_contracts_per_team}}</span>
+                                        </div>
+                                        {% if active_team.package_status == 'active' %}
+                                        <a class="btn btn-danger py-2 px-4 mt-4" href="?cancel_package=true"><span>Cancel</span></a>
+                                        {% else %}
+                                        <a class="btn btn-primary py-2 px-4 mt-4" href="{% url 'teams:purchase_package' package.type %}"><span>Subscribe</span></a>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
+                            {% endif %}
+                            
+                            {% endfor %}
                         </div>
-                        {% for package in packages %}
-                        <div class="wt-package wt-baiscpackage">
-                            <div class="wt-packagehead">
-                                <h3>{% firstof package.verbose_type package.type %}</h3>
-                                <span>{{package.get_status_display}}</span>
-                            </div>
-                            <div class="wt-packagecontent">
-                                <ul class="wt-packageinfo">
-                                    <li class="wt-packageprice"><span><sup>{{base_currency_symbol}}</sup>{{package.price}}<sub>\ Month</sub></span></li>
-                                    <li><span>{% if package.type == 'Team' %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
-                                    <li><span>{% if package.type == 'Team' %} <i class="ti-check"></i> {% else %} <i class="ti-na"></i>{% endif %}</span></li>
-                                    <li><span>{% if package.max_member_per_team > 0 %} <i class="ti-check"> {{package.max_member_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_member_per_team}} </i>{% endif %}</span></li>
-                                    <li><span>{% if package.monthly_offer_contracts_per_team > 0 %} <i class="ti-check">{{package.monthly_offer_contracts_per_team}}</i> {% else %} <i class="ti-na">.</i>{% endif %}</span></li>
-                                    <li><span>{% if package.max_proposals_allowable_per_team > 0 %} <i class="ti-check">{{package.max_proposals_allowable_per_team}}</i> {% else %} <i class="ti-na">  {{package.max_proposals_allowable_per_team}}</i>{% endif %}</span></li>
-                                    <li><span>{% if package.monthly_projects_applicable_per_team > 0 %} <i class="ti-check">{{package.monthly_projects_applicable_per_team}}</i>{% else %} <i class="ti-na">  {{package.monthly_projects_applicable_per_team}}</i>{% endif %}</span></li>
-                                </ul>
-                                {% if package.type == 'Basic' %}
-                                {% if team.package.type == 'Basic' %}
-                                <button type="button" class="wt-btn" disabled=true> Active </button>
-                                {% endif %}
-                                {% elif package.type == 'Team' %}
-                                {% if team.package.type == 'Team' %}
-                                <a class="wt-btn" href="?cancel_package=true"><span>Cancel</span></a>
-                                {% else %}
-                                <a class="wt-btn" href="{% url 'teams:purchase_package' package.type %}"><span>Subscribe</span></a>
-                                {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-3 float-left">
-							<div class="wt-dashboardboxcontent wt-offersidebar wt-dashboardbox-margin">
-								<figure><img src="{% static 'images/save-img-01.jpg'%}" alt="img description"></figure>
-								<div class="wt-offercontent">
-									<h2>Save Big, Do Big</h2>
-									<p>Consectetur adipisicing elitems sed dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim incune utnaem labore etdolore maigna aliqua.</p>
-								</div>
-							</div>
-						</div>
+
                     </div>
                 </div>
             </div>

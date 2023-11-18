@@ -3,7 +3,6 @@ from django.dispatch import receiver
 from . models import Customer, TwoFactorAuth, Merchant
 from django.core.cache import cache
 from django.core.cache import caches
-from teams.models import Package
 
 
 @receiver(post_save, sender=Customer)

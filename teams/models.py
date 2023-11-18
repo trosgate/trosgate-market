@@ -31,9 +31,9 @@ class Package(MerchantMaster):
         (BASIC, _('Basic')),
         (TEAM, _('Subscription'))
     )
-
     #
     #Initial Plan Configuration
+    verbose_type = models.CharField(_("Branded Name"), max_length=40, blank=True, null=True)  
     type = models.CharField(_("Package Type"), choices=STATUS, max_length=20)  
     max_proposals_allowable_per_team = models.PositiveIntegerField(_("Max Proposals Per Team"), default=5, help_text=_("You can add min of 5 and max of 50 Proposals per Team"), validators=[MinValueValidator(5), MaxValueValidator(50)])
     monthly_projects_applicable_per_team = models.PositiveIntegerField(_("Monthly Applications Per Team"), default=5, help_text=_("Monthly Jobs Applications with min of 5 and max 50"), validators=[MinValueValidator(5), MaxValueValidator(50)])
@@ -46,7 +46,6 @@ class Package(MerchantMaster):
         ordering = ('ordering',)
         verbose_name = _("Upsell Package")
         verbose_name_plural = _("Upsell Packages")
-        unique_together = ['type', 'merchant']
 
     def __str__(self):
         return str(self.get_type_display())

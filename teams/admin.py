@@ -7,13 +7,13 @@ MAX_OBJECTS = 2
 
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):  
-    list_display = ['merchant', 'type', 'max_member_per_team', 'price', 'ordering']
-    list_display_links = ['merchant', 'max_member_per_team']
-    list_editable = ['ordering']
+    list_display = ['merchant', 'type', 'price', 'verbose_type', 'ordering']
+    list_display_links = ['merchant', 'type']
+    list_editable = ['verbose_type', 'ordering']
     # readonly_fields = ['type']
 
     fieldsets = (
-        ('Merchant Package', {'fields': ('merchant', 'type', 'price', 'ordering',)}),
+        ('Merchant Package', {'fields': ('merchant', 'type', 'verbose_type', 'price', 'ordering',)}),
         ('Merchant Upsell', {'fields': (
             'max_member_per_team', 'max_proposals_allowable_per_team',   
             'monthly_offer_contracts_per_team', 'monthly_projects_applicable_per_team', 
@@ -23,7 +23,7 @@ class PackageAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(PackageAdmin, self).get_queryset(request)
-        return qs.filter(type='team')
+        return qs#.filter(type='team')
         
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -53,15 +53,15 @@ class PackageAdmin(admin.ModelAdmin):
             return False
         return super().has_add_permission(request)
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+    # def get_actions(self, request):
+    #     actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
+    #     if 'delete_selected' in actions:
+    #         del actions['delete_selected']
+    #     return actions
 
 
 class TeamMemberAdmin(admin.TabularInline):
@@ -90,15 +90,16 @@ class InvitationAdmin(admin.TabularInline):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['title', 'merchant', 'package', 'team_balance', 'status',]
+    list_display = ['title', 'merchant', 'package_status', 'team_balance', 'status',]
     list_display_links = ['title', 'merchant']
     search_fields = ['title']
     list_filter =  ['merchant']
+    list_editable = ['package_status']
     inlines = [InvitationAdmin, TeamMemberAdmin]
     readonly_fields = [
         'title', 'merchant', 'slug', 'team_balance', 'created_by', 'members',
         'package_expiry', 'stripe_customer_id', 'stripe_subscription_id',
-        'paypal_customer_id', 'paypal_subscription_id',  'package',
+        'paypal_customer_id', 'paypal_subscription_id',#  'package',
         'razorpay_payment_id', 'razorpay_payment_url', 'razorpay_subscription_id',  
     ]
 
@@ -146,4 +147,9 @@ class TeamAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+
+
+
 

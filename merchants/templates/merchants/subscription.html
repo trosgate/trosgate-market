@@ -11,7 +11,7 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-left">
                 <div class="wt-dashboardbox">
                     <div class="wt-dashboardboxtitle">
-                        <h2>Packages ({{request.merchant.package.get_type_display}})
+                        <h2>Packages ({{request.merchant.packages.get_type_display}})
 
                             {% if request.merchant.merchant == request.user %}
                             <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Payment Due On: <b>{{request.merchant.trial_end|date:'M-d-Y'}}</b></span>
