@@ -1,30 +1,131 @@
 {% extends "dashboard/main_base.html" %}
 {% load static %}
-{% block content %}
-{% include "account/partials/feebanner.html" %}
-        
-    <div class="wt-proposalholder">
-        
-        <div class="container">
-            <div id="payment-method" class="row">
-                {% include 'teams/components/purchase_package.html' %}
+{% block content%}
+
+
+    <div class="row flex-checkout-page">
+        <div class="col-md-6 col-sm-12 custom-checkout-left">
+        <a class="badge-badge-primary" href="{% url 'teams:packages' %}"style="font-size: 24px; font-weight:bold;">Click to go back</a><br><br>
+        <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{package.price}}</span><br><br>
+        <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
+        </div>
+        <div class="col-md-6 col-sm-12 custom-checkout-right"> 
+            <div class="reposition-top checkout-to-show" style="display:none;">
+                <a class="badge-badge-primary" href="{% url 'teams:packages' %}"style="font-size: 24px; font-weight:bold;">Click to go back</a><br><br>
+                <span style="font-size: 24px; font-weight:bold;">Price: {{base_currency}} {{package.price}}</span><br><br>
+                <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
             </div>
-            {% comment %} <br>
-            <br>
-            <br>
-            <br>
-            <br> {% endcomment %}
+            {% if gateway_type.name == "paypal" %}
+            <br><br><br><br><br><br>
+            <div class="reposition-top">
+                <div id="paypal-button-container"></div>
+            </div>
+            {% endif %}
+            {% if gateway_type.name == "flutterwave" %}
+            <br><br><br><br><br><br>
+            <div class="reposition-top">
+                <button id="flutterwaveButton" class="btn btn-success w-100 fw-bold">
+                    Pay with Flutterwave
+                </button>
+            </div>
+            {% endif %}
+            {% if gateway_type.name == "paystack" %}
+            <br><br><br><br><br><br>
+            <div class="reposition-top">
+                <button id="paystackButton" class="btn btn-success w-100 fw-bold">
+                    Pay with Paystack
+                </button>
+            </div>
+            {% endif %}
+            {% if gateway_type.name == "razorpay" %}
+                <br><br><br><br><br><br>
+                <div class="reposition-top">
+                    <button id="razorpayButton" type="button" class="btn btn-success w-100 fw-bold">Pay with Razorpay</button>
+                </div>
+            {% endif %}
+
+            {% if gateway_type.name == "stripe" %}
+            <div class="reposition-top"><br><br><br>
+                <form id="stripe-form">
+                    <!-- Error messages in this element -->
+                    <div id="card-errors" class="col-sm-12 text-center" role="alert"></div>
+                    
+                    <br>
+                    <label for="card-element" style="font-weight:bold;">Credit or debit card</label>
+                    <div id="card-element" class="form-control">
+                    <!-- Payment elements will appear here -->
+                    </div>
+                    <br>
+                    <br>
+                    <button id="stripeButton" 
+                        type="submit" 
+                        class="btn btn-primary w-100 fw-bold" >
+                        Stripe Checkout
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+
+
+        <div class="wt-proposalholder mt-6">
             <div class="row justify-content-md-center">
                 <div class="wt-sectionhead wt-textcenter">
-                    <span>Copyright @ {{website.site.name|capfirst}}</span>
+                    <span>Copyright @ {{website.site_name}}</span>
                 </div>
             </div>
-            <br>
-            <br>
         </div> 
-        </div> 
-        
-    </div> 
-    </div>
+    {{ request.user.get_full_name|json_script:"checkout_user"}}
+    {{ request.user.email|json_script:"checkout_user_email"}}
+    {{ website.site_logo_tag|json_script:"checkout_logo"}}
+    {{ website.site_name|json_script:"checkout_site"}}
 
-    {% endblock content %}
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token }}';
+        const USER = document.getElementById('checkout_user');
+        const USER_EMAIL = document.getElementById('checkout_user_email');
+        const SITE_NAME = document.getElementById('checkout_site');
+    </script>
+
+    {% if gateway_type.name == "paypal" %}
+    <script 
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}">
+    </script>
+    <script src="{% static 'js/payments/subscription/paypal-checkout.js' %}"></script>
+    {% endif %}
+    
+    {% if gateway_type.name == "stripe" %}
+    <script>
+        const STRIPE_PUBLIC_KEY = '{{ stripe_public_key }}';
+    </script>    
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="{% static 'js/payments/subscription/stripe-checkout.js' %}"></script>
+
+    {% endif %}
+
+    {% if gateway_type.name == "paystack" %}
+    <script>
+        const paystack_public_key = '{{ paystack_public_key }}';
+    </script> 
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="{% static 'js/payments/subscription/paystack-checkout.js' %}"></script>
+    {% endif %}
+
+    {% if gateway_type.name == "flutterwave" %}
+    <script>
+        const flutterwave_public_key = '{{ flutterwave_public_key }}';
+    </script> 
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script src="{% static 'js/payments/subscription/flutterwave-checkout.js' %}"></script>
+    {% endif %}
+
+    {% if gateway_type.name == "razorpay" %}
+    <script>
+        const razorpay_public_key = '{{ razorpay_public_key }}';
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="{% static 'js/payments/subscription/razorpay-checkout.js' %}"></script>
+    {% endif %}
+    
+    {% endblock content %}  

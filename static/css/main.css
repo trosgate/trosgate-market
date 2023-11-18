@@ -5211,3 +5211,15 @@ body.wt-login .wt-userlogedin{display: block;}
 		transform: translateY(-20%) !important;
 	}
 }
+
+.circular-button {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 18px;
+	background-color:blueviolet;
+  }

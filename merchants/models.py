@@ -6,8 +6,24 @@ from django.contrib.sites.models import Site
 from account.models import Merchant
 import uuid
 from threadlocals.threadlocals import get_thread_variable
+from django.contrib.auth import get_user_model
 
 
+# class MerchantMasterManager(models.Manager):
+#     def get_queryset(self):
+#         current_site = get_thread_variable('current_site')
+#         parent_site = get_thread_variable('parent_site')
+#         merchant_id = get_thread_variable('merchant')
+
+#         qs = super().get_queryset()
+
+#         filter_conditions = Q(merchant__site=current_site) | Q(merchant_id=merchant_id)
+
+#         if parent_site != 1:
+#             filter_conditions &= Q(merchant__site=current_site)
+
+#         return qs.filter(filter_conditions).select_related('merchant') 
+    
 
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):

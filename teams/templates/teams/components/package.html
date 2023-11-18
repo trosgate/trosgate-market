@@ -17,7 +17,7 @@
                     {% endif %}>
                         <form>
                         <input type="radio" name="gatewayid" id="{{gateway.id}}" value="{{gateway.id}}"
-                            hx-post="{% url 'teams:purchase_package' package.type %}"
+                            hx-post="{% url 'teams:packages'%}"
                             hx-target="#payment-method"
                             {% if gateway_type.pk == gateway.pk %}checked{% endif %}>
                         </form>
@@ -34,7 +34,7 @@
         </table>
     </div>
 </div>
-<div class="col-md-4">
+<div class="col-md-4" id="paytime">
     <div class="table-responsive">
         <table class="table" style="border:none;">
             <thead class="addon-header">
@@ -44,23 +44,27 @@
             </thead>
         </table>
     </div>
-    
-    <div class="d-flex justify-content-between mb-3">
-        <span>Price</span><span id="grandTotal2" class="text-primary pt-1">{{base_currency}} {{package.price}}</span>
-    </div>
-    <div class="d-flex justify-content-between mb-3">
-        <span>Plan Type </span><span class="text-primary pt-1"> {{package.get_type_display}}</span>
-    </div>
-    <div class="d-flex justify-content-between mb-3">
-        <span>Team </span><span class="text-primary pt-1">{{active_team.title|truncatechars:35}}</span>
-    </div>
-    
-    <div class="proposal-action">
-        <a href="" 
-            class="btn btn-primary btn-block product-btn-state"
-            style="border-radius:20px;">
-            <i class="fa fa-lock" aria-hidden="true"></i>
-            {% if gateway_type.name %}Pay with {{gateway_type.name}} {% else %}Select Gateway{% endif %}
+  
+    {% if gateway_type.name == 'balance' %}
+    <div class="d-flex justify-content-center">
+        <a href="" class="btn btn-primary circular-button">
+            Pay with {{gateway_type.name}}
         </a>
     </div>
+    {% endif %}
+    {% if gateway_type.name != 'balance' %}
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'teams:purchase_package' %}" class="btn btn-primary circular-button">
+            Pay with {{gateway_type.name}}
+        </a>
+    </div>
+    {% endif %}
+    {% if not gateway_type%}
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'teams:purchase_package' %}" class="btn btn-primary circular-button">
+            Pay with {{gateway_type.name}}
+        </a>
+    </div>
+    {% endif %}
+
 </div>

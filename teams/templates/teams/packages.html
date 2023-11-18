@@ -56,7 +56,7 @@
                                         <div class="d-flex justify-content-between mb-3">
                                             <span>Monthly Contract Offer</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_offer_contracts_per_team}}</span>
                                         </div>
-                                        <button class="btn btn-danger py-2 px-4 mt-4" disabled>
+                                        <button class="btn btn-primary py-2 px-4 mt-4" disabled>
                                             <span>
                                                 {% if active_team.package_status == 'active' %}
                                                 Active
@@ -101,10 +101,11 @@
                                         <div class="d-flex justify-content-between mb-3">
                                             <span>Monthly Contract Offer</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_offer_contracts_per_team}}</span>
                                         </div>
+                                        
                                         {% if active_team.package_status == 'active' %}
                                         <a class="btn btn-danger py-2 px-4 mt-4" href="?cancel_package=true"><span>Cancel</span></a>
                                         {% else %}
-                                        <a class="btn btn-primary py-2 px-4 mt-4" href="{% url 'teams:purchase_package' package.type %}"><span>Subscribe</span></a>
+                                        <a class="btn btn-primary py-2 px-4 mt-4" href="#paytime">Subscribe</a>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -118,15 +119,29 @@
                 </div>
             </div>
         </div>
+     
     </section>
     
     <div class="wt-proposalholder">
-        <div class="row justify-content-md-center">
-            <div class="wt-sectionhead wt-textcenter">
-                <span>Copyright @ {{website.site_name}}</span>
+        
+        <div class="container">
+            {% if active_team.package_status == 'default' %}
+            <div id="payment-method" class="row">
+                {% include 'teams/components/package.html' %}
             </div>
-        </div>
-    </div>
+            {% endif %}
+            <div class="row justify-content-md-center">
+                <div class="wt-sectionhead wt-textcenter">
+                    <span>Copyright @ {{website.site_name}}</span>
+                </div>
+            </div>
+            <br>
+            <br>
+        </div> 
+        </div> 
+        
+    </div> 
+    </div>    
 </main>
 
 {% endblock %}
