@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import Purchase, ApplicationSale, ProposalSale, ContractSale, SubscriptionItem
+from . models import Purchase, ApplicationSale, ProposalSale, ContractSale
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
@@ -314,36 +314,6 @@ class ContractSaleAdmin(admin.ModelAdmin):
         context['title'] = action_title
 
         return TemplateResponse(request, 'admin/account/contract_refund.html', context)
-
-    def has_add_permission(self, request):        
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
-
-
-@admin.register(SubscriptionItem)
-class SubscriptionItemAdmin(admin.ModelAdmin):
-    model = SubscriptionItem
-    list_display = ['team', 'subscription_id', 'payment_method', 'expired_time']
-    search_fields = ['team__title', 'subscription_id', 'customer_id']
-    list_filter=['status']
-    readonly_fields = [
-        'team', 'customer_id', 'subscription_id','created_at',
-        'price', 'status','payment_method', 'activation_time','expired_time'
-        ]
-    fieldsets = (
-        ('Customer', {'fields': ('team', 'customer_id', 'subscription_id',)}),
-        ('State and Attributes', {'fields': ('price', 'status','payment_method',)}),
-        ('Timestamp', {'fields': ('created_at', 'activation_time','expired_time',)}),
-    )
 
     def has_add_permission(self, request):        
         return False

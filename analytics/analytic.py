@@ -1,4 +1,4 @@
-from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale
 from django.db.models import Avg, F, Count, Sum, Aggregate
 from resolution.models import (
     # ApplicationReview, 

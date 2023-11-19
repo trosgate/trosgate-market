@@ -12,18 +12,13 @@ from account.models import Customer,Merchant
 from teams.models import Team
 from merchants.models import MerchantMaster
 from django.contrib.sites.models import Site
+from teams.utilities import generate_unique_reference
+from freelancer.models import FreelancerAccount
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 
 
 
-# class MerchantAPIsManager(models.Manager):
-#     def get_queryset(self, merchant=None):
-#         site = Site.objects.get_current()
-#         curr_merchant = Merchant.objects.filter(site=site).exists()
-#         if not curr_merchant:
-#             return super().get_queryset().filter(merchant=merchant)
-#         else:
-#             return super().get_queryset().filter(merchant__site=site.id)
- 
 
 class PaymentAPI(models.Model): # This model stores apis for parent site
     public_key = encrypt(models.CharField(_("Puplishable Key/API Id"), max_length=255, blank=True, null=True))
@@ -392,8 +387,148 @@ class AdminCredit(models.Model):
         return account, super_admin_user, owner_active_team
 
 
+class SubscriptionMaster(MerchantMaster):
+    BALANCE = 'balance'
+    PAYPAL = 'paypal'
+    STRIPE = 'stripe'
+    PAYSTACK = 'paystack'
+    FLUTTERWAVE = 'flutterwave'
+    RAZORPAY = 'razorpay'
+    PAYMENT_METHODS = (
+        (BALANCE, _('Balance')),
+        (PAYPAL, _('PayPal')),
+        (STRIPE, _('Stripe')),
+        (PAYSTACK, _('Paystack')),
+        (FLUTTERWAVE, _('Flutterwave')),
+        (RAZORPAY, _('Razorpay')),
+    )
+    payment_method = models.CharField(_("Payment Method"), choices=PAYMENT_METHODS, default=BALANCE, max_length=200)
+    price = models.PositiveIntegerField()
+    status = models.BooleanField(_("Paid"), choices=((False, 'Failed'), (True, 'Success')), default=False)
+    customer_id = models.CharField(_("Customer ID"), max_length=255, blank=True, null=True)
+    subscription_id = models.CharField(_("Subscription ID"), max_length=255, blank=True, null=True)    
+    created_at = models.DateTimeField(_("Subscription Start"), blank=True, null=True)
+    activation_time = models.DateTimeField(_("Activation Time"), blank=True, null=True)
+    expired_time = models.DateTimeField(_("Est. Expiration"), blank=True, null=True)
+    reference = models.CharField(_("Order Key"), max_length=200, blank=True, null=True, unique=True)
+    
+    class Meta:
+        abstract = True
 
 
+class Subscription(SubscriptionMaster):
+    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='subscriptionteam', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("-created_at",)
+        get_latest_by = ("-created_at",)
+        
+    def __str__(self):
+        return str(self.team.title)
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            self.reference = generate_unique_reference(Subscription)
+        super().save(*args, **kwargs)
+
+
+    @classmethod
+    def subscribe_with_balance(cls, merchant, team, package):
+        with db_transaction.atomic():
+            
+            if team is None:
+                raise FundException('Error occured. Try in few time')
+            
+            if merchant is None:
+                raise FundException('Error occured. Try in few time')
+            
+            if package is None:
+                raise FundException('Price error occured')
+            
+            if team.created_by.fundtransferuser.available_balance < package.price:
+                raise FundException('Insufficuent Balance')
+            
+            if team.default_plan:
+                # THIS CODE WILL ACTIVATE THE PLAN
+                subscription = cls.objects.create(
+                    team=team,
+                    price=package.price,
+                    merchant=merchant,
+                    payment_method = cls.BALANCE,
+                    created_at=timezone.now(),
+                    activation_time=timezone.now(),
+                    expired_time = timezone.now() + relativedelta(months = 1)
+                )
+                subscription.customer_id = team.created_by.pk
+                subscription.subscription_id = subscription.reference
+                subscription.status = True
+                subscription.save()
+                FreelancerAccount.charge_freelancer(team.created_by, package.price)
+
+                user_team = team
+                user_team.package = package
+                user_team.package_status = 'active'
+                user_team.package_expiry = timezone.now() + relativedelta(months = 1)
+                user_team.save()
+                # db_transaction.on_commit(lambda: lock_fund_email(account, message))
+                return subscription
+            else:
+                # THIS CODE WILL CANCEL THE PLAN
+                user_team = team
+                user_team.package = team.basic_package
+                user_team.package_status = 'default'
+                user_team.package_expiry = None
+                user_team.save()
+
+                return user_team
+
+       
+    
+
+    @classmethod
+    def subscribe_with_stripe(cls, merchant, team, package):
+        with db_transaction.atomic():
+            if team.package_status != 'default':
+                raise FundException('This team has active subscription')
+            
+            if team.package.pk == package.pk:
+                raise FundException('This team has active subscription')
+            
+            if team is None:
+                raise FundException('Error occured. Try in few time')
+            
+            if merchant is None:
+                raise FundException('Error occured. Try in few time')
+            
+            if package is None:
+                raise FundException('Price error occured')
+            
+            if team.created_by.fundtransferuser.available_balance < package.price:
+                raise FundException('Insufficuent Balance')
+            
+            subscription = cls.objects.create(
+                team=team,
+                price=package.price,
+                merchant=merchant,
+                payment_method = cls.BALANCE,
+                created_at=timezone.now(),
+                activation_time=timezone.now(),
+                expired_time = timezone.now() + relativedelta(months = 1)
+            )
+            subscription.customer_id = team.created_by.pk
+            subscription.subscription_id = subscription.reference
+            subscription.status = True
+            subscription.save()
+            FreelancerAccount.charge_freelancer(team.created_by, package.price)
+
+            user_team = team
+            user_team.package = package
+            user_team.package_status = 'active'
+            user_team.package_expiry = timezone.now() + relativedelta(months = 1)
+            user_team.save()
+            # db_transaction.on_commit(lambda: lock_fund_email(account, message))
+
+        return subscription
 
 
 

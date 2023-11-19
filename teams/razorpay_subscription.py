@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Team
 from account.models import Package
 from .utilities import get_expiration
-from transactions.models import SubscriptionItem
+from payments.models import Subscription
 from payments.checkout.razorpay import RazorpayClientConfig
 from django.contrib import messages
 from django.utils import timezone

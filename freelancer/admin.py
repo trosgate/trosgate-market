@@ -68,8 +68,9 @@ class FreelancerAdmin(admin.ModelAdmin):
 class FreelancerAccountAdmin(admin.ModelAdmin):
     model = FreelancerAccount
     list_display = ['merchant', 'user', 'pending_balance', 'available_balance', 'lock_fund','admin_action','admin_lock']
-    readonly_fields = ['merchant', 'user', 'created_at', 'pending_balance', 'available_balance','lock_fund', 'admin_action']
+    readonly_fields = ['merchant', 'user', 'created_at', 'pending_balance', 'lock_fund', 'admin_action']
     list_select_related = ('user',)
+    list_editable=['available_balance']
     list_display_links = ['merchant', 'user']
     actions = ['unlock_single_or_bulk_account']
 

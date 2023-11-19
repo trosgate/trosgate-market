@@ -99,13 +99,13 @@ class TeamAdmin(admin.ModelAdmin):
     readonly_fields = [
         'title', 'merchant', 'slug', 'team_balance', 'created_by', 'members',
         'package_expiry', 'stripe_customer_id', 'stripe_subscription_id',
-        'paypal_customer_id', 'paypal_subscription_id',#  'package',
+        'paypal_customer_id', 'paypal_subscription_id',  'package',
         'razorpay_payment_id', 'razorpay_payment_url', 'razorpay_subscription_id',  
     ]
 
     fieldsets = (
         ('Introduction', {'fields': ('title', 'merchant', 'slug',  'status', 'team_balance',)}),
-        ('Package and Background', {'fields': ('package', 'created_by','notice',)}),
+        ('Package and Background', {'fields': ('created_by','package', 'package_status','package_expiry','notice',)}),
         ('Subscription Type - Stripe', {'fields': ('stripe_customer_id','stripe_subscription_id',)}),
         ('Subscription Type - Razorpay', {'fields': ('razorpay_payment_id','razorpay_subscription_id','razorpay_payment_url',)}),
         ('Subscription Type - PayPal', {'fields': ('paypal_customer_id','paypal_subscription_id',)}),

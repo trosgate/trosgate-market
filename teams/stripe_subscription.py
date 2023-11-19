@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Team
 from account.models import Package
-from transactions.models import SubscriptionItem
+from payments.models import Subscription
 from payments.checkout.stripe import StripeClientConfig
 from django.contrib import messages
 from django.utils import timezone

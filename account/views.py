@@ -33,7 +33,7 @@ from general_settings.fees_and_charges import get_contract_fee_calculator, get_a
 from general_settings.models import Mailer
 from general_settings.currency import get_base_currency_symbol
 from .fund_exception import InvitationException
-from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale
 from freelancer.models import FreelancerAccount
 from applications.application import ApplicationAddon
 from contract.contract import BaseContract

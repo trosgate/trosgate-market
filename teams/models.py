@@ -19,7 +19,7 @@ from django.db.models  import F, Sum
 from datetime import timedelta
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-
+from django.utils.functional import cached_property
 
 
 class Package(MerchantMaster):
@@ -29,7 +29,7 @@ class Package(MerchantMaster):
     TEAM = 'team'
     STATUS =(
         (BASIC, _('Basic')),
-        (TEAM, _('Subscription'))
+        (TEAM, _('Active'))
     )
     #
     #Initial Plan Configuration
@@ -56,6 +56,7 @@ class Package(MerchantMaster):
         else:
             self.price = 0
         super(Package, self).save(*args, **kwargs)
+
 
 
 class Team(MerchantMaster):
@@ -153,6 +154,25 @@ class Team(MerchantMaster):
             
         return team
 
+    
+    @cached_property
+    def team_package(self):
+        return Package.objects.filter(type=Package.TEAM).first()
+    
+    @cached_property
+    def basic_package(self):
+        return Package.objects.filter(type=Package.BASIC).first()
+    
+
+    @property
+    def active_plan(self):
+        return self.package.type == 'team' and self.package_status == 'active'
+    
+    @property
+    def default_plan(self):
+        return self.package.type == 'basic' and self.package_status == 'default'
+    
+    
     @property
     def max_member_per_team(self):
         # Checks that the team qualifies to invite new members

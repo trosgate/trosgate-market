@@ -4,56 +4,17 @@ from freelancer.models import Freelancer, FreelancerAccount, FreelancerAction
 from django.contrib.auth.decorators import login_required
 from account.permission import user_is_freelancer
 from teams.forms import TeamCreationForm
-from teams.models import Team, Invitation
-from .models import PaymentAccount, PaymentRequest
+from teams.models import Team, Package
+from .models import PaymentAccount, PaymentRequest, Subscription
 from .forms import CreditCardForm, PaymentAccountForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import PaymentGateway
 from general_settings.currency import get_base_currency_symbol
 from .checkout_card import CreditCard
-
-
-
-# def paypal(request):
-#     amount = 1
-#     response = None
-#     if request.method == 'POST':
-#         form = CheckoutCardForm(request.POST)
-#         if form.is_valid():
-#             data = form.cleaned_data
-#             credit_card = CreditCard(**data)
-#             merchant = get_gateway("pay_pal")
-#             try:
-#                 merchant.validate_card(credit_card)
-#             except CardNotSupported:
-#                 response = "Credit Card Not Supported"
-#             # response = merchant.purchase(amount, credit_card, options={'request': request})
-#             response = merchant.recurring(amount, credit_card, options={'request': request})
-#     else:
-#         form = CreditCardForm(initial=GATEWAY_INITIAL['paypal'])
-#     return render(request, 'app/index.html', {'form': form,
-#                                               'amount': amount,
-#                                               'response': response,
-#                                               'title': 'Paypal'})
-
-
-# def stripe(request):
-#     amount = 1
-#     response= None
-#     if request.method == 'POST':
-#         form = CheckoutCardForm(request.POST)
-#         if form.is_valid():
-#             data = form.cleaned_data
-#             credit_card = CreditCard(**data)
-#             merchant = get_gateway("stripe")
-#             response = merchant.purchase(amount,credit_card)
-#     else:
-#         form = CreditCardForm(initial=GATEWAY_INITIAL['stripe'])
-#     return render(request, 'app/index.html',{'form': form,
-#                                              'amount':amount,
-#                                              'response':response,
-#                                              'title':'Stripe Payment'})
+from django_htmx.http import HttpResponseClientRedirect
+from django.contrib import messages
+from transactions.utilities import get_base_currency
 
 
 
@@ -135,4 +96,66 @@ def withdrawal_transactions(request):
     }
     return render(request, "payments/withdrawal_transactions.html", context)
 
+
+@login_required
+def subscribe_with_balance(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+    
+    if  "teamplan" not in request.session:
+        messages.error(request, "Please select payment option")
+        return redirect("teams:packages")
+    
+    try:
+        package = Package.objects.get(type='team')
+        Subscription.subscribe_with_balance(
+            merchant=request.merchant, 
+            team=team, 
+            package=package
+        )
+        del request.session["teamplan"]["gateway_id"]
+        request.session.modified = True
+        messages.info(request, f'Action Successful')
+        return HttpResponseClientRedirect('/team/packages/')
+    except Exception as e:
+        messages.error(request, f'Error! {e}')
+        return HttpResponseClientRedirect('/team/packages/')
+        # return HttpResponseClientRedirect('/team/subscription/')
+
+
+@login_required
+def paypal_package_order(request):
+    PayPalClient = PayPalClientConfig()
+    body = json.loads(request.body)
+
+    data = body["orderID"]
+    paypal_request_order = OrdersGetRequest(data)
+    response = PayPalClient.client.execute(paypal_request_order)
+    Subscription.objects.create(
+        team=team,
+        subscriber=request.user,
+        price=response.result.purchase_units[0].plan.amount.value,
+
+        payment_method='PayPal',
+        status=True
+    )
+    return JsonResponse({'done':'done deal'})
+
+
+
+@login_required
+def package_transaction(request):
+    base_currency = get_base_currency(request)
+    team = None
+    if request.user.user_type == Customer.FREELANCER:
+        team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)    
+        subscriptions = Subscription.objects.filter(team=team)
+        print(subscriptions)
+    elif request.user.user_type == Customer.MERCHANT:
+        subscriptions = Subscription.objects.filter(merchant=request.merchant)
+
+    context = {
+        'subscriptions':subscriptions,
+        'base_currency': base_currency,       
+    }
+    return render(request, 'payments/package_transactions.html', context)
 

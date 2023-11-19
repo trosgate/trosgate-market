@@ -18,7 +18,7 @@ from general_settings.fund_control import (
     get_max_withdrawal, get_min_deposit, 
     get_max_deposit, get_max_depositor_balance,
 )
-from payments.models import PaymentRequest, AdminCredit
+# from payments.models import PaymentRequest, AdminCredit
 # from general_settings.storage_backend import activate_storage_type, DynamicStorageField
 from notification.mailer import initiate_credit_memo_email, credit_pending_balance_email, lock_fund_email
 from PIL import Image
@@ -232,6 +232,17 @@ class FreelancerAccount(MerchantMaster):
             db_transaction.on_commit(lambda: send_pending_balance_email.delay(account.id, paid_amount, purchase_model, purchase.id))
 
             
+        return account
+    
+
+    @classmethod
+    def charge_freelancer(cls, user, price):
+        with db_transaction.atomic():
+            account = cls.objects.select_for_update().get(user=user)
+            account.available_balance -= price
+    
+            account.save(update_fields=['available_balance'])           
+
         return account
  
 

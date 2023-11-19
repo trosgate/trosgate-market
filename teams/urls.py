@@ -18,8 +18,7 @@ urlpatterns = [
     # payment subscription urls
     path('packages/', views.packages, name='packages'),
     path('subscription/', views.purchase_package, name='purchase_package'),
-    path('packages/success/', views.package_success, name='package_success'),
-    path('packages/paypal/create/', views.paypal_package_order, name='paypal_package_order'),
+    
     # Urls for team table
     path('message/', views.teamchat, name='teamchat'),
     path('chat/', views.teamchatroom, name='teamchatroom'),

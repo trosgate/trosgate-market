@@ -1,0 +1,77 @@
+{% extends "dashboard/main_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+	<!--Main Start-->
+	<div class="wt-haslayout wt-innerbannerholder">
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+					<div class="wt-innerbannercontent">
+						<div class="wt-title"><h2>Transactions</h2></div>
+							<ol class="wt-breadcrumb">
+								<li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+								<li class="wt-active">Subscriptions</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="background"  style="background-color:#fff;">
+		<section class="container" style="background-color:#fff;">
+			<div class="row justify-content-md-center">				
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 float-center">
+					<div class="table-responsive">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Transaction ID</th>
+									<th>Date</th>
+									<th>Method</th>
+									<th>Price</th>
+									<th>Renewal</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								{% for subscription in subscriptions %}
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<td>{{subscription.reference}}</td>
+									<td>{{subscription.created_at}}</td>
+									<td>{{subscription.payment_method|capfirst}}</td>
+									<td>{{base_currency}}{{subscription.price}}</td> 
+									<td>{{subscription.expired_time}}</td>
+									<td>
+										<button class="btn btn-{% if subscription.status == True %}success{% else %}danger{% endif %} btn-sm" disabled>
+											{{subscription.get_status_display}}
+										</button>
+									</td>
+									
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+						{% if not subscriptions %}
+						<div class="alert alert-info text-center" role="alert">
+							<span style="color: blue; font-weight: bold;"> No subscriptions to show</span>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-md-center">
+				<div class="wt-sectionhead wt-textcenter">
+					<span>Copyright @ {{website.site.name}}</span>
+				</div>
+			</div>
+		</section>						
+	</div>
+	{% endblock %}
+

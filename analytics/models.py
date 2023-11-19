@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from projects.models import Project
 from projects . models import Project
 from account . models import Customer
-from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale, SubscriptionItem
+from transactions.models import ApplicationSale, Purchase, ProposalSale, ContractSale
 
 
 class NewStats(models.Model):

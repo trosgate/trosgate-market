@@ -45,25 +45,29 @@
         </table>
     </div>
   
-    {% if gateway_type.name == 'balance' %}
+    {% if gateway_type %}
+        {% if gateway_type.name == 'balance' %}
+        <div class="d-flex justify-content-center">
+            <button hx-get="{% url 'payments:subscribe_with_balance' %}" 
+                class="btn btn-primary circular-button"
+                hx-target = "#payment-method"
+                hx-trigger='click'
+                >
+                {{base_currency}} {{request.user.fundtransferuser.available_balance}} <br> Pay with {{gateway_type.name}}
+            </button>
+        </div>
+        {% else %}
+        <div class="d-flex justify-content-center">
+            <a href="{% url 'teams:purchase_package' %}" class="btn btn-primary circular-button">
+                Pay with {{gateway_type.name}}
+            </a>
+        </div>
+        {% endif %}
+    {% else %}
     <div class="d-flex justify-content-center">
-        <a href="" class="btn btn-primary circular-button">
-            Pay with {{gateway_type.name}}
-        </a>
-    </div>
-    {% endif %}
-    {% if gateway_type.name != 'balance' %}
-    <div class="d-flex justify-content-center">
-        <a href="{% url 'teams:purchase_package' %}" class="btn btn-primary circular-button">
-            Pay with {{gateway_type.name}}
-        </a>
-    </div>
-    {% endif %}
-    {% if not gateway_type%}
-    <div class="d-flex justify-content-center">
-        <a href="{% url 'teams:purchase_package' %}" class="btn btn-primary circular-button">
-            Pay with {{gateway_type.name}}
-        </a>
+        <button class="btn btn-primary circular-button" disabled>
+            Select gateway
+        </button>
     </div>
     {% endif %}
 

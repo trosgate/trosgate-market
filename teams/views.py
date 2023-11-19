@@ -35,7 +35,7 @@ from payments.checkout.razorpay import RazorpayClientConfig
 from payments.checkout.flutterwave import FlutterwaveClientConfig
 from payments.checkout.paystack import PaystackClientConfig
 from paypalcheckoutsdk.orders import OrdersGetRequest
-from transactions.models import Purchase, SubscriptionItem
+from transactions.models import Purchase
 from django.conf import settings
 from account.fund_exception import InvitationException
 from .paypal_subscription import get_paypal_subscription_url, get_subscription_access_token
@@ -617,7 +617,6 @@ def packages(request):
     return render(request, 'teams/packages.html', context)
 
 
-
 @login_required
 def purchase_package(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, created_by = request.user)
@@ -642,6 +641,7 @@ def purchase_package(request):
     }
 
     context = {
+        'team': team,
         'package': package,
         'payment_gateways': payment_gateways,
         'gateway_type': gateway_type,
@@ -655,28 +655,3 @@ def purchase_package(request):
     #     return render(request, 'teams/components/purchase_package.html', context)
     return render(request, 'teams/purchase_package.html', context)
 
-
-@login_required #success subscription
-def package_success(request):
-    messages.info(request, 'Congratulations. It went successful')
-    return render(request, 'teams/subscription_success.html')
-
-
-@login_required
-def paypal_package_order(request):
-    PayPalClient = PayPalClientConfig()
-    body = json.loads(request.body)
-
-    data = body["orderID"]
-    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE)
-    paypal_request_order = OrdersGetRequest(data)
-    response = PayPalClient.client.execute(paypal_request_order)
-    SubscriptionItem.objects.create(
-        team=team,
-        subscriber=request.user,
-        price=response.result.purchase_units[0].plan.amount.value,
-
-        payment_method='PayPal',
-        status=True
-    )
-    return JsonResponse({'done':'done deal'})

@@ -851,37 +851,3 @@ class ContractSale(MerchantTransaction):
 
         return contract_sale, client, freelancer, resolution
 
-
-class SubscriptionMaster(MerchantMaster):
-    payment_method = models.CharField(_("Payment Method"), max_length=200, blank=True)
-    price = models.PositiveIntegerField()
-    status = models.BooleanField(_("Paid"), choices=((False, 'No'), (True, 'Yes')), default=False)
-    customer_id = models.CharField(_("Customer ID"), max_length=255, blank=True, null=True)
-    subscription_id = models.CharField(_("Subscription ID"), max_length=255, blank=True, null=True)    
-    created_at = models.DateTimeField(_("Subscription Start"), blank=True, null=True)
-    activation_time = models.DateTimeField(_("Activation Time"), blank=True, null=True)
-    expired_time = models.DateTimeField(_("Est. Expiration"), blank=True, null=True)
-
-    class Meta:
-        abstract = True
-
-
-class Plan(SubscriptionMaster):
-
-    class Meta:
-        ordering = ("-created_at",)
-        get_latest_by = ("-created_at",)
-        
-    def __str__(self):
-        return str(self.team.title)
-
-
-class SubscriptionItem(SubscriptionMaster):
-    team = models.ForeignKey("teams.Team", verbose_name=_("Team"), related_name='subscriptionteam', on_delete=models.CASCADE)
-
-    class Meta:
-        ordering = ("-created_at",)
-        get_latest_by = ("-created_at",)
-        
-    def __str__(self):
-        return str(self.team.title)

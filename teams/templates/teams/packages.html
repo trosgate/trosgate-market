@@ -13,8 +13,8 @@
                     <div class="wt-dashboardboxtitle">
                         <h2>Packages ({{active_team.package.get_type_display}})
 
-                            {% if active_team.package_status == 'active' %}
-                            <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Payment Due On: <b>{{request.merchant.trial_end|date:'M-d-Y'}}</b></span>
+                            {% if active_team.active_plan %}
+                            <span class="wt-boxleft float-right"><i class="lnr lnr-clock" ></i> Next Payment On: <b>{{active_team.package_expiry|date:'M-d-Y'}}</b></span>
                             {% endif %}
                         </h2>
                     </div>
@@ -102,8 +102,14 @@
                                             <span>Monthly Contract Offer</span><span class="badge badge-primary text-center pt-1" style="color:white; border-radius:50%; font-size:13px;">{{package.monthly_offer_contracts_per_team}}</span>
                                         </div>
                                         
-                                        {% if active_team.package_status == 'active' %}
-                                        <a class="btn btn-danger py-2 px-4 mt-4" href="?cancel_package=true"><span>Cancel</span></a>
+                                        {% if active_team.active_plan %}
+                                        <button hx-get="{% url 'payments:subscribe_with_balance' %}" 
+                                            class="btn btn-danger py-2 px-4 mt-4"
+                                            hx-target = "#wt-main"
+                                            hx-trigger='click'>
+                                            Cancel
+                                        </button>
+                                        {% comment %} <a class="btn btn-danger py-2 px-4 mt-4" href="subscribe_with_balance"><span>Cancel</span></a> {% endcomment %}
                                         {% else %}
                                         <a class="btn btn-primary py-2 px-4 mt-4" href="#paytime">Subscribe</a>
                                         {% endif %}
@@ -125,14 +131,14 @@
     <div class="wt-proposalholder">
         
         <div class="container">
-            {% if active_team.package_status == 'default' %}
+            {% if active_team.default_plan %}
             <div id="payment-method" class="row">
                 {% include 'teams/components/package.html' %}
             </div>
             {% endif %}
             <div class="row justify-content-md-center">
                 <div class="wt-sectionhead wt-textcenter">
-                    <span>Copyright @ {{website.site_name}}</span>
+                    <span>Copyright @ {{website}}</span>
                 </div>
             </div>
             <br>

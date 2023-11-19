@@ -30,7 +30,6 @@ from .models import (
     Purchase, 
     ProposalSale, 
     ContractSale, 
-    SubscriptionItem
 )
 from .hiringbox import HiringBox
 from general_settings.forms import CurrencyForm

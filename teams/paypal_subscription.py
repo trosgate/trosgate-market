@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Team
 from account.models import Package
-from transactions.models import SubscriptionItem
+from payments.models import Subscription
 from general_settings.gateways import PayPalClientConfig, get_gateway_environment
 from django.utils import timezone
 from .utilities import get_expiration
@@ -74,7 +74,7 @@ def activate_paypal_subscription(request):
             team.package_expiry = next_billing_time
             team.save()
         
-            SubscriptionItem.objects.create(    
+            Subscription.objects.create(    
                 team=team,
                 customer_id = team.paypal_customer_id,
                 subscription_id=team.paypal_subscription_id,
@@ -114,7 +114,6 @@ def deactivate_paypal_subscription(request):
             team.package_expiry = timezone.now()
             team.save()
 
-            # SubscriptionItem.objects.filter(subscription_id=team.paypal_subscription_id).update()
                         
         except:
             error = 'Ooops! Something went wrong. Please try again later!'
