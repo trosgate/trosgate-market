@@ -405,12 +405,12 @@ class SubscriptionMaster(MerchantMaster):
     payment_method = models.CharField(_("Payment Method"), choices=PAYMENT_METHODS, default=BALANCE, max_length=200)
     price = models.PositiveIntegerField()
     status = models.BooleanField(_("Paid"), choices=((False, 'Failed'), (True, 'Success')), default=False)
-    customer_id = models.CharField(_("Customer ID"), max_length=255, blank=True, null=True)
+    reference = models.CharField(_("Order Key"), max_length=200, blank=True, null=True, unique=True)
+    customer_token = models.CharField(_("Customer Token"), max_length=2088, blank=True, null=True)
     subscription_id = models.CharField(_("Subscription ID"), max_length=255, blank=True, null=True)    
     created_at = models.DateTimeField(_("Subscription Start"), blank=True, null=True)
     activation_time = models.DateTimeField(_("Activation Time"), blank=True, null=True)
     expired_time = models.DateTimeField(_("Est. Expiration"), blank=True, null=True)
-    reference = models.CharField(_("Order Key"), max_length=200, blank=True, null=True, unique=True)
     
     class Meta:
         abstract = True
@@ -433,7 +433,7 @@ class Subscription(SubscriptionMaster):
 
 
     @classmethod
-    def subscribe_with_balance(cls, merchant, team, package):
+    def subscribe_with_balance(cls, merchant, team):
         with db_transaction.atomic():
             
             if team is None:
@@ -442,17 +442,14 @@ class Subscription(SubscriptionMaster):
             if merchant is None:
                 raise FundException('Error occured. Try in few time')
             
-            if package is None:
-                raise FundException('Price error occured')
-            
-            if team.created_by.fundtransferuser.available_balance < package.price:
+            if team.created_by.fundtransferuser.available_balance < team.team_package.price:
                 raise FundException('Insufficuent Balance')
             
             if team.default_plan:
                 # THIS CODE WILL ACTIVATE THE PLAN
                 subscription = cls.objects.create(
                     team=team,
-                    price=package.price,
+                    price=team.team_package.price,
                     merchant=merchant,
                     payment_method = cls.BALANCE,
                     created_at=timezone.now(),
@@ -463,10 +460,10 @@ class Subscription(SubscriptionMaster):
                 subscription.subscription_id = subscription.reference
                 subscription.status = True
                 subscription.save()
-                FreelancerAccount.charge_freelancer(team.created_by, package.price)
+                FreelancerAccount.charge_freelancer(team.created_by, team.team_package.price)
 
                 user_team = team
-                user_team.package = package
+                user_team.package = team.team_package
                 user_team.package_status = 'active'
                 user_team.package_expiry = timezone.now() + relativedelta(months = 1)
                 user_team.save()
@@ -483,55 +480,49 @@ class Subscription(SubscriptionMaster):
                 return user_team
 
        
+    @classmethod
+    def subscribe_with_stripe(cls, merchant, team, customer_token, subscription_id):
+        
+        if team is None:
+            raise FundException('Error occured. Try in few time')
+        
+        if merchant is None:
+            raise FundException('Error occured. Try in few time')
     
+        subscription = cls.objects.create(
+            customer_token=customer_token,
+            team=team,
+            merchant=merchant,
+            payment_method = cls.STRIPE,
+            subscription_id=subscription_id,
+            price=team.team_package.price,
+            created_at=timezone.now(),
+            activation_time=timezone.now(),
+            expired_time = timezone.now() + relativedelta(months = 1)
+        )
+        subscription.customer_id = team.created_by.pk
+        subscription.status = False
+        subscription.save()
+        
+        return subscription
+
 
     @classmethod
-    def subscribe_with_stripe(cls, merchant, team, package):
+    def stripe_confirmation(cls, subscription_id):
         with db_transaction.atomic():
-            if team.package_status != 'default':
-                raise FundException('This team has active subscription')
-            
-            if team.package.pk == package.pk:
-                raise FundException('This team has active subscription')
-            
-            if team is None:
-                raise FundException('Error occured. Try in few time')
-            
-            if merchant is None:
-                raise FundException('Error occured. Try in few time')
-            
-            if package is None:
-                raise FundException('Price error occured')
-            
-            if team.created_by.fundtransferuser.available_balance < package.price:
-                raise FundException('Insufficuent Balance')
-            
-            subscription = cls.objects.create(
-                team=team,
-                price=package.price,
-                merchant=merchant,
-                payment_method = cls.BALANCE,
-                created_at=timezone.now(),
-                activation_time=timezone.now(),
-                expired_time = timezone.now() + relativedelta(months = 1)
-            )
-            subscription.customer_id = team.created_by.pk
-            subscription.subscription_id = subscription.reference
+            subscription = cls.objects.select_for_update().get(subscription_id=subscription_id)
             subscription.status = True
             subscription.save()
-            FreelancerAccount.charge_freelancer(team.created_by, package.price)
 
-            user_team = team
-            user_team.package = package
+            FreelancerAccount.charge_freelancer(subscription.team.created_by, subscription.price)
+            
+            user_team = subscription.team
+            user_team.package = user_team.team_package
             user_team.package_status = 'active'
             user_team.package_expiry = timezone.now() + relativedelta(months = 1)
             user_team.save()
             # db_transaction.on_commit(lambda: lock_fund_email(account, message))
-
         return subscription
-
-
-
 
 
 

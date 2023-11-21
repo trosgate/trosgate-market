@@ -1,11 +1,15 @@
 from django.contrib.sites.models import Site
-from payments.models import MerchantAPIs
+from payments.models import MerchantAPIs, Subscription
 import stripe
 from account.fund_exception import (
     GatewayModuleNotFound, 
     GatewayNotConfigured, 
     InvalidData
 )
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+
+
 
 
 class StripeClientConfig:
@@ -23,13 +27,16 @@ class StripeClientConfig:
         stripe.api_key = self.stripe_secret_key()
         self.stripe = stripe
 
+
     def get_payment_gateway(self):
         merchant = MerchantAPIs.objects.filter(merchant=self.site, stripe_active=True).first()
         return merchant
 
+
     def default_currency(self):
         currency = self.site.merchant.country.currency.lower()
         return currency if currency else 'usd'
+
 
     def stripe_public_key(self):
         gateway = self.get_payment_gateway()
@@ -37,24 +44,34 @@ class StripeClientConfig:
             return gateway.stripe_public_key
         return None
 
+
     def stripe_secret_key(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_secret_key
         return None
     
+
     def stripe_webhook_key(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_webhook_key
         return None
 
+    def stripe_subscription_price(self):
+        gateway = self.get_payment_gateway()
+        if gateway:
+            return gateway.stripe_subscription_price_id
+        return None
+
+
     def get_gateway_status(self):
         gateway = self.get_payment_gateway()
         if gateway:
             return gateway.stripe_sandbox
         return False
-    
+
+
     def create_payment_intent(self, amount, card_token):
         try:
             payment_intent = self.stripe.PaymentIntent.create(
@@ -92,16 +109,37 @@ class StripeClientConfig:
             raise InvalidData(f"Error! {e}")
     
 
-    def subscribe(self, customer_id, plan_id):
+    def subscribe_customer(self, customer, card_token, team):
+       
         try:
-            subscription = self.stripe.Subscription.create(
-                customer=customer_id,
-                items=[{'plan': plan_id}]
+            customer = self.stripe.Customer.create(
+                email=customer,
+                source=card_token,
             )
-            return subscription.id
+            
+            subscribe_user = self.stripe.Subscription.create(
+                customer=customer.id,
+                items=[
+                    {'price': self.stripe_subscription_price()}
+                ],
+                expand=['latest_invoice.payment_intent'],
+            )
+            payment_intent = subscribe_user.latest_invoice.payment_intent
+            subscription = Subscription.subscribe_with_stripe(
+                merchant=self.site, 
+                team=team,
+                customer_token=card_token,
+                subscription_id = payment_intent.id,
+            )
+            return subscription.subscription_id, payment_intent.client_secret
+           
         except self.stripe.error.StripeError as e:
             raise InvalidData(f"Error! {e}")
 
+
+    def confirm_subscription(self, subscription_id):
+        return Subscription.stripe_confirmation(subscription_id)
+        
 
     def cancel_subscription(self, subscription_id):
         try:

@@ -34,12 +34,12 @@ form.addEventListener('submit', function(event) {
   stripe.createToken(cardElement).then(function(result) {
     if (result.error) {
       // Handle card tokenization error
-      console.log(result.error.message);
+      displayError.textContent = 'Invalid card details';
       cardbtn.disabled = false;
     } else {
       let formData = new FormData();
       formData.append('card_token', result.token.id);
-      fetch('/team/stripe_payment_intent/', {
+      fetch('/payments/subscribe_with_stripe/', {
         method: 'POST',
         body: formData, 
         credentials: 'same-origin',
@@ -49,20 +49,20 @@ form.addEventListener('submit', function(event) {
       }).then(function(response) {
         return response.json();
       }).then(function(data) {
+        
         if (data.client_secret) {
           // Handle the card action (3D Secure) and confirm the payment
           stripe.handleCardPayment(data.client_secret).then(function(result) {
             if (result.error) {
-              // Handle payment authentication error
-              console.log(result.error.message);
+              displayError.textContent = 'Transaction failed';
               cardbtn.disabled = false;
             } else {
               if (result.paymentIntent.status === 'succeeded') {
                 // Payment successful, submit the form data to your backend
-                console.log('stripe_order_key ::', result.paymentIntent.id)
+                // console.log('stripe_order_key ::', result.paymentIntent.id)
                 let formData = new FormData();
-                formData.append('stripe_order_key', result.paymentIntent.id);
-                fetch('/application/stripe_payment_order/', {
+                formData.append('subscription_id', result.paymentIntent.id);
+                fetch('/payments/stripe_confirmation/', {
                   method: 'POST',
                   body: formData,
                   credentials: 'same-origin',
@@ -96,6 +96,7 @@ form.addEventListener('submit', function(event) {
           });
         } else {
           // Error handling if client_secret is not available
+          displayError.textContent = 'Transaction failed';
           console.log("Client secret is missing.");
           cardbtn.disabled = false;
         }

@@ -17,6 +17,8 @@ urlpatterns = [
 
 htmx_urlpatterns = [
     path('balance/', views.subscribe_with_balance, name='subscribe_with_balance'),
+    path('subscribe_with_stripe/', views.subscribe_with_stripe, name='subscribe_with_stripe'),
+    path('stripe_confirmation/', views.stripe_confirmation, name='stripe_confirmation'),
 
 ]
 

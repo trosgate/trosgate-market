@@ -595,13 +595,13 @@ def packages(request):
     base_currency = get_base_currency(request)
     session = request.session
     gateways = session.get("teamplan", {}).get("gateway_id")
-    
+
     if request.method == 'POST':
         with db_transaction.atomic():
             gateways = int(request.POST.get('gatewayid'))
             session["teamplan"] = {"gateway_id": gateways}
             session.modified = True
-
+    
     gateway_type = PaymentGateway.objects.filter(id=gateways).first()
 
     context = {
@@ -622,7 +622,7 @@ def purchase_package(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, status=Team.ACTIVE, created_by = request.user)
     if  "teamplan" not in request.session:
         messages.error(request, "Please select payment option")
-        return redirect("applications:pricing_option_with_fees")
+        return redirect("teams:packages")
     
     payment_gateways = request.merchant.gateways.all()
     
@@ -651,7 +651,5 @@ def purchase_package(request):
     if gateway_name in payment_api_config:
         context[f"{gateway_name}_public_key"] = payment_api_config[gateway_name]
 
-    # if request.htmx:
-    #     return render(request, 'teams/components/purchase_package.html', context)
     return render(request, 'teams/purchase_package.html', context)
 

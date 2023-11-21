@@ -266,15 +266,15 @@ class AdminCreditAdmin(admin.ModelAdmin):
 @admin.register(Subscription)
 class SubscriptionItemAdmin(admin.ModelAdmin):
     model = Subscription
-    list_display = ['team', 'reference', 'payment_method', 'expired_time']
+    list_display = ['team', 'reference', 'payment_method', 'expired_time', 'status']
     search_fields = ['team__title', 'reference', 'customer_id']
     list_filter=['status']
     readonly_fields = [
-        'team', 'customer_id', 'subscription_id','created_at',
+        'team', 'customer_token', 'subscription_id','created_at','reference',
         'price', 'status','payment_method', 'activation_time','expired_time'
         ]
     fieldsets = (
-        ('Customer', {'fields': ('team', 'customer_id', 'subscription_id',)}),
+        ('Customer', {'fields': ('team', 'reference', 'customer_token', 'subscription_id',)}),
         ('State and Attributes', {'fields': ('price', 'status','payment_method',)}),
         ('Timestamp', {'fields': ('created_at', 'activation_time','expired_time',)}),
     )

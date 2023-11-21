@@ -11,11 +11,13 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import PaymentGateway
 from general_settings.currency import get_base_currency_symbol
-from .checkout_card import CreditCard
+from .checkout.stripe import StripeClientConfig
 from django_htmx.http import HttpResponseClientRedirect
 from django.contrib import messages
 from transactions.utilities import get_base_currency
-
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
+from django.urls import reverse
 
 
 @login_required
@@ -98,29 +100,59 @@ def withdrawal_transactions(request):
 
 
 @login_required
+@never_cache
 def subscribe_with_balance(request):
     team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
     
-    if  "teamplan" not in request.session:
-        messages.error(request, "Please select payment option")
-        return redirect("teams:packages")
-    
     try:
-        package = Package.objects.get(type='team')
         Subscription.subscribe_with_balance(
             merchant=request.merchant, 
             team=team, 
-            package=package
         )
-        del request.session["teamplan"]["gateway_id"]
-        request.session.modified = True
+
         messages.info(request, f'Action Successful')
         return HttpResponseClientRedirect('/team/packages/')
     except Exception as e:
         messages.error(request, f'Error! {e}')
         return HttpResponseClientRedirect('/team/packages/')
-        # return HttpResponseClientRedirect('/team/subscription/')
 
+
+@login_required
+@never_cache
+@require_http_methods(['POST'])
+def subscribe_with_stripe(request):
+    team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id, created_by=request.user, status=Team.ACTIVE)
+    
+    card_token = request.POST.get('card_token')
+    stripe_client = StripeClientConfig()
+    try:
+        subscription_id, client_secret = stripe_client.subscribe_customer(
+            customer = request.user.email, 
+            card_token = card_token,
+            team = team
+        )
+
+        response_data = {
+            'client_secret': client_secret,
+            'payment_intent': subscription_id
+        }
+
+        return JsonResponse(response_data)
+    except Exception as e:
+        print('%s' % (str(e)))
+        return JsonResponse({'status': 'failed'})
+
+
+@login_required
+@never_cache
+@require_http_methods(['POST'])
+def stripe_confirmation(request):
+    subscription_id = request.POST.get('subscription_id')
+    print('Confirmed ::', subscription_id)
+    StripeClientConfig().confirm_subscription(subscription_id)
+    transaction_url = reverse('teams:packages') 
+    return JsonResponse({'status': 'success', 'transaction_url':transaction_url})
+    
 
 @login_required
 def paypal_package_order(request):
@@ -141,7 +173,6 @@ def paypal_package_order(request):
     return JsonResponse({'done':'done deal'})
 
 
-
 @login_required
 def package_transaction(request):
     base_currency = get_base_currency(request)
@@ -158,4 +189,5 @@ def package_transaction(request):
         'base_currency': base_currency,       
     }
     return render(request, 'payments/package_transactions.html', context)
+
 
