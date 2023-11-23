@@ -18,6 +18,10 @@ class StripeClientConfig:
     TEST_CARD = 4000000000003220
     TEST_CVC = 234
     TEST_DATE = 'PUT FUTURE DATE HERE DYNAMICALLY'
+    # Publishable = 'pk_test_51JxEfNF4wH80TkNlATFfBxzCUc3qSRaxqa4FsqgGoWSHsa28ryhmyMGSFCra5SUBM6apgSyAEoU9V46H4GD9Cn5T00sgjgBqF0'
+    # Secret = 'sk_test_51JxEfNF4wH80TkNlnyypq0PIFMPbvIjOMANrXv6qnN6RsCjHRGefSAuLNFjrhn9XvNmrr7NZCTMXni6LQEXbpSsm00VwoR0Rg2'
+    # Webhook = 'whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c'
+    # Sunscription_price = 'price_1OCo8dF4wH80TkNlZKABK9rG'
 
     def __init__(self):
         self.name = 'stripe'
@@ -57,6 +61,7 @@ class StripeClientConfig:
         if gateway:
             return gateway.stripe_webhook_key
         return None
+
 
     def stripe_subscription_price(self):
         gateway = self.get_payment_gateway()
@@ -129,6 +134,7 @@ class StripeClientConfig:
                 merchant=self.site, 
                 team=team,
                 customer_token=card_token,
+                reference=subscribe_user.id,
                 subscription_id = payment_intent.id,
             )
             return subscription.subscription_id, payment_intent.client_secret

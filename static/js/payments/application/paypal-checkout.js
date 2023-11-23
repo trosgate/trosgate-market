@@ -18,17 +18,6 @@ const paypalButton = document.getElementById('paypal-button-container');
 
 paypal.Buttons({
     createOrder(){
-        // createOrder: function(data, actions) {
-        //     // Set up the transaction details
-        //     const actions = actions.order.create({
-        //         purchase_units: [{
-        //             amount: {
-        //                 value: "{{hiring_box.get_total_price_after_discount_and_fee}}"
-        //             }
-        //         }]
-        //     });
-        //     console.log('PayPal', actions.id)    
-        //     console.log('PayPalD', actions.orderID) 
         return fetch("/application/paypal/api/", {
             method: 'GET',
             credentials: 'same-origin',

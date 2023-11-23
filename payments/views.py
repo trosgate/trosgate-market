@@ -16,8 +16,11 @@ from django_htmx.http import HttpResponseClientRedirect
 from django.contrib import messages
 from transactions.utilities import get_base_currency
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.urls import reverse
+import json
+
 
 
 @login_required
@@ -147,31 +150,64 @@ def subscribe_with_stripe(request):
 @never_cache
 @require_http_methods(['POST'])
 def stripe_confirmation(request):
-    subscription_id = request.POST.get('subscription_id')
-    print('Confirmed ::', subscription_id)
-    StripeClientConfig().confirm_subscription(subscription_id)
-    transaction_url = reverse('teams:packages') 
-    return JsonResponse({'status': 'success', 'transaction_url':transaction_url})
-    
+    subscription_id = request.POST.get('subscription_id', '')
+    try:
+        StripeClientConfig().confirm_subscription(subscription_id)
+        transaction_url = reverse('teams:packages') 
+        return JsonResponse({'status': 'success', 'transaction_url':transaction_url})
+    except Exception as e:
+        print('%s' % (str(e)))
+        return JsonResponse({'status': 'failed'})
+
 
 @login_required
-def paypal_package_order(request):
-    PayPalClient = PayPalClientConfig()
+@never_cache
+@require_http_methods(['GET'])
+def paypal_subscription(request):
     body = json.loads(request.body)
+    paypal_order_key = body["paypal_order_key"]
+    print(paypal_order_key)
 
-    data = body["orderID"]
-    paypal_request_order = OrdersGetRequest(data)
-    response = PayPalClient.client.execute(paypal_request_order)
-    Subscription.objects.create(
-        team=team,
-        subscriber=request.user,
-        price=response.result.purchase_units[0].plan.amount.value,
+    return JsonResponse({'error': 'Invalid request method'})
+    # paypal_order_key = PayPalClientConfig().create_order(grand_total)
+    # if paypal_order_key:
+    #     try:
+    #         purchase = Purchase.create_purchase_and_sales(
+    #             client=request.user,
+    #             **payment_data,
+    #             category=Purchase.PROPOSAL,
+    #             paypal_order_key=paypal_order_key,
+    #             hiringbox=hiringbox,
+    #         )
+    #         response_data = {
+    #             'paypal_order_key': paypal_order_key,
+    #         }
+    #         print('purchase ID ::', purchase.id)
+    #         return JsonResponse(response_data)
+    #     except Exception as e:
+    #         print('purchase ID ::', str(e))
+    #         return JsonResponse({'error': 'Invalid request method'})
+    # else:
+    #     print('purchase ID ::', str(e))
+    #     return JsonResponse({'error': 'Invalid request method'})
 
-        payment_method='PayPal',
-        status=True
-    )
-    return JsonResponse({'done':'done deal'})
 
+@csrf_exempt
+@never_cache
+@require_http_methods(['POST'])
+def paypal_callback(request):
+    body = json.loads(request.body)
+    paypal_order_key = body["paypal_order_key"]
+
+    capture_data = PayPalClientConfig().capture_order(paypal_order_key)
+    capture_data_id = capture_data['purchase_units'][0]['payments']['captures'][0]['id']
+    if capture_data['status'] == 'COMPLETED':
+        Purchase.paypal_order_confirmation(paypal_order_key, capture_data_id)
+        hiringbox.clean_box()
+        return JsonResponse(capture_data)
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+    
 
 @login_required
 def package_transaction(request):

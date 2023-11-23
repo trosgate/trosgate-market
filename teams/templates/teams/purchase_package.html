@@ -16,7 +16,7 @@
                 <span style="font-size: 18px; font-weight:bold;">Type: {{gateway_type|capfirst}}</span><br><br>
             </div>
             {% if gateway_type.name == "paypal" %}
-            <br><br><br><br><br><br>
+            <br><br><br><br><br>
             <div class="reposition-top">
                 <div id="paypal-button-container"></div>
             </div>
@@ -76,6 +76,8 @@
                 </div>
             </div>
         </div> 
+
+
     {{ request.user.get_full_name|json_script:"checkout_user"}}
     {{ request.user.email|json_script:"checkout_user_email"}}
     {{ website.site_logo_tag|json_script:"checkout_logo"}}
@@ -89,8 +91,12 @@
     </script>
 
     {% if gateway_type.name == "paypal" %}
-    <script 
-        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}">
+    <script>
+        const paypal_subscription_plan_id = "{{ paypal_subscription_plan_id }}";
+    </script>
+    <script
+        {% comment %} src="https://www.paypal.com/sdk/js?client-id=AfOQ1PqXoJ1t3gGaCI3AMcmnwpITuRZ_Zipvqk9CTYkpyCWPUUN3CZB3TAf0ezn-8xgOwOqcHBRnxC3H&currency={{base_currency}}&vault=true&intent=subscription" data-sdk-integration-source="button-factory"> {% endcomment %}
+        src="https://www.paypal.com/sdk/js?client-id={{paypal_public_key}}&currency={{base_currency}}&vault=true&intent=subscription" data-sdk-integration-source="button-factory">
     </script>
     <script src="{% static 'js/payments/subscription/paypal-checkout.js' %}"></script>
     {% endif %}

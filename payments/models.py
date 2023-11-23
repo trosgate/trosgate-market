@@ -405,7 +405,7 @@ class SubscriptionMaster(MerchantMaster):
     payment_method = models.CharField(_("Payment Method"), choices=PAYMENT_METHODS, default=BALANCE, max_length=200)
     price = models.PositiveIntegerField()
     status = models.BooleanField(_("Paid"), choices=((False, 'Failed'), (True, 'Success')), default=False)
-    reference = models.CharField(_("Order Key"), max_length=200, blank=True, null=True, unique=True)
+    reference = models.CharField(_("Reference"), max_length=200, blank=True, null=True, unique=True)
     customer_token = models.CharField(_("Customer Token"), max_length=2088, blank=True, null=True)
     subscription_id = models.CharField(_("Subscription ID"), max_length=255, blank=True, null=True)    
     created_at = models.DateTimeField(_("Subscription Start"), blank=True, null=True)
@@ -427,7 +427,7 @@ class Subscription(SubscriptionMaster):
         return str(self.team.title)
 
     def save(self, *args, **kwargs):
-        if not self.reference:
+        if self.payment_method == 'balance' and not self.reference:
             self.reference = generate_unique_reference(Subscription)
         super().save(*args, **kwargs)
 
@@ -481,7 +481,7 @@ class Subscription(SubscriptionMaster):
 
        
     @classmethod
-    def subscribe_with_stripe(cls, merchant, team, customer_token, subscription_id):
+    def subscribe_with_stripe(cls, merchant, team, customer_token, subscription_id, reference):
         
         if team is None:
             raise FundException('Error occured. Try in few time')
@@ -494,13 +494,13 @@ class Subscription(SubscriptionMaster):
             team=team,
             merchant=merchant,
             payment_method = cls.STRIPE,
+            reference = reference,
             subscription_id=subscription_id,
             price=team.team_package.price,
             created_at=timezone.now(),
             activation_time=timezone.now(),
             expired_time = timezone.now() + relativedelta(months = 1)
         )
-        subscription.customer_id = team.created_by.pk
         subscription.status = False
         subscription.save()
         
@@ -525,6 +525,27 @@ class Subscription(SubscriptionMaster):
         return subscription
 
 
+    @classmethod
+    def stripe_confirmation(cls, subscription_id):
+        with db_transaction.atomic():
+            subscription = cls.objects.select_for_update().get(subscription_id=subscription_id)
+            subscription.status = True
+            subscription.save()
+
+            FreelancerAccount.charge_freelancer(subscription.team.created_by, subscription.price)
+            
+            user_team = subscription.team
+            user_team.package = user_team.team_package
+            user_team.package_status = 'active'
+            user_team.package_expiry = timezone.now() + relativedelta(months = 1)
+            user_team.save()
+            # db_transaction.on_commit(lambda: lock_fund_email(account, message))
+        return subscription
+
+
+    @classmethod
+    def stripe_cancel(cls, subscription_id):
+        pass
 
 
 

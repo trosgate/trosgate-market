@@ -14,7 +14,18 @@ class PayPalClientConfig:
     
     TEST_CARD = 4000000000003220
     TEST_CVC = 234
-    TEST_DATE = 'PUT FUTURE DATE HERE DYNAMICALLY'
+    TEST_FUTURE_DATE = ''
+    
+    BUSINESS_ACCOUNT_EMAIL = 'sb-qgenr27297447@business.example.com'
+    BUSINESS_ACCOUNT_PASSWORD = '2F+1|fb2'
+
+    PERSONAL_ACCOUNT_EMAIL = 'sb-teapn26843346@personal.example.com'
+    PERSONAL_ACCOUNT_PASSWORD = 'Cl8Bs1<2'
+
+    # Publishable = 'AYzYz9rCMVBdd_UK0zRWrQG-XF_9japBSw3eeD-8yRlpO4xigH4dfoJzuXxpE54b8OZhKteag1_b3aEN'
+    # Secret = 'ELhKybyooduhj-u7msngpDJwR1xzXH6bB-EX95Pt24JmAcRumRHV4rdK0KKdfeN7PPpNnT6FcDOLedAW'
+    # Webhook = 'whsec_4fa73f32fb144a572b269e1cd7ba4b1ee56dcbe013d8cd87a50a99373f7c629c'
+    # Sunscription_price = 'P-7CV85479XR9558615MVPZPTY'
 
     def __init__(self):
         self.name = 'paypal'
@@ -35,6 +46,12 @@ class PayPalClientConfig:
         gateway = self.get_payment_gateway()      
         if gateway:
             return gateway.paypal_public_key
+        return None
+    
+    def paypal_subscription_plan_id(self):
+        gateway = self.get_payment_gateway()      
+        if gateway:
+            return gateway.paypal_subscription_price_id
         return None
 
 

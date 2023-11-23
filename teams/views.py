@@ -632,8 +632,11 @@ def purchase_package(request):
     
     gateway_type = get_object_or_404(PaymentGateway, id=gateways)
     package = get_object_or_404(Package, type='team')
+
+    paypal_client = PayPalClientConfig()
+    
     payment_api_config = {
-        'paypal': PayPalClientConfig().paypal_public_key(),
+        'paypal': paypal_client.paypal_public_key(),
         'stripe': StripeClientConfig().stripe_public_key(),
         'razorpay': RazorpayClientConfig().razorpay_key_id,
         'flutterwave': FlutterwaveClientConfig().flutterwave_public_key,
@@ -646,6 +649,7 @@ def purchase_package(request):
         'payment_gateways': payment_gateways,
         'gateway_type': gateway_type,
         'base_currency': base_currency,
+        'paypal_subscription_plan_id': paypal_client.paypal_subscription_plan_id(),
     }
     gateway_name = gateway_type.name
     if gateway_name in payment_api_config:
