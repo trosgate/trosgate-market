@@ -8,42 +8,51 @@ import uuid
 from threadlocals.threadlocals import get_thread_variable
 from django.contrib.auth import get_user_model
 
-
-# class MerchantMasterManager(models.Manager):
-#     def get_queryset(self):
-#         current_site = get_thread_variable('current_site')
-#         parent_site = get_thread_variable('parent_site')
-#         merchant_id = get_thread_variable('merchant')
-
-#         qs = super().get_queryset()
-
-#         filter_conditions = Q(merchant__site=current_site) | Q(merchant_id=merchant_id)
-
-#         if parent_site != 1:
-#             filter_conditions &= Q(merchant__site=current_site)
-
-#         return qs.filter(filter_conditions).select_related('merchant') 
-    
+curr_merchant = get_thread_variable('merchant')
 
 class MerchantMasterManager(models.Manager):
     def get_queryset(self):
+        base_queryset = super().get_queryset()
+
         current_site = get_thread_variable('current_site')
         # print('curr_site', current_site)
-        parent_site = get_thread_variable('parent_site')
-        # print('curr_parent_site', parent_site)
-        merchant_id = get_thread_variable('merchant')
-        # print('curr_merchant', merchant_id)
-        qs = super().get_queryset()
+        parent_user = get_thread_variable('parent_user')
+        merchant = get_thread_variable('merchant')
+        merchant_user = get_thread_variable('merchant_user')
+        # print('merchant_user ::', merchant_user)
+        if parent_user and parent_user.is_staff:
+            return base_queryset
         
-        # return qs.filter(
-        #         Q(merchant__site=current_site)|
-        #         Q(merchant_id=merchant_id)
-        #     ).select_related('merchant')
-        return qs if parent_site == 1 else qs.filter(
-                Q(merchant__site=current_site)|
-                Q(merchant_id=merchant_id)
+        if merchant:
+            return base_queryset.filter(
+                merchant__site=current_site, 
+                merchant=merchant
             ).select_related('merchant')
+        else:
+            return base_queryset.filter(
+                merchant__merchant=merchant_user
+            )
+
         
+# class MerchantMasterManager(models.Manager):
+#     def get_queryset(self):
+#         current_site = get_thread_variable('current_site')
+#         # print('curr_site', current_site)
+#         parent_site = get_thread_variable('parent_site')
+#         # print('curr_parent_site', parent_site)
+#         merchant_id = get_thread_variable('merchant')
+#         # print('curr_merchant', merchant_id)
+#         qs = super().get_queryset()
+        
+#         # return qs.filter(
+#         #         Q(merchant__site=current_site)|
+#         #         Q(merchant_id=merchant_id)
+#         #     ).select_related('merchant')
+#         return qs if parent_site == 1 else qs.filter(
+#                 Q(merchant__site=current_site)|
+#                 Q(merchant_id=merchant_id)
+#             ).select_related('merchant')
+
 
 class MerchantMaster(models.Model):
     merchant = models.ForeignKey("account.Merchant", verbose_name=_("Merchant"), on_delete=models.CASCADE)
@@ -53,9 +62,9 @@ class MerchantMaster(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        current_site = Site.objects.get_current()
-        if not self.merchant_id:
-            self.merchant = Merchant.objects.filter(site=current_site).first()
+        # current_site = Site.objects.get_current()
+        if not self.merchant:
+            self.merchant = curr_merchant # Merchant.objects.filter(site=current_site).first()
         super().save(*args, **kwargs)
 
 

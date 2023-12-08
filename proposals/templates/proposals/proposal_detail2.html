@@ -4,182 +4,165 @@
 
 {% block content %}
 
-	<!--Inner Home Banner Start-->
-	<div class="wt-haslayout wt-innerbannerholder">
-		<div class="container">
-			<div class="row justify-content-md-center">
-				<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
-					<div class="wt-innerbannercontent">
-					<div class="wt-title"><h2>Proposal Detail</h2></div>
-						{% if request.user.is_authenticated %}
-						<ol class="wt-breadcrumb">
-							<li><a href="{% url 'account:dashboard' %}" class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o"></i> Dashboard</a></li>
-							{% if active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'active' %}
-							<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
-							<li><a href="{% url 'proposals:archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Archive</a></li>
-							{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'review' %}
-							<li><a href="javascript:void(0);" class="btn btn-success btn-sm"><i class="fas fa-spinner fa-spin"></i> Reviewing</a></li>
-							{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'archived' %}
-							<li><a href="{% url 'proposals:reactivate_archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm"><i class="fa fa-window-restore"></i> Restore</a></li>
-							{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'modify' %}
-							<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
-							{% endif %}
-						</ol>
-						{% endif %}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	
-<!--Inner Home End-->
-<!--Main Start-->
-{% comment %} <main class="wt-haslayout wt-innerbgcolor"> {% endcomment %}
-	<div class="wt-haslayout wt-main-section" style='background:white;'>
-		<!-- User Listing Start-->
-		<div class="container">
-			<div class="row">
-				<div class="col-md-8 mb-4">			
-					<h3 class="d-flex justify-content-between">{{proposal.title}}</h3>
-						<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" style="width:1920px; max-height:560px;" alt="img description">
-					</div>
-					<div class="col-md-4">
-						<div class="bg-light rounded">
-							{% if proposal.pricing == False %}
-							<div class="p-3 pt-0">
-								
-								<div class="d-flex justify-content-center" style="font-weight:bold; font-size:18px; width:100%; color:green;">
-									<span >Proposal Attributes</span>
-								</div>
-								<div class="d-flex justify-content-between mb-3">
-									<span>Price</span><span id="salaryT0" class="text-primary pt-1"> {{website.merchant.country.currency}} {{proposal.salary}}</span>
-								</div>
-								<div class="d-flex justify-content-between mb-3">
-									<span>Revision</span><i class="text-primary pt-1">{{proposal.get_revision_display}}</i>
-								</div>
-								<div class="d-flex justify-content-between mb-3">
-									<span>Task Duration</span><i class="text-primary pt-1"> {{proposal.get_duration_display }}</i>
-								</div>
-								
-								{% if request.user.clients %}
-								<div class="d-flex justify-content-center">
-									<span class="addon-header">Add-On</span>
-								</div>
-								<div class="d-flex justify-content-between mb-3">
-									<span>Available Staffs</span><i class="text-primary pt-1"> {{proposal.team.members.count}} Staff{{proposal.team.members.count|pluralize}}</i>
-								</div>
-								<form method="POST">{% csrf_token %}
-									<div class="proposal-action">
-										<input id="salary" type="number" name="salary" value="{{proposal.salary}}" hidden/>
-										<input id="proposal" type="number" name="proposalid" value="{{proposal.id}}" hidden/>
-										<input id="package" type="text" name="package" value="single" hidden/>
-											
-										<select id="select" name="memberqty" class="custom-select">
-											<option selected disabled hidden> {{member.member_qty}} Worker{{member.member_qty|pluralize}}</option>
-											{% if proposal.team.members.count >= 1 %}<option value="1" selected> 1 Worker </option>{% endif %}
-											{% if proposal.team.members.count >= 2 %}<option value="2"> 2 Workers</option>{% endif %}
-											{% if proposal.team.members.count >= 3 %}<option value="3"> 3 Workers</option>{% endif %}
-											{% if proposal.team.members.count >= 4 %}<option value="4"> 4 Workers</option>{% endif %}
-											{% if proposal.team.members.count >= 5 %}<option value="5"> 5 Workers</option>{% endif %}
-										</select>                                                                                                                    
-										<button id="packageSingle" type="button" class="btn btn-success allign-self-end addon-btn"> +/- Addon </button>
-									</div>
-								</form>
-								<div class="proposal-action">
-									<button type="button" class="btn btn-info btn-block proposal-btn-state" data-toggle="modal" data-target="#oneClickProposalCheckout" style='background-color:black; color:white;'>Instant Hire <i class="fa fa-info badge badge-success" hx-on="click: window.confirm('this is the total messages')"></i></button>
-								</div>
-								<div class="proposal-action">
-									<button id="packageSingleNext" type="button" class="btn btn-info proposal-btn-state">Continue Basic</button>
-								</div>
-								
-								{% endif %} 
-								
-							</div>
-							{% else %}
-							<ul class="nav nav-tabs" id="myTab" role="tablist">
-								<li class="nav-item" role="presentation" style="list-style-type: none;">
-									<button class="nav-link active packager" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">{{proposal.BASIC|capfirst}}</button>
-								</li>
-								<li class="nav-item" role="presentation" style="list-style-type: none;">
-									<button class="nav-link packager" id="standard-tab" data-bs-toggle="tab" data-bs-target="#standard" type="button" role="tab" aria-controls="standard" aria-selected="false">{{proposal.STANDARD|capfirst}}</button>
-								</li>
-								<li class="nav-item" role="presentation" style="list-style-type: none;">
-									<button class="nav-link packager" id="premium-tab" data-bs-toggle="tab" data-bs-target="#premium" type="button" role="tab" aria-controls="premium" aria-selected="false">{{proposal.PREMIUM|capfirst}}</button>
-								</li>
-							</ul>
-							<div class="tab-content" id="myTabContent">
-							{% include 'proposals/partials/proposal_tier.html' %}
-							</div>
-							
-							{% endif %}
-						</div>
-				</div>
-				
+			<!--Inner Home Banner Start-->
+			<div class="wt-haslayout wt-innerbannerholder">
 				<div class="container">
-				<div class="row">
-					<div class="col-md-8">
-						<div class="wt-tabscontenttitle">
-							<h3>Proposal Detail</h3>
-						</div>
-							{{proposal.description|linebreaksbr}}
-						</div>
-						<div class="col-md-4">
-							<div class="wt-dashboardbox" style="background-color: rgb(81, 72, 212); border-radius:20%;">
-								<div class="wt-dashboardboxcontent wt-hiredfreelance">
-									<div class="wt-companysinfo">
-										<figure class="wt-companyad">
-											<img src="{% firstof proposal.created_by.freelancer.profile_photo.url proposal.created_by.freelancer.banner_photo.url proposal.thumbnail.url %}" style="height:100px;" alt="img description">
-										</figure>
-										<div class="wt-title"> 
-											<a href="javascript:void(0);">
-												<i class="fa fa-check-circle"> {% if request.user.is_authenticated %} {{proposal.created_by.get_full_name|capfirst}} {% else %} {{proposal.created_by.short_name|capfirst}} {% endif %}</i>
-											</a>
-										</div>
-										<ul class="wt-postarticlemeta">
-											<li>
-												<a href="javascript:void(0);">
-													<span style="color: white;">Jobs</span>
-												</a>
-											</li>
-											<li>
-												<a href="{{profile_view.freelancer_profile_absolute_url}}">
-													<span style="color: white;">Profile</span>
-												</a>
-											</li>
-											<li class="wt-following">
-												<a href="javascript:void(0);">
-													<span style="color: white;">Following</span>
-												</a>
-											</li>
-										</ul>
-									</div>
-									<div class="wt-description"style="color: white;"><br>
-										{{proposal.created_by.freelancer.description|linebreaksbr|truncatechars:150}}
-									</div>
-								</div>
-								{% if request.user.clients or request.user.freelancer %}
-								<div class="wt-clicksavearea" style="border-radius:20%;">
-									<a href="{% url 'proposals:proposal_chat_messages' proposal.slug %}" 
-										class="btn btn-danger justify-content-md-center" 
-										style="background-color:red;">
-										<i class="far fa-smile"></i> 
-										Author Support
-									</a>
-								</div>
+					<div class="row justify-content-md-center">
+						<div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+							<div class="wt-innerbannercontent">
+							<div class="wt-title"><h2>Proposal Detail</h2></div>
+								{% if request.user.is_authenticated %}
+								<ol class="wt-breadcrumb">
+									<li><a href="{% url 'account:dashboard' %}" class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o"></i> Dashboard</a></li>
+									{% if active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'active' %}
+									<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
+									<li><a href="{% url 'proposals:archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Archive</a></li>
+									{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'review' %}
+									<li><a href="javascript:void(0);" class="btn btn-success btn-sm"><i class="fas fa-spinner fa-spin"></i> Reviewing</a></li>
+									{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'archived' %}
+									<li><a href="{% url 'proposals:reactivate_archive_proposal' proposal.created_by.short_name proposal.slug %}" class="btn btn-info btn-sm"><i class="fa fa-window-restore"></i> Restore</a></li>
+									{% elif active_team.pk == request.user.freelancer.active_team_id and proposal.status == 'modify' %}
+									<li><a href="{% url 'proposals:modify_proposals' proposal.id proposal.slug %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil-square-o"></i> Modify</a></li>
+									{% endif %}
+								</ol>
 								{% endif %}
 							</div>
 						</div>
-					</div><br><br>
-					{% include 'proposals/components/proposal_summary.html' %}
+					</div>
 				</div>
-			</div>		
+			</div>
+			
+			<!--Inner Home End-->
+			<!--Main Start-->
+			<main class="wt-haslayout wt-innerbgcolor">
+				<div class="wt-haslayout wt-main-section">
+					<!-- User Listing Start-->
+					<div class="container" style="background:#fff; margin-bottom:10px;">
+						<div class="row">
+							<div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
+								<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">
+									<div class="wt-proposalholder">
+										<div class="wt-proposalhead">
+											<h2>{{proposal.title}}</h2>
+											<ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+												<li><span><i class="far fa-money-bill-alt" style="color:green;"></i> {{website.merchant.country.currency}} {{proposal.salary}}</span></li>
+												<li><span><i class="fa fa-arrow-up" style="color:red;"></i> Sales: {{overal_proposal_sales_count}}</span></li>
+												<li><span>{% if proposal.created_by.country.flag %}<img src="{{proposal.created_by.country.flag.url}}" alt="img description"> {% else %}{{proposal.created_by.country.country_code}} - {% endif %} {{proposal.created_by.country.name}}</span></li>
+												<li><span><i class="far fa-clock" style="color:blue;"></i> Duration: {{proposal.get_duration_display }}</span></li>
+											</ul>
+										</div>
+										<div class="wt-btnarea">
+										{% if request.user.is_authenticated %}
+											<button class="wt-btn" data-toggle="modal" data-target="#oneClickProposalCheckout" 
+											style='background-color:black; color:white;'>
+											Digital Product
+											</button>
+										{% else %}
+											<a href="{% url 'account:login' %}" class="wt-btn">Hire Expert</a>
+										{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-md-8">
+								<img src="{% firstof proposal.thumbnail.url proposal.created_by.freelancer.banner_photo.url %}" 
+								class="proposal-banner-img" alt="image description">
+							</div>
+
+							<div class="col-md-4">
+								{% include 'proposals/partials/proposal_tier_fetcher.html' %}
+							</div>		
+						</div>		
+
+						<div class="row">
+							<div class="col-md-8">
+								<div class="wt-projectdetail-holder">
+									<div class="wt-projectdetail">
+										<div class="wt-title">
+											<h4>Proposal Detail</h4>
+										</div>
+										
+										<div class="wt-description">
+											{{proposal.description|linebreaksbr}}
+											
+										</div>
+											
+										<div class="wt-title">
+											<h4>Proposal Faqs</h4>
+										</div>
+										<div class="wt-description">
+											<ul class="wt-accordionhold accordion">
+												<li>
+													{% if proposal.faq_one %}
+													<div class="wt-accordiontitle collapsed" id="headingtwo2" data-toggle="collapse" data-target="#collapsetwo2">
+														<span>#1. {{proposal.faq_one}}</span>
+													</div>
+													<div class="wt-accordiondetails collapse" id="collapsetwo2" aria-labelledby="headingtwo2">
+														<div class="wt-title">
+															<h3>{{proposal.faq_one}}</h3>
+														</div>
+														<div class="wt-description">
+															{{proposal.faq_one_description}}
+														</div>
+													</div>
+													{% endif %}
+												</li>
+												<li>
+													{% if proposal.faq_two %}
+													<div class="wt-accordiontitle collapsed" id="headingthree2" data-toggle="collapse" data-target="#collapsethree2">
+														<span>#2. {{proposal.faq_two}}</span>
+													</div>
+													<div class="wt-accordiondetails collapse" id="collapsethree2" aria-labelledby="headingthree2">
+														<div class="wt-title">
+															<h3>{{proposal.faq_two}}</h3>
+														</div>
+														<div class="wt-description">
+															{{proposal.faq_two_description}}
+														</div>
+													</div>
+													{% endif %}
+												</li>
+											</ul>
+											
+										</div>
+										<div class="wt-title">
+											<h4>Proposal Skills</h4>
+										</div>
+										<div class="wt-widgetcontent">
+											<div class="wt-widgettag wt-widgettagvtwo">
+											{% for skill in proposal.skill.all %}
+												<a href="javascript:void(0);">{{skill}}</a>
+											{% endfor %}
+											</div>
+										</div>
+										
+									</div>
+								</div>
+							</div>
+							{% comment %} <div class="col-md-4 dlex-f flex-column">
+								{% include 'proposals/components/proposal_side.html' %}
+							</div> {% endcomment %}
+						</div>
+
+						<div class="row">		
+							{% include 'proposals/components/proposal_summary.html' %}
+						</div>
+						<div class="row">
+							<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
+								
+							</div>
+						</div>
+						{% comment %} </div> {% endcomment %}
+					</div>
+				</div>
+			</main>
 		</div>
 		<!--Content Wrapper End-->
 	</div>
-
-	{% include 'client/partials/one_click_proposal_modal.html' %}
-
+	{% include 'proposals/partials/instant_product_modal.html' %}
 {% endblock content %}
+
 
 {% block scripts %}
 {% if proposal.pricing == False %}
@@ -354,11 +337,47 @@
 	})
   </script>
 {% endif %}
+  <script>
+	$(document).on('click', '#oneClickCheckout', function (e) {
+	  e.preventDefault();
 
+	  let displayMessage = document.getElementById('oneClick-message');
+	  let displayError = document.getElementById("oneClick-error")
+	  $.ajax({
+		type: 'POST',
+		url: '{% url "client:one_click_proposal_checkout" %}',
+		data: {
+			proposalId:'{{proposal.id}}',
+			csrfmiddlewaretoken: "{{csrf_token}}",
+			action: 'oneclick-pay'
+		},
+		beforeSend:function(){
+			$("#oneClickCheckout").attr("disabled", true);
+		},
+		success: function (json) {
+			if(json.errors != ''){
+				displayError.innerHTML = json.errors;
+				$("#oneClickCheckout").attr("disabled", false);
+				return false
+			}
+			else{
+				displayMessage.innerHTML = '';
+				displayMessage.innerHTML = json.message;
+				window.location.href = "{% url 'transactions:proposal_transaction' %}"
+				$("#oneClickCheckout").attr("disabled", false);
+			}
+		},
+		error: function (xhr, errmsg, err) {
+			$("#oneClickCheckout").attr("disabled", false);
+		}
+	  });
+	})
+  </script>
 	<!-- sharethis script begins-->	
 	<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=61172317d98f630012c48739&product=inline-share-buttons" async="async"></script>	
 	<!-- sharethis script ends-->
 {% endblock scripts %}
+
 
 
 

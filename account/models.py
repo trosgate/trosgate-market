@@ -111,6 +111,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         (FREELANCER, _('Freelancer')),
         (CLIENT, _('Client')),
     )
+    MERCHANT_USERS = [FREELANCER, CLIENT, MERCHANT]
     email = models.EmailField(_("Email Address"), max_length=100, unique=True)
     short_name = models.CharField(_("Username"), max_length=30, blank=True, null=True, unique=True)
     first_name = models.CharField(_("First Name"), max_length=50, blank=True, null=True)
@@ -175,6 +176,20 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     @property
     def is_admin(self):
         return self.user_type == 'admin' and self.is_active == True and self.is_staff == True
+    
+    @property
+    def get_profile(self):
+        if self.user_type == 'freelancer':
+            return self.freelancer.freelancer_profile_absolute_url()
+        if self.user_type == 'client':
+            return self.clients.client_profile_get_absolute_url()
+        if self.user_type == 'merchant':
+            return '#'
+
+    @property
+    def get_contact(self):
+        return f'<{self.get_full_name()}><{self.email}>'
+
 
     def email_user(self, subject, message, from_email, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)

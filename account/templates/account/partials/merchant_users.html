@@ -1,25 +1,97 @@
-
-{% for user in users %}
+{% for user in merchant_users %}
 <tr>
     <tr>
         <td class="text-center">{{forloop.counter}}</td>
         <td class="text-left">{{user.get_full_name}}</td>  
-        <td class="text-left">{{user.email}}</td>  
         <td>{{user.get_user_type_display}}</td>  
-        <td>{{user.date_joined|date:'M-d-Y'}}</td>  
-        <td>{{user.last_login}}</td>  
-        <td>{% if user.is_active %} <i class="fa fa-check" style="color:green;"></i> {% else %} <i class="fa fa-close" style="color:red;"></i>{% endif %}</td>  
-
+        <td>{{user.last_login}}</td>
         <td>
-            <form>{% csrf_token %}
-                <input type="text" name="userblockunblock" value="{{user.pk}}" id="{{user.pk}}" hidden>
-                <button type="button" class="badge badge-{% if user.is_active %}success{% else %}danger{% endif %} badge"
-                    hx-post="{% url 'account:block_or_unblock' %}"
-                    hx-target="#user-manager"
-                    hx-confirm="By proceeding, you agree that an inactive user will be active. Same way active user will be inactive and cannot login until you activate again.">
-                    {% if user.is_active %}Activated{% else %}Deactivated{% endif %}
+            
+            <span class="badge badge-{% if user.is_active %}success{% else %}secondary{% endif %}">{% if user.is_active %}Active{% else %}Inactive{% endif %}</span> |
+            <div class="btn-group">
+                <button type="button" class="badge badge-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-gear"> View </i>
                 </button>
-            </form>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a href="javascript:void(0);" class="dropdown-item" type="button" data-toggle="modal" data-target="#userModal{{ user.id }}">
+                            <i class="fa fa-folder-open"> Preview</i>
+                        </a>
+                    </li>  
+                    <li>
+                        <a hx-post="{% url 'account:block_or_unblock' %}?merchant_users={{user.pk}}" 
+                            class="dropdown-item" type="button"
+                            hx-target="#user-manager"
+                            hx-confirm="By proceeding,{% if user.is_active %} this user cannot login unless you reverse your action {% else %} this user can login again and access features {% endif %}.">
+                            <i class="fa fa-pencil-square-o"> Change Status</i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{user.get_profile}}" class="dropdown-item" type="button">
+                            <i class="fa fa-user"> Profile</i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0);" class="dropdown-item" type="button" data-toggle="modal" data-target="#userModalMsg{{ user.id }}">
+                            <i class="fa fa-envelope"> Email User </i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="modal fade" id="userModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel{{ user.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="userModalLabel{{ user.id }}">User Details: {{ user.username }}</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                        {{user.get_full_name}} 
+                        
+                        <p>User ID User IDUser IDUser IDUser IDUser IDUser IDUser IDUser ID</p>
+                        <p>User ID User IDUser IDUser IDUser IDUser IDUser IDUser IDUser ID</p>
+                        <p>User ID User IDUser IDUser IDUser IDUser IDUser IDUser IDUser ID</p>
+                        <p>User ID User IDUser IDUser IDUser IDUser IDUser IDUser IDUser ID</p>
+                        <p>User ID User IDUser IDUser IDUser IDUser IDUser IDUser IDUser ID</p>
+                        <p>User ID User IDUser IDUser IDUser IDUser IDUser IDUser IDUser ID</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <!-- Add more buttons as needed -->
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal fade" id="userModalMsg{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="userModalMsgLabel{{ user.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="userModalMsgLabel{{ user.id }}">New message</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form>
+                        <div class="mb-3">
+                          <label for="recipient-name" class="col-form-label text-left">Recipient:</label>
+                          <input type="text" class="form-control" id="recipient-name" value="{{user.get_contact}}" disabled>
+                        </div>
+                        <div class="mb-3">
+                          <label for="message-text" class="col-form-label text-left">Message:</label>
+                          <textarea class="form-control" id="message-text"></textarea>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary">Send message</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
         </td>
         
     </tr>

@@ -93,7 +93,7 @@ INTERNAL_IPS = [
 ]
 
 MIDDLEWARE = [
-    'account.middleware_host.DynamicHostMiddleware',
+    'account.middleware_host.DynamicHostMiddleware', #Must appear at the top
     # 'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -107,8 +107,8 @@ MIDDLEWARE = [
     # Django htmx begins
     'django_htmx.middleware.HtmxMiddleware',###
     # Django htmx ends
-    'account.middleware_gate.MerchantGateMiddleware',
-    'account.middleware_admin.AdminGateMiddleware',
+    'account.middleware_gate.MerchantGateMiddleware', #Must appear anywhere after AuthenticationMiddleware
+    'account.middleware_admin.AdminGateMiddleware', #Must appear anywhere after AuthenticationMiddleware
     'analytics.middleware.Middleware',
 ]
 

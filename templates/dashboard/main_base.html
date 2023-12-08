@@ -3,8 +3,7 @@
 <html lang="en">
     {% include 'dashboard/main_header.html' %}
     <body class="wt-login" hx-headers='{"X-CSRFToken":"{{csrf_token}}"}'>
-    {% comment %} hx-boost="true" {% endcomment %}
-    {% include 'dashboard/main_navbar.html' %}
+        {% include 'dashboard/main_navbar.html' %}
 
     {% if request.user.is_authenticated %}
     {% if messages %}

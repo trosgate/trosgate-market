@@ -44,8 +44,8 @@ from django_htmx.http import HttpResponseClientRedirect
 from contract.models import Contract
 from .backend import CustomAuthBackend
 from .permission import user_is_merchant
-from django.db.models import Q, Prefetch, F, Sum, Count, Avg
-
+from django.db.models import When, Case, Q, Count, Value, CharField
+from django.contrib.postgres.fields import ArrayField
 
 
 @login_required
@@ -459,18 +459,39 @@ def user_dashboard(request):
 @login_required
 @user_is_merchant
 def merchant_user(request):
-    users = Customer.objects.filter(site=request.merchant.site)
+    user_choice  = request.GET.get('usertype', 'all_users')
+    request.session["usertype"] = user_choice        
+    user_choices = request.session.get('usertype', user_choice)
+
+    print(user_choices)
+    merchant_user = Q(user_type=Customer.FREELANCER) | Q(user_type=Customer.CLIENT)
+    merchant_only = Q(user_type=Customer.MERCHANT)
+    merchant_users = Customer.objects.filter(
+        active_merchant_id=request.merchant.pk
+    ).annotate(
+        user_type_chosen = Case(
+            When(Q(merchant_user), then=Value('all_users')),
+            When(merchant_only, then=Value('merchant')),
+            default=Value('all_users'),
+            output_field=CharField()
+        )
+    )
+    merchant_users = merchant_users.filter(user_type_chosen=user_choice)
+
     context = {
-        'users': users,
+        'merchant_users': merchant_users,
     }
+    if request.htmx:
+        return render(request, 'account/partials/merchant_users.html', context)
     return render(request, 'account/user/merchant_user.html', context)
 
 
 @login_required
 @user_is_merchant
 def block_or_unblock(request):
-    user_id = request.POST.get('userblockunblock')
-    myuser = get_object_or_404(Customer, site=request.merchant.site, pk=user_id)
+    user_id = request.GET.get('merchant_users')
+    user_choice = request.session.get('usertype', 'all_users')
+    myuser = get_object_or_404(Customer, active_merchant_id=request.merchant.pk, pk=user_id)
     
     if myuser.is_active == True:
         myuser.is_active = False
@@ -479,9 +500,22 @@ def block_or_unblock(request):
         myuser.is_active = True
         myuser.save()
 
-    users = Customer.objects.filter(site=request.merchant.site)
+    merchant_user = Q(user_type=Customer.FREELANCER) | Q(user_type=Customer.CLIENT)
+    merchant_only = Q(user_type=Customer.MERCHANT)
+    merchant_users = Customer.objects.filter(
+        active_merchant_id=request.merchant.pk
+    ).annotate(
+        user_type_chosen = Case(
+            When(Q(merchant_user), then=Value('all_users')),
+            When(merchant_only, then=Value('merchant')),
+            default=Value('all_users'),
+            output_field=CharField()
+        )
+    )
+    merchant_users = merchant_users.filter(user_type_chosen=user_choice)
+
     context = {
-        'users': users,
+        'merchant_users': merchant_users,
     }
     return render(request, 'account/partials/merchant_users.html', context)
 

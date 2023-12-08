@@ -56,7 +56,7 @@ class SettingsMaster(models.Model):
     modified = models.DateTimeField(_("Last Modified"), auto_now=True)
     
     # Theme Changing
-    proposal_detail = models.BooleanField(_("Proposal Detail Display"), choices = ((False,'Proposal with Full Image'), (True, 'Proposal with Side Image')), default = False)
+    proposal_detail = models.BooleanField(_("Proposal Detail Display"), choices = ((False,'Proposal without Image'), (True, 'Proposal with Image')), default = False)
     category_type = models.BooleanField(_("Category Type"), choices = ((False,'Flat Display Category'), (True, 'Popup Display Category')), default = False)
     project_type = models.BooleanField(_("Job Listing Type"), choices = ((False,'VerticaL display'), (True, 'Horizontal display')), default = False)
     banner_type = models.CharField(_("Banner Activator"), max_length=20, choices = BANNER_TYPES, default = ROYAL)
@@ -125,7 +125,6 @@ class SettingsMaster(models.Model):
     )
 
     # Marketing
-
     brand_ambassador_image = models.ImageField(
         _("Brand Ambassador Image"), 
         help_text=_("This will appear to logged-in user on 'About Us Page, Freelancer page, project page'. Size should be 255px x 255px. image must be any of these: 'JPEG','JPG','PNG','PSD'"), 
@@ -147,12 +146,13 @@ class SettingsMaster(models.Model):
     
     def site_logo_tag(self):
         if self.site_Logo:
-            return mark_safe('<img src="/media/%s" width="185" height="50" />' % (self.site_Logo))
+            return mark_safe('<img src="/media/%s" width="185" height="40" />' % (self.site_Logo))
         else:
             return f'{self.site.name}'
 
     site_logo_tag.short_description = 'site_Logo'
 
+    @property
     def get_site_logo(self):
         if self.site_Logo:
             return self.site_Logo.url

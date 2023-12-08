@@ -1,177 +1,207 @@
 
-  <!-- Wrapper Start -->
-  <div id="wt-wrapper" class="wt-wrapper wt-haslayout">
-    
-    <!-- Content Wrapper Start -->
-    <div class="wt-contentwrapper">
-      <!-- Header Start -->
-      <header id="wt-header" class="wt-header wt-headervtwo wt-haslayout">
-        <div class="wt-navigationarea">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                
-                <div class="wt-logo" style="max-width:185px; max-height:40px; margin-top:10px;">
-                  <a href="{% url 'account:homepage' %}">{{website.site_logo_tag}}</a>
-                </div>
+<div class="preloader-outer">
+  <div class="loader"></div>
+</div>
+<!-- Preloader End -->
+<!-- Wrapper Start -->
+<div id="wt-wrapper" class="wt-wrapper wt-haslayout">
+  <!-- Content Wrapper Start -->
+  <div class="wt-contentwrapper">
+    <!-- Header Start -->
+    <header id="wt-header" class="wt-header wt-headervtwo wt-haslayout">
+      <div class="wt-navigationarea">
+        <div class="container-fluid">
+          <div class="row">
 
-                <div class="wt-rightarea">
-                  <nav id="wt-nav" class="wt-nav navbar-expand-lg">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">
-                      <i class="lnr lnr-menu"></i>
-                    </button>
-                    
-                    <div class="collapse navbar-collapse wt-navigation" id="navbarNav">
-                      <ul class="navbar-nav">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <strong class="wt-logo">
+                    <a href="{% url 'account:homepage' %}"><img src="{{website.get_site_logo}}" alt="company logo" style="height: 40px;"></a>
+                  </strong>
+
+                  <form class="wt-formtheme wt-formbanner wt-formbannervtwo">
+                    <fieldset>
+                      <div class="form-group">
+                        <input type="text" name="job" class="form-control" placeholder="I’m looking for">
+                        <div class="wt-formoptions">
+                          <div class="wt-dropdown">
+                            <span>In: <em class="selected-search-type">Freelancers </em><i class="lnr lnr-chevron-down"></i></span>
+                          </div>
+                          <div class="wt-radioholder">
+                            <span class="wt-radio">
+                              <input id="wt-freelancers" data-title="Freelancers" type="radio" name="searchtype" value="freelancer" checked="">
+                              <label for="wt-freelancers">Freelancers</label>
+                            </span>
+                            <span class="wt-radio">
+                              <input id="wt-jobs" data-title="Jobs" type="radio" name="searchtype" value="job">
+                              <label for="wt-jobs">Jobs</label>
+                            </span>
+                            <span class="wt-radio">
+                              <input id="wt-companies" data-title="Companies" type="radio" name="searchtype" value="job">
+                              <label for="wt-companies">Companies</label>
+                            </span>
+                          </div>
+                          <a href="javascrip:void(0);" class="wt-searchbtn"><i class="lnr lnr-magnifier"></i></a>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </form>
+
+                  <div class="wt-rightarea">
+                    <nav id="wt-nav" class="wt-nav navbar-expand-lg">
+                      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">
+                        <i class="lnr lnr-menu"></i>
+                      </button>
+                      
+                      <div class="collapse navbar-collapse wt-navigation" id="navbarNav">
+                        <ul class="navbar-nav">
+                          
+                          {% comment %} <li class="nav-item">
+                            <a href="{% url 'pages:aboutus' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>About Us</a>
+                          </li> {% endcomment %}
+                          
+                          {% comment %} <li class="nav-item">
+                            <a href="{% url 'freelancer:freelancer_listing' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Freelancers</a>
+                          </li> {% endcomment %}
+
+                          <li class="nav-item">
+                            <a href="{% url 'pages:how_it_works' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>WorkFlow</a>
+                          </li>
+
+                          <li class="nav-item">
+                            <a href="{% url 'marketing:article_list' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Articles</a>
+                          </li>
                         
-                        <li class="nav-item">
-                          <a href="{% url 'pages:aboutus' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>About Us</a>
-                        </li>
-                        
-                        <li class="nav-item">
-                          <a href="{% url 'freelancer:freelancer_listing' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Freelancers</a>
-                        </li>
-
-                        <li class="nav-item">
-                          <a href="{% url 'pages:how_it_works' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>WorkFlow</a>
-                        </li>
-
-                        <li class="nav-item">
-                          <a href="{% url 'marketing:article_list' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Articles</a>
-                        </li>
-                       
-                        {% if request.user.is_authenticated and request.user.clients %}
-                        <li class="menu-item-has-children page_item_has_children"><span class="wt-dropdowarrow"><i class="lnr lnr-chevron-right"></i></span>
-                          <a href="javascript:void(0);" {% if website.navbar_color %} style="color:black;" {% endif %}>Bucket</a>
-                          <ul class="sub-menu">
-                            <li><a href="{% url 'transactions:pricing_option_with_fees' %}">Proposals &nbsp;<span class="badge badge-success" id="members-qty">{% with total_staff=hiring_box|length %}{% if total_staff > 0 %}{{total_staff}}{% else %}0{% endif %}{% endwith %}</span></a></li>
-                            <li><a href="{% url 'applications:pricing_option_with_fees' %}">Applications &nbsp;<span class="badge badge-success" id="applicantApproveCount">{% with total_applicant=application_addon|length %}{% if total_applicant > 0 %}{{total_applicant}}{% else %}0{% endif %}{% endwith %}</span></a></li>
-                          </ul>
-                        </li>                        
-                        <li
-                          class="nav-item">
-                          <a href="{% url 'proposals:proposal_list' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Proposals</a>
-                        </li>
-                        <li
-                          class="nav-item text-center">
-                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:black;"></i> Balance: &nbsp;{{request.user.clientfunduser.available_balance}}</span></a>
-                        </li>
-                        {% endif %}
-                        {% if request.user.is_authenticated %}
-                        {% if active_team.created_by == request.user %}
-                        <li
-                          class="nav-item text-center">
-                          <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:black;"></i> Team Bal: &nbsp;{{active_team.team_balance}}</span></a>
-                        </li>
-                        {% endif %}
-                        {% endif %}
-                        {% if not request.user.is_authenticated %}
-                        <li class="nav-item text-center">
-                          <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-black" style="background-color:{% firstof website.button_color home_layout.banner_color purple %};">Login Now</span></a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </div>
-                  </nav>
-                  
-									<div class="wt-userlogedin">
-                    {% if not request.user.is_authenticated %}
-                      {% if request.parent_site %}
-                      <a class="btn btn-danger btn-sm" href="#pricing" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Become a Merchant</a>
-                      {% else %}
-
-											  <a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Signup</a>
-                      {% endif %}
-                    {% endif %}
-
-                    {% if request.user.is_authenticated %}
-                    <figure class="wt-userimg">
-                      {% if request.user.freelancer %}
-                      <img src="{% if request.user.freelancer.profile_photo %}{{request.user.freelancer.profile_photo.url}}{% endif %}" alt="image description"/>
-                      {% endif  %}
-                      {% if request.user.clients %}
-                      <img src="{% if request.user.clients.profile_photo %}{{request.user.clients.profile_photo.url}}{% endif %}" alt="image description"/>
-                      {% endif  %}
-                      {% if request.user.merchant %}
-                      <img src="{% if request.user.merchant.profile_photo %}{{request.user.merchant.profile_photo.url}}{% endif %}" alt="image description"/>
-                      {% endif  %}
-                    </figure>
-                    <div class="wt-username">
-                      <h3><span {% if website.navbar_color %} style="color:black;" {% endif %}>{{request.user.get_short_name|capfirst}}</span></h3>
-                      <span {% if website.navbar_color %} style="color:black;" {% endif %}>
-                        {% if active_team %} {{active_team.title|slice:10}}
-                        {% else %}
-                        {{request.user.get_user_type_display}}
-                        {% endif %}
-                      </span>
-                    </div>
-                    <nav class="wt-usernav">
-                      <ul>
-                        {% if request.user.freelancer %}
-                        <li
-                          class="menu-item-has-children page_item_has_children">
-                          <a href="{% url 'payments:payment_vault' %}">
-                            <span>Account</span>
-                          </a>
-                        </li>
-                        <li
-                          class="menu-item-has-children page_item_has_children">
-                          <a href="{% url 'freelancer:update_freelancer_profile' request.user.short_name %}">
-                            <span>My Profile</span>
-                          </a>
-                        </li>
-                        {% endif %}
-                        {% if request.user.clients %}
-                        <li
-                          class="menu-item-has-children page_item_has_children">
-                          <a href="{% url 'client:update_client_profile' request.user.short_name %}">
-                            <span>Brand Profile</span>
-                          </a>
-                        </li>
-                        {% endif %}
-                        
-                        <li class="menu-item-has-children">
-                          <a href="javascript:void(0);">
-                            <span>Manage Jobs</span>
-                          </a>
-                          <ul class="sub-menu">
-                            
-                            <li>
-                              <a href="{% url 'transactions:proposal_transaction' %}">Proposal</a>
-                            </li>
-                            <li>
-                              <a href="{% url 'transactions:application_transaction' %}">Application</a>
-                            </li>
-                            <li>
-                              <a href="{% url 'transactions:contract_transaction' %}">Contract</a>
-                            </li>
-                            <li><a href="{% url 'payments:package_transaction' %}">Subscriptions</a></li>
-							
-                          </ul>
-                        </li>
-                        <li
-                          class="menu-item-has-children page_item_has_children">
-                          <a href="{% url 'marketing:support' %}">
-                            <span>Help &amp; Support</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="{% url 'account:logout' %}" data-bs-toggle="modal" data-bs-target="#genericlogoutModal">
-                            <span>Logout</span>
-                          </a>
-                        </li>
-                      </ul>
+                          {% if request.user.is_authenticated and request.user.clients %}
+                          <li class="menu-item-has-children page_item_has_children"><span class="wt-dropdowarrow"><i class="lnr lnr-chevron-right"></i></span>
+                            <a href="javascript:void(0);" {% if website.navbar_color %} style="color:black;" {% endif %}>Bucket</a>
+                            <ul class="sub-menu">
+                              <li><a href="{% url 'transactions:pricing_option_with_fees' %}">Proposals &nbsp;<span class="badge badge-success" id="members-qty">{% with total_staff=hiring_box|length %}{% if total_staff > 0 %}{{total_staff}}{% else %}0{% endif %}{% endwith %}</span></a></li>
+                              <li><a href="{% url 'applications:pricing_option_with_fees' %}">Applications &nbsp;<span class="badge badge-success" id="applicantApproveCount">{% with total_applicant=application_addon|length %}{% if total_applicant > 0 %}{{total_applicant}}{% else %}0{% endif %}{% endwith %}</span></a></li>
+                            </ul>
+                          </li>                        
+                          <li
+                            class="nav-item">
+                            <a href="{% url 'proposals:proposal_list' %}" {% if website.navbar_color %} style="color:black;" {% endif %}>Proposals</a>
+                          </li>
+                          <li
+                            class="nav-item text-center">
+                            <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:black;"></i> Balance: &nbsp;{{request.user.clientfunduser.available_balance}}</span></a>
+                          </li>
+                          {% endif %}
+                          {% if request.user.is_authenticated %}
+                          {% if active_team.created_by == request.user %}
+                          <li
+                            class="nav-item text-center">
+                            <a href="javascript:void(0);"><span class="badge badge-success"><i class="far fa-money-bill-alt" style="color:black;"></i> Team Bal: &nbsp;{{active_team.team_balance}}</span></a>
+                          </li>
+                          {% endif %}
+                          {% endif %}
+                          {% if not request.user.is_authenticated %}
+                          <li class="nav-item text-center">
+                            <a href="{% url 'account:login' %}" style="color:green;"><span class="badge badge-success text-black" style="background-color:{% firstof website.button_color home_layout.banner_color purple %};">Login Now</span></a>
+                          </li>
+                          {% endif %}
+                        </ul>
+                      </div>
                     </nav>
-                    {% endif %}
+                    
+                    <div class="wt-userlogedin">
+                      {% if not request.user.is_authenticated %}
+                        {% if request.parent_site %}
+                        <a class="btn btn-danger btn-sm" href="#pricing" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Become a Merchant</a>
+                        {% else %}
+
+                          <a class="btn btn-danger btn-sm" href="{% url 'account:register' %}" style="background-color:{% firstof website.button_color home_layout.banner_color purple %}; font-color:black;">Signup</a>
+                        {% endif %}
+                      {% endif %}
+
+                      {% if request.user.is_authenticated %}
+                      <figure class="wt-userimg">
+                        {% if request.user.freelancer %}
+                        <img src="{% if request.user.freelancer.profile_photo %}{{request.user.freelancer.profile_photo.url}}{% endif %}" alt="image description"/>
+                        {% endif  %}
+                        {% if request.user.clients %}
+                        <img src="{% if request.user.clients.profile_photo %}{{request.user.clients.profile_photo.url}}{% endif %}" alt="image description"/>
+                        {% endif  %}
+                        {% if request.user.merchant %}
+                        <img src="{% if request.user.merchant.profile_photo %}{{request.user.merchant.profile_photo.url}}{% endif %}" alt="image description"/>
+                        {% endif  %}
+                      </figure>
+                      <div class="wt-username">
+                        <h3><span {% if website.navbar_color %} style="color:black;" {% endif %}>{{request.user.get_short_name|capfirst}}</span></h3>
+                        <span {% if website.navbar_color %} style="color:black;" {% endif %}>
+                          {% if active_team %} {{active_team.title|slice:10}}
+                          {% else %}
+                          {{request.user.get_user_type_display}}
+                          {% endif %}
+                        </span>
+                      </div>
+                      <nav class="wt-usernav">
+                        <ul>
+                          {% if request.user.freelancer %}
+                          <li
+                            class="menu-item-has-children page_item_has_children">
+                            <a href="{% url 'payments:payment_vault' %}">
+                              <span>Account</span>
+                            </a>
+                          </li>
+                          <li
+                            class="menu-item-has-children page_item_has_children">
+                            <a href="{% url 'freelancer:update_freelancer_profile' request.user.short_name %}">
+                              <span>My Profile</span>
+                            </a>
+                          </li>
+                          {% endif %}
+                          {% if request.user.clients %}
+                          <li
+                            class="menu-item-has-children page_item_has_children">
+                            <a href="{% url 'client:update_client_profile' request.user.short_name %}">
+                              <span>Brand Profile</span>
+                            </a>
+                          </li>
+                          {% endif %}
+                          
+                          <li class="menu-item-has-children">
+                            <a href="javascript:void(0);">
+                              <span>Manage Jobs</span>
+                            </a>
+                            <ul class="sub-menu">
+                              
+                              <li>
+                                <a href="{% url 'transactions:proposal_transaction' %}">Proposal</a>
+                              </li>
+                              <li>
+                                <a href="{% url 'transactions:application_transaction' %}">Application</a>
+                              </li>
+                              <li>
+                                <a href="{% url 'transactions:contract_transaction' %}">Contract</a>
+                              </li>
+                              <li><a href="{% url 'payments:package_transaction' %}">Subscriptions</a></li>
+                
+                            </ul>
+                          </li>
+                          <li
+                            class="menu-item-has-children page_item_has_children">
+                            <a href="{% url 'marketing:support' %}">
+                              <span>Help &amp; Support</span>
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              href="{% url 'account:logout' %}" data-bs-toggle="modal" data-bs-target="#genericlogoutModal">
+                              <span>Logout</span>
+                            </a>
+                          </li>
+                        </ul>
+                      </nav>
+                      {% endif %}
+                    </div>
                   </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </header>
-      <!--Header End-->
-    </div>
+ 
 
 

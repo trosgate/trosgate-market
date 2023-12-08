@@ -8,7 +8,6 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from teams.utilities import create_random_code
 from account.models import Customer
 from account.fund_exception import FundException
 from teams.models import Team
@@ -120,8 +119,6 @@ class Freelancer(MerchantMaster):
         #     cropped_image = image.crop((0, 0, desired_width, desired_height))
         #     cropped_image = cropped_image.resize((desired_width, desired_height), Image.ANTIALIAS)
         #     cropped_image.save(self.profile_photo.path)
-
-
 
     def get_tagline(self):
         return f"I am {self.user.get_short_name()} with specialty in ..." 

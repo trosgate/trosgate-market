@@ -1,69 +1,70 @@
 {% extends "dashboard/main_base.html" %}
-{% load widget_tweaks %}
+{% load static %}
 {% block content %}
-{% include 'dashboard/main_sidebar.html' %}
 
-<!--Main Start-->
-	<main id="ticket-list" class="wt-main wt-haslayout">
-
-		<div class="wt-proposalholder">
-			<div class="container">
-				<div class="row justify-content-md-center">
-					<div class="col-12">
-						<div class="wt-sectionhead wt-textcenter">
-							<div class="wt-sectiontitle">
-								<h3>User Manager</h3>
-								<form class="form-group text-center">{% csrf_token %}
-									<input type="text"
-										hx-post=""
-										hx-trigger="keyup changed delay:500ms"
-										hx-target="#search-tickets" 
-										class="form-control-sm col-md-6"
-										name="search" 
-										placeholder="start typing something ...."
-										autocomplete="off">
-								</form>
-							</div>
-						</div>
+<div class="wt-haslayout wt-innerbannerholder">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
+                <div class="wt-innerbannercontent">
+                    <div class="wt-title"><h2>User Manager</h2></div>
+                        <ol class="wt-breadcrumb">
+                            <li><a href="{% url 'account:dashboard' %}">Dashboard</a></li>
+                            <li class="wt-active">Users</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wt-haslayout wt-main-section" style="background:white;">
+		        
+        <div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<div class="user-searcher">
+						<span class="mt-6">Select User Type</span>
 					</div>
 				</div>
-			</div>				
-
-			<div class="table-responsive">
-				<table class="table-borderless">
-					<thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
-						<tr>
-							<th>SN</th>
-							<th>Names</th>
-							<th>Email</th>
-							<th>Type</th>
-							<th>Date Joined</th>
-							<th>Last Login</th>
-							<th>Status</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					
-					<tbody id="user-manager">
-						{% include 'account/partials/merchant_users.html' %}
-					</tbody>
-				</table>
-				{% if not users %}       
-				<div class="text-center">
-					<span style="font-weight: bold;"> You donnot have any freelancer or client</span>
-				</div>
-				{% endif %}  
-			</div>
-		</div>
-
-		<div class="wt-proposalholder mt-6">
-			<div class="row justify-content-md-center">
-				<div class="wt-sectionhead wt-textcenter">
-					<span>Copyright @ {{request.site.name|capfirst}}</span>
+				<div class="col-md-8">
+					<div class="user-searcher text-left">
+						<form hx-get="{% url 'account:merchant_user' %}" hx-trigger="change" hx-target="#user-manager">
+							<select name="usertype" id="usertype" class="custom-select">
+								<option value="all_users" selected >---Select all Customers---</option>
+								<option value="merchant">---Select Staff Users---</option>
+							</select>
+						</form>
+					</div>
 				</div>
 			</div>
-		</div>
-	
-	</main>
-
-	{% endblock %}
+			<br>
+			<div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 float-left">    
+                    <div class="table-responsive">
+						<table class="table-borderless">
+							<thead style="background-color:rgb(29, 118, 90); color:white; font-weight: bold;">
+								<tr>
+									<th>SN<br></th>
+									<th>Names<br></th>
+									<th>Type<br></th>
+									<th>Last Login<br></th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							
+							<tbody id="user-manager">
+								{% include 'account/partials/merchant_users.html' %}
+							</tbody>
+						</table>
+						{% if not merchant_users %}       
+						<div class="text-center">
+							<span style="font-weight: bold;"> Nothing to show for selected user</span>
+						</div>
+						{% endif %}  
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    {% endblock content %}

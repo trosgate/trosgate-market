@@ -46,7 +46,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib.sites.shortcuts import get_current_site
 from transactions.hiringbox import HiringBox
-
+from django.db import transaction as db_transaction
 
 
 def merchant_proposal(request):
@@ -142,25 +142,25 @@ def proposal_filter(request):
         proposals = proposals.filter(revision=False).distinct()
     # Duration
     if one_day != '':
-        proposals = proposals.filter(dura_converter = one_day).distinct()
+        proposals = proposals.filter(duration = one_day).distinct()
     if two_days != '':
-        proposals = proposals.filter(dura_converter = two_days).distinct()
+        proposals = proposals.filter(duration = two_days).distinct()
     if three_days != '':
-        proposals = proposals.filter(dura_converter = three_days).distinct()
+        proposals = proposals.filter(duration = three_days).distinct()
     if four_days != '':
-        proposals = proposals.filter(dura_converter = four_days).distinct()
+        proposals = proposals.filter(duration = four_days).distinct()
     if five_days != '':
-        proposals = proposals.filter(dura_converter = five_days).distinct()
+        proposals = proposals.filter(duration = five_days).distinct()
     if six_days != '':
-        proposals = proposals.filter(dura_converter = six_days).distinct()
+        proposals = proposals.filter(duration = six_days).distinct()
     if one_week != '':
-        proposals = proposals.filter(dura_converter = one_week).distinct()
+        proposals = proposals.filter(duration = one_week).distinct()
     if two_weeks != '':
-        proposals = proposals.filter(dura_converter = two_weeks).distinct()
+        proposals = proposals.filter(duration = two_weeks).distinct()
     if three_weeks != '':
-        proposals = proposals.filter(dura_converter = three_weeks).distinct()
+        proposals = proposals.filter(duration = three_weeks).distinct()
     if one_month != '':
-        proposals = proposals.filter(dura_converter = one_month).distinct()
+        proposals = proposals.filter(duration = one_month).distinct()
     # Upgraded Teams
     if upgraded_teams != '':
         proposals = proposals.filter(team__package__type = 'Team').distinct()
@@ -345,86 +345,40 @@ def proposal_step_four(request):
     
     if pricing_type_data is None:
         return redirect("proposals:proposal_step_two")
-         
+    
+    config_pricing = True if pricing_type_data else False
+
     if request.method == 'POST':
         proposalformfour = ProposalStepFourForm(request.POST, request.FILES)
         if proposalformfour.is_valid():
             # unpack and combine all form data from previous steps and current step
-            form_data = {**step_one_data, **step_two_data, **step_three_data, **proposalformfour.cleaned_data}
-            # Create Post object
-            category = get_object_or_404(Category, pk=form_data['category'])
-            team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id)
-            
-            if pricing_type_data:
-
+            with db_transaction.atomic():
+                form_data = {**step_one_data, **step_two_data, **step_three_data, **proposalformfour.cleaned_data}
+                # Create Post object
+                team = get_object_or_404(Team, pk=request.user.freelancer.active_team_id)
+                form_data.pop('skill', None)
+                category_id = form_data.pop('category', None)
+                
                 proposal = Proposal.objects.create(
-                    pricing = True,
-                    title=form_data['title'],
-                    preview=form_data['preview'],
-                    description=form_data['description'],
-                    sample_link=form_data['sample_link'],
-
-                    tier1_preview=form_data['tier1_preview'],
-                    tier2_preview=form_data['tier2_preview'],
-                    tier3_preview=form_data['tier3_preview'],
-
-                    salary=form_data['salary_tier1'],
-                    salary_tier1=form_data['salary_tier1'],
-                    salary_tier2=form_data['salary_tier2'],
-                    salary_tier3=form_data['salary_tier3'],
-
-                    revision_tier1=form_data['revision_tier1'],
-                    revision_tier2=form_data['revision_tier2'],
-                    revision_tier3=form_data['revision_tier3'],
-
-                    pricing1_duration=form_data['pricing1_duration'],
-                    pricing2_duration=form_data['pricing2_duration'],
-                    pricing3_duration=form_data['pricing3_duration'],
-
-                    faq_one=form_data['faq_one'],
-                    faq_one_description=form_data['faq_one_description'],
-                    faq_two=form_data['faq_two'],
-                    faq_two_description=form_data['faq_two_description'],
-                    thumbnail=form_data['thumbnail'],
-                    category=category,
+                    pricing = config_pricing,
+                    **form_data,
+                    category_id=category_id,
                     created_by=request.user,
                     team=team,
                 )
-            else:
-                proposal = Proposal.objects.create(
-                    title=form_data['title'],
-                    preview=form_data['preview'],
-                    description=form_data['description'],
-                    sample_link=form_data['sample_link'],
-                    salary=form_data['salary'],
-                    service_level=form_data['service_level'],
-                    revision=form_data['revision'],
-                    dura_converter=form_data['dura_converter'],
-                    faq_one=form_data['faq_one'],
-                    faq_one_description=form_data['faq_one_description'],
-                    faq_two=form_data['faq_two'],
-                    faq_two_description=form_data['faq_two_description'],
-                    thumbnail=form_data['thumbnail'],
-                    category=category,
-                    created_by=request.user,
-                    team=team,
-                    pricing = False
-                )
+                
+                proposal.skill.set(proposalformfour.cleaned_data['skill'])
+                proposal.slug = slugify(proposal.title)
+                proposal.save()
 
-            proposal.skill.set(proposalformfour.cleaned_data['skill'])
-            proposal.slug = slugify(proposal.title)
-            proposal.save()
-            
-            if proposal.pk:# Implying that proposal was created
-                # Clear session data
                 del request.session['post_step_one']
                 del request.session['post_step_two']
                 del request.session['post_step_three']
                 del request.session['pricing_data_type']
 
-            return render(request, 'proposals/partials/create_steps.html', {'variable': 'stepFive', 'proposal':proposal})
+                return render(request, 'proposals/partials/create_steps.html', {'variable': 'stepFive', 'proposal':proposal})
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, 'Error occured in some steps.')
     else:
         # Get initial form data from session if available
         initial_data = request.session.get('post_step_four', {})

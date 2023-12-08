@@ -28,6 +28,7 @@ class DynamicHostMiddleware:
 
         settings.SITE_ID = site.pk
         request.site = site
+        
         set_thread_variable('current_site', request.site)
 
         request.parent_site = getattr(site, 'websitesetting', None)
@@ -36,7 +37,7 @@ class DynamicHostMiddleware:
         if request.parent_site:
             set_thread_variable('parent_site', request.parent_site.pk)
         elif request.merchant:
-            set_thread_variable('merchant', request.merchant.pk)
+            set_thread_variable('merchant', request.merchant)
 
         response = self.get_response(request)
         return response
