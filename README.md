@@ -1,3 +1,5 @@
+THIS REPOSITORY HAS BEEN MADE PUBLIC FOR EMPLOYER ACCESS. PLEASE CONSULT WITH AUTO IF YOU WANT TO REPRODUCE FOR COMMERCIAL PURPOSES
+
 **TROSGATE SOFTWARE OVERVIEW**
 
 Trosgate Marketplace stands out as a distinctive multi-tenant SaaS web application tailored for individuals or companies in the freelancing industry. It dynamically provisions instances resembling popular freelance platforms like Freelancer or Upwork for each merchant, offering not only software but also hosting with customizable domains. Beta testers have emphasized that Trosgate surpasses typical freelance marketplaces, featuring over 18 independent apps and various modules, showcasing its robust and comprehensive capabilities. See entire workflow in pdf.
