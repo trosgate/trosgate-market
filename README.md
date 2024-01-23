@@ -26,6 +26,7 @@ The Master Products Available
 
 9. **Country-specific Checkout Gateways**: Tailor your payment experience with our country-specific checkout gateways, accommodating diverse payment methods and preferences worldwide.
 
+**KEY FEATURES**
 
 Once a marchant is onboarded, that business has full functionality of any popular freelance marketplace with country-specific features. 
 
